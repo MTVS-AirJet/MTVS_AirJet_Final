@@ -4,4 +4,5 @@
 #include "Modules/ModuleManager.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, MTVS_AirJet_Final, "MTVS_AirJet_Final" );
- 
+
+DEFINE_LOG_CATEGORY(AIRJET_LOG);
