@@ -8,6 +8,8 @@ public class MTVS_AirJet_Final : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "UMG",
+                                                            "OnlineSubsystem", "OnlineSubsystemSteam", "OnlineSubsystemUtils",
+                                                            "HTTP", "Json", "JsonUtilities", "GameplayTasks", "AudioCapture", "AudioMixer", "OpenCVHelper", "OpenCV" });
 	}
 }
