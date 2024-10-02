@@ -34,7 +34,7 @@ void UK_StreamingUI::NativeConstruct()
 	}
 
 	//ButtonLookSharingScreen->OnClicked.AddDynamic(this , &UWindowList::OnButtonLookSharingScreen);
-	ButtonWindowScreen->OnClicked.AddDynamic(this , &UWindowList::OnButtonWindowScreen);
+	ButtonWindowScreen->OnClicked.AddDynamic(this , &UK_StreamingUI::OnButtonWindowScreen);
 	ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 	ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 
@@ -137,25 +137,25 @@ void UK_StreamingUI::OnButtonWindowScreen()
 		//IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>(
 		//	"PixelStreaming");
 
-		if ( PixelStreamingModule )
-		{
-			// 2. 스트리머를 가져옵니다.
-			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
+		//if ( PixelStreamingModule )
+		//{
+		//	// 2. 스트리머를 가져옵니다.
+		//	TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
 
-			if ( Streamer.IsValid() )
-			{
-				// 4. 스트리밍을 시작합니다.
-				Streamer->StopStreaming();
-			}
-			else
-			{
-				UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
-		}
+		//	if ( Streamer.IsValid() )
+		//	{
+		//		// 4. 스트리밍을 시작합니다.
+		//		Streamer->StopStreaming();
+		//	}
+		//	else
+		//	{
+		//		UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
+		//	}
+		//}
+		//else
+		//{
+		//	UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
+		//}
 	}
 }
 
@@ -286,5 +286,5 @@ void UK_StreamingUI::InitProcessListUI()
 
 	//	Row++;
 	//}
-}
+
 }

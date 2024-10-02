@@ -1,4 +1,4 @@
-{
+﻿{
 	"FileVersion": 3,
 	"EngineAssociation": "5.4",
 	"Category": "",
@@ -44,6 +44,10 @@
 		},
 		{
 			"Name": "PixelStreamingPlayer",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
 		}
 	]
