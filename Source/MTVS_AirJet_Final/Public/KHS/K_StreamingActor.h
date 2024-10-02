@@ -55,12 +55,11 @@ public:
     void UpdateTexture();  // 매 프레임 텍스처를 업데이트하는 함수
 
 
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UTexture2D* imageTexture;  // OpenCV에서 처리된 화면 이미지를 저장하는 Unreal Engine의 텍스처
-
     cv::VideoCapture capture;  // OpenCV에서 비디오 캡처를 위한 객체
     cv::Mat image;  // OpenCV의 Mat 타입으로 화면 이미지를 저장할 객체
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UTexture2D* imageTexture;  // OpenCV에서 처리된 화면 이미지를 저장하는 텍스처
 
     // 캡처할 특정 창의 핸들을 저장하는 변수
     HWND TargetWindowHandle;  // 특정 창의 핸들을 저장
@@ -86,7 +85,8 @@ public:
     //==========================================================================
 public:
     
-    void SetViewSharingUserID(FString ID, const bool& bAddPlayer);  // 주어진 사용자 ID를 설정하여 화면 공유를 시작하는 함수
+    UFUNCTION(BlueprintCallable, Category = "PixelStreaming")
+	void SetViewSharingUserID(FString ID, const bool& bAddPlayer);  // 주어진 사용자 ID를 설정하여 화면 공유를 시작하는 함수
 
     // 블루프린트에서 호출할 수 있는 함수 정의
     void StopLookSharingScreen();  // 화면 공유를 중지하는 함수
@@ -97,14 +97,16 @@ public:
 
     void ChangeLookSharingScreen();  // 화면 공유를 다른 사용자 시점으로 변경하는 함수
 
-    UPROPERTY(BlueprintReadWrite)  
-    FString UserID;  // 픽셀 스트리밍에서 사용하는 사용자 ID
+    UPROPERTY(BlueprintReadWrite, Category = "PixelStreaming")
+	FString UserID; //픽셀 스트리밍 아이디
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")  
-    class UStaticMeshComponent* WindowScreenPlaneMesh;  // 화면 공유를 위한 평면 메쉬 컴포넌트
+    TSharedPtr<class IPixelStreamingStreamer> CurrentStreamer;
 
-    UPROPERTY(EditDefaultsOnly)  
-    TSubclassOf<UUserWidget> WindowListFactory;  // 창 목록을 표시할 UUserWidget 서브클래스
+    UPROPERTY(EditDefaultsOnly , BlueprintReadWrite , Category = "Components")
+	class UStaticMeshComponent* WindowScreenPlaneMesh; //픽셀 스트리밍 하는 Plane
+
+    UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> WindowListFactory;  // 창 목록을 표시할 UUserWidget 서브클래스
 
     UPROPERTY(BlueprintReadWrite) 
     class UK_StreamingUI* WindowList;  // 픽셀 스트리밍 화면을 표시할 UI 위젯
@@ -115,9 +117,8 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture") 
     class USceneCaptureComponent2D* SceneCapture;  // 2D 장면 캡처 컴포넌트
 
-    // ==========MetaRealm 게임 상태 관련 변수 및 함수==========
-
-    //UPROPERTY()  // Unreal 엔진의 UPROPERTY 매크로를 사용한 변수 선언
-    //class AMetaRealmGameState* gs;  // 게임 상태를 저장할 변수
+    //==========화면공유 추가
+	//UPROPERTY()
+	//class AMetaRealmGameState* gs;
 
 };
