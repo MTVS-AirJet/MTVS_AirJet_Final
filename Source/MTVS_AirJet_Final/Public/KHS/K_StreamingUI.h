@@ -42,7 +42,7 @@ public:
     void OnButtonLookSharingScreen();  
 
     // StreamingActor를 설정하는 함수
-    void SetScreenActor(class AScreenActor* Actor);  
+    void SetScreenActor(class AK_StreamingActor* Actor);
 
     // 현재 온라인 세션의 ID를 반환하는 함수
     FString GetCurrentSessionID();  
