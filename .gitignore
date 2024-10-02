@@ -75,3 +75,5 @@ DerivedDataCache/*
 .ignore
 /.vscode
 *.code-workspace
+.clangd
+.clang-format
