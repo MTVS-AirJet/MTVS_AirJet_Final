@@ -75,3 +75,6 @@ DerivedDataCache/*
 .ignore
 /.vscode
 *.code-workspace
+.idea/.idea.MTVS_AirJet_Final/.idea/vcs.xml
+.idea/.idea.MTVS_AirJet_Final/.idea/indexLayout.xml
+.idea/.idea.MTVS_AirJet_Final/.idea/encodings.xml
