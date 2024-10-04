@@ -5,7 +5,9 @@
 #include "Containers/Map.h"
 #include "Containers/UnrealString.h"
 #include "Dom/JsonObject.h"
+#include "Dom/JsonValue.h"
 #include "Json.h"
+#include "JsonObjectConverter.h"
 #include "JsonUtilities.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -33,6 +35,24 @@ FString UJ_JsonUtility::JsonParse(const FString &jsonData)
     }
 
     return returnStr;
+}
+
+FTempJson UJ_JsonUtility::JsonParseTemp(const FString& jsonData)
+{
+    FTempJson jsonAry;
+
+    FJsonObjectConverter::JsonObjectStringToUStruct<FTempJson>(jsonData, &jsonAry,0,0);
+
+    return jsonAry;
+}
+
+FTempJsonAry UJ_JsonUtility::JsonParseTempAry(const FString& jsonData)
+{
+    FTempJsonAry jsonAry;
+
+    FJsonObjectConverter::JsonObjectStringToUStruct<FTempJsonAry>(jsonData, &jsonAry,0,0);
+
+    return jsonAry;
 }
 
 FString UJ_JsonUtility::MakeJson(const TMap<FString, FString> sourceData)

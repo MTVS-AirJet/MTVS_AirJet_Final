@@ -25,14 +25,32 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString defaultUrl = TEXT("https://jsonplaceholder.typicode.com/");
 
 
 public:
 
 protected:
-    void ReqPost(const FString &url = "");
+	UFUNCTION(BlueprintCallable)
+	void ReqGet(const FString& url = "", bool useDefaultUrl = true);
+
+	void ResGet(FHttpRequestPtr req, FHttpResponsePtr res, bool isSuccess);
+
+	UFUNCTION(BlueprintCallable)
+    void ReqPost(const FString &url = "", bool useDefaultUrl = true);
 
     void ResPost(FHttpRequestPtr req, FHttpResponsePtr res, bool isSuccess);
 
-public:
+	UFUNCTION(BlueprintCallable)
+	void ReqPostTemp(const FString &url = "", bool useDefaultUrl = true);
+
+	void ResPostTemp(FHttpRequestPtr req, FHttpResponsePtr res, bool isSuccess);
+
+	UFUNCTION(BlueprintCallable)
+	void ReqPostTempAry(const FString &url = "", bool useDefaultUrl = true);
+
+	void ResPostTempAry(FHttpRequestPtr req, FHttpResponsePtr res, bool isSuccess);
+
+    public:
 };
