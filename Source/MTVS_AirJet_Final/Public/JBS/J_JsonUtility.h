@@ -4,50 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include <JBS/J_Utility.h>
+#include <JBS/J_JsonManager.h>
 #include "J_JsonUtility.generated.h"
 
 /**
  * 
  */
-// 전송 타입
-UENUM(BlueprintType)
-enum class ERequestType : uint8
-{
-    GET = 0
-    ,POST = 1
-};
 
-// @@ 테스트 용
-USTRUCT(BlueprintType)
-struct FTempJson
-{
-    GENERATED_BODY()
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    int userId;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    int id;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString title;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString body;
 
-    FTempJson() : userId(-1), id(-1), title(TEXT("미정")), body(TEXT("없음")) {}
 
-    FString ToString() const
-    {
-        return FString::Printf(TEXT("userid : %d, id : %d, title : %s, body : %s\n"), userId, id, *title, *body);
-    }
-};
-
-USTRUCT(BlueprintType)
-struct FTempJsonAry
-{
-    GENERATED_BODY()
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FTempJson> tempJsons;
-};
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_JsonUtility : public UBlueprintFunctionLibrary
@@ -60,4 +26,19 @@ public:
 
     static FTempJson JsonParseTemp(const FString& jsonData);
     static FTempJsonAry JsonParseTempAry(const FString& jsonData);
+
+    // 레벨의 jsonManager 찾기
+    static class AJ_JsonManager* GetJsonManager(const UWorld* world);
+
+    // json 요청
+    template<typename InStructType>
+    static void RequestExecute(const UWorld* world, EJsonType type, const InStructType& structData, AJ_JsonManager* manager = nullptr)
+    {
+        // 없으면 찾기
+        if(manager == nullptr)
+            manager = UJ_JsonUtility::GetJsonManager(world);
+        
+        // 요청 시작
+        manager->RequestToServer<InStructType>(type, structData);
+    }
 };

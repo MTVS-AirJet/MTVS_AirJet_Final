@@ -13,6 +13,9 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "Templates/SharedPointer.h"
+#include "Kismet/GameplayStatics.h"
+// #include <JBS/J_JsonManager.h>
+#include <Engine/World.h>
 
 #pragma region 손수 json convert
 FString UJ_JsonUtility::JsonParse(const FString &jsonData)
@@ -75,3 +78,12 @@ FString UJ_JsonUtility::MakeJson(const TMap<FString, FString> sourceData)
 }
 
 #pragma endregion
+
+AJ_JsonManager* UJ_JsonUtility::GetJsonManager(const UWorld* world)
+{
+    auto* jsonManager = Cast<AJ_JsonManager>(
+    UGameplayStatics::GetActorOfClass(world, AJ_JsonManager::StaticClass()));
+    check(jsonManager);
+
+    return jsonManager;
+}

@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <JBS/J_JsonUtility.h>
 #include <Http.h>
+#include <JBS/J_Utility.h>
+#include "JsonObjectConverter.h"
 #include "J_JsonManager.generated.h"
 
 DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
@@ -50,13 +51,21 @@ protected:
 	// 서버에 요청
 	// 구조체 데이터 있음 == 대부분 post 중 일부
 	template<typename InStructType>
-	void ReqData(FResponseDelegate resDel, const InStructType& structData, const FString& url = "", bool useDefaultURL = true, ERequestType type = ERequestType::POST);
+	void ReqData(FResponseDelegate resDel, const InStructType& structData, const FString& url = "", bool useDefaultURL = true, ERequestType type = ERequestType::POST)
+	{
+		// 구조체 -> json 화
+		FString jsonData;
+		FJsonObjectConverter::UStructToJsonObjectString(structData, jsonData, 0, 0);
+
+		ReqData(resDel, url, useDefaultURL, type, jsonData);
+	}
+
 	// 구조체 데이터 없음 == get, post 일부
 	void ReqData(FResponseDelegate resDel, const FString& url = "", bool useDefaultURL = true, ERequestType type = ERequestType::POST, const FString& jsonData = TEXT(""));
 
 	// @@ 테스트용 데이터 주고 받기
 	UFUNCTION(BlueprintCallable)
-	void ReqTempCallback(const FString& url);
+	void ReqTempCallback();
 
 	UFUNCTION()
 	void ResTempCallback(const FString& jsonData, bool isSuccess);
@@ -64,5 +73,23 @@ protected:
 	
 
 public:
+	template<typename InStructType>
+	void RequestToServer(EJsonType type, const InStructType& structData)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s 요청 시작"), *UEnum::GetValueAsString(type)));
+
+		// type 에 따라 다른 req 실행
+		switch(type)
+		{
+			// @@ 이 부분을 또 구조체로 만들어서 enum : struct 같은 느낌으로 가면 좋을지도?
+			case EJsonType::TEMP01_CALLBACK:
+			{
+				tempDel.BindUObject(this, &AJ_JsonManager::ResTempCallback);
+				
+				ReqData<FTempJsonAry>(tempDel, structData, TEXT("https://jsonplaceholder.typicode.com/posts"), false);
+			}
+				break;
+		}
+	}
 	
 };
