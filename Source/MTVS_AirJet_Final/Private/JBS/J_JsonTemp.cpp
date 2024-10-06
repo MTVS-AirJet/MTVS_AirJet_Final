@@ -212,9 +212,15 @@ void AJ_JsonTemp::ResPostTempAry(FHttpRequestPtr req, FHttpResponsePtr res, bool
 {
 	if(isSuccess && res.IsValid())
 	{
+		// json -> 정해진 구조체
 		FString resStr = res->GetContentAsString();
 
-		auto rresult = UJ_JsonUtility::JsonParseTempAry(resStr);
+		FTempJsonAry jsonAry;
+		FJsonObjectConverter::JsonObjectStringToUStruct<FTempJsonAry>(resStr, &jsonAry,0,0);
+
+		// 변환된 구조체가지고 뭔가 하기
+		auto rresult = jsonAry;
+		// auto rresult = UJ_JsonUtility::JsonParseTempAry(resStr);
 
 		FString result;
 		for(auto r : rresult.tempJsons)
@@ -223,7 +229,7 @@ void AJ_JsonTemp::ResPostTempAry(FHttpRequestPtr req, FHttpResponsePtr res, bool
 		}
 		
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *result));
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : %s"), *result));
 		UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
 	}
 	else {

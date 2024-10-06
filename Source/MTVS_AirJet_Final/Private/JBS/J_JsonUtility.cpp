@@ -14,6 +14,7 @@
 #include "Serialization/JsonWriter.h"
 #include "Templates/SharedPointer.h"
 
+#pragma region 손수 json convert
 FString UJ_JsonUtility::JsonParse(const FString &jsonData)
 {
     // 리더기
@@ -24,7 +25,7 @@ FString UJ_JsonUtility::JsonParse(const FString &jsonData)
     FString returnStr = TEXT("");
     if(FJsonSerializer::Deserialize(reader, result))
     {
-        // XXX 만약 json 배열이 들어온다면 내부를 배열로 가져옴
+        // 만약 json 배열이 들어온다면 내부를 배열로 가져옴
         // TArray<TSharedPtr<FJsonValue>> parseDataList = result->GetArrayField(TEXT("items"));
         // for(auto data : parseDataList)
         // {
@@ -72,3 +73,5 @@ FString UJ_JsonUtility::MakeJson(const TMap<FString, FString> sourceData)
 
     return jsonData;
 }
+
+#pragma endregion

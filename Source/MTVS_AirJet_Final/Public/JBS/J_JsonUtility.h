@@ -9,6 +9,14 @@
 /**
  * 
  */
+// 전송 타입
+UENUM(BlueprintType)
+enum class ERequestType : uint8
+{
+    GET = 0
+    ,POST = 1
+};
+
 // @@ 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
