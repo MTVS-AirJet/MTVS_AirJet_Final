@@ -35,6 +35,9 @@ private: // Component
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly)
 	class UArrowComponent* JetArrow;
+public:
+	UPROPERTY(EditDefaultsOnly)
+	class UStaticMeshComponent* JetStaticMesh;
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly)
@@ -102,7 +105,7 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float ValueOfMoveForce = 5000000.f;
+	float ValueOfMoveForce = 5000000.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float ValueOfHeightForce = 1.f;
 	UPROPERTY(EditDefaultsOnly)

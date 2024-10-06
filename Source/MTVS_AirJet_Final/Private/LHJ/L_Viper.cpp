@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "MTVS_AirJet_Final.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -19,10 +20,11 @@ AL_Viper::AL_Viper()
 	if (tmpMesh.Succeeded())
 	{
 		JetMesh->SetSkeletalMesh(tmpMesh.Object);
+		JetMesh->SetSimulatePhysics(true);
 	}
 
 	JetSprintArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArm"));
-	JetSprintArm->SetupAttachment(RootComponent);
+	JetSprintArm->SetupAttachment(JetMesh);
 	JetSprintArm->SetRelativeLocationAndRotation(FVector(-160 , 0 , 400) , FRotator(-10 , 0 , 0));
 	JetSprintArm->TargetArmLength = 2000.f;
 	JetSprintArm->bEnableCameraRotationLag = true;
@@ -32,9 +34,11 @@ AL_Viper::AL_Viper()
 	JetCamera->SetupAttachment(JetSprintArm);
 
 	JetArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("JetArrow"));
-	JetArrow->SetupAttachment(RootComponent);
+	JetArrow->SetupAttachment(JetMesh);
 	JetArrow->SetRelativeLocation(FVector(-1000 , 0 , 0));
 	JetArrow->SetHiddenInGame(false); // For Test
+
+	JetStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetStaticMesh"));
 }
 #pragma endregion
 
@@ -47,14 +51,19 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 	{
-		input->BindAction(IA_ViperEngine , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperEngine);
+		input->BindAction(IA_ViperEngine , ETriggerEvent::Started , this , &AL_Viper::F_ViperEngine);
+
 		input->BindAction(IA_ViperLook , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLook);
+
 		input->BindAction(IA_ViperUp , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperUpTrigger);
 		input->BindAction(IA_ViperUp , ETriggerEvent::Completed , this , &AL_Viper::F_ViperUpCompleted);
+
 		input->BindAction(IA_ViperDown , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperDownTrigger);
 		input->BindAction(IA_ViperDown , ETriggerEvent::Completed , this , &AL_Viper::F_ViperDownCompleted);
+
 		input->BindAction(IA_ViperRight , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperRightTrigger);
 		input->BindAction(IA_ViperRight , ETriggerEvent::Completed , this , &AL_Viper::F_ViperRightCompleted);
+
 		input->BindAction(IA_ViperLeft , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLeftTrigger);
 		input->BindAction(IA_ViperLeft , ETriggerEvent::Completed , this , &AL_Viper::F_ViperLeftCompleted);
 	}
@@ -62,7 +71,9 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 {
-	IsEngineOn = value.Get<bool>();
+	bool b = value.Get<bool>();
+	IsEngineOn = !IsEngineOn;
+	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
 }
 
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
@@ -73,12 +84,13 @@ void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
 {
 	FVector inputVec = value.Get<FVector>();
 
+	IsKeyUpPress = true;
+
 	if (CurrentTime < ChangeTime)
 		return;
 
 	CurrentTime = 0.f;
 	ForceUnitRot = CombineRotate(inputVec);
-	IsKeyUpPress = true;
 }
 
 void AL_Viper::F_ViperUpCompleted(const FInputActionValue& value)
@@ -92,12 +104,13 @@ void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
 {
 	FVector inputVec = value.Get<FVector>();
 
+	IsKeyDownPress = true;
+
 	if (CurrentTime < ChangeTime)
 		return;
 
 	CurrentTime = 0.f;
 	ForceUnitRot = CombineRotate(inputVec);
-	IsKeyDownPress = true;
 }
 
 void AL_Viper::F_ViperDownCompleted(const FInputActionValue& value)
@@ -111,12 +124,13 @@ void AL_Viper::F_ViperRightTrigger(const FInputActionValue& value)
 {
 	FVector inputVec = value.Get<FVector>();
 
+	IsKeyRightPress = true;
+
 	if (CurrentTime < ChangeTime)
 		return;
 
 	CurrentTime = 0.f;
 	ForceUnitRot = CombineRotate(inputVec);
-	IsKeyRightPress = true;
 }
 
 void AL_Viper::F_ViperRightCompleted(const FInputActionValue& value)
@@ -130,12 +144,13 @@ void AL_Viper::F_ViperLeftTrigger(const FInputActionValue& value)
 {
 	FVector inputVec = value.Get<FVector>();
 
+	IsKeyLeftPress = true;
+
 	if (CurrentTime < ChangeTime)
 		return;
 
 	CurrentTime = 0.f;
 	ForceUnitRot = CombineRotate(inputVec);
-	IsKeyLeftPress = true;
 }
 
 void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
@@ -173,6 +188,7 @@ void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//LOG_SCREEN("Roll : %f, Pitch : %f, Yaw : %f" , ForceUnitRot.Roll , ForceUnitRot.Pitch , ForceUnitRot.Yaw);
 	// Add DeltaTime To CurrentTime
 	CurrentTime += DeltaTime;
 
@@ -192,22 +208,21 @@ void AL_Viper::Tick(float DeltaTime)
 	else
 	{
 		JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
+	}
 
-		jetRot = JetArrow->GetRelativeRotation();
-		if (jetRot.Yaw > MaxYawValue)
-		{
-			JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , jetRot.Yaw , MaxYawValue - 1.f));
-			ForceUnitRot = FRotator(0 , 0 , 0);
-		}
-		else if (jetRot.Yaw < MinYawValue)
-		{
-			JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , jetRot.Yaw , MinYawValue + 1.f));
-			ForceUnitRot = FRotator(0 , 0 , 0);
-		}
-		else
-		{
-			JetArrow->AddRelativeRotation(FRotator(0 , ForceUnitRot.Yaw , 0));
-		}
+	if (jetRot.Yaw > MaxYawValue)
+	{
+		JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MaxYawValue - 1.f , jetRot.Roll));
+		ForceUnitRot = FRotator(0 , 0 , 0);
+	}
+	else if (jetRot.Yaw < MinYawValue)
+	{
+		JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MinYawValue + 1.f , jetRot.Roll));
+		ForceUnitRot = FRotator(0 , 0 , 0);
+	}
+	else
+	{
+		JetArrow->AddRelativeRotation(FRotator(0 , ForceUnitRot.Yaw , 0));
 	}
 #pragma endregion
 
@@ -215,33 +230,40 @@ void AL_Viper::Tick(float DeltaTime)
 	if (IsEngineOn)
 	{
 		// Add Force
+		LOG_S(Warning , TEXT("======================="));
 		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-		FVector forceLoc = JetMesh->GetRelativeLocation();
-		JetMesh->AddForceAtLocation(forceVec , forceLoc);
+		LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
+		FVector forceLoc = JetStaticMesh->GetComponentLocation();
+		LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
+		if (JetStaticMesh->IsSimulatingPhysics())
+			JetStaticMesh->AddForceAtLocation(forceVec , forceLoc);
 
-		// Move Up & Down
-		jetRot = JetArrow->GetRelativeRotation();
-		JetMesh->AddForceAtLocation(FVector(0 , 0 , jetRot.Pitch * ValueOfHeightForce) , HeightForceLoc);
-
-		// Rotate
-		jetRot = JetArrow->GetRelativeRotation();
-		JetMesh->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
+		// // Move Up & Down
+		// jetRot = JetArrow->GetRelativeRotation();
+		// JetMesh->AddForceAtLocation(FVector(0 , 0 , jetRot.Pitch * ValueOfHeightForce) , HeightForceLoc);
+		//
+		// // Rotate
+		// jetRot = JetArrow->GetRelativeRotation();
+		// JetMesh->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
 	}
 #pragma endregion
-
+	/*
 #pragma region Reset Jet Arrow
 	if (IsKeyUpPress || IsKeyDownPress)
 	{
 		jetRot = JetArrow->GetRelativeRotation();
-		ForceUnitRot = FRotator(jetRot.Pitch * ValueOfArrowReset , ForceUnitRot.Yaw , ForceUnitRot.Roll);
-		JetArrow->AddRelativeRotation(ForceUnitRot);
+		float newPitch = jetRot.Pitch * ValueOfArrowReset;
+		ForceUnitRot = FRotator(newPitch , ForceUnitRot.Yaw , ForceUnitRot.Roll);
+		JetArrow->AddRelativeRotation(FRotator(newPitch , 0 , 0));
 	}
 
 	if (IsKeyRightPress || IsKeyLeftPress)
 	{
 		jetRot = JetArrow->GetRelativeRotation();
-		ForceUnitRot = FRotator(ForceUnitRot.Pitch , jetRot.Yaw * ValueOfArrowReset , ForceUnitRot.Roll);
-		JetArrow->AddRelativeRotation(ForceUnitRot);
+		float newYaw = jetRot.Yaw * ValueOfArrowReset;
+		ForceUnitRot = FRotator(ForceUnitRot.Pitch , newYaw , ForceUnitRot.Roll);
+		JetArrow->AddRelativeRotation(FRotator(0 , newYaw , 0));
 	}
 #pragma endregion
+*/
 }
