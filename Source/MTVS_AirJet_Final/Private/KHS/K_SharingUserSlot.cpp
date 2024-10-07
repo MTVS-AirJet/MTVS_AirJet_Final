@@ -19,7 +19,6 @@ void UK_SharingUserSlot::NativeConstruct()
         break;
     }
 
-    //WindowList = CastChecked<UWindowList>(CreateWidget(GetWorld() , WindowListFactory));
     auto* pc = Cast<AK_PlayerController>(GetWorld()->GetFirstPlayerController());
     StreamingUI = pc->StreamingUI;
 
@@ -45,7 +44,7 @@ void UK_SharingUserSlot::SetUserID(FString ID)
 // 사용자 ID 버튼 클릭 시 호출될 함수
 void UK_SharingUserSlot::OnUserIDButtonClicked()
 {
-    // 버튼 클릭 시 발생하는 이벤트, 다른 스트리머의 화면을 볼 수 있어야함
+   // 버튼 클릭 시 발생하는 이벤트, 다른 스트리머의 화면을 볼 수 있어야함
    //아이디 전환
    //ScreenActor->ChangeLookSharingScreen();
     if ( StreamingUI )

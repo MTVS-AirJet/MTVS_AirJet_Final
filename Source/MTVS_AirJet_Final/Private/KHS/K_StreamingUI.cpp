@@ -4,7 +4,6 @@
 #include "KHS/K_StreamingUI.h"
 #include "KHS/K_StreamingActor.h"
 #include "KHS/K_SharingUserSlot.h"
-//#include "NetGameInstance.h"
 #include "MTVS_AirJet_FinalCharacter.h"
 
 #include "EngineUtils.h"
@@ -165,25 +164,23 @@ void UK_StreamingUI::OnButtonLookSharingScreen()
 	bLookStreaming = !bLookStreaming;
 	if ( bLookStreaming )
 	{
+		ScreenActor->userID = "No Session Found";
 		// 레벨에 배치된 ScreenActor를 찾음
 		for ( TActorIterator<AK_StreamingActor> It(GetWorld() , AK_StreamingActor::StaticClass()); It; ++It )
 		{
 			ScreenActor = *It;
 			break;
 		}
-		//TextLookSharingScreen->SetText(FText::FromString(TEXT("Watching"))); //보는중
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 		//블루프린트 subs
 		ScreenActor->ChangeLookSharingScreen();
 	}
 	else
 	{
-		//TextLookSharingScreen->SetText(FText::FromString(TEXT("Screen Look"))); //화면 보기
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 		//블루프린트 subs
 		ScreenActor->StopLookSharingScreen();
 		WindowList->ClearChildren();
-		//ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

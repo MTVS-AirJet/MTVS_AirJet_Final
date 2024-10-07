@@ -94,6 +94,8 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture") 
     class USceneCaptureComponent2D* SceneCapture;  // 2D 장면 캡처 컴포넌트
 
+    FString userID;
+
     //==========화면공유 추가
 	//UPROPERTY()
 	//class AMetaRealmGameState* gs;

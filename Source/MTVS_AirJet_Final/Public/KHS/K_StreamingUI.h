@@ -51,7 +51,6 @@ public:
     void InitSlot(TArray<FString> Items);  
     
 
-
     //==========================================================================
     //  Variables, Instance
     //==========================================================================
@@ -69,12 +68,7 @@ public:
     class UTextBlock* TextLookSharingScreen;  // ButtonLookSharingScreen의 상태를 나타내는 텍스트 블록 (예: "Screen Look", "Watching")
     UPROPERTY(meta = (BindWidget)) 
     class UImage* ImageSharingScreen;  // 공유된 화면을 표시할 이미지 컴포넌트
-    //UPROPERTY(meta = (BindWidget))  
-    //class UImage* ImageCoveringScreen;  // 화면을 덮는 이미지 (특정 상태에서 화면을 가리거나 가림을 표시할 때 사용)
-    // ==========특정 화면 공유 부분==========
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget)) 
-    //class UUniformGridPanel* ProcessList;  // 현재 실행되고 있는 창의 목록을 표시할 그리드 패널
-
+    
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)  
     TSubclassOf<UUserWidget> SharingUserSlotFactory;  // 창 목록에서 사용자 정보를 표시할 위젯 템플릿
@@ -92,10 +86,8 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture", meta = (AllowPrivateAccess = "true"))  
     class USceneCaptureComponent2D* SceneCapture;  // 화면을 캡처하는 장면 캡처 컴포넌트
-
     
     TSharedPtr<class FPixelStreamingVideoInputRenderTarget> VideoInput; // 화면 캡처 결과를 저장할 렌더 타겟
-
    
 
 private:

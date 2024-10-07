@@ -90,7 +90,6 @@ AK_StreamingActor::AK_StreamingActor()
     SceneCapture->CaptureSource = SCS_FinalColorLDR;  // 캡처 소스를 최종 컬러 LDR로 설정합니다.
     SceneCapture->TextureTarget = RenderTarget;  // 캡처한 내용을 RenderTarget에 저장합니다.
 
-    
 }
 
 // Called when the game starts or when spawned
@@ -104,9 +103,9 @@ void AK_StreamingActor::BeginPlay()
     sceneComp->AttachToComponent(playerCamera , FAttachmentTransformRules::SnapToTargetIncludingScale); //카메라 붙이기
 
     // Z 축이 카메라를 향하도록 회전
-    DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0) , this);
-    WindowScreenPlaneMesh->SetMaterial(0 , DynamicMaterial);
-    WindowScreenPlaneMesh->SetRelativeLocationAndRotation(FVector(400 , 0 , 0) , FRotator(0 , 90 , 90));
+	DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0) , this);
+	WindowScreenPlaneMesh->SetMaterial(0 , DynamicMaterial);
+	WindowScreenPlaneMesh->SetRelativeLocationAndRotation(FVector(400 , 0 , 0) , FRotator(0 , 90 , 90));
 
     //GameState클래스 만들고나서 다시 살리기(플레이어 가져오는거..학주한테 물어봐서 처리)
     auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
@@ -123,7 +122,6 @@ void AK_StreamingActor::BeginPlay()
     {
         UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
     }
-
 }
 
 // Called every frame
@@ -140,15 +138,13 @@ void AK_StreamingActor::Tick(float DeltaTime)
         TimeAccumulator = 0.0f;
         UpdateTexture();  // 일정 시간 간격으로만 업데이트
     }
-
 }
-
 
 // 매 프레임 텍스처를 업데이트하는 함수
 void AK_StreamingActor::UpdateTexture()
 {
  
-    if ( DynamicMaterial && imageTexture && WindowScreenPlaneMesh )
+    if ( DynamicMaterial && WindowScreenPlaneMesh )
     {
         // BaseTexture 파라미터에 텍스처 설정
         DynamicMaterial->SetTextureParameterValue(TEXT("Base") , imageTexture);
@@ -219,7 +215,6 @@ void AK_StreamingActor::BeginLookSharingScreen()
     if ( Function )
     {
         // 블루프린트 함수 호출 (매개변수가 없는 경우)
-        FString userID = "Editor";
         ProcessEvent(Function , &userID);
     }
     else
@@ -238,10 +233,9 @@ void AK_StreamingActor::ChangeLookSharingScreen()
     UFunction* Function = FindFunction(FunctionName);
 
     if ( Function )
-    {
-        FString userID = "Editor";
+    {  
         // 블루프린트 함수 호출 (매개변수가 없는 경우)
-        ProcessEvent(Function , &userID);
+        ProcessEvent(Function, &userID);
     }
     else
     {

@@ -61,6 +61,12 @@ void AMTVS_AirJet_FinalCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	if ( IsLocallyControlled() )
+	{
+		InitStreamingUI();
+		UE_LOG(LogTemp, Warning, TEXT("==========================Streaming!!!"));
+	}
 }
 
 
@@ -183,7 +189,7 @@ void AMTVS_AirJet_FinalCharacter::InitStreamingUI()
 		StreamingUI = pc->StreamingUI;
 
 		StreamingUI->AddToViewport(1);
-		StreamingUI->SetVisibility(ESlateVisibility::Hidden);
+		StreamingUI->SetVisibility(ESlateVisibility::Visible);
 	}
 	else
 	{
