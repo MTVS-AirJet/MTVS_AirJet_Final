@@ -16,6 +16,8 @@ DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
 
 DECLARE_DELEGATE_OneParam(FResSimpleDelegate, const FResSimple&);
 
+// _One~ _NineParams 까지 가능
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
 {

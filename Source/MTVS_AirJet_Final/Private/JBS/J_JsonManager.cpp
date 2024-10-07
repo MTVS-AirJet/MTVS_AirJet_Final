@@ -5,6 +5,7 @@
 #include "Engine/Engine.h"
 #include "JBS/J_Utility.h"
 #include <JBS/J_JsonUtility.h>
+#include <KHS/K_GameInstance.h>
 
 // Sets default values
 AJ_JsonManager::AJ_JsonManager()
@@ -42,7 +43,7 @@ void AJ_JsonManager::ReqLogin()
 
 void AJ_JsonManager::ReqTempAuth()
 {
-	auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
 	gi->tempLoginAuthUseDel.BindUObject(this, &AJ_JsonManager::OnLoginAuthData);
 
 	UJ_JsonUtility::RequestExecute<FLogin>(GetWorld(), EJsonType::TEMP02_AUTH, tempLogin);

@@ -6,7 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include <JBS/J_Utility.h>
 #include <JBS/J_JsonManager.h>
-#include <JBS/J_GameInstance.h>
+#include <KHS/K_GameInstance.h>
 #include "J_JsonUtility.generated.h"
 
 /**
@@ -35,11 +35,11 @@ public:
 
     // json 요청
     template<typename InStructType>
-    static void RequestExecute(const UWorld* world, EJsonType type, const InStructType& structData, UJ_GameInstance* gameInstance = nullptr)
+    static void RequestExecute(const UWorld* world, EJsonType type, const InStructType& structData, UK_GameInstance* gameInstance = nullptr)
     {
         // 없으면 찾기
         if(gameInstance == nullptr)
-            gameInstance = UJ_Utility::GetJGameInstance(world);
+            gameInstance = UJ_Utility::GetKGameInstance(world);
         
         // 요청 시작
         gameInstance->RequestToServer<InStructType>(type, structData);

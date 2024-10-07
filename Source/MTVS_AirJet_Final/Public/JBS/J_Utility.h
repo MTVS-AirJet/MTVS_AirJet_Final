@@ -138,5 +138,7 @@ class MTVS_AIRJET_FINAL_API UJ_Utility : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-    static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
+    // static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
+
+    static class UK_GameInstance* GetKGameInstance(const UWorld* world);
 };
