@@ -22,7 +22,83 @@ UENUM(BlueprintType)
 enum class EJsonType : uint8
 {
     TEMP01_CALLBACK = 0
+    ,SIGN_UP
+    ,LOGIN
+    ,TEMP02_AUTH
 };
+
+#pragma region 웹 통신 용 구조체
+
+#pragma region 요청단
+USTRUCT(BlueprintType)
+struct FSignup
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString loginId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString password;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString confirmPassword;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString nickname;
+
+    FSignup() : loginId(TEXT("미설정")), password(TEXT("미설정")), confirmPassword(TEXT("미설정")), nickname(TEXT("미설정")) {}
+
+    FSignup(FString loginId ,FString password ,FString confirmPassword ,FString nickname) 
+        : loginId(loginId)
+        ,password(password)
+        ,confirmPassword(confirmPassword)
+        ,nickname(nickname) {}
+};
+
+USTRUCT(BlueprintType)
+struct FLogin
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString loginId;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString password;
+
+    FLogin() : loginId(TEXT("미설정")), password(TEXT("미설정")) {}
+
+    FLogin(FString loginId ,FString password) 
+        : loginId(loginId)
+        ,password(password) {}
+};
+
+#pragma endregion
+
+#pragma region 반환단
+
+USTRUCT(BlueprintType)
+struct FResSimple
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool success;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString response;
+
+    FResSimple() : success(false), response(TEXT("미설정")) {}
+
+    FString ToString()
+    {
+        FString str = FString::Printf(TEXT("성공 여부 : %s\n응답 결과 데이터 : %s")
+            , this->success ? TEXT("TRUE") : TEXT("FALSE")
+            , *this->response);
+
+        return str;
+    }
+};
+
+#pragma endregion
+
+#pragma endregion
 
 // @@ 테스트 용
 USTRUCT(BlueprintType)
@@ -60,5 +136,7 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_Utility : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
+public:
+    static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
 };

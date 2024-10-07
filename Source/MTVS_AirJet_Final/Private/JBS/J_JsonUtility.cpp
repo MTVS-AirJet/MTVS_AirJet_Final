@@ -14,7 +14,7 @@
 #include "Serialization/JsonWriter.h"
 #include "Templates/SharedPointer.h"
 #include "Kismet/GameplayStatics.h"
-// #include <JBS/J_JsonManager.h>
+#include <JBS/J_GameInstance.h>
 #include <Engine/World.h>
 
 #pragma region 손수 json convert

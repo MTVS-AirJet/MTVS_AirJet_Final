@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include <JBS/J_Utility.h>
 #include <JBS/J_JsonManager.h>
+#include <JBS/J_GameInstance.h>
 #include "J_JsonUtility.generated.h"
 
 /**
@@ -30,15 +31,17 @@ public:
     // 레벨의 jsonManager 찾기
     static class AJ_JsonManager* GetJsonManager(const UWorld* world);
 
+    // 게임 인스턴스 가져오기
+
     // json 요청
     template<typename InStructType>
-    static void RequestExecute(const UWorld* world, EJsonType type, const InStructType& structData, AJ_JsonManager* manager = nullptr)
+    static void RequestExecute(const UWorld* world, EJsonType type, const InStructType& structData, UJ_GameInstance* gameInstance = nullptr)
     {
         // 없으면 찾기
-        if(manager == nullptr)
-            manager = UJ_JsonUtility::GetJsonManager(world);
+        if(gameInstance == nullptr)
+            gameInstance = UJ_Utility::GetJGameInstance(world);
         
         // 요청 시작
-        manager->RequestToServer<InStructType>(type, structData);
+        gameInstance->RequestToServer<InStructType>(type, structData);
     }
 };
