@@ -148,37 +148,37 @@ void UK_GameInstance::RequestToServer(EJsonType type, const FString &sendJsonDat
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("%s 요청 시작"), *UEnum::GetValueAsString(type)));
 
 	// type 에 따라 다른 req 실행
-		switch(type)
-		{
-			// @@ 이 부분을 또 구조체로 만들어서 enum : struct 같은 느낌으로 가면 좋을지도?
-			case EJsonType::TEMP01_CALLBACK:
-			{
-				tempDel.BindUObject(this, &UK_GameInstance::ResTempCallback);
-				
-				ReqData(tempDel, sendJsonData, TEXT("https://jsonplaceholder.typicode.com/posts"), false);
-				break;
-			}
-			case EJsonType::SIGN_UP:
-			{
-				signupDel.BindUObject(this, &UK_GameInstance::ResSignup);
-				
-				ReqData(signupDel, sendJsonData, TEXT("auth/signup"));
-				break;
-			}
-			case EJsonType::LOGIN:
-			{
-				loginDel.BindUObject(this, &UK_GameInstance::ResLogin);
-				
-				ReqData(loginDel, sendJsonData, TEXT("auth/login"));
-				break;
-			}
-			case EJsonType::TEMP02_AUTH:
-			{
-				tempLoginAuthDel.BindUObject(this, &UK_GameInstance::ResLoginAuth);
-				ReqData(tempLoginAuthDel, sendJsonData, TEXT("test"));
-				break;
-			}
-		}
+    switch(type)
+    {
+        // @@ 이 부분을 또 구조체로 만들어서 enum : struct 같은 느낌으로 가면 좋을지도?
+        case EJsonType::TEMP01_CALLBACK:
+        {
+            tempDel.BindUObject(this, &UK_GameInstance::ResTempCallback);
+            
+            ReqData(tempDel, sendJsonData, TEXT("https://jsonplaceholder.typicode.com/posts"), false);
+            break;
+        }
+        case EJsonType::SIGN_UP:
+        {
+            signupDel.BindUObject(this, &UK_GameInstance::ResSignup);
+            
+            ReqData(signupDel, sendJsonData, TEXT("auth/signup"));
+            break;
+        }
+        case EJsonType::LOGIN:
+        {
+            loginDel.BindUObject(this, &UK_GameInstance::ResLogin);
+            
+            ReqData(loginDel, sendJsonData, TEXT("auth/login"));
+            break;
+        }
+        case EJsonType::TEMP02_AUTH:
+        {
+            tempLoginAuthDel.BindUObject(this, &UK_GameInstance::ResLoginAuth);
+            ReqData(tempLoginAuthDel, sendJsonData, TEXT("test"));
+            break;
+        }
+    }
 }
 
 
