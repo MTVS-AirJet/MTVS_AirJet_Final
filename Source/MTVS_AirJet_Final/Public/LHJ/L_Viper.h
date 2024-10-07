@@ -28,6 +28,8 @@ public:
 
 private: // Component
 	UPROPERTY(EditDefaultsOnly)
+	class UBoxComponent* JetRoot;
+	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* JetMesh;
 	UPROPERTY(EditDefaultsOnly)
 	class USpringArmComponent* JetSprintArm;
@@ -35,9 +37,6 @@ private: // Component
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly)
 	class UArrowComponent* JetArrow;
-public:
-	UPROPERTY(EditDefaultsOnly)
-	class UStaticMeshComponent* JetStaticMesh;
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly)
@@ -105,13 +104,13 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float ValueOfMoveForce = 5000000.0f;
+	float ValueOfMoveForce = 1000000.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float ValueOfHeightForce = 1.f;
 	UPROPERTY(EditDefaultsOnly)
 	FVector HeightForceLoc = FVector(1000 , 0 , 0);
 	UPROPERTY(EditDefaultsOnly)
-	float ValueOfDivRot = 50.f;
+	float ValueOfDivRot = 500.f;
 	UPROPERTY(EditDefaultsOnly)
 	float ValueOfArrowReset = -.1f;
 };

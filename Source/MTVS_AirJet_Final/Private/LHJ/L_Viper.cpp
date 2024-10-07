@@ -5,6 +5,7 @@
 #include "MTVS_AirJet_Final.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -13,14 +14,22 @@ AL_Viper::AL_Viper()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	JetRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRoot"));
+	RootComponent = JetRoot;
+	JetRoot->SetSimulatePhysics(true);
+	JetRoot->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	// 공기저항
+	JetRoot->SetLinearDamping(1.f);
+	JetRoot->SetAngularDamping(1.f);
+
 	JetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("JetMesh"));
-	RootComponent = JetMesh;
+	JetMesh->SetupAttachment(JetRoot);
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh(TEXT(
 		"/Script/Engine.SkeletalMesh'/Game/VigilanteContent/Vehicles/West_Fighter_F18C/SK_West_Fighter_F18C.SK_West_Fighter_F18C'"));
 	if (tmpMesh.Succeeded())
 	{
 		JetMesh->SetSkeletalMesh(tmpMesh.Object);
-		JetMesh->SetSimulatePhysics(true);
 	}
 
 	JetSprintArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArm"));
@@ -37,8 +46,6 @@ AL_Viper::AL_Viper()
 	JetArrow->SetupAttachment(JetMesh);
 	JetArrow->SetRelativeLocation(FVector(-1000 , 0 , 0));
 	JetArrow->SetHiddenInGame(false); // For Test
-
-	JetStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetStaticMesh"));
 }
 #pragma endregion
 
@@ -232,19 +239,21 @@ void AL_Viper::Tick(float DeltaTime)
 		// Add Force
 		LOG_S(Warning , TEXT("======================="));
 		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-		LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
-		FVector forceLoc = JetStaticMesh->GetComponentLocation();
-		LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
-		if (JetStaticMesh->IsSimulatingPhysics())
-			JetStaticMesh->AddForceAtLocation(forceVec , forceLoc);
+		//LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
+		FVector forceLoc = JetRoot->GetComponentLocation();
+		//LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
+		if (JetRoot->IsSimulatingPhysics())
+			JetRoot->AddForceAtLocation(forceVec , forceLoc);
 
-		// // Move Up & Down
-		// jetRot = JetArrow->GetRelativeRotation();
-		// JetMesh->AddForceAtLocation(FVector(0 , 0 , jetRot.Pitch * ValueOfHeightForce) , HeightForceLoc);
-		//
-		// // Rotate
-		// jetRot = JetArrow->GetRelativeRotation();
-		// JetMesh->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
+		// Move Up & Down
+		jetRot = JetArrow->GetRelativeRotation();
+		float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * -10.f;
+		LOG_S(Warning , TEXT("zRot %f") , zRot);
+		JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+
+		// Rotate
+		jetRot = JetArrow->GetRelativeRotation();
+		JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
 	}
 #pragma endregion
 	/*
