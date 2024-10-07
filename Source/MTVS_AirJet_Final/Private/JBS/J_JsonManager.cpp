@@ -3,15 +3,7 @@
 
 #include "JBS/J_JsonManager.h"
 #include "Engine/Engine.h"
-#include "HttpModule.h"
-#include "Interfaces/IHttpRequest.h"
-#include "JBS/J_JsonUtility.h"
 #include "JBS/J_Utility.h"
-#include "JsonObjectConverter.h"
-#include "Math/UnrealMathUtility.h"
-#include "Serialization/JsonTypes.h"
-#include "Templates/SharedPointer.h"
-#include "Templates/SharedPointerFwd.h"
 #include <JBS/J_JsonUtility.h>
 
 // Sets default values
@@ -36,6 +28,8 @@ void AJ_JsonManager::Tick(float DeltaTime)
 
 }
 
+
+
 void AJ_JsonManager::ReqSignup()
 {
 	UJ_JsonUtility::RequestExecute<FSignup>(GetWorld(), EJsonType::SIGN_UP, tempSignup);
@@ -48,5 +42,14 @@ void AJ_JsonManager::ReqLogin()
 
 void AJ_JsonManager::ReqTempAuth()
 {
+	auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	gi->tempLoginAuthUseDel.BindUObject(this, &AJ_JsonManager::OnLoginAuthData);
+
 	UJ_JsonUtility::RequestExecute<FLogin>(GetWorld(), EJsonType::TEMP02_AUTH, tempLogin);
+}
+
+void AJ_JsonManager::OnLoginAuthData(const FResSimple &resData)
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("asd"));
+	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
 }

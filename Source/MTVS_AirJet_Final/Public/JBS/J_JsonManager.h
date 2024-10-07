@@ -9,7 +9,7 @@
 #include "JsonObjectConverter.h"
 #include "J_JsonManager.generated.h"
 
-DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
+// DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_JsonManager : public AActor
@@ -29,27 +29,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	// 기본 ip
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FString defaultURL = TEXT("http://125.132.216.190:7757/api/");
-	// 인증값 // 로그인 시 받아옴
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FString authorValue = TEXT("");
-
 	// @@ 임시 요청 데이터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FSignup tempSignup;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FLogin tempLogin;
 
-	
-
-
 public:
 
 protected:
-	// @@ 임시 요청 단
-	// 나중엔 실제 요청하는 요소요소에 넣을것
 	UFUNCTION(BlueprintCallable)
 	void ReqSignup();
 
@@ -59,8 +47,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ReqTempAuth();
 
+	// @@ 테스트용 로그인 인증 데이터 받기
+	UFUNCTION(BlueprintCallable)
+	void OnLoginAuthData(const FResSimple &resData);
+
     public:
-
-
-	
 };

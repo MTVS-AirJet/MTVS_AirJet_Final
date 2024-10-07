@@ -86,7 +86,7 @@ struct FResSimple
 
     FResSimple() : success(false), response(TEXT("미설정")) {}
 
-    FString ToString()
+    FString ToString() const
     {
         FString str = FString::Printf(TEXT("성공 여부 : %s\n응답 결과 데이터 : %s")
             , this->success ? TEXT("TRUE") : TEXT("FALSE")
