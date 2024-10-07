@@ -7,9 +7,10 @@
 AMTVS_AirJet_FinalGameMode::AMTVS_AirJet_FinalGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+	//ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter_C"));
+	// auto a = PlayerPawnBPClass.;
+	// if (PlayerPawnBPClass.Succeeded())
+	// {
+	// 	DefaultPawnClass = PlayerPawnBPClass.Object;
+	// }
 }

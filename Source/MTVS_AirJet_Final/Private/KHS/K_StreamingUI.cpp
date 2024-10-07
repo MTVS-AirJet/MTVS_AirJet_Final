@@ -2,7 +2,10 @@
 
 
 #include "KHS/K_StreamingUI.h"
-#include "KHS//K_StreamingActor.h"
+#include "KHS/K_StreamingActor.h"
+#include "KHS/K_SharingUserSlot.h"
+//#include "NetGameInstance.h"
+#include "MTVS_AirJet_FinalCharacter.h"
 
 #include "EngineUtils.h"
 #include "Components/UniformGridPanel.h"
@@ -18,10 +21,7 @@
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineSessionInterface.h"
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/OnlineSessionSettings.h"
 #include "Kismet/GameplayStatics.h"
-//#include "SharingUserSlot.h"
-//#include "NetGameInstance.h"
-//#include "PlayerCharacter.h"
-//#include "ProcessListButton.h"
+
 
 // 위젯이 생성된 후 초기화할 때 호출되는 함수
 void UK_StreamingUI::NativeConstruct()
@@ -33,21 +33,21 @@ void UK_StreamingUI::NativeConstruct()
 		break;
 	}
 
-	//ButtonLookSharingScreen->OnClicked.AddDynamic(this , &UWindowList::OnButtonLookSharingScreen);
+	ButtonLookSharingScreen->OnClicked.AddDynamic(this , &UK_StreamingUI::OnButtonLookSharingScreen);
 	ButtonWindowScreen->OnClicked.AddDynamic(this , &UK_StreamingUI::OnButtonWindowScreen);
 	ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
-	ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
+	//ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 
-	/*Me = Cast<APlayerCharacter>(GetOwningPlayerPawn());
+	Me = Cast<AMTVS_AirJet_FinalCharacter>(GetOwningPlayerPawn());
 	if ( Me )
 	{
 		UE_LOG(LogTemp , Warning , TEXT("Me is not Null"));
-		Me->WindowListWidget->TextWindowScreen->SetText(FText::FromString(TEXT("Screen Share")));
+		Me->StreamingUI->TextWindowScreen->SetText(FText::FromString(TEXT("Screen Share")));
 	}
 	else
 	{
 		UE_LOG(LogTemp , Warning , TEXT("Me is NullPtr"));
-	}*/
+	}
 }
 
 // 매 프레임마다 호출되는 함수
@@ -68,9 +68,9 @@ void UK_StreamingUI::NativeOnInitialized()
 // 현재 실행 중인 창에 대한 프로세스 목록을 그리드 패널에 추가하는 함수
 void UK_StreamingUI::NativeDestruct()
 {
-	/*if ( CurrentStreamer ) {
+	if ( CurrentStreamer ) {
 		CurrentStreamer->SetVideoInput(nullptr);
-	}*/
+	}
 }
 
 // 주어진 ID를 사용하여 StreamingActor의 공유 사용자 ID를 설정
@@ -102,10 +102,10 @@ void UK_StreamingUI::OnButtonWindowScreen()
 
 		streamID = GetCurrentSessionID(); //세션 아이디 받아오기
 
-		/*IPixelStreamingModule& PixelStreamingModule1 = FModuleManager::LoadModuleChecked<IPixelStreamingModule>("PixelStreaming");
+		IPixelStreamingModule& PixelStreamingModule1 = FModuleManager::LoadModuleChecked<IPixelStreamingModule>("PixelStreaming");
 		CurrentStreamer = PixelStreamingModule1.CreateStreamer(streamID);
 		if ( nullptr == CurrentStreamer )
-			return;*/
+			return;
 
 		//ScreenActor에 CurrentStreamer 값 설정
 		ScreenActor->CurrentStreamer = CurrentStreamer;
@@ -114,48 +114,48 @@ void UK_StreamingUI::OnButtonWindowScreen()
 
 
 		////Back Buffer를 비디오 입력으로 설정합니다.
-		//CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
-		//ScreenActor->SceneCapture->Activate();
+		CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
+		ScreenActor->SceneCapture->Activate();
 
-		//SetUserID(streamID , true);
+		SetUserID(streamID , true);
 
 		//// 2. Pixel Streaming 비디오 입력으로 설정
-		//VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
-		//CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
-		//CurrentStreamer->SetSignallingServerURL("ws://125.132.216.190:7755");
-		//CurrentStreamer->StartStreaming();
+		VideoInput = FPixelStreamingVideoInputRenderTarget::Create(ScreenActor->SceneCapture->TextureTarget);
+		CurrentStreamer->SetVideoInput(VideoInput); // 스트리밍에 사용
+		CurrentStreamer->SetSignallingServerURL("ws://125.132.216.190:7755");
+		CurrentStreamer->StartStreaming();
 	}
 	else
 	{
-		//Me->WindowListWidget->TextWindowScreen->SetText(FText::FromString(TEXT("Screen Share"))); //화면 공유
-		//ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
-		//SetUserID(streamID , false);
+		TextWindowScreen->SetText(FText::FromString(TEXT("Screen Share"))); //화면 공유
+		ScreenActor->WindowScreenPlaneMesh->SetVisibility(false);
+		SetUserID(streamID , false);
 
 		//ProcessList->ClearChildren();
 
-		////1. PixelStreaming 모듈을 가져옵니다.
-		//IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>(
-		//	"PixelStreaming");
+		//1. PixelStreaming 모듈을 가져옵니다.
+		IPixelStreamingModule* PixelStreamingModule = FModuleManager::GetModulePtr<IPixelStreamingModule>(
+			"PixelStreaming");
 
-		//if ( PixelStreamingModule )
-		//{
-		//	// 2. 스트리머를 가져옵니다.
-		//	TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
+		if ( PixelStreamingModule )
+		{
+			// 2. 스트리머를 가져옵니다.
+			TSharedPtr<IPixelStreamingStreamer> Streamer = PixelStreamingModule->FindStreamer(streamID);
 
-		//	if ( Streamer.IsValid() )
-		//	{
-		//		// 4. 스트리밍을 시작합니다.
-		//		Streamer->StopStreaming();
-		//	}
-		//	else
-		//	{
-		//		UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
-		//	}
-		//}
-		//else
-		//{
-		//	UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
-		//}
+			if ( Streamer.IsValid() )
+			{
+				// 4. 스트리밍을 시작합니다.
+				Streamer->StopStreaming();
+			}
+			else
+			{
+				UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
+		}
 	}
 }
 
@@ -174,7 +174,6 @@ void UK_StreamingUI::OnButtonLookSharingScreen()
 		//TextLookSharingScreen->SetText(FText::FromString(TEXT("Watching"))); //보는중
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Visible);
 		//블루프린트 subs
-		//ScreenActor->BeginLookSharingScreen();
 		ScreenActor->ChangeLookSharingScreen();
 	}
 	else
@@ -184,8 +183,7 @@ void UK_StreamingUI::OnButtonLookSharingScreen()
 		//블루프린트 subs
 		ScreenActor->StopLookSharingScreen();
 		WindowList->ClearChildren();
-		ProcessList->ClearChildren(); //프로세스 리스트 없애기
-		ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
+		//ImageCoveringScreen->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -235,56 +233,29 @@ void UK_StreamingUI::InitSlot(TArray<FString> Items)
 
 
 	// 아이템 데이터 바탕으로 슬롯 생성 및 추가
-	//for ( FString UserID : Items )
-	//{
-	//	SharingUserSlot = CastChecked<USharingUserSlot>(CreateWidget(GetWorld() , SharingUserSlotFactory));
-	//	if ( SharingUserSlot )
-	//	{
-	//		// 슬롯 가시성 및 레이아웃 확인
-	//		SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
-	//		SharingUserSlot->SetUserID(UserID);
-	//		//SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this, FName("SetUserID"));
-	//		// Grid에 슬롯 추가
-	//		WindowList->AddChildToUniformGrid(SharingUserSlot , Row , Column);
+	for ( FString UserID : Items )
+	{
+		SharingUserSlot = CastChecked<UK_SharingUserSlot>(CreateWidget(GetWorld() , SharingUserSlotFactory));
+		if ( SharingUserSlot )
+		{
+			// 슬롯 가시성 및 레이아웃 확인
+			SharingUserSlot->SetVisibility(ESlateVisibility::Visible);
+			SharingUserSlot->SetUserID(UserID);
+			//SharingUserSlot->FUserIDButtonDelegate_OneParam.BindUFunction(this, FName("SetUserID"));
+			// Grid에 슬롯 추가
+			WindowList->AddChildToUniformGrid(SharingUserSlot , Row , Column);
 
-	//		// Row 값 증가
-	//		Row++;
+			// Row 값 증가
+			Row++;
 
-	//		if ( !WindowList )
-	//		{
-	//			UE_LOG(LogTemp , Error , TEXT("PartsPanel is not valid."));
-	//			return;
-	//		}
+			if ( !WindowList )
+			{
+				UE_LOG(LogTemp , Error , TEXT("PartsPanel is not valid."));
+				return;
+			}
 
-	//		//SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
-	//	}
-	//}
+			//SharingUserSlot->clickcnt = P_clickcnt; // 클릭 값 전달 (계속 InvSlot 갱신돼서 clickcnt값 업데이트 안 되는 문제 때문)
+		}
+	}
 }
 
-// 현재 실행 중인 창에 대한 프로세스 목록을 그리드 패널에 추가하는 함수
-void UK_StreamingUI::InitProcessListUI()
-{
-	//기존 슬롯 제거
-	ProcessList->ClearChildren();
-	int32 Row = 0;
-	int32 Column = 0;
-
-	ScreenActor->LogActiveWindowTitles();
-
-	////프로세스 리스트 추가, 윈도우 타이틀 배열의 수만큼 채우고 싶다.
-	//for ( int i = 0; i < ScreenActor->WindowTitles.Num(); i++ ) {
-	//	ProcessListButtonSlot = CastChecked<UProcessListButton>(CreateWidget(GetWorld() , ProcessListButtonFactory));
-
-	//	if ( ProcessListButtonSlot ) {
-	//		ProcessListButtonSlot->SetVisibility(ESlateVisibility::Visible);
-	//		ProcessListButtonSlot->SetProcessList(ScreenActor->WindowTitles[i]);
-
-	//		ProcessList->AddChildToUniformGrid(ProcessListButtonSlot , Row , Column);
-
-	//		UE_LOG(LogTemp , Warning , TEXT("ProcessListButtonSlot Add"));
-	//	}
-
-	//	Row++;
-	//}
-
-}

@@ -77,3 +77,6 @@ DerivedDataCache/*
 *.code-workspace
 .clangd
 .clang-format
+.idea/.idea.MTVS_AirJet_Final/.idea/vcs.xml
+.idea/.idea.MTVS_AirJet_Final/.idea/indexLayout.xml
+.idea/.idea.MTVS_AirJet_Final/.idea/encodings.xml
