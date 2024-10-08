@@ -100,6 +100,17 @@ struct FResSimple
 
 #pragma endregion
 
+#pragma region 미션 관련
+
+UENUM(BlueprintType)
+enum class EPlayerRole : uint8
+{
+    COMMANDER = 0
+    ,PILOT = 1
+};
+
+#pragma endregion
+
 // @@ 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson

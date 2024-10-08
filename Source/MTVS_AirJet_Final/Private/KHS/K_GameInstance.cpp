@@ -6,8 +6,10 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "JBS/J_JsonUtility.h"
+#include "JBS/J_Utility.h"
 #include "JsonObjectConverter.h"
 #include "Math/UnrealMathUtility.h"
+#include "Templates/SubclassOf.h"
 #include <Engine/World.h>
 
 void UK_GameInstance::Host(FString ServerName)
@@ -181,5 +183,9 @@ void UK_GameInstance::RequestToServer(EJsonType type, const FString &sendJsonDat
     }
 }
 
-
 #pragma endregion
+
+TSubclassOf<APawn> UK_GameInstance::GetMissionPlayerPrefab()
+{
+	return playerPrefabMap[playerRole];
+}
