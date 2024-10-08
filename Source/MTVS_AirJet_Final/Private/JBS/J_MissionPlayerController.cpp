@@ -1,0 +1,59 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "JBS/J_MissionPlayerController.h"
+#include "Engine/World.h"
+#include "GenericPlatform/ICursor.h"
+#include "Kismet/GameplayStatics.h"
+#include <KHS/K_GameInstance.h>
+#include <JBS/J_Utility.h>
+
+void AJ_MissionPlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // @@ 임시 spawnpos 가져오기
+    TArray<AActor*> outActors;
+    UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), FName(TEXT("SpawnPos")), outActors);
+    spawnTR = outActors[0]->GetActorTransform();
+
+    // FIXME gi에서 내 역할을 가져오고
+    // 해당 역할에 맞는 플레이어 생성 후 포제스
+    if(this->IsLocalController())
+    {
+        auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+        check(gi);
+        playerRole = gi->PLAYER_ROLE;
+
+        // 플레이어 생성
+        auto prefab = gi->GetMissionPlayerPrefab();
+        SRPC_SpawnMyPlayer(prefab);
+
+        // 지휘관은 커서 보이게 처리
+        switch (playerRole)
+        {
+            case EPlayerRole::COMMANDER:
+                this->bShowMouseCursor = true;
+                DefaultMouseCursor = EMouseCursor::Crosshairs;
+                break;
+            case EPlayerRole::PILOT:
+                break;
+        }
+    }
+}
+
+void AJ_MissionPlayerController::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
+
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(playerRole)));
+
+}
+
+void AJ_MissionPlayerController::SRPC_SpawnMyPlayer_Implementation(TSubclassOf<class APawn> playerPrefab)
+{
+    // FIXME spawnTR 게임모드에서 역할에 맞는 위치 가져올 수 있도록 해야할 듯
+    auto* player = GetWorld()->SpawnActor<APawn>(playerPrefab, spawnTR);
+    
+    this->Possess(player);
+}

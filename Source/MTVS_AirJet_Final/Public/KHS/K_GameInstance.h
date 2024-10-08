@@ -87,6 +87,29 @@ protected:
 
 	FResponseDelegate tempLoginAuthDel;
 
+	// 미션
+	// 자신 플레이어 역할
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values", BlueprintGetter=GetPlayerRole, BlueprintSetter=SetPlayerRole)
+	EPlayerRole playerRole;
+		public:
+	__declspec(property(get = GetPlayerRole, put = SetPlayerRole)) EPlayerRole PLAYER_ROLE;
+	UFUNCTION(BlueprintGetter)
+	EPlayerRole GetPlayerRole()
+	{
+		return playerRole;
+	}
+	UFUNCTION(BlueprintSetter)
+	void SetPlayerRole(EPlayerRole value)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(value)));
+		playerRole = value;
+	}
+		protected:
+
+	// 미션 플레이어 역할, 캐릭터 프리팹 맵
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TMap<EPlayerRole, TSubclassOf<class APawn>> playerPrefabMap;
+
 public:
 #pragma region 사용 함수 연결용 딜리게이트 단
 	// res 구조체 데이터 사용할 함수 연결용 딜리게이트
@@ -142,9 +165,8 @@ public:
 
 	void RequestToServer(EJsonType type, const FString &sendJsonData = TEXT(""));
 
-
-
-
+	// 자신 플레이어 역할에 맞는 프리팹 주기
+	TSubclassOf<APawn> GetMissionPlayerPrefab();
 
 #pragma endregion
 
