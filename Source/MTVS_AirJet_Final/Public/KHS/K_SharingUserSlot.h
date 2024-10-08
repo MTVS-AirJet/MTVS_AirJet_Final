@@ -40,6 +40,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UUserWidget> StreamingUIFactory;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UK_StreamingUI* StreamingUI; //사용자 정보를 표시하는 슬롯
 };

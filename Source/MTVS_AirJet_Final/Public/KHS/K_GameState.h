@@ -20,15 +20,15 @@ private:
 
 
 public:
-   //=================화면공유
+   //=================화면공유 관련 정보 저장
+   //Streaming 중인 UserID를 저장하는 배열 델리게이트 변수
    UPROPERTY(BlueprintReadOnly , ReplicatedUsing=OnRep_StreamingID)
    TArray<FString> ArrStreamingUserID;
 
    UFUNCTION()
    void OnRep_StreamingID();
 
-   UPROPERTY(Replicated , BlueprintReadOnly , Replicated)
-   TArray<FString> ConnectedPlayerNames;
-
+   /*UPROPERTY(Replicated , BlueprintReadOnly , Replicated)
+   TArray<FString> ConnectedPlayerNames;*/ //(미사용)
 
 };
