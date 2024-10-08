@@ -33,11 +33,11 @@ public:
     UFUNCTION()  
     void SetUserID(FString ID, const bool& bAddPlayer);  // 주어진 ID와 함께 화면 공유를 설정하는 함수
 
-    // 화면 공유 버튼을 눌렀을 때, 호출될 델리게이트에 등록할 함수
+    // 화면 공유 버튼을 눌렀을 때, 호출될 델리게이트에 등록할 함수(조종사 Plane메쉬)
     UFUNCTION(BlueprintCallable)  
     void OnButtonWindowScreen();  
 
-    // 다른 사용자의 화면을 볼 때 호출되는 함수
+    // 다른 사용자의 화면을 볼 때 호출되는 함수(지휘관 UI에)
     UFUNCTION(BlueprintCallable)  
     void OnButtonLookSharingScreen();  
 
@@ -50,11 +50,6 @@ public:
     // 사용자 ID 목록을 받아 여러 사용자 슬롯을 초기화하는 함수
     void InitSlot(TArray<FString> Items);  
     
-    // ==========특정 화면 공유 부분==========
-    // 현재 실행 중인 창에 대한 프로세스 목록을 그리드 패널에 추가하는 함수
-    void InitProcessListUI();  
-    
-
 
     //==========================================================================
     //  Variables, Instance
@@ -73,18 +68,13 @@ public:
     class UTextBlock* TextLookSharingScreen;  // ButtonLookSharingScreen의 상태를 나타내는 텍스트 블록 (예: "Screen Look", "Watching")
     UPROPERTY(meta = (BindWidget)) 
     class UImage* ImageSharingScreen;  // 공유된 화면을 표시할 이미지 컴포넌트
-    UPROPERTY(meta = (BindWidget))  
-    class UImage* ImageCoveringScreen;  // 화면을 덮는 이미지 (특정 상태에서 화면을 가리거나 가림을 표시할 때 사용)
-    // ==========특정 화면 공유 부분==========
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget)) 
-    class UUniformGridPanel* ProcessList;  // 현재 실행되고 있는 창의 목록을 표시할 그리드 패널
-
+    
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)  
     TSubclassOf<UUserWidget> SharingUserSlotFactory;  // 창 목록에서 사용자 정보를 표시할 위젯 템플릿
     
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite)  
-    //class USharingUserSlot* SharingUserSlot;  // 각 사용자 정보를 표시할 슬롯
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)  
+    class UK_SharingUserSlot* SharingUserSlot;  // 각 사용자 정보를 표시할 슬롯
 
     UPROPERTY()  
     class AK_StreamingActor* ScreenActor;  // 화면 공유와 관련된 ScreenActor 액터
@@ -96,21 +86,12 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture", meta = (AllowPrivateAccess = "true"))  
     class USceneCaptureComponent2D* SceneCapture;  // 화면을 캡처하는 장면 캡처 컴포넌트
-
     
     TSharedPtr<class FPixelStreamingVideoInputRenderTarget> VideoInput; // 화면 캡처 결과를 저장할 렌더 타겟
-
-    
-    // ==========특정 화면 공유 부분==========
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)  
-    TSubclassOf<UUserWidget> ProcessListButtonFactory;  // 현재 켜져있는  프로세스 목록을 표시할 버튼 위젯 템플릿
-
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite) 
-    //class UProcessListButton* ProcessListButtonSlot;  // 프로세스 목록을 표시할 슬롯
-    
+   
 
 private:
-    //UPROPERTY()  
-    //class AKHS_DronePlayer* Me;  // 현재 플레이어 캐릭터를 나타내는 포인터
+    UPROPERTY()  
+    class AMTVS_AirJet_FinalCharacter* Me;  // 현재 플레이어 캐릭터를 나타내는 포인터
 
 };

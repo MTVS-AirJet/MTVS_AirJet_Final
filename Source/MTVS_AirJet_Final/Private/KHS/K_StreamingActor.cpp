@@ -25,9 +25,10 @@
 #include "CanvasTypes.h"  // 캔버스 타입 관련 헤더 
 #include "Camera/CameraComponent.h"  
 #include "Net/UnrealNetwork.h"  // 네트워크 관련 헤더
-//#include "MetaRealmGameState.h"  // MetaRealm 게임 상태에 대한 헤더 
-//#include "NetGameInstance.h"  // 네트워크 게임 인스턴스에 대한 헤더
-//#include "PlayerCharacter.h"  // 플레이어 캐릭터에 대한 Unreal Engine 헤더 
+//#include "NetGameInstance.h"  // 네트워크 게임 인스턴스에 대한 헤더 -> 스팀 스트리머 ID을 받아오는 형식의 코드는 학주에게 문의바람
+#include "MTVS_AirJet_FinalCharacter.h"  // 플레이어 캐릭터에 대한 Unreal Engine 헤더 (범서의 조종사플레이어 헤더)
+#include "KHS/K_GameState.h"  // MetaRealm 게임 상태에 대한 헤더 
+#include <MTVS_AirJet_Final.h>
 //#include "MetaRealm/MetaRealm.h"  // MetaRealm 관련된 헤더 
 
 
@@ -89,9 +90,6 @@ AK_StreamingActor::AK_StreamingActor()
     SceneCapture->CaptureSource = SCS_FinalColorLDR;  // 캡처 소스를 최종 컬러 LDR로 설정합니다.
     SceneCapture->TextureTarget = RenderTarget;  // 캡처한 내용을 RenderTarget에 저장합니다.
 
-    // 초기에는 텍스처 업데이트를 하지 않도록 설정
-    bShouldUpdateTexture = false;  // 텍스처를 업데이트할지 여부를 결정하는 플래그를 false로 설정합니다
-
 }
 
 // Called when the game starts or when spawned
@@ -105,17 +103,16 @@ void AK_StreamingActor::BeginPlay()
     sceneComp->AttachToComponent(playerCamera , FAttachmentTransformRules::SnapToTargetIncludingScale); //카메라 붙이기
 
     // Z 축이 카메라를 향하도록 회전
-    DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0) , this);
-    WindowScreenPlaneMesh->SetMaterial(0 , DynamicMaterial);
-    WindowScreenPlaneMesh->SetRelativeLocationAndRotation(FVector(400 , 0 , 0) , FRotator(0 , 90 , 90));
+	DynamicMaterial = UMaterialInstanceDynamic::Create(WindowScreenPlaneMesh->GetMaterial(0) , this);
+	WindowScreenPlaneMesh->SetMaterial(0 , DynamicMaterial);
+	WindowScreenPlaneMesh->SetRelativeLocationAndRotation(FVector(400 , 0 , 0) , FRotator(0 , 90 , 90));
 
-    //GameState클래스 만들고나서 다시 살리기
-    /*gs = Cast<AMetaRealmGameState>(GetWorld()->GetGameState());
+    //GameState클래스 만들고나서 다시 살리기(플레이어 가져오는거..학주한테 물어봐서 처리)
+    auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
     if ( gs )
     {
-        AB_LOG(LogABNetwork , Log , TEXT("======================================================================"));
-        AB_LOG(LogABNetwork , Log , TEXT("Current Streaming Player Num : %d") , gs->ArrStreamingUserID.Num());
-    }*/
+        LOG_S(Warning , TEXT("Current Streaming Player Num : %d") , gs->ArrStreamingUserID.Num());
+    }
 
     if ( RenderTarget && SceneCapture )
     {
@@ -125,10 +122,6 @@ void AK_StreamingActor::BeginPlay()
     {
         UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
     }
-
-    // 활성 창의 타이틀을 출력하는 함수
-    LogActiveWindowTitles();
-
 }
 
 // Called every frame
@@ -140,203 +133,18 @@ void AK_StreamingActor::Tick(float DeltaTime)
     const float CaptureInterval = 0.5f; // 0.5초마다 텍스처 업데이트
     TimeAccumulator += DeltaTime;
 
-    if ( TimeAccumulator >= CaptureInterval && bShouldUpdateTexture )
+    if ( TimeAccumulator >= CaptureInterval)
     {
         TimeAccumulator = 0.0f;
         UpdateTexture();  // 일정 시간 간격으로만 업데이트
-    }
-
-}
-
-// 화면을 읽어오는 함수 (캡처된 화면을 처리)
-void AK_StreamingActor::ReadFrame()
-{
-    cv::Mat desktopImage = GetScreenToCVMat();
-    imageTexture = MatToTexture2D(desktopImage);
-
-    // 캡처된 화면을 동적 머티리얼에 적용
-    if ( DynamicMaterial && imageTexture && WindowScreenPlaneMesh )
-    {
-        DynamicMaterial->SetTextureParameterValue(TEXT("Base") , imageTexture);
-    }
-}
-
-// OpenCV의 Mat 형식을 Unreal Engine의 UTexture2D로 변환하는 함수
-UTexture2D* AK_StreamingActor::MatToTexture2D(const cv::Mat InMat)
-{
-    UTexture2D* Texture = UTexture2D::CreateTransient(InMat.cols , InMat.rows , PF_B8G8R8A8);
-
-    if ( InMat.type() == CV_8UC3 )
-    {
-        cv::Mat bgraImage;
-        cv::cvtColor(InMat , bgraImage , cv::COLOR_BGR2BGRA);
-
-        FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
-        void* Data = Mip.BulkData.Lock(LOCK_READ_WRITE);
-        FMemory::Memcpy(Data , bgraImage.data , bgraImage.total() * bgraImage.elemSize());
-        Mip.BulkData.Unlock();
-        Texture->PostEditChange();
-
-        Texture->UpdateResource();
-        return Texture;
-    }
-    else if ( InMat.type() == CV_8UC4 )
-    {
-        FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
-        void* Data = Mip.BulkData.Lock(LOCK_READ_WRITE);
-        FMemory::Memcpy(Data , InMat.data , InMat.total() * InMat.elemSize());
-        Mip.BulkData.Unlock();
-        Texture->PostEditChange();
-        Texture->UpdateResource();
-        return Texture;
-    }
-
-    Texture->PostEditChange();
-    Texture->UpdateResource();
-    return Texture;
-}
-
-// 모니터 전체 화면을 캡처하여 OpenCV의 Mat 객체로 반환하는 함수
-cv::Mat AK_StreamingActor::GetScreenToCVMat()
-{
-    HDC hScreenDC = GetDC(NULL);
-    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-    int screenWidth = GetDeviceCaps(hScreenDC , HORZRES);
-    int screenHeight = GetDeviceCaps(hScreenDC , VERTRES);
-
-    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC , screenWidth , screenHeight);
-    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC , hBitmap);
-    BitBlt(hMemoryDC , 0 , 0 , screenWidth , screenHeight , hScreenDC , 0 , 0 , SRCCOPY);
-    SelectObject(hMemoryDC , hOldBitmap);
-
-    cv::Mat matImage(screenHeight , screenWidth , CV_8UC4);
-    GetBitmapBits(hBitmap , matImage.total() * matImage.elemSize() , matImage.data);
-
-    return matImage;
-}
-
-// 특정 창의 화면을 캡처하여 OpenCV의 Mat 객체로 반환하는 함수
-cv::Mat AK_StreamingActor::GetWindowToCVMat(HWND hwnd)
-{
-    RECT windowRect;
-    GetWindowRect(hwnd , &windowRect);
-
-    int windowWidth = windowRect.right - windowRect.left;
-    int windowHeight = windowRect.bottom - windowRect.top;
-
-    HDC hWindowDC = GetDC(hwnd);
-    HDC hMemoryDC = CreateCompatibleDC(hWindowDC);
-
-    HBITMAP hBitmap = CreateCompatibleBitmap(hWindowDC , windowWidth , windowHeight);
-    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC , hBitmap);
-
-    BitBlt(hMemoryDC , 0 , 0 , windowWidth , windowHeight , hWindowDC , 0 , 0 , SRCCOPY);
-    SelectObject(hMemoryDC , hOldBitmap);
-
-    cv::Mat windowImage(windowHeight , windowWidth , CV_8UC4);
-    GetBitmapBits(hBitmap , windowImage.total() * windowImage.elemSize() , windowImage.data);
-
-    ReleaseDC(hwnd , hWindowDC);
-    DeleteDC(hMemoryDC);
-    DeleteObject(hBitmap);
-
-    return windowImage;
-}
-
-// 활성 창의 타이틀을 출력하는 함수
-void AK_StreamingActor::LogActiveWindowTitles()
-{
-    WindowTitles.Empty();
-
-    EnumWindows([](HWND hwnd , LPARAM lParam) -> BOOL
-        {
-            int length = GetWindowTextLength(hwnd);
-            if ( length == 0 )
-                return true;
-
-            if ( !IsWindowVisible(hwnd) )
-                return true;
-
-            WINDOWPLACEMENT placement;
-            placement.length = sizeof(WINDOWPLACEMENT);
-            GetWindowPlacement(hwnd , &placement);
-            if ( placement.showCmd == SW_SHOWMINIMIZED )
-                return true;
-
-            LONG style = GetWindowLong(hwnd , GWL_STYLE);
-            if ( !(style & WS_OVERLAPPEDWINDOW) )
-                return true;
-
-            TCHAR windowTitle[256];
-            GetWindowText(hwnd , windowTitle , 256);
-
-            TArray<FString>* WindowList = (TArray<FString>*)lParam;
-            WindowList->Add(FString(windowTitle));
-
-            FString title = FString(windowTitle);
-            UE_LOG(LogTemp , Log , TEXT("Active Window: %s") , *title);
-
-            return true;
-        } , (LPARAM)&WindowTitles);
-}
-
-// 주어진 창 제목에 해당하는 창을 찾는 함수
-void AK_StreamingActor::FindTargetWindow(FString TargetWindowTitle)
-{
-    TargetWindowHandle = nullptr;
-
-    EnumWindows([](HWND hwnd , LPARAM lParam) -> BOOL
-        {
-            TCHAR windowTitle[256];
-            GetWindowText(hwnd , windowTitle , 256);
-
-            // 타겟을 찾음
-            if ( FString(windowTitle) == *(FString*)lParam )
-            {
-                HWND* targetHandle = (HWND*)lParam;
-                *targetHandle = hwnd;
-                return false;
-            }
-
-            return true; //타겟을 찾지 못했을 경우 계속 순회
-        } , (LPARAM)&TargetWindowHandle);
-
-    if ( TargetWindowHandle == nullptr )
-    {
-        UE_LOG(LogTemp , Warning , TEXT("Target window not found"));
-        bShouldUpdateTexture = false;
-    }
-    else
-    {
-        //UE_LOG(LogTemp, Log, TEXT("Target window found: "));
-        bShouldUpdateTexture = true;
     }
 }
 
 // 매 프레임 텍스처를 업데이트하는 함수
 void AK_StreamingActor::UpdateTexture()
 {
-    if ( TargetWindowHandle != nullptr )
-    {
-        //특정 앱만 찾아서 화면 공유
-        cv::Mat windowImage = GetWindowToCVMat(TargetWindowHandle);
-        imageTexture = MatToTexture2D(windowImage);
-        //UE_LOG(LogTemp, Warning, TEXT("Successfully captured the window: ChatGPT - Chrome"));
-    }
-    else
-    {
-        //UE_LOG(LogTemp, Warning, TEXT("Target window not found. Capturing main screen instead."));
-        ReadFrame();
-    }
-
-    //먼저 GetWorld()가 유효한지 확인합니다.
-    if ( !GetWorld() )
-    {
-        UE_LOG(LogTemp , Error , TEXT("GetWorld() is null!"));
-        return;
-    }
-
-    if ( DynamicMaterial && imageTexture && WindowScreenPlaneMesh )
+ 
+    if ( DynamicMaterial && WindowScreenPlaneMesh )
     {
         // BaseTexture 파라미터에 텍스처 설정
         DynamicMaterial->SetTextureParameterValue(TEXT("Base") , imageTexture);
@@ -348,10 +156,11 @@ void AK_StreamingActor::SetViewSharingUserID(FString ID, const bool& bAddPlayer)
 {
     UserID = ID; //UserID에 스트리머 ID 
 
-    /*if ( auto Mycharacter = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()) )
-        Mycharacter->ServerRPC_SetStreamingPlayer(ID , bAddPlayer);
+    //학주한테 문의
+	if ( auto MyCharacter = Cast<AMTVS_AirJet_FinalCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()) )
+		MyCharacter->ServerRPC_SetStreamingPlayer(ID , bAddPlayer);
 
-    AB_LOG(LogABNetwork , Log , TEXT("Set Streaming Player ID : %s") , *ID);*/
+	LOG_S(Warning , TEXT("Set Streaming Player ID : %s") , *ID);
 }
 
 // 화면 공유를 중지하는 함수
@@ -406,7 +215,6 @@ void AK_StreamingActor::BeginLookSharingScreen()
     if ( Function )
     {
         // 블루프린트 함수 호출 (매개변수가 없는 경우)
-        FString userID = "Editor";
         ProcessEvent(Function , &userID);
     }
     else
@@ -425,10 +233,9 @@ void AK_StreamingActor::ChangeLookSharingScreen()
     UFunction* Function = FindFunction(FunctionName);
 
     if ( Function )
-    {
-        FString userID = "Editor";
+    {  
         // 블루프린트 함수 호출 (매개변수가 없는 경우)
-        ProcessEvent(Function , &userID);
+        ProcessEvent(Function, &userID);
     }
     else
     {

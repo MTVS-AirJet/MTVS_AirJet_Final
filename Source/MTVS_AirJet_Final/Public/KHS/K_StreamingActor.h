@@ -40,18 +40,6 @@ public:
     // 화면 공유 관련 Function, Variables
     //==========================================================================
 
-    UFUNCTION(BlueprintCallable) 
-    void ReadFrame();  // 화면을 읽어오는 함수 (캡처된 화면을 처리)
-
-    UTexture2D* MatToTexture2D(const cv::Mat InMat);  // OpenCV의 Mat 형식을 Unreal Engine의 UTexture2D로 변환하는 함수
-
-    cv::Mat GetScreenToCVMat();  // 모니터 전체 화면을 캡처하여 OpenCV의 Mat 객체로 반환하는 함수
-    cv::Mat GetWindowToCVMat(HWND hwnd);  // 특정 창의 화면을 캡처하여 OpenCV의 Mat 객체로 반환하는 함수
-
-    void LogActiveWindowTitles();  // 활성 창의 타이틀을 출력하는 함수
-
-    void FindTargetWindow(FString TargetWindowTitle);  // 주어진 창 제목에 해당하는 창을 찾는 함수
-
     void UpdateTexture();  // 매 프레임 텍스처를 업데이트하는 함수
 
 
@@ -61,23 +49,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UTexture2D* imageTexture;  // OpenCV에서 처리된 화면 이미지를 저장하는 텍스처
 
-    // 캡처할 특정 창의 핸들을 저장하는 변수
-    HWND TargetWindowHandle;  // 특정 창의 핸들을 저장
-
-    // 창 제목을 저장할 배열
-    TArray<FString> WindowTitles;  // 활성 창 제목을 저장할 배열
-
-    // 매 프레임 Tick에서 UpdateTexture를 호출할지 여부를 나타내는 플래그
-    bool bShouldUpdateTexture;  // 텍스처 업데이트 여부를 나타내는 플래그
-
     // 액터의 전반적인 위치를 고정하기 위한 SceneComponent
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")  
     class USceneComponent* sceneComp;  // 액터의 루트 컴포넌트 역할을 하는 SceneComponent
 
     class UMaterialInstanceDynamic* DynamicMaterial;  // 동적 머티리얼 인스턴스 (캡처된 화면을 표시할 머티리얼)
 
-    // UTexture2D* CaptureScreenToTexture();  // 화면을 캡처하여 텍스처로 변환하는 함수 (현재 주석 처리됨)
-    // UTexture2D* CapturedTexture;  // 캡처된 텍스처 (현재 주석 처리됨)
 
 
     //==========================================================================
@@ -116,6 +93,8 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Capture") 
     class USceneCaptureComponent2D* SceneCapture;  // 2D 장면 캡처 컴포넌트
+
+    FString userID;
 
     //==========화면공유 추가
 	//UPROPERTY()

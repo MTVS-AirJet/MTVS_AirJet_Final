@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -69,5 +69,17 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+public:
+// Pixel Streaming =============================================================
+	//StreamingPlayer 가져오기
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetStreamingPlayer(const FString& PlayerID, bool bAddPlayer);
+
+	UPROPERTY(BlueprintReadWrite)
+	class UK_StreamingUI* StreamingUI;
+	
+	void InitStreamingUI();
+
 };
 

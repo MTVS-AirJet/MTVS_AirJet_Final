@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MTVS_AirJet_FinalCharacter.h"
 #include "Engine/LocalPlayer.h"
@@ -10,6 +10,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "KHS/K_GameState.h"
+#include "KHS/K_PlayerController.h"
+#include "KHS/K_StreamingUI.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,7 +61,19 @@ void AMTVS_AirJet_FinalCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	if ( IsLocallyControlled() )
+	{
+		InitStreamingUI();
+		UE_LOG(LogTemp, Warning, TEXT("==========================Streaming!!!"));
+	}
 }
+
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -127,4 +142,58 @@ void AMTVS_AirJet_FinalCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+//StreamingPlayer 가져오기
+void AMTVS_AirJet_FinalCharacter::ServerRPC_SetStreamingPlayer_Implementation(const FString& PlayerID , bool bAddPlayer)
+{
+	if ( auto gs = Cast<AK_GameState>(GetWorld()->GetGameState()) )
+	{
+		if ( bAddPlayer )
+		{
+			if ( gs->ArrStreamingUserID.Find(PlayerID) >= 0 )
+				return;
+
+			gs->ArrStreamingUserID.Add(PlayerID);
+			if ( HasAuthority() )
+				gs->OnRep_StreamingID();
+		}
+		else
+		{
+			if ( gs->ArrStreamingUserID.Num() == 0 )
+				return;
+
+			if ( gs->ArrStreamingUserID.Find(PlayerID) < 0 )
+				return;
+
+			gs->ArrStreamingUserID.Remove(PlayerID);
+			if ( HasAuthority() )
+				gs->OnRep_StreamingID();
+		}
+	}
+}
+
+void AMTVS_AirJet_FinalCharacter::InitStreamingUI()
+{
+	auto pc = Cast<AK_PlayerController>(Controller);
+	if ( nullptr == pc )
+	{
+		UE_LOG(LogTemp , Warning , TEXT("[initWindowList] Player Controller is null"));
+		return;
+	}
+
+	pc->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , pc->StreamingUIFactory));
+	if ( pc->StreamingUI )
+	{
+		UE_LOG(LogTemp , Warning , TEXT("[initWindowList] MemoWidget is not null"));
+		StreamingUI = pc->StreamingUI;
+
+		StreamingUI->AddToViewport(1);
+		StreamingUI->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		UE_LOG(LogTemp , Warning , TEXT("[initMemoUI] MemoWidget is null"));
+	}
+
 }
