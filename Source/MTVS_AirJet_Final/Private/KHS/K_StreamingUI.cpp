@@ -117,7 +117,7 @@ void UK_StreamingUI::OnButtonWindowScreen()
 		ScreenActor->UserID = streamID;
 
 
-		////Back Buffer를 비디오 입력으로 설정
+		//Back Buffer를 비디오 입력으로 설정
 		CurrentStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
 		//UI에서 ScreenActor의 SceneCapture를 활성화.
 		ScreenActor->SceneCapture->Activate();
@@ -170,6 +170,7 @@ void UK_StreamingUI::OnButtonLookSharingScreen()
 	bLookStreaming = !bLookStreaming;
 	if ( bLookStreaming )
 	{
+		TextLookSharingScreen->SetText(FText::FromString(TEXT("Watching"))); //공유상태임을 나타냄
 		//=======임시로 userID를 직접 설정해서 세션없는 상태에서 작동상태 확인가능하도록 함.
 		//이후에 세션 생기면 세션정보 받아와서 userID에 변수형태로 넣으면됨(GetCurrentSessionID 함수있으니 사용바람)
 		//ScreenActor->userID = "No Session Found";
@@ -188,6 +189,7 @@ void UK_StreamingUI::OnButtonLookSharingScreen()
 	}
 	else
 	{
+		TextLookSharingScreen->SetText(FText::FromString(TEXT("Look Screen")));
 		//스트리밍을 끄면 위젯 비활성화
 		ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 		//블루프린트 함수호출(스트리밍 종료, WindowList위젯의 버튼들 모두 삭제)
