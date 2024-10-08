@@ -53,6 +53,16 @@ private: // Input
 	class UInputAction* IA_ViperLeft;
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* IA_ViperRight;
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_ViperTurnLeft;
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_ViperTurnRight;
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_ViperResetRotation;
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_ViperAccel;
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* IA_ViperBreak;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -74,18 +84,44 @@ private: // Input
 	void F_ViperLeftTrigger(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperLeftCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperTurnRightTrigger(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperTurnRightCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperTurnLeftTrigger(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperTurnLeftCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperResetRotation(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperAccelStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperAccelCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperBreakStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperBreakCompleted(const struct FInputActionValue& value);
 
 private:
 	// For Engine Using 
 	bool IsEngineOn;
 	// For Change Arrow Rotate
 	float CurrentTime;
+	UPROPERTY(EditDefaultsOnly)
 	float ChangeTime = .3f;
 	// For Reset Arrow Rotate
 	bool IsKeyUpPress;
 	bool IsKeyDownPress;
 	bool IsKeyRightPress;
 	bool IsKeyLeftPress;
+	// Rotate vector
+	bool IsRightRoll;
+	bool IsLeftRoll;
+	UPROPERTY(EditDefaultsOnly)
+	FVector ChangeMoveVector = FVector(0 , .5f , 0);
+	UPROPERTY(EditDefaultsOnly)
+	FRotator RotateValue = FRotator(0 , 0 , .5f);
 	// Rotate Value
 	FRotator ForceUnitRot;
 	// Add Rotate Value ( ForceUnitRot To NewVector )
@@ -110,7 +146,14 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	FVector HeightForceLoc = FVector(1000 , 0 , 0);
 	UPROPERTY(EditDefaultsOnly)
-	float ValueOfDivRot = 500.f;
+	float ValueOfDivRot = 50.f;
 	UPROPERTY(EditDefaultsOnly)
 	float ValueOfArrowReset = -.1f;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	float MaxAccelValue = 150.f;
+	float CurrAccelValue = 0.f;
+	bool IsAccel = false;
+	bool IsBreak = false;
 };
