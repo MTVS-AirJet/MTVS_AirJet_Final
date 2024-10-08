@@ -140,7 +140,7 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float ValueOfMoveForce = 1000000.0f;
+	float ValueOfMoveForce = 185200.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float ValueOfHeightForce = 1.f;
 	UPROPERTY(EditDefaultsOnly)

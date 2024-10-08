@@ -87,6 +87,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperBreak , ETriggerEvent::Started , this , &AL_Viper::F_ViperBreakStarted);
 		input->BindAction(IA_ViperBreak , ETriggerEvent::Completed , this , &AL_Viper::F_ViperBreakCompleted);
+
+		input->BindAction(IA_ViperResetRotation , ETriggerEvent::Started , this , &AL_Viper::F_ViperResetRotation);
 	}
 }
 
@@ -337,7 +339,7 @@ void AL_Viper::Tick(float DeltaTime)
 	{
 		// Add Force
 		// LOG_S(Warning , TEXT("======================="));
-		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce * CurrAccelValue;
+		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce * CurrAccelValue * 100;
 		//LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
 		FVector forceLoc = JetRoot->GetComponentLocation();
 		//LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
