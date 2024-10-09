@@ -11,7 +11,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="" />
+    <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,7 +58,7 @@
     "C++ Project.MTVS_AirJet_Final.executor": "Debug",
     "C++ 프로젝트.MTVS_AirJet_Final.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "LHJ__Commit",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
