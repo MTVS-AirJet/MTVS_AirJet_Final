@@ -36,8 +36,15 @@ AL_Viper::AL_Viper()
 
 	JetSprintArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArm"));
 	JetSprintArm->SetupAttachment(JetMesh);
-	JetSprintArm->SetRelativeLocationAndRotation(FVector(-160 , 0 , 400) , FRotator(-10 , 0 , 0));
-	JetSprintArm->TargetArmLength = 2000.f;
+
+	// 3인칭 뷰
+	//JetSprintArm->SetRelativeLocationAndRotation(FVector(-160 , 0 , 400) , FRotator(-10 , 0 , 0));
+	//JetSprintArm->TargetArmLength = 2000.f;
+
+	// 조종석 뷰
+	JetSprintArm->SetRelativeLocationAndRotation(FVector(350 , 0 , 310) , FRotator(0 , -30 , 0));
+	JetSprintArm->TargetArmLength = 0.f;
+
 	JetSprintArm->bEnableCameraRotationLag = true;
 	JetSprintArm->CameraRotationLagSpeed = 3.5f;
 
@@ -48,6 +55,15 @@ AL_Viper::AL_Viper()
 	JetArrow->SetupAttachment(JetMesh);
 	JetArrow->SetRelativeLocation(FVector(-1000 , 0 , 0));
 	JetArrow->SetHiddenInGame(false); // For Test
+
+	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
+	JetFirstEngine->SetupAttachment(JetMesh);
+	JetFirstEngine->SetRelativeScale3D(FVector(.3f));
+	JetFirstEngine->SetRelativeLocation(FVector(390 , -25 , 240));
+	JetFirstEngine->SetGenerateOverlapEvents(true);
+	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
+	//JetFirstEngine->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+	JetFirstEngine->SetHiddenInGame(false); // For Test
 }
 #pragma endregion
 
@@ -89,6 +105,16 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ViperBreak , ETriggerEvent::Completed , this , &AL_Viper::F_ViperBreakCompleted);
 
 		input->BindAction(IA_ViperResetRotation , ETriggerEvent::Started , this , &AL_Viper::F_ViperResetRotation);
+	}
+}
+
+void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
+{
+	if (!bFristEngine)
+	{
+		LOG_SCREEN("Clicked!!");
+		AccelGear = 1;
+		bFristEngine = true;
 	}
 }
 
@@ -234,6 +260,8 @@ void AL_Viper::BeginPlay()
 		{
 			subsys->AddMappingContext(IMC_Viper , 0);
 		}
+
+		pc->bEnableClickEvents = true;
 	}
 }
 
