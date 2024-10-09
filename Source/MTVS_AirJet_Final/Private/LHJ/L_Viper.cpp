@@ -28,7 +28,7 @@ AL_Viper::AL_Viper()
 	JetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("JetMesh"));
 	JetMesh->SetupAttachment(JetRoot);
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh(TEXT(
-		"/Script/Engine.SkeletalMesh'/Game/VigilanteContent/Vehicles/West_Fighter_F18C/SK_West_Fighter_F18C.SK_West_Fighter_F18C'"));
+		"/Script/Engine.SkeletalMesh'/Game/Asset/VigilanteContent/Vehicles/West_Fighter_F18C/SK_West_Fighter_F18C.SK_West_Fighter_F18C'"));
 	if (tmpMesh.Succeeded())
 	{
 		JetMesh->SetSkeletalMesh(tmpMesh.Object);
@@ -187,21 +187,29 @@ void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
 
 void AL_Viper::F_ViperAccelStarted(const FInputActionValue& value)
 {
+	AccelGear++;
+	if (AccelGear > 3)
+		AccelGear = 3;
 	IsAccel = true;
 }
 
 void AL_Viper::F_ViperAccelCompleted(const FInputActionValue& value)
 {
+	KeyDownAccel = 0.f;
 	IsAccel = false;
 }
 
 void AL_Viper::F_ViperBreakStarted(const FInputActionValue& value)
 {
+	AccelGear--;
+	if (AccelGear < 0)
+		AccelGear = 0;
 	IsBreak = true;
 }
 
 void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 {
+	KeyDownAccel = 0.f;
 	IsBreak = false;
 }
 
@@ -319,19 +327,39 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region	Change Accel Value
+
 	if (IsAccel)
 	{
-		CurrAccelValue += DeltaTime;
-		if (CurrAccelValue > MaxAccelValue)
-			CurrAccelValue = MaxAccelValue;
+		KeyDownAccel += DeltaTime;
+		if (KeyDownAccel >= ChangeAccelTime)
+		{
+			KeyDownAccel = 0.f;
+
+			// 기어 변경
+			AccelGear++;
+			if (AccelGear > 3)
+				AccelGear = 3;
+		}
 	}
 	else if (IsBreak)
 	{
-		CurrAccelValue -= DeltaTime;
-		if (CurrAccelValue < 0)
-			CurrAccelValue = 0;
+		KeyDownAccel += DeltaTime;
+		if (KeyDownAccel >= ChangeAccelTime)
+		{
+			KeyDownAccel = 0.f;
+
+			// 기어 변경
+			AccelGear--;
+			if (AccelGear < 0)
+				AccelGear = 0;
+		}
 	}
-	LOG_SCREEN("Now Accel Value : %f" , CurrAccelValue);
+
+	ValueOfMoveForce += GetAddTickSpeed();
+	if (ValueOfMoveForce < 0)
+		ValueOfMoveForce = 0;
+	else if (ValueOfMoveForce > MaxValueOfMoveForce)
+		ValueOfMoveForce = MaxValueOfMoveForce;
 #pragma endregion
 
 #pragma region Jet Move
@@ -339,8 +367,8 @@ void AL_Viper::Tick(float DeltaTime)
 	{
 		// Add Force
 		// LOG_S(Warning , TEXT("======================="));
-		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce * CurrAccelValue * 100;
-		//LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
+		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+		LOG_S(Warning , TEXT("forceVec x : %f, y : %f, z : %f") , forceVec.X , forceVec.Y , forceVec.Z);
 		FVector forceLoc = JetRoot->GetComponentLocation();
 		//LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
 		if (JetRoot->IsSimulatingPhysics())
@@ -382,4 +410,58 @@ void AL_Viper::Tick(float DeltaTime)
 	// 	JetArrow->AddRelativeRotation(FRotator(0 , newYaw , 0));
 	// }
 #pragma endregion
+}
+
+float AL_Viper::GetAddTickSpeed()
+{
+	float fRtn = 0.f;
+
+	if (AccelGear == 0)
+		fRtn = -20;
+	else
+	{
+		FRotator jetRot = JetArrow->GetRelativeRotation();
+		// 수평비행
+		if (jetRot == FRotator(0 , 0 , 0))
+		{
+			if (AccelGear == 1)
+				fRtn = BasicFlight50;
+			else if (AccelGear == 2)
+				fRtn = BasicFlight100;
+			else if (AccelGear == 3)
+				fRtn = BasicFlightAB;
+		}
+		// 상승비행
+		else if (jetRot.Pitch > 0)
+		{
+			if (AccelGear == 1)
+				fRtn = UpFlight50;
+			else if (AccelGear == 2)
+				fRtn = UpFlight100;
+			else if (AccelGear == 3)
+				fRtn = UpFlightAB;
+		}
+		// 하강비행
+		else if (jetRot.Pitch < 0)
+		{
+			if (AccelGear == 1)
+				fRtn = DownFlight50;
+			else if (AccelGear == 2)
+				fRtn = DownFlight100;
+			else if (AccelGear == 3)
+				fRtn = DownFlightAB;
+		}
+		// 좌우회전
+		else if (jetRot.Yaw > 0 || jetRot.Yaw < 0)
+		{
+			if (AccelGear == 1)
+				fRtn = TurnFlight50;
+			else if (AccelGear == 2)
+				fRtn = TurnFlight100;
+			else if (AccelGear == 3)
+				fRtn = TurnFlightAB;
+		}
+	}
+
+	return fRtn;
 }
