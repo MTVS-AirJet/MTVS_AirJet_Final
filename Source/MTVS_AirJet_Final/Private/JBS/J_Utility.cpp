@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
+#include <JBS/J_MissionGamemode.h>
 #include <Engine/World.h>
 
 // UJ_GameInstance *UJ_Utility::GetJGameInstance(const UWorld* world)
@@ -23,3 +24,10 @@ UK_GameInstance *UJ_Utility::GetKGameInstance(const UWorld* world)
     return gi;
 }
 
+AJ_MissionGamemode* UJ_Utility::GetMissionGamemode(const UWorld* world)
+{
+    auto* gm = world->GetAuthGameMode<AJ_MissionGamemode>();
+    check(gm);
+
+    return gm;
+}

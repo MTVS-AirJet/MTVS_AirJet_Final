@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Templates/SubclassOf.h"
 #include "J_Utility.generated.h"
 
 /**
@@ -109,6 +110,27 @@ enum class EPlayerRole : uint8
     ,PILOT = 1
 };
 
+USTRUCT(BlueprintType)
+struct FMissionPlayerSpawnPoints
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FName spawnPointTag;
+    // 스폰 포인트 맵
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    TMap<EPlayerRole, class AJ_MissionSpawnPointActor*> spawnPointMap;
+
+    // 스폰 포인트 기본 위치 맵
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TMap<EPlayerRole, FTransform> spawnPointDefaultPos;
+
+    // 스폰 포인트 프리팹
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+    TSubclassOf<class AJ_MissionSpawnPointActor> spawnPointPrefab;
+    // TSubclassOf<AActor> spawnPointPrefab;
+};
+
 #pragma endregion
 
 // @@ 테스트 용
@@ -152,4 +174,6 @@ public:
     // static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
 
     static class UK_GameInstance* GetKGameInstance(const UWorld* world);
+
+    static class AJ_MissionGamemode* GetMissionGamemode(const UWorld* world);
 };

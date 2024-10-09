@@ -19,9 +19,9 @@ protected:
 	// 플레이어 역할
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	EPlayerRole playerRole;
-	// 스폰 위치
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FTransform spawnTR;
+	// XXX 스폰 위치
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	// FTransform spawnTR;
 
 
 	
