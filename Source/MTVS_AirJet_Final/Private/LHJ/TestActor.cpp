@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "LHJ/TestActor.h"
-
-#include "MTVS_AirJet_Final/MTVS_AirJet_Final.h"
+#include "MTVS_AirJet_Final/Public/MTVS_AirJet_Final.h"
 
 // Sets default values
 ATestActor::ATestActor()
