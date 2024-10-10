@@ -37,8 +37,8 @@ protected:
 		,{ERequestType::POST, TEXT("POST")}
 	};	
 
-
 	// json 데이터 변환 시킬 res 함수 연결용 딜리게이트
+	// 통신 단위 하나당 한 개 씩 추가
 	FResponseDelegate tempDel;
 
 	FResponseDelegate signupDel;
@@ -46,6 +46,29 @@ protected:
 	FResponseDelegate loginDel;
 
 	FResponseDelegate tempLoginAuthDel;
+
+	// 미션
+	// 자신 플레이어 역할
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values", BlueprintGetter=GetPlayerRole, BlueprintSetter=SetPlayerRole)
+	EPlayerRole playerRole;
+		public:
+	__declspec(property(get = GetPlayerRole, put = SetPlayerRole)) EPlayerRole PLAYER_ROLE;
+	UFUNCTION(BlueprintGetter)
+	EPlayerRole GetPlayerRole()
+	{
+		return playerRole;
+	}
+	UFUNCTION(BlueprintSetter)
+	void SetPlayerRole(EPlayerRole value)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(value)));
+		playerRole = value;
+	}
+		protected:
+
+	// 미션 플레이어 역할, 캐릭터 프리팹 맵
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TMap<EPlayerRole, TSubclassOf<class APawn>> playerPrefabMap;
 
 public:
 #pragma region 사용 함수 연결용 딜리게이트 단
@@ -68,25 +91,27 @@ protected:
 	}
 
 	// 구조체 데이터 없음 == get, post 일부
+	// json 데이터 가지고 서버 요청
 	void ReqData(FResponseDelegate resDel, const FString& jsonData = TEXT(""),  const FString& url = "", bool useDefaultURL = true, ERequestType type = ERequestType::POST);
 
 	// solved 테스트용 데이터 주고 받기
 	UFUNCTION(BlueprintCallable)
-	void ReqTempCallback();
+	virtual void ReqTempCallback();
 
 	UFUNCTION()
-	void ResTempCallback(const FString& jsonData, bool isSuccess);
+	virtual void ResTempCallback(const FString& jsonData, bool isSuccess);
 
 	UFUNCTION()
-	void ResSignup(const FString &jsonData, bool isSuccess);
+	virtual void ResSignup(const FString &jsonData, bool isSuccess);
 
 	UFUNCTION()
-	void ResLogin(const FString &jsonData, bool isSuccess);
+	virtual void ResLogin(const FString &jsonData, bool isSuccess);
 
 	UFUNCTION()
-	void ResLoginAuth(const FString &jsonData, bool isSuccess);
+	virtual void ResLoginAuth(const FString &jsonData, bool isSuccess);
 
-    public:
+public:
+	// 통신 타입, 데이터 받아서 서버에 요청 시작
 	template<typename InStructType>
 	void RequestToServer(EJsonType type, const InStructType& structData)
 	{
@@ -98,5 +123,8 @@ protected:
 		RequestToServer(type, jsonData);
 	}
 
-	void RequestToServer(EJsonType type, const FString &sendJsonData = TEXT(""));
+	virtual void RequestToServer(EJsonType type, const FString &sendJsonData = TEXT(""));
+
+	// 자신 플레이어 역할에 맞는 프리팹 주기
+	virtual TSubclassOf<APawn> GetMissionPlayerPrefab();
 };

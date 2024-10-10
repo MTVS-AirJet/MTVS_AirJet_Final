@@ -97,6 +97,31 @@ struct FResSimple
     }
 };
 
+USTRUCT(BlueprintType)
+struct FLoginResponse
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool success;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString response;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString loginId;
+
+    FLoginResponse() : success(false), response(TEXT("미설정")) {}
+
+    FString ToString() const
+    {
+        FString str = FString::Printf(TEXT("성공 여부 : %s\n응답 결과 데이터 : %s\n로그인 id : %s")
+            , this->success ? TEXT("TRUE") : TEXT("FALSE")
+            , *this->response
+            , *this->loginId);
+
+        return str;
+    }
+};
+
 #pragma endregion
 
 #pragma endregion
