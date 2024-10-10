@@ -44,8 +44,13 @@ protected:
     // 스폰 포인트 액터 추가
     class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole);
 
+    int pIdx = 0;
+
 public:
     virtual void Tick(float DeltaSeconds) override;
+
+    // 플레이어 접속
+    virtual void PostLogin(APlayerController *newPlayer) override;
 
     // 해당 역할의 플레이어 스폰 포인트 트랜스폼 가져오기
     FTransform GetPlayerSpawnTransfrom(EPlayerRole role);

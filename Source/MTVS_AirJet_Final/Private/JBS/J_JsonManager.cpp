@@ -28,7 +28,14 @@ void AJ_JsonManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+void AJ_JsonManager::ReqTemp()
+{
+	FResSimple simple;
+	simple.success = true;
+	simple.response = TEXT("doremifarondo");
 
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::TEMP01_CALLBACK, simple);
+}
 
 // 0-1. 회원 가입 요청 예시
 void AJ_JsonManager::ReqSignup()
