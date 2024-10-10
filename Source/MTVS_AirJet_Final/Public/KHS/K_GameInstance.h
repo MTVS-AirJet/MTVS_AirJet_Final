@@ -42,21 +42,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	void CreateLoginWidget(); // 로그인 UI를 생성하는 함수
 
-	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
-	//void CreateServerWidget(); // 시작화면 UI를 생성하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Create Widget")
+	void CreateServerWidget(); // Server UI를 생성하는 함수
 
 	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	//void CreateInGameWidget(); // 인게임 UI를 생성하는 함수
 
 	// 3) Travel 관련 함수 ------------------------------------------------------------------------------------
-	UFUNCTION(BlueprintCallable, Category = "Load Widget Map")
-	void LoadServerWidgetMap(bool bKeepCurrentSound); // ServerWidget UI가 있는 맵으로 로드시키는 함수 (UI를 레벨에 Attach 해놓았음.)
+	UFUNCTION(BlueprintCallable, Category = "Load Lobby Map")
+	void TravelMainLobbyMap(bool bKeepCurrentSound); // Lobby 맵으로 트래블시키는 함수
 
 	// 5) 사운드 관련 함수 --------------------------------------------------------------------------------------
 	void PlayLobbySound(); // 로비 사운드 재생 함수
 	//UFUNCTION()
 	//void PlayStageSound(); // 시뮬레이션 스테이지 사운드 재생 함수
-	//void StopCurrentSound(); // 현재 사운드 재생 중지 함수
+	void StopCurrentSound(); // 현재 사운드 재생 중지 함수
 	void ContinueCurrentSound(); // 현재 사운드 유지 함수
 
 
@@ -64,9 +64,13 @@ public:
 
 	// 1) UI 관련 참조 ------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UK_LoginRegisterWidget> LoginWidgetFactory; // ServerWidget(UI) 공장
-	class UK_LoginRegisterWidget* LoginWidget; // ServerWidget(UI) 참조 선언
+	TSubclassOf<class UK_LoginRegisterWidget> LoginWidgetFactory; // LoginWidget(UI) 공장
+	class UK_LoginRegisterWidget* LoginWidget; // LoginWidget(UI) 참조 선언
 	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UK_ServerWidget> ServerWidgetFactory; // ServerWidget(UI) 공장
+	class UK_ServerWidget* ServerWidget; // ServerWidget(UI) 참조 선언
+
 	// 2) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundWave* LobbySound; // 로비 사운드

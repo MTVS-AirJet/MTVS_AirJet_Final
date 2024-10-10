@@ -15,10 +15,11 @@ class MTVS_AIRJET_FINAL_API AK_PlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	//------------------------------------------화면 공유 UI
+	//화면 공유 UI======================================
    UPROPERTY(EditDefaultsOnly)
    TSubclassOf<class UUserWidget> StreamingUIFactory;
    UPROPERTY(BlueprintReadWrite)
    class UK_StreamingUI* StreamingUI;
+
 
 };

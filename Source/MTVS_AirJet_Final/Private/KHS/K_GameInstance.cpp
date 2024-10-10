@@ -3,9 +3,8 @@
 
 #include "KHS/K_GameInstance.h"
 #include "KHS/K_LoginRegisterWidget.h"
-
-#include "JBS/J_JsonUtility.h"
-#include "JBS/J_Utility.h"
+#include "KHS/K_PlayerController.h"
+#include "KHS/K_ServerWidget.h"
 
 #include "Components/AudioComponent.h"
 #include <Engine/World.h>
@@ -42,8 +41,38 @@ void UK_GameInstance::CreateLoginWidget()
 	LoginWidget->SetUI(); //부모함수 호출
 }
 
-void UK_GameInstance::LoadServerWidgetMap(bool bKeepCurrentSound)
+// Server UI를 생성하는 함수
+void UK_GameInstance::CreateServerWidget()
 {
+	// ServerUIFactory를 통해 ServerUI 위젯 생성
+	ServerWidget = CreateWidget<UK_ServerWidget>(this , ServerWidgetFactory);
+	ServerWidget->SetInterface(this); //부모함수 호출
+	ServerWidget->SetUI(); //부모함수 호출
+}
+
+void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
+{
+	// K_PlayerController를 가져온다,
+	AK_PlayerController* pc = Cast<AK_PlayerController>(GetFirstLocalPlayerController());
+	if ( pc && pc->IsLocalController() ) // 컨트롤러가 있으면,
+	{
+		if ( false == bKeepCurrentSound ) // false 인자인 경우 기존 사운드를 유지하지 않으면서 이동
+		{
+			StopCurrentSound();
+		}
+		else
+		{
+			ContinueCurrentSound();
+		}
+
+		// PlayerController를 통해 LobbyMap으로 이동시킨다.
+		pc->ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
+	}
+
+	else
+	{
+		UE_LOG(LogTemp , Error , TEXT("Failed to get PlayerController in LoadServerWidgetMap."));
+	}
 }
 
 // 로비 사운드 재생 함수
@@ -61,6 +90,15 @@ void UK_GameInstance::PlayLobbySound()
 	else
 	{
 		UE_LOG(LogTemp , Error , TEXT("LobbySound is not set"));
+	}
+}
+
+void UK_GameInstance::StopCurrentSound()
+{
+	if ( CurrentPlayingSound && CurrentPlayingSound->IsPlaying() )
+	{
+		CurrentPlayingSound->Stop();
+		UE_LOG(LogTemp , Warning , TEXT("Stopped current sound"));
 	}
 }
 
