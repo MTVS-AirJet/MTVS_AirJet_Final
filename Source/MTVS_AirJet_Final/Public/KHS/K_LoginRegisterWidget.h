@@ -86,6 +86,8 @@ public:
 	void ShowLoginFailure(); //로그인 실패시 나타나는 Txt Msg 처리 함수
 	UFUNCTION(BlueprintCallable)
 	void OnClickedGuestLogin(); //게스트 로그인 (바로 로비로 입장)
+	UFUNCTION(BlueprintCallable)
+	void OnClickedQuit(); //Quit버튼 클릭(게임종료)
 
 	//======================================================
 	// 회원가입 Functions, Variables

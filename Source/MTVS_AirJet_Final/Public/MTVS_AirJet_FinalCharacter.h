@@ -81,5 +81,10 @@ public:
 	
 	void InitStreamingUI();
 
+	FString CurrentMapName; //특정맵일때만 보이도록
+
+
+
+
 };
 

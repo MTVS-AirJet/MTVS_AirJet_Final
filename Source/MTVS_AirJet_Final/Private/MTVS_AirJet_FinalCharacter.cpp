@@ -13,6 +13,7 @@
 #include "KHS/K_GameState.h"
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_StreamingUI.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -62,10 +63,15 @@ void AMTVS_AirJet_FinalCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	if ( IsLocallyControlled() )
+	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+
+	if ( CurrentMapName == "K_TestMap" || CurrentMapName == "K_LobbyMap" )
 	{
-		InitStreamingUI();
-		UE_LOG(LogTemp, Warning, TEXT("==========================Streaming!!!"));
+		if ( IsLocallyControlled() )
+		{
+			InitStreamingUI();
+			UE_LOG(LogTemp , Warning , TEXT("==========================Streaming!!!"));
+		}
 	}
 }
 
@@ -144,6 +150,12 @@ void AMTVS_AirJet_FinalCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// Pixel Streaming
+
 //StreamingPlayer 가져오기
 void AMTVS_AirJet_FinalCharacter::ServerRPC_SetStreamingPlayer_Implementation(const FString& PlayerID , bool bAddPlayer)
 {
@@ -178,22 +190,25 @@ void AMTVS_AirJet_FinalCharacter::InitStreamingUI()
 	auto pc = Cast<AK_PlayerController>(Controller);
 	if ( nullptr == pc )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("[initWindowList] Player Controller is null"));
+		UE_LOG(LogTemp , Warning , TEXT("Player Controller is null"));
 		return;
 	}
 
 	pc->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , pc->StreamingUIFactory));
 	if ( pc->StreamingUI )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("[initWindowList] MemoWidget is not null"));
+		UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
 		StreamingUI = pc->StreamingUI;
 
-		StreamingUI->AddToViewport(1);
+		StreamingUI->AddToViewport(0);
 		StreamingUI->SetVisibility(ESlateVisibility::Visible);
+
+		pc->SetInputMode(FInputModeGameOnly()); //트래블할때 문제가 있어서 UI불러올떄 GameOnly로 설정
+		//블루프린트로 Tab키 바인딩해서 필요할때 마우스 껐다켰다하면서 UI사용하면됨.
 	}
 	else
 	{
-		UE_LOG(LogTemp , Warning , TEXT("[initMemoUI] MemoWidget is null"));
+		UE_LOG(LogTemp , Warning , TEXT("StreamingUI is null"));
 	}
 
 }

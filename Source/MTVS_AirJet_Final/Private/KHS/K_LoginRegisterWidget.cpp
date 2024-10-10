@@ -52,6 +52,8 @@ bool UK_LoginRegisterWidget::Initialize()
 		LoginMenu_btn_Login->OnClicked.AddDynamic(this , &UK_LoginRegisterWidget::OnMyLogin);
 	if ( LoginMenu_btn_GuestLogin ) //Guest로그인
 		LoginMenu_btn_GuestLogin->OnClicked.AddDynamic(this , &UK_LoginRegisterWidget::OnClickedGuestLogin);
+	if (LoginMenu_btn_Quit) // Quit버튼
+		LoginMenu_btn_Quit->OnClicked.AddDynamic(this, &UK_LoginRegisterWidget::OnClickedQuit);
 
 	// Register 메뉴 버튼 델리게이트 바인딩
 	if ( RegisterMenu_btn_CreateID ) //계정 생성 버튼
@@ -213,7 +215,7 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 				}
 
 				GameInstance->ContinueCurrentSound(); // 로그인 성공 시에도 현재 사운드 계속 재생
-				GameInstance->LoadServerWidgetMap(true); // true 인자를 통해 현재 사운드를 유지하며 이동
+				GameInstance->TravelMainLobbyMap(true); // true 인자를 통해 현재 사운드를 유지하며 이동
 			}
 			else {
 				UE_LOG(LogTemp , Error , TEXT("Failed to get GameInstance"));
@@ -249,8 +251,17 @@ void UK_LoginRegisterWidget::OnClickedGuestLogin()
 	UK_GameInstance* GameInstance = Cast<UK_GameInstance>(GetWorld()->GetGameInstance());
 	if ( GameInstance )
 	{
-		GameInstance->LoadServerWidgetMap(true); // true 인자를 통해 현재 사운드를 유지하며 레벨로 트래블
+		GameInstance->TravelMainLobbyMap(true); // true 인자를 통해 현재 사운드를 유지하며 레벨로 트래블
 	}
+}
+
+//Quit버튼 클릭(게임종료)
+void UK_LoginRegisterWidget::OnClickedQuit()
+{
+	UWorld* World = GetWorld();
+	APlayerController* pc = World->GetFirstPlayerController();
+
+	pc->ConsoleCommand("quit"); // 게임종료명령
 }
 
 #pragma endregion
@@ -280,7 +291,7 @@ void UK_LoginRegisterWidget::OpenLoginMenu()
 //계정생성 요청함수
 void UK_LoginRegisterWidget::OnMyRegister()
 {
-	// 입력된 로그인 정보를 가져옴.
+	// 입력된 회원가입 정보를 가져옴.
 	FString RegisterUserID = RegisterMenu_txt_UserID->GetText().ToString();
 	FString RegisterNickname = RegisterMenu_txt_NIckName->GetText().ToString();
 	FString RegisterPassword = RegisterMenu_txt_UserPW->GetText().ToString();
