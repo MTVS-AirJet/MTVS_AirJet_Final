@@ -32,7 +32,7 @@ enum class EJsonType : uint8
 
 #pragma region 요청단
 USTRUCT(BlueprintType)
-struct FSignup
+struct FSignupReq
 {
     GENERATED_BODY()
     
@@ -45,9 +45,9 @@ struct FSignup
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString nickname;
 
-    FSignup() : loginId(TEXT("미설정")), password(TEXT("미설정")), confirmPassword(TEXT("미설정")), nickname(TEXT("미설정")) {}
+    FSignupReq() : loginId(TEXT("미설정")), password(TEXT("미설정")), confirmPassword(TEXT("미설정")), nickname(TEXT("미설정")) {}
 
-    FSignup(FString loginId ,FString password ,FString confirmPassword ,FString nickname) 
+    FSignupReq(FString loginId ,FString password ,FString confirmPassword ,FString nickname) 
         : loginId(loginId)
         ,password(password)
         ,confirmPassword(confirmPassword)
@@ -55,7 +55,7 @@ struct FSignup
 };
 
 USTRUCT(BlueprintType)
-struct FLogin
+struct FLoginReq
 {
     GENERATED_BODY()
 
@@ -64,9 +64,9 @@ struct FLogin
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString password;
 
-    FLogin() : loginId(TEXT("미설정")), password(TEXT("미설정")) {}
+    FLoginReq() : loginId(TEXT("미설정")), password(TEXT("미설정")) {}
 
-    FLogin(FString loginId ,FString password) 
+    FLoginReq(FString loginId ,FString password) 
         : loginId(loginId)
         ,password(password) {}
 };
@@ -98,7 +98,7 @@ struct FResSimple
 };
 
 USTRUCT(BlueprintType)
-struct FLoginResponse
+struct FLoginRes
 {
     GENERATED_BODY()
     
@@ -109,7 +109,7 @@ struct FLoginResponse
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString loginId;
 
-    FLoginResponse() : success(false), response(TEXT("미설정")) {}
+    FLoginRes() : success(false), response(TEXT("미설정")) {}
 
     FString ToString() const
     {
@@ -196,7 +196,7 @@ class MTVS_AIRJET_FINAL_API UJ_Utility : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-    // static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
+    static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
 
     static class UK_GameInstance* GetKGameInstance(const UWorld* world);
 
