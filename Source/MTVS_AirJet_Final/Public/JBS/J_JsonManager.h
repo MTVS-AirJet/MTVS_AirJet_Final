@@ -31,13 +31,14 @@ public:
 protected:
 	// @@ 임시 요청 데이터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FSignup tempSignup;
+	FSignupReq tempSignup;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FLogin tempLogin;
+	FLoginReq tempLogin;
 
 public:
 
 protected:
+	// 0. 회원가입 요청 예시
 	UFUNCTION(BlueprintCallable)
 	void ReqSignup();
 
@@ -50,6 +51,10 @@ protected:
 	// @@ 테스트용 로그인 인증 데이터 받기
 	UFUNCTION(BlueprintCallable)
 	void OnLoginAuthData(const FResSimple &resData);
+
+	// @@ 5. 테스트용 로그인 했을때 반환 데이터 받기
+	UFUNCTION(BlueprintCallable)
+	void OnLoginData(const FLoginRes &resData);
 
     public:
 };
