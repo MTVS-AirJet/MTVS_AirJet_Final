@@ -3,6 +3,8 @@
 
 #include "JBS/J_MissionGamemode.h"
 #include "Engine/LatentActionManager.h"
+#include "JBS/J_GameInstance.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
@@ -93,4 +95,19 @@ FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role)
     auto tr = this->GetSpawnPoint(role)->GetActorTransform();;
 
     return tr;
+}
+
+void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
+{
+    Super::PostLogin(newPlayer);
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("플레이어 id : %d"), pIdx));
+    // FIXME 임시로 첫 플레이어는 지휘관 이후는 파일럿으로 역할 설정
+    auto* gi = newPlayer->GetGameInstance<UJ_GameInstance>();
+    gi->SetPlayerRole(pIdx == 0 ? EPlayerRole::COMMANDER : EPlayerRole::PILOT);
+    // 역할 설정후 플레이어 스폰
+    auto* pc = Cast<AJ_MissionPlayerController>(newPlayer);
+    pc->SpawnMyPlayer();
+
+    pIdx++;
 }

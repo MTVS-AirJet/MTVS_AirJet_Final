@@ -31,11 +31,14 @@ public:
 protected:
     virtual void BeginPlay() override;
 
+
 	UFUNCTION(Server, Reliable)
 	void SRPC_SpawnMyPlayer(TSubclassOf<class APawn> playerPrefab);
 
 public:
 	virtual void Tick(float deltaTime);
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnMyPlayer();
 	
 };

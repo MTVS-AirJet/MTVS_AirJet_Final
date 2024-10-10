@@ -38,7 +38,10 @@ protected:
 public:
 
 protected:
-	// 0. 회원가입 요청 예시
+	UFUNCTION(BlueprintCallable)
+	void ReqTemp();
+
+        // 0. 회원가입 요청 예시
 	UFUNCTION(BlueprintCallable)
 	void ReqSignup();
 

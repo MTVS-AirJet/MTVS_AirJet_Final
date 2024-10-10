@@ -126,22 +126,22 @@ void UJ_GameInstance::ReqTempCallback()
 void UJ_GameInstance::ResTempCallback(const FString& jsonData, bool isSuccess)
 {
 	// json string 데이터 -> 구조체 데이터로 변환
-	FTempJsonAry jsonAry;
-	FJsonObjectConverter::JsonObjectStringToUStruct<FTempJsonAry>(jsonData, &jsonAry,0,0);
+	FResSimple jsonAry;
+	FJsonObjectConverter::JsonObjectStringToUStruct<FResSimple>(jsonData, &jsonAry,0,0);
 
 	// 변환된 구조체가지고 뭔가 하기
 	auto rresult = jsonAry;
 	// auto rresult = UJ_JsonUtility::JsonParseTempAry(resStr);
 
-	FString result;
-	for(auto r : rresult.tempJsons)
-	{
-		result.Append(r.ToString());
-	}
-	
+	// FString result;
+	// for(auto r : rresult.tempJsons)
+	// {
+	// 	result.Append(r.ToString());
+	// }
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : \n%s"), *rresult.ToString()));
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : %s"), *result));
-	UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : %s"), *result));
+	// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
 }
 
 void UJ_GameInstance::ResSignup(const FString &jsonData, bool isSuccess)
