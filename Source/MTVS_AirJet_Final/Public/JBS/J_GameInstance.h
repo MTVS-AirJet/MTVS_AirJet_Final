@@ -12,6 +12,7 @@
 /**
  * 
  */
+ #pragma region api마다 하나씩 추가하는 곳
 //  딜리게이트 선언
 DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
 
@@ -23,6 +24,53 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+protected:
+#pragma region 반응 딜리게이트 단
+	// json 데이터 변환 시킬 res 함수 연결용 딜리게이트
+	// 통신 api 하나당 한 개 씩 추가
+	FResponseDelegate tempDel;
+
+	FResponseDelegate signupDel;
+
+	FResponseDelegate loginDel;
+
+	FResponseDelegate tempLoginAuthDel;
+
+#pragma endregion
+	// solved 테스트용 데이터 주고 받기
+	UFUNCTION(BlueprintCallable)
+	virtual void ReqTempCallback();
+
+#pragma region 반응 함수 단
+	// 4. 요청 후 반응 함수 예시
+	UFUNCTION()
+	virtual void ResTempCallback(const FString& jsonData, bool isSuccess);
+
+	UFUNCTION()
+	virtual void ResSignup(const FString &jsonData, bool isSuccess);
+
+	UFUNCTION()
+	virtual void ResLogin(const FString &jsonData, bool isSuccess);
+
+	UFUNCTION()
+	virtual void ResLoginAuth(const FString &jsonData, bool isSuccess);
+
+#pragma endregion
+
+#pragma region 사용 함수 연결용 딜리게이트 단
+public:
+	// res 구조체 데이터 사용할 함수 연결용 딜리게이트
+	// XXX
+	FResSimpleDelegate tempLoginAuthUseDel;
+
+	FResSimpleDelegate signupResUseDelegate;
+
+	FLoginResDelegate loginResUseDelegate;
+#pragma endregion
+
+#pragma endregion
+
+
 	
 protected:
 	// 기본 ip
@@ -36,20 +84,7 @@ protected:
 	TMap<ERequestType, FString> reqTypeMap = {
 		{ERequestType::GET, TEXT("GET")}
 		,{ERequestType::POST, TEXT("POST")}
-	};	
-
-#pragma region 반응 딜리게이트 단
-	// json 데이터 변환 시킬 res 함수 연결용 딜리게이트
-	// 통신 api 하나당 한 개 씩 추가
-	FResponseDelegate tempDel;
-
-	FResponseDelegate signupDel;
-
-	FResponseDelegate loginDel;
-
-	FResponseDelegate tempLoginAuthDel;
-
-#pragma endregion
+	};
 
 	// 미션
 	// 자신 플레이어 역할
@@ -75,15 +110,6 @@ protected:
 	TMap<EPlayerRole, TSubclassOf<class APawn>> playerPrefabMap;
 
 public:
-#pragma region 사용 함수 연결용 딜리게이트 단
-	// res 구조체 데이터 사용할 함수 연결용 딜리게이트
-	// XXX
-	FResSimpleDelegate tempLoginAuthUseDel;
-
-	FResSimpleDelegate signupUseDelegate;
-
-	FLoginResDelegate loginResUseDelegate;
-#pragma endregion
 
 protected:
 	// 3-1. 서버에 요청 : 반응 딜리게이트, 구조체 데이터, url, 기본 url 사용 여부, 전송 타입(POST or GET)
@@ -99,27 +125,6 @@ protected:
 
 	// 3-2. 서버에 요청 : 반응 딜리게이트, json 데이터, url, 기본 url 사용 여부, 전송 타입(POST or GET)
 	void RequestData(FResponseDelegate resDel, const FString& jsonData = TEXT(""),  const FString& url = "", bool useDefaultURL = true, ERequestType type = ERequestType::POST);
-
-#pragma region 반응 함수 단
-
-	// solved 테스트용 데이터 주고 받기
-	UFUNCTION(BlueprintCallable)
-	virtual void ReqTempCallback();
-
-	// 4. 요청 후 반응 함수 예시
-	UFUNCTION()
-	virtual void ResTempCallback(const FString& jsonData, bool isSuccess);
-
-	UFUNCTION()
-	virtual void ResSignup(const FString &jsonData, bool isSuccess);
-
-	UFUNCTION()
-	virtual void ResLogin(const FString &jsonData, bool isSuccess);
-
-	UFUNCTION()
-	virtual void ResLoginAuth(const FString &jsonData, bool isSuccess);
-
-#pragma endregion
 
 public:
 	// 2-1. 통신 타입, 데이터 받아서 서버에 요청 시작

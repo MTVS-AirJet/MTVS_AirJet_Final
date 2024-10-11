@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include <JBS/J_BaseMissionPawn.h>
 #include "J_CommanderPlayer.generated.h"
 
 UCLASS()
-class MTVS_AIRJET_FINAL_API AJ_CommanderPlayer : public APawn
+class MTVS_AIRJET_FINAL_API AJ_CommanderPlayer : public AJ_BaseMissionPawn
 {
 	GENERATED_BODY()
 

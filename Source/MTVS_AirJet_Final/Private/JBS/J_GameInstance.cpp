@@ -151,7 +151,7 @@ void UJ_GameInstance::ResSignup(const FString &jsonData, bool isSuccess)
 
 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
 
-	signupUseDelegate.ExecuteIfBound(resData);
+	signupResUseDelegate.ExecuteIfBound(resData);
 }
 
 // 로그인 반응 함수
