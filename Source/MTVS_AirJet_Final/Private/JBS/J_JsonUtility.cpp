@@ -6,6 +6,7 @@
 #include "Containers/UnrealString.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
+#include "JBS/J_Utility.h"
 #include "Json.h"
 #include "JsonObjectConverter.h"
 #include "JsonUtilities.h"
@@ -86,4 +87,14 @@ AJ_JsonManager* UJ_JsonUtility::GetJsonManager(const UWorld* world)
     check(jsonManager);
 
     return jsonManager;
+}
+
+void UJ_JsonUtility::RequestExecute(const UWorld *world, EJsonType type, const FString &sendJsonData, UJ_GameInstance *gameInstance)
+{
+    // 게임 인스턴스 못 받았으면 가져오기
+    if(!gameInstance)
+        gameInstance = UJ_Utility::GetJGameInstance(world);
+    
+    // 2. 요청 시작
+    gameInstance->RequestToServerByType(type, sendJsonData);
 }

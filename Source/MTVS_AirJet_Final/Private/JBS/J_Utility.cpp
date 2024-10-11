@@ -8,13 +8,13 @@
 #include <JBS/J_MissionGamemode.h>
 #include <Engine/World.h>
 
-// UJ_GameInstance *UJ_Utility::GetJGameInstance(const UWorld* world)
-// {
-//     auto* gi =  Cast<UJ_GameInstance>(UGameplayStatics::GetGameInstance(world));
-//     check(gi);
+UJ_GameInstance *UJ_Utility::GetJGameInstance(const UWorld* world)
+{
+    auto* gi =  Cast<UJ_GameInstance>(UGameplayStatics::GetGameInstance(world));
+    check(gi);
 
-//     return gi;
-// }
+    return gi;
+}
 
 UK_GameInstance *UJ_Utility::GetKGameInstance(const UWorld* world)
 {

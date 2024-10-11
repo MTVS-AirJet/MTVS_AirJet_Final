@@ -28,29 +28,52 @@ void AJ_JsonManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+void AJ_JsonManager::ReqTemp()
+{
+	FResSimple simple;
+	simple.success = true;
+	simple.response = TEXT("doremifarondo");
 
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::TEMP01_CALLBACK, simple);
+}
 
-
+// 0-1. 회원 가입 요청 예시
 void AJ_JsonManager::ReqSignup()
 {
-	UJ_JsonUtility::RequestExecute<FSignup>(GetWorld(), EJsonType::SIGN_UP, tempSignup);
+	// 그냥 요청만 하는 예시
+	UJ_JsonUtility::RequestExecute<FSignupReq>(GetWorld(), EJsonType::SIGN_UP, tempSignup);
 }
 
 void AJ_JsonManager::ReqLogin()
 {
-	UJ_JsonUtility::RequestExecute<FLogin>(GetWorld(), EJsonType::LOGIN, tempLogin);
+	// auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	// gi->tempLoginResUseDel.BindLambda([this](const FLoginResponse& resData){
+	// 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
+	// });
+
+
+	UJ_JsonUtility::RequestExecute<FLoginReq>(GetWorld(), EJsonType::LOGIN, tempLogin);
 }
 
+// 0-2. 요청하고 반응 데이터까지 받아오는 예시
 void AJ_JsonManager::ReqTempAuth()
 {
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
 	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
 	gi->tempLoginAuthUseDel.BindUObject(this, &AJ_JsonManager::OnLoginAuthData);
 
-	UJ_JsonUtility::RequestExecute<FLogin>(GetWorld(), EJsonType::TEMP02_AUTH, tempLogin);
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute<FLoginReq>(GetWorld(), EJsonType::TEMP02_AUTH, tempLogin);
 }
 
 void AJ_JsonManager::OnLoginAuthData(const FResSimple &resData)
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("asd"));
+	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
+}
+
+// 5. 반응 데이터 처리하는 예시
+void AJ_JsonManager::OnLoginData(const FLoginRes &resData)
+{
 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
 }

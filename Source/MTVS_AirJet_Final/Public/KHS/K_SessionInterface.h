@@ -26,7 +26,7 @@ public:
 	
 	virtual void Host(FString ServerName) = 0;  //방생성 가상함수
 	virtual void Join(uint32 Index) = 0;  //방합류 가상함수
-	virtual void LoadServerWidgetMap(bool bKeepCurrentSound) = 0;  //위젯레벨 로드 가상함수
+	virtual void TravelMainLobbyMap(bool bKeepCurrentSound) = 0;  //위젯레벨 로드 가상함수
 	virtual void RefreshServerList() = 0;  //서버목록갱신 가상함수
 
 };
