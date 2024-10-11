@@ -1,14 +1,15 @@
 #include "LHJ/L_Viper.h"
 
-#include <cmath>
-
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "MTVS_AirJet_Final.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "LHJ/L_HUDWidget.h"
 
 
 #pragma region Construct
@@ -64,6 +65,11 @@ AL_Viper::AL_Viper()
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
 	//JetFirstEngine->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	JetFirstEngine->SetHiddenInGame(false); // For Test
+
+	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
+	JetWidget->SetupAttachment(JetMesh);
+	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
+	JetWidget->SetDrawSize(FVector2D(300 , 200));
 }
 #pragma endregion
 
@@ -263,6 +269,8 @@ void AL_Viper::BeginPlay()
 
 		pc->bEnableClickEvents = true;
 	}
+
+	JetWidget->SetWidgetClass(HUD_UI);
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -417,9 +425,9 @@ void AL_Viper::Tick(float DeltaTime)
 		if (IsRightRoll)
 			JetRoot->AddRelativeRotation(RotateValue);
 	}
-#pragma endregion
 
 	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
+#pragma endregion	
 
 #pragma region Reset Jet Arrow (Not Using)
 	// if (IsKeyUpPress || IsKeyDownPress)
@@ -438,6 +446,42 @@ void AL_Viper::Tick(float DeltaTime)
 	// 	JetArrow->AddRelativeRotation(FRotator(0 , newYaw , 0));
 	// }
 #pragma endregion
+
+#pragma region 고도계
+	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if (CurrentMapName == TEXT("LHJ_TestLevel"))
+	{
+		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
+		float CurrFeet = CurrHeight / 30.48; // cm to feet
+		if (CurrFeet < 0)
+			CurrFeet = 0;
+
+		if (CurrFeet <= 1400)
+		{
+			JetWidget->SetVisibility(true);
+			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+			{
+				HUDui->UpdateHeightBar(CurrFeet);
+			}
+		}
+		else
+		{
+			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+			{
+				HUDui->UpdateHeightText(CurrFeet);
+			}
+			JetWidget->SetVisibility(false);
+		}
+#pragma endregion
+
+#pragma region 속도계
+		int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
+		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+		{
+			HUDui->UpdateHeightText(ValueOfMoveForceInNote);
+		}
+#pragma endregion
+	}
 }
 
 float AL_Viper::GetAddTickSpeed()

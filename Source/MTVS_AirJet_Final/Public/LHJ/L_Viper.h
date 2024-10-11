@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/Image.h"
+#include "Components/ProgressBar.h"
+
 #include "L_Viper.generated.h"
 
 UCLASS()
@@ -39,6 +42,8 @@ private: // Component
 	class UArrowComponent* JetArrow;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UWidgetComponent* JetWidget;
 
 	UFUNCTION()
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed);
@@ -146,7 +151,7 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
-	float MaxValueOfMoveForce = 305800000.f;
+	float MaxValueOfMoveForce = 305580000.f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
 	float ValueOfMoveForce = 0.0f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
@@ -192,4 +197,10 @@ private:
 	float TurnFlight100 = -5.f;
 	UPROPERTY(EditDefaultsOnly , category = "TurnFlight")
 	float TurnFlightAB = 20.f;
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	float HeightOfSea = -480000; // Cesium 해수면 높이
+	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	TSubclassOf<class UUserWidget> HUD_UI;
 };
