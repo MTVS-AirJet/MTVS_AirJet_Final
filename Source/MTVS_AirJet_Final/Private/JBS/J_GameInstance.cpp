@@ -150,6 +150,8 @@ void UJ_GameInstance::ResSignup(const FString &jsonData, bool isSuccess)
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
 
 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
+
+	signupUseDelegate.ExecuteIfBound(resData);
 }
 
 // 로그인 반응 함수
@@ -162,7 +164,7 @@ void UJ_GameInstance::ResLogin(const FString &jsonData, bool isSuccess)
 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
 
 	// 0.에서 바인드된 함수 실행
-	tempLoginResUseDel.ExecuteIfBound(resData);
+	loginResUseDelegate.ExecuteIfBound(resData);
 }
 
 void UJ_GameInstance::ResLoginAuth(const FString &jsonData, bool isSuccess)

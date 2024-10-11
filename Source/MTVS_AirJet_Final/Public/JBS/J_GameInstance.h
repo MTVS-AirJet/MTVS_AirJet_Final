@@ -12,13 +12,12 @@
 /**
  * 
  */
+//  딜리게이트 선언
 DECLARE_DELEGATE_TwoParams(FResponseDelegate, const FString&, bool);
 
 DECLARE_DELEGATE_OneParam(FResSimpleDelegate, const FResSimple&);
 
 DECLARE_DELEGATE_OneParam(FLoginResDelegate, const FLoginRes&);
-
-// _One~ _NineParams 까지 가능
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
@@ -78,9 +77,12 @@ protected:
 public:
 #pragma region 사용 함수 연결용 딜리게이트 단
 	// res 구조체 데이터 사용할 함수 연결용 딜리게이트
+	// XXX
 	FResSimpleDelegate tempLoginAuthUseDel;
 
-	FLoginResDelegate tempLoginResUseDel;
+	FResSimpleDelegate signupUseDelegate;
+
+	FLoginResDelegate loginResUseDelegate;
 #pragma endregion
 
 protected:

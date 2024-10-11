@@ -61,6 +61,7 @@ void AJ_JsonManager::ReqTempAuth()
 	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
 	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
 	gi->tempLoginAuthUseDel.BindUObject(this, &AJ_JsonManager::OnLoginAuthData);
+
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
 	UJ_JsonUtility::RequestExecute<FLoginReq>(GetWorld(), EJsonType::TEMP02_AUTH, tempLogin);
 }
