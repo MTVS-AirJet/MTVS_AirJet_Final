@@ -32,17 +32,23 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", ReplicatedUsing=OnRep_Fov)
 	float fov = 90.f;
+		public:
+	__declspec(property(get = GetFov, put = SetFov)) float FOV;
+	float GetFov()
+	{
+		return fov;
+	}
+	UFUNCTION(BlueprintSetter)
+	void SetFov(float value);
 
-public:
-
-protected:
+    protected:
+    public:
+    protected:
 
 	UFUNCTION()
 	void OnRep_Fov();
 
-    public:
-	// fov 값 설정
-    void SetFov(float value);
+public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 };
