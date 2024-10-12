@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Components/Image.h"
-#include "Components/ProgressBar.h"
-
 #include "L_Viper.generated.h"
 
 UCLASS()
@@ -49,7 +46,7 @@ private: // Component
 	class UCharacterMovementComponent* movement;
 
 	UFUNCTION()
-	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed);
+	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
