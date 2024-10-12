@@ -7,6 +7,7 @@
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "LHJ/L_HUDWidget.h"
@@ -70,6 +71,8 @@ AL_Viper::AL_Viper()
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
 	JetWidget->SetDrawSize(FVector2D(300 , 200));
+
+	movement = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movement"));
 }
 #pragma endregion
 
@@ -149,7 +152,7 @@ void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
 
 void AL_Viper::F_ViperUpCompleted(const FInputActionValue& value)
 {
-	ForceUnitRot = CombineRotate(-1 * ChangeMoveVector);
+	//ForceUnitRot = CombineRotate(-1 * ChangeMoveVector);
 	IsKeyUpPress = false;
 }
 
@@ -166,7 +169,7 @@ void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
 
 void AL_Viper::F_ViperDownCompleted(const FInputActionValue& value)
 {
-	ForceUnitRot = CombineRotate(ChangeMoveVector);
+	//ForceUnitRot = CombineRotate(ChangeMoveVector);
 	IsKeyDownPress = false;
 }
 
@@ -288,69 +291,87 @@ void AL_Viper::Tick(float DeltaTime)
 		{
 			JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
 			ForceUnitRot = FRotator(0 , 0 , 0);
+			// ForceUnitRot -= RotateValue;
 		}
 		else if (jetRot.Pitch < MinPitchValue)
 		{
 			JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
 			ForceUnitRot = FRotator(0 , 0 , 0);
+			// ForceUnitRot += RotateValue;
 		}
 		else
 		{
 			JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
 		}
 
-		if (jetRot.Yaw > MaxYawValue)
-		{
-			JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MaxYawValue - 1.f , jetRot.Roll));
-			ForceUnitRot = FRotator(0 , 0 , 0);
-		}
-		else if (jetRot.Yaw < MinYawValue)
-		{
-			JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MinYawValue + 1.f , jetRot.Roll));
-			ForceUnitRot = FRotator(0 , 0 , 0);
-		}
-		else
-		{
-			JetArrow->AddRelativeRotation(FRotator(0 , ForceUnitRot.Yaw , 0));
-		}
+		// if (jetRot.Yaw > MaxYawValue)
+		// {
+		// 	JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MaxYawValue - 1.f , jetRot.Roll));
+		// 	// ForceUnitRot = FRotator(0 , 0 , 0);
+		// }
+		// else if (jetRot.Yaw < MinYawValue)
+		// {
+		// 	JetArrow->SetRelativeRotation(FRotator(jetRot.Pitch , MinYawValue + 1.f , jetRot.Roll));
+		// 	// ForceUnitRot = FRotator(0 , 0 , 0);
+		// }
+		// else
+		// {
+		// 	JetArrow->AddRelativeRotation(FRotator(0 , ForceUnitRot.Yaw , 0));
+		// }
 	}
 
 	if (IsKeyLeftPress)
 	{
-		if (MinYawValue <= JetArrow->GetRelativeRotation().Yaw)
+		if (!IsKeyRightPress)
 		{
-			if (float emptyYaw = (MinYawValue - JetArrow->GetRelativeRotation().Yaw) > -1)
-			{
-				JetArrow->AddRelativeRotation(FRotator(0 , emptyYaw , 0));
-			}
-			else
-			{
-				FRotator lerpRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
-				FRotator newRot = FMath::Lerp(jetRot , lerpRot , DeltaTime);
-				//LOG_SCREEN("%f, %f, %f" , newRot.Roll , newRot.Pitch , newRot.Yaw);
-				LOG_S(Warning , TEXT("%f, %f, %f") , newRot.Roll , newRot.Pitch , newRot.Yaw);
-
-				JetArrow->AddRelativeRotation(newRot);
-			}
+			FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+			JetArrow->SetRelativeRotation(resetRot);
+			FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
+			JetArrow->AddRelativeRotation(newRot);
+			// if (MinYawValue <= JetArrow->GetRelativeRotation().Yaw)
+			// {
+			// 	if (float emptyYaw = (MinYawValue - JetArrow->GetRelativeRotation().Yaw) > -1)
+			// 	{
+			// 		JetArrow->AddRelativeRotation(FRotator(0 , emptyYaw , 0));
+			// 	}
+			// 	else
+			// 	{
+			// 		FRotator lerpRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
+			// 		// FRotator newRot = FMath::Lerp(jetRot , lerpRot , DeltaTime);
+			// 		// //LOG_SCREEN("%f, %f, %f" , newRot.Roll , newRot.Pitch , newRot.Yaw);
+			// 		// LOG_S(Warning , TEXT("%f, %f, %f") , newRot.Roll , newRot.Pitch , newRot.Yaw);
+			//
+			// 		// JetArrow->AddRelativeRotation(newRot);
+			// 		JetArrow->AddRelativeRotation(lerpRot);
+			// 	}
+			// }
 		}
 	}
 	else if (IsKeyRightPress)
 	{
-		if (MaxYawValue >= JetArrow->GetRelativeRotation().Yaw)
+		if (!IsKeyLeftPress)
 		{
-			if (float emptyYaw = (MaxYawValue - JetArrow->GetRelativeRotation().Yaw) < 1)
-			{
-				JetArrow->AddRelativeRotation(FRotator(0 , emptyYaw , 0));
-			}
-			else
-			{
-				FRotator lerpRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
-				FRotator newRot = FMath::Lerp(jetRot , lerpRot , DeltaTime);
-				//LOG_SCREEN("%f, %f, %f" , newRot.Roll , newRot.Pitch , newRot.Yaw);
-				LOG_S(Warning , TEXT("%f, %f, %f") , newRot.Roll , newRot.Pitch , newRot.Yaw);
-
-				JetArrow->AddRelativeRotation(newRot);
-			}
+			FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+			JetArrow->SetRelativeRotation(resetRot);
+			FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
+			JetArrow->AddRelativeRotation(newRot);
+			// if (MaxYawValue >= JetArrow->GetRelativeRotation().Yaw)
+			// {
+			// 	if (float emptyYaw = (MaxYawValue - JetArrow->GetRelativeRotation().Yaw) < 1)
+			// 	{
+			// 		JetArrow->AddRelativeRotation(FRotator(0 , emptyYaw , 0));
+			// 	}
+			// 	else
+			// 	{
+			// 		FRotator lerpRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
+			// 		// FRotator newRot = FMath::Lerp(jetRot , lerpRot , DeltaTime);
+			// 		// //LOG_SCREEN("%f, %f, %f" , newRot.Roll , newRot.Pitch , newRot.Yaw);
+			// 		// LOG_S(Warning , TEXT("%f, %f, %f") , newRot.Roll , newRot.Pitch , newRot.Yaw);
+			//
+			// 		// JetArrow->AddRelativeRotation(newRot);
+			// 		JetArrow->AddRelativeRotation(lerpRot);
+			// 	}
+			// }
 		}
 	}
 
@@ -362,8 +383,7 @@ void AL_Viper::Tick(float DeltaTime)
 	//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
 #pragma endregion
 
-#pragma region	Change Accel Value
-
+#pragma region Change Accel Value
 	if (IsAccel)
 	{
 		KeyDownAccel += DeltaTime;
@@ -426,8 +446,8 @@ void AL_Viper::Tick(float DeltaTime)
 			JetRoot->AddRelativeRotation(RotateValue);
 	}
 
-	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
-#pragma endregion	
+	// JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
+#pragma endregion
 
 #pragma region Reset Jet Arrow (Not Using)
 	// if (IsKeyUpPress || IsKeyDownPress)
@@ -489,7 +509,7 @@ float AL_Viper::GetAddTickSpeed()
 	float fRtn = 0.f;
 
 	if (AccelGear == 0)
-		fRtn = -20;
+		fRtn = ZeroGearFlight;
 	else
 	{
 		FRotator jetRot = JetArrow->GetRelativeRotation();

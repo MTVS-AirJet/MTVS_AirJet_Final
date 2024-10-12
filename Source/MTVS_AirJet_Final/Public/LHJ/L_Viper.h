@@ -45,6 +45,9 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
+	UPROPERTY(EditDefaultsOnly, category="Components")
+	class UCharacterMovementComponent* movement;
+
 	UFUNCTION()
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed);
 
@@ -172,6 +175,9 @@ private:
 	bool IsBreak = false;
 	int32 AccelGear = 0; // 현재 엑셀 기어 (0=0%,1=50%,2=100%,3=100% + 애프터버너)
 	float GetAddTickSpeed();
+	// 기어 0
+	UPROPERTY(EditDefaultsOnly , category = "ZeroGear")
+	float ZeroGearFlight = -20.f;
 	// 수평비행
 	UPROPERTY(EditDefaultsOnly , category = "BasicFlight")
 	float BasicFlight50 = 20.f;
