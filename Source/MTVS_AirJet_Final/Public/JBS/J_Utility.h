@@ -297,4 +297,6 @@ public:
     static class AJ_MissionGamemode* GetMissionGamemode(const UWorld* world);
     // 게임 스테이트 가져오기
     static class AK_GameState *GetKGameState(const UWorld *world);
+    // 미션맵 로컬 플레이어 가져오기
+    static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
 };

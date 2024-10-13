@@ -30,24 +30,24 @@ public:
     
     // 주어진 ID를 사용하여 StreamingActor의 공유 사용자 ID 및 화면 공유 설정
     UFUNCTION()  
-    void SetUserID(FString ID, const bool& bAddPlayer);  
+    virtual void SetUserID(FString ID, const bool& bAddPlayer);  
 
     // 화면 공유 버튼을 눌렀을 때, 호출될 델리게이트에 등록할 함수(조종사 Plane메쉬)
     UFUNCTION(BlueprintCallable)  
-    void OnButtonWindowScreen();  
+    virtual void OnButtonWindowScreen();  
 
     // 다른 사용자의 화면을 볼 때 호출되는 함수(지휘관 UI에)
     UFUNCTION(BlueprintCallable)  
-    void OnButtonLookSharingScreen();  
+    virtual void OnButtonLookSharingScreen();  
 
     // StreamingActor를 설정하는 함수
-    void SetScreenActor(class AK_StreamingActor* Actor);
+    virtual void SetScreenActor(class AK_StreamingActor* Actor);
 
     // 현재 온라인 세션의 ID를 반환하는 함수
-    FString GetCurrentSessionID();  
+    virtual FString GetCurrentSessionID();  
 
     // 사용자 ID 목록을 받아 여러 사용자 슬롯을 초기화하는 함수
-    void InitSlot(TArray<FString> Items);  
+    virtual void InitSlot(TArray<FString> Items);  
     
 
     //==========================================================================

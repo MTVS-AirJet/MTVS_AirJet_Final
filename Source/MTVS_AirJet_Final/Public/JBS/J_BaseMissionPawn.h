@@ -29,16 +29,19 @@ protected:
 
 
 public:
+	// FIXME 나중에 분리 필요
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
+	class UK_StreamingUI* streamingUI;
+
 
 protected:
-
+    virtual void PossessedBy(AController *newController) override;
 
 public:
 	// 픽셀 스트리밍용 함수
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetStreamingPlayer(const FString &playerId, bool bAddPlayer);
 
-        // ui와는 분리함
-	// class UK_StreamingUI* streamingUI;
-	// void InitStreamingUI();
+	
+	void InitStreamingUI();
 };
