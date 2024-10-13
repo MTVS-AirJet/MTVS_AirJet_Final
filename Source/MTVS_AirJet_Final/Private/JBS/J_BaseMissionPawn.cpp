@@ -2,8 +2,14 @@
 
 
 #include "JBS/J_BaseMissionPawn.h"
+#include "Blueprint/UserWidget.h"
+#include "Containers/UnrealString.h"
+#include "Engine/Engine.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "KHS/K_GameState.h"
+#include <KHS/K_PlayerController.h>
 #include <JBS/J_Utility.h>
+#include "KHS/K_StreamingUI.h"
 
 // Sets default values
 AJ_BaseMissionPawn::AJ_BaseMissionPawn()
@@ -17,6 +23,12 @@ AJ_BaseMissionPawn::AJ_BaseMissionPawn()
 void AJ_BaseMissionPawn::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
+
+void AJ_BaseMissionPawn::PossessedBy(AController *newController)
+{
+	Super::PossessedBy(newController);
 	
 }
 
@@ -58,3 +70,4 @@ void AJ_BaseMissionPawn::ServerRPC_SetStreamingPlayer_Implementation(const FStri
 	if(this->HasAuthority())
 		gs->OnRep_StreamingID();
 }
+
