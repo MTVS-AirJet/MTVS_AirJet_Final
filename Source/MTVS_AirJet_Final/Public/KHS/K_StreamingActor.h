@@ -50,7 +50,7 @@ public:
 	class UStaticMeshComponent* StreamingScreen; //픽셀 스트리밍 하는 Plane
 
     UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UUserWidget> StreamingUIFactory;  // 창 목록을 표시할 UUserWidget 서브클래스
+	TSubclassOf<class UUserWidget> StreamingUIFactory;  // 창 목록을 표시할 UUserWidget 서브클래스
 
     UPROPERTY(BlueprintReadWrite) 
     class UK_StreamingUI* StreamingUI;  // 픽셀 스트리밍 화면을 표시할 UI 위젯 인스턴스
@@ -82,18 +82,18 @@ public:
     // Function
     //==========================================================================
     
-    void UpdateTexture();  // 매 프레임 텍스처를 업데이트하는 함수
+    virtual void UpdateTexture();  // 매 프레임 텍스처를 업데이트하는 함수
 
     UFUNCTION(BlueprintCallable, Category = "PixelStreaming")
-	void SetViewSharingUserID(FString ID, const bool& bAddPlayer);  // 주어진 사용자 ID를 설정하여 화면 공유를 시작하는 함수
+	virtual void SetViewSharingUserID(FString ID, const bool& bAddPlayer);  // 주어진 사용자 ID를 설정하여 화면 공유를 시작하는 함수
 
     // 블루프린트에서 호출할 함수
-    void StopLookSharingScreen();  // 화면 공유를 중지하는 함수
+    virtual void StopLookSharingScreen();  // 화면 공유를 중지하는 함수
 
     //void BeginStreaming();  // 스트리밍을 시작하는 함수
 
-    void BeginLookSharingScreen();  // 화면 공유를 시작하는 함수
+    virtual void BeginLookSharingScreen();  // 화면 공유를 시작하는 함수
 
-    void ChangeLookSharingScreen();  // 화면 공유를 다른 사용자 시점으로 변경하는 함수
+    virtual void ChangeLookSharingScreen();  // 화면 공유를 다른 사용자 시점으로 변경하는 함수
 
 };

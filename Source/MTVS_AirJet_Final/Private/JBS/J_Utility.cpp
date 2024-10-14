@@ -2,6 +2,8 @@
 
 
 #include "JBS/J_Utility.h"
+#include "JBS/J_BaseMissionPawn.h"
+#include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
@@ -30,4 +32,20 @@ AJ_MissionGamemode* UJ_Utility::GetMissionGamemode(const UWorld* world)
     check(gm);
 
     return gm;
+}
+
+AK_GameState *UJ_Utility::GetKGameState(const UWorld *world)
+{
+    auto* gs = world->GetGameState<AK_GameState>();
+    check(gs);
+
+    return gs;
+}
+
+AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 playerIdx)
+{
+    auto* player = Cast<AJ_BaseMissionPawn>(UGameplayStatics::GetPlayerController(world, playerIdx));
+    check(player);
+
+    return player;
 }

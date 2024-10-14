@@ -26,7 +26,7 @@ public:
    TArray<FString> ArrStreamingUserID;
 
    UFUNCTION()
-   void OnRep_StreamingID();
+   virtual void OnRep_StreamingID();
 
    /*UPROPERTY(Replicated , BlueprintReadOnly , Replicated)
    TArray<FString> ConnectedPlayerNames;*/ //(미사용)

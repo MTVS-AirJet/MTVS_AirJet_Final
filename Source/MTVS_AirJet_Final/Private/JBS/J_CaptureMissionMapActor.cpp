@@ -36,11 +36,12 @@ void AJ_CaptureMissionMapActor::Tick(float DeltaTime)
 void AJ_CaptureMissionMapActor::SetFov(float value)
 {
 	fov = value;
+	OnRep_Fov();
 }
 
 void AJ_CaptureMissionMapActor::OnRep_Fov()
 {
-	missionMapCapture2D->FOVAngle = fov;
+	missionMapCapture2D->FOVAngle = FOV;
 }
 
 void AJ_CaptureMissionMapActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

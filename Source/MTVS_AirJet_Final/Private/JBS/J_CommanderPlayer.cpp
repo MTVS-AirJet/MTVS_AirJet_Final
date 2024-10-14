@@ -26,6 +26,8 @@ void AJ_CommanderPlayer::BeginPlay()
 // 사실상 이게 beginplay 취급
 void AJ_CommanderPlayer::PossessedBy(AController *newController)
 {	
+	Super::PossessedBy(newController);
+	
 	auto* pc = Cast<APlayerController>(newController);
 	if(pc)
 	{

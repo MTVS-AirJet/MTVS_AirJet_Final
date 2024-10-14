@@ -80,12 +80,12 @@ struct FResSimple
 {
     GENERATED_BODY()
     
+    // 성공 여부
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     bool success;
+    // 서버단 메시지
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString response;
-
-    FResSimple() : success(false), response(TEXT("미설정")) {}
 
     FString ToString() const
     {
@@ -98,18 +98,13 @@ struct FResSimple
 };
 
 USTRUCT(BlueprintType)
-struct FLoginRes
+struct FLoginRes : public FResSimple
 {
     GENERATED_BODY()
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    bool success;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString response;
+
+    // 로그인 한 아이디
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString loginId;
-
-    FLoginRes() : success(false), response(TEXT("미설정")) {}
 
     FString ToString() const
     {
@@ -121,6 +116,105 @@ struct FLoginRes
         return str;
     }
 };
+
+USTRUCT(BlueprintType)
+struct FJVector2D
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float x;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float y;
+
+    virtual FString ToString() const
+    {
+        FString str = FString::Printf(TEXT("x : %.2f, y : %.2f"), x,y);
+
+        return str;
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FMissionStartPos : public FJVector2D
+{
+    GENERATED_BODY()
+};
+
+USTRUCT(BlueprintType)
+struct FMissionObject : public FJVector2D
+{
+    GENERATED_BODY()
+    
+    // 핀 순서
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int pinNo;
+    // 명령 ENUM
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int commandNo;
+
+    virtual FString ToString() const override
+    {
+        FString str = FString::Printf(TEXT("핀 No : %d\n명령 No : %d\nx : %.2f, y : %.2f")
+        , pinNo, commandNo, x,y);
+
+        return str;
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FMissionDataRes
+{
+    GENERATED_BODY()
+    
+    // 맵 제작자
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString producer;
+    // 위도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float latitude;
+    // 경도
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float longitude;
+    // 맵 이름
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString mapName;
+    // 썸네일 이미지 바이트 배열
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values|Image")
+    TArray<uint8> mapImage;
+    // 시작 지점
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FMissionStartPos startPoint;
+    // 목표 데이터 배열
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FMissionObject> mission;
+
+    FString ToString() const
+    {
+        FString allMissionStr = TEXT("[");
+        for(auto m : mission)
+        {
+            FString temp = FString::Printf(TEXT("{\n    %s\n    },"), *m.ToString());
+            allMissionStr.Append(temp);
+
+        }
+        allMissionStr.Append(TEXT("]"));
+
+        FString str = FString::Printf(
+        TEXT("맵 제작자 : %s\n위도 : %.2f , 경도 : %.2f\n맵 이름 : %s\n썸네일 이미지 존재 : %s\n시작 지점 : %s\n목표들 : %s")
+        , *producer
+        , latitude
+        , longitude
+        , *mapName
+        , mapImage.Num() > 0 ? TEXT("TRUE") : TEXT("FALSE")
+        , *startPoint.ToString() 
+        , *allMissionStr);
+
+        return str;
+    }
+};
+
+
 
 #pragma endregion
 
@@ -197,8 +291,12 @@ class MTVS_AIRJET_FINAL_API UJ_Utility : public UBlueprintFunctionLibrary
 
 public:
     static class UJ_GameInstance *GetJGameInstance(const UWorld* world);
-
+    // 게임 인스턴스 가져오기
     static class UK_GameInstance* GetKGameInstance(const UWorld* world);
-
+    // 미션 게임모드 가져오기
     static class AJ_MissionGamemode* GetMissionGamemode(const UWorld* world);
+    // 게임 스테이트 가져오기
+    static class AK_GameState *GetKGameState(const UWorld *world);
+    // 미션맵 로컬 플레이어 가져오기
+    static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
 };
