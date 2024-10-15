@@ -41,7 +41,4 @@ public:
 	// 픽셀 스트리밍용 함수
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_SetStreamingPlayer(const FString &playerId, bool bAddPlayer);
-
-	
-	void InitStreamingUI();
 };

@@ -16,15 +16,13 @@
 
 void AJ_StreamingActor::BeginPlay()
 {
-        
+    Super::BeginPlay();
+
+
 }
 
 void AJ_StreamingActor::Tick(float DeltaTime)
 {
-    // 로컬 플레이어
-    // @@ 이건 왜 실행안됨?
-    auto* localPlayer = UJ_Utility::GetBaseMissionPawn(GetWorld());
-    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("로컬 플레이어 : %s"), localPlayer ? *localPlayer->GetName() : TEXT("없음")));
     // 최초 플레이어 카메라 설정
     if(!isInitScreen)
     {
@@ -77,12 +75,13 @@ bool AJ_StreamingActor::TryInitScreen()
 
 void AJ_StreamingActor::SetViewSharingUserID(FString ID, const bool &bAddPlayer)
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("5. SA 에서 공유 아이디 설정"));
+
     UserID = ID; //UserID에 스트리머 ID 
 
     //플레이어를 통해 Game State에 접근하여 Streaming 중인 userID배열을 전달
-    auto* localPlayer = Cast<AJ_BaseMissionPawn>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+    auto* localPlayer = UJ_Utility::GetBaseMissionPawn(GetWorld(), 0);
     check(localPlayer)
-    // @@ 여기서 플레이어 못 찾는거 해결 필요
     localPlayer->ServerRPC_SetStreamingPlayer(ID, bAddPlayer);
 
 	// LOG_S(Warning , TEXT("Set Streaming Player ID : %s") , *ID);

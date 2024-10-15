@@ -44,7 +44,9 @@ AK_GameState *UJ_Utility::GetKGameState(const UWorld *world)
 
 AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 playerIdx)
 {
-    auto* player = Cast<AJ_BaseMissionPawn>(UGameplayStatics::GetPlayerController(world, playerIdx));
+    auto* pc = UGameplayStatics::GetPlayerController(world, playerIdx);
+    check(pc);
+    auto* player = pc->GetPawn<AJ_BaseMissionPawn>();
     check(player);
 
     return player;

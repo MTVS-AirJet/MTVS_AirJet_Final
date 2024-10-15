@@ -35,6 +35,8 @@ class MTVS_AIRJET_FINAL_API UJ_StreamingUI : public UK_StreamingUI
 		virtual void OnButtonWindowScreen() override;
                 // 
 		virtual void OnButtonLookSharingScreen() override;
+		// 주어진 ID를 사용하여 StreamingActor의 공유 사용자 ID 및 화면 공유 설정
+		virtual void SetUserID(FString ID, const bool &bAddPlayer) override;
 
             public:
 	

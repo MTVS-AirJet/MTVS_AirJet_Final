@@ -234,6 +234,19 @@ struct FMissionDataRes
     // @@ 이미지 변환하는거 내장할까?
 };
 
+// 전체 미션 데이터 
+USTRUCT(BlueprintType)
+struct FAllMissionDataRes
+{
+    GENERATED_BODY()
+    
+    // @@ 이름 나중에 확인 필요
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FMissionDataRes> allMissionData;
+
+    // @@ 모든 미션 썸네일 이미지 받아오는 기능 추가
+};
+
 
 
 #pragma endregion
