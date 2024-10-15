@@ -26,6 +26,7 @@ enum class EJsonType : uint8
     ,SIGN_UP
     ,LOGIN
     ,TEMP02_AUTH
+    ,MISSION_DATA_RECEIVE
 };
 
 #pragma region 웹 통신 용 구조체
@@ -69,6 +70,19 @@ struct FLoginReq
     FLoginReq(FString loginId ,FString password) 
         : loginId(loginId)
         ,password(password) {}
+};
+
+USTRUCT(BlueprintType)
+struct FMissionDataReq
+{
+    GENERATED_BODY()
+    
+    // 맵 이름
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString mapName;
+
+    FMissionDataReq() : mapName(TEXT("미설정")) {}
+    FMissionDataReq(const FString& mapName) : mapName(mapName) {}
 };
 
 #pragma endregion
@@ -139,6 +153,8 @@ USTRUCT(BlueprintType)
 struct FMissionStartPos : public FJVector2D
 {
     GENERATED_BODY()
+
+    // fjvector2d 상속 받아서 x, y 값 있음
 };
 
 USTRUCT(BlueprintType)
@@ -146,6 +162,7 @@ struct FMissionObject : public FJVector2D
 {
     GENERATED_BODY()
     
+    // fjvector2d 상속 받아서 x, y 값 있음
     // 핀 순서
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int pinNo;
@@ -181,7 +198,7 @@ struct FMissionDataRes
     FString mapName;
     // 썸네일 이미지 바이트 배열
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values|Image")
-    TArray<uint8> mapImage;
+    FString mapImage;
     // 시작 지점
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FMissionStartPos startPoint;
@@ -206,12 +223,15 @@ struct FMissionDataRes
         , latitude
         , longitude
         , *mapName
-        , mapImage.Num() > 0 ? TEXT("TRUE") : TEXT("FALSE")
+        , !mapImage.IsEmpty() ? TEXT("TRUE") : TEXT("FALSE")
+        // ,*mapImage
         , *startPoint.ToString() 
         , *allMissionStr);
 
         return str;
     }
+
+    // @@ 이미지 변환하는거 내장할까?
 };
 
 

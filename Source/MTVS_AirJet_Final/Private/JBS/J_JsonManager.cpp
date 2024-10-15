@@ -77,3 +77,23 @@ void AJ_JsonManager::OnLoginData(const FLoginRes &resData)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
 }
+
+
+void AJ_JsonManager::ReqGetMissionData()
+{
+	FMissionDataReq tempreq(tempReqMapName);
+
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+	gi->missionDataResDelegate.BindUObject(this, &AJ_JsonManager::OnGetMissionData);
+
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::MISSION_DATA_RECEIVE, tempreq);
+}
+
+void AJ_JsonManager::OnGetMissionData(const FMissionDataRes &resData)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
+
+	tempGetMissionData = resData;
+}

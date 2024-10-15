@@ -20,6 +20,8 @@ DECLARE_DELEGATE_OneParam(FResSimpleDelegate, const FResSimple&);
 
 DECLARE_DELEGATE_OneParam(FLoginResDelegate, const FLoginRes&);
 
+DECLARE_DELEGATE_OneParam(FMissionDataGetResDelegate, const FMissionDataRes&);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
 {
@@ -35,6 +37,8 @@ protected:
 	FResponseDelegate loginDel;
 
 	FResponseDelegate tempLoginAuthDel;
+
+	FResponseDelegate missionDataGetDel;
 
 #pragma endregion
 	// solved 테스트용 데이터 주고 받기
@@ -55,6 +59,9 @@ protected:
 	UFUNCTION()
 	virtual void ResLoginAuth(const FString &jsonData, bool isSuccess);
 
+	UFUNCTION()
+	virtual void ResMissionDataReceive(const FString &jsonData, bool isSuccess);
+
 #pragma endregion
 
 #pragma region 사용 함수 연결용 딜리게이트 단
@@ -66,6 +73,8 @@ public:
 	FResSimpleDelegate signupResUseDelegate;
 
 	FLoginResDelegate loginResUseDelegate;
+
+	FMissionDataGetResDelegate missionDataResDelegate;
 #pragma endregion
 
 #pragma endregion
