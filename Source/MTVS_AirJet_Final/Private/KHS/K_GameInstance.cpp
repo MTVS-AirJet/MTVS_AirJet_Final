@@ -5,7 +5,9 @@
 #include "KHS/K_LoginRegisterWidget.h"
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_ServerWidget.h"
+#include "KHS/K_LoadingWidget.h"
 #include "KHS/K_JsonParseLib.h"
+#include <MTVS_AirJet_Final.h>
 
 #include "Components/AudioComponent.h"
 #include <Engine/World.h>
@@ -27,10 +29,249 @@
 const static FName SESSION_NAME = TEXT("Session Name");
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 
+
+UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
+{
+	UE_LOG(LogTemp , Warning , TEXT("GameInstance Constructor"));
+}
+
+void UK_GameInstance::Init()
+{
+	Super::Init();
+
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get(); // OnlineSubsystem 가져오기
+
+	if ( Subsystem ) // 만약, Subsystem이 유효하다면,
+	{
+		SessionInterface = Subsystem->GetSessionInterface(); // 세션 인터페이스 가져오기
+
+		// 만약, 세션 인터페이스가 유효하다면,
+		if ( SessionInterface.IsValid() )
+		{
+			//세션인터페이스의 처리상태에 따라 바인딩 함수 연결
+			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this , &UK_GameInstance::OnCreateSessionComplete);
+			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this , &UK_GameInstance::OnDestroySessionComplete);
+			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this , &UK_GameInstance::OnFindSessionComplete);
+			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this , &UK_GameInstance::OnJoinSessionComplete);
+		}
+	}
+}
+
+void UK_GameInstance::OnStart()
+{
+	// 처음에는 로비 사운드 재생
+	PlayLobbySound();
+}
+
+// 세션 생성 완료 시 호출될 함수
+void UK_GameInstance::OnCreateSessionComplete(FName SessionName , bool Success)
+{
+	// 세션 생성 실패 시,
+	if ( !Success )
+	{
+		if ( LoadingWidget )
+			LoadingWidget->RemoveUI();
+		return;
+	}
+	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Hosting"));
+
+	// 세션이 성공적으로 생성 시,
+	if ( ServerWidget ) // ServerWidget 제거
+		ServerWidget->RemoveUI();
+	if ( LoadingWidget ) // LoadingWidget 생성
+		LoadingWidget->SetUI();
+
+	// 맵 전환 전, 비동기 로딩을 시작 -> 끝나면 OnMapPreloadComplete을 호출하여 ServerTravel 시작
+	StreamableManager.RequestAsyncLoad(FSoftObjectPath(TEXT("/Game/Maps/KHS/CesiumTest.CesiumTest")), 
+		FStreamableDelegate::CreateUObject(this , &UK_GameInstance::OnMapPreloadComplete));
+}
+
+// Map 비동기 load 함수
+void UK_GameInstance::OnMapPreloadComplete()
+{
+	if ( LoadingWidget )
+		LoadingWidget->RemoveUI();
+
+	StopCurrentSound(); // 기존 사운드 중지
+
+	// 게임맵으로 리슨서버를 열고 Server Travel
+	GetWorld()->ServerTravel(TEXT("/Game/Maps/KHS/CesiumTest?listen"));
+
+	// 맵 전환 후 약간의 지연을 두고 StageSound 재생
+	FTimerHandle TimerHandle_StageSound;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_StageSound , this , &UK_GameInstance::PlayStageSound , 3.0f , false);
+}
+
+// 세션 파괴 완료 시 호출될 바인딩 함수
+void UK_GameInstance::OnDestroySessionComplete(FName SessionName , bool Success)
+{
+	if ( Success ) // 파괴에 성공하면?
+	{
+		CreateSession(); // (기존에 세션이 있으면 파괴하고 새로운 세션 생성)
+	}
+
+	if ( nullptr != GEngine )
+	{
+		GEngine->OnNetworkFailure().AddUObject(this , &UK_GameInstance::OnNetworkFailure);
+	}
+}
+
+// 세션 찾기 완료 시 호출될 바인딩 함수. Success 인자만 있으면됨 -> 발견된 세션 목록은 SeesionSearch TSharedRef 포인터에 있기 때문
+void UK_GameInstance::OnFindSessionComplete(bool Success)
+{
+	if ( !Success )
+	{
+		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: Session search failed."));
+		return;
+	}
+
+	if ( !SessionSearch.IsValid() )
+	{
+		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: SessionSearch is not valid."));
+		return;
+	}
+
+	if ( !ServerWidget )
+	{
+		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: ServerWidget is not valid."));
+		return;
+	}
+
+	UE_LOG(LogTemp , Warning , TEXT("Starting Find Session"));
+
+	TArray<FServerData> ServerNames;
+
+	for ( const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults )
+	{
+		FServerData Data;
+		Data.sessionName = SearchResult.GetSessionIdStr();
+		Data.maxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections; // 입장가능한 최대 플레이어 수
+		Data.curPlayers = Data.maxPlayers - SearchResult.Session.NumOpenPublicConnections;
+		// 최대 플레이어 수 - 비어있는 슬롯의 수 = 접속 중인 플레이어 수
+		Data.hostUserName = SearchResult.Session.OwningUserName;
+		FString ServerName;
+		if ( SearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS_KEY , ServerName) )
+		{
+			Data.sessionName = ServerName;
+		}
+		else
+		{
+			//Data.Name = "Could not Find Name";
+			Data.sessionName = SearchResult.GetSessionIdStr(); // 서버 이름을 찾을 수 없는 경우, 고유 아이디를 가져옴
+		}
+
+		ServerNames.Add(Data);
+	}
+
+	// ServerWidget이 유효하고 SetServerList 호출이 안전한 경우에만 실행
+	if ( ServerWidget )
+	{
+		ServerWidget->SetServerList(ServerNames);
+	}
+	else
+	{
+		UE_LOG(LogTemp , Error , TEXT("ServerWidget is not valid during SetServerList call."));
+	}
+}
+// 세션 Join 완료시 호출된 바인딩 함수
+void UK_GameInstance::OnJoinSessionComplete(FName SessionName , EOnJoinSessionCompleteResult::Type Result)
+{
+	FString Address;
+
+	if ( SessionInterface.IsValid() )
+	{
+		if ( !SessionInterface->GetResolvedConnectString(SessionName , Address) )
+		{
+			UE_LOG(LogTemp , Warning , TEXT("Could Not Get Connect String"));
+			return;
+		}
+	}
+
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+
+
+	if ( PlayerController )
+	{
+		// 호스트 플레이어의 경우에도 ClientTravel을 호출(Absolute는 절대 경로를 사용하여 이동하는 것을 의미)
+		//-> 즉, 클라이언트를 명시된 정확한 맵이나 서버로 이동시킨다. (이 옵션을 사용할 때는 URL이 완전히 지정되어야 한다.)
+		if ( PlayerController->GetLocalRole() == ROLE_Authority )
+		{
+			PlayerController->ClientTravel(Address , ETravelType::TRAVEL_Relative);
+		}
+		else
+		{
+			PlayerController->ClientTravel(Address , ETravelType::TRAVEL_Absolute);
+		}
+	}
+}
+//네트워크서버 찾기 실패시 호출
+void UK_GameInstance::OnNetworkFailure(UWorld* World , UNetDriver* NetDriver , ENetworkFailure::Type FailureType , const FString& ErrorString)
+{
+	// 현재 사운드를 중지
+	StopCurrentSound();
+
+	// 서버 위젯 맵으로 이동
+	TravelMainLobbyMap(false); // false 인자를 통해 현재 사운드를 유지하지 않으며 이동
+
+	// 로비 사운드 재생
+	PlayLobbySound();
+}
+
+//세션리스트 업데이트함수
+void UK_GameInstance::RefreshServerList()
+{
+	// 기존 세션 검색 결과 초기화
+	if ( SessionSearch.IsValid() )
+	{
+		SessionSearch.Reset();
+	}
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+
+	if ( SessionSearch.IsValid() )
+	{
+		//SessionSearch->bIsLanQuery = true; // LAN 사용 여부, true 면 LAN 세션을 찾고 false 면 인터넷 세션을 찾음.
+		SessionSearch->bIsLanQuery = false; // LAN 세션 검색 여부 설정
+		SessionSearch->MaxSearchResults = 50; // 한번 세션을 찾을때 최대 50개까지만 검색
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE , true , EOnlineComparisonOp::Equals);
+
+		SessionInterface->FindSessions(0 , SessionSearch.ToSharedRef());
+		// ToSharedRef -> TSharedPtr 을 항상 유효하게 바꿔주는 내장함수. 
+		// TSharedptr 은 Null일 수도 있는데, FindSession이란 메서드는 Null이면 위험하니까 애초에 유효한 녀석만 넣게 요청
+		// 그래서 우리가 항상 유효하게 ToSharedRef로 변환해줘야함
+	}
+}
+
 // 1) 세션 관련 함수 --------------------------------------------------------------------------------------
 //서버생성함수
 void UK_GameInstance::Host(FString ServerName)
 {
+	DesiredServerName = ServerName;
+
+	// 만약, 세션 인터페이스가 유효하다면,
+	if ( SessionInterface.IsValid() )
+	{
+		// LoadingWidget 초기화
+		if ( LoadingWidgetFactory )
+			LoadingWidget = CreateWidget<UK_LoadingWidget>(this , LoadingWidgetFactory);
+
+		if ( LoadingWidget )
+			LoadingWidget->SetUI();
+
+		auto ExistingSession = SessionInterface->GetNamedSession(SESSION_NAME);  // 현재 세션 정보 얻기
+		if ( ExistingSession ) // 세션이 이미 존재한다면
+		{
+			UE_LOG(LogTemp , Warning , TEXT("Existing session found. Destroying the session..."));
+			SessionInterface->DestroySession(SESSION_NAME); // 기존에 명명된 세션을 파괴
+			// 실행되면 'DestroySession'이 델리게이트에 정보를 제공한다. 즉, 바로 델리게이트가 호출된다.
+		}
+
+		else // 세션이 없을 경우
+		{
+			UE_LOG(LogTemp , Warning , TEXT("No existing session found. Creating a new session..."));
+			CreateSession(); // 새로운 세션 생성
+		}
+	}
 }
 //서버접속함수
 void UK_GameInstance::Join(uint32 Index)
@@ -53,16 +294,36 @@ void UK_GameInstance::Join(uint32 Index)
 		ServerWidget->RemoveUI(); //서버 UI제거
 	}
 
+	//Session Interface 를 통해 JoinSession 실행
 	SessionInterface->JoinSession(0 , SESSION_NAME , SessionSearch->SearchResults[Index]);
 }
 //세션생성함수
 void UK_GameInstance::CreateSession()
 {
+	if ( SessionInterface.IsValid() )
+	{
+		FOnlineSessionSettings SessionSettings; // CreateSession을 위해 임의로 세션세팅을 만들어준다.
+		if ( IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ) // OnlineSubsystem 이 NULL 로 세팅되면 (NULL : 로컬 연결 설정)
+		{
+			SessionSettings.bIsLANMatch = true; // true 시 : 같은 네트워크에 있는 사람을 찾음 (로컬 연결일 때)
+		}
+		else
+		{
+			SessionSettings.bIsLANMatch = false; // false 시 : 다른 네트워크와 연결 가능하도록 함. (Steam, XBox 등 공식플랫폼 연결 설정)
+		}
+		//Session Setting 초기화
+		SessionSettings.NumPublicConnections = 5; // 플레이어 수
+		SessionSettings.bShouldAdvertise = true; // 온라인에서 세션을 볼 수 있도록함.
+		SessionSettings.bUseLobbiesIfAvailable = true; // 로비기능을 활성화한다. (Host 하려면 필요)
+		SessionSettings.bUsesPresence = true;
+		SessionSettings.Set(SERVER_NAME_SETTINGS_KEY , DesiredServerName , EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+		SessionInterface->CreateSession(0 , SESSION_NAME , SessionSettings); // 세션을 생성한다. 
+		// 실행되면 'CreateSession'이 델리게이트 호출 // 인자(플레이어번호, TEXT("세션이름"), 세션세팅)
+	}
 }
-//서버리스트 업데이트함수
-void UK_GameInstance::RefreshServerList()
-{
-}
+
+
 
 // 2) UI 생성 관련 함수 -----------------------------------------------------------------------------------
 // 로그인 UI를 생성하는 함수
@@ -128,6 +389,19 @@ void UK_GameInstance::PlayLobbySound()
 		UE_LOG(LogTemp , Error , TEXT("LobbySound is not set"));
 	}
 }
+// 시뮬레이션 스테이지 사운드 재생 함수
+void UK_GameInstance::PlayStageSound()
+{
+	if ( StageSound )
+	{
+		CurrentPlayingSound = UGameplayStatics::SpawnSound2D(this , StageSound , 1.0f , 1.0f , 0.0f);
+		UE_LOG(LogTemp , Warning , TEXT("Started playing stage sound"));
+	}
+	else
+	{
+		UE_LOG(LogTemp , Error , TEXT("StageSound is not set"));
+	}
+}
 // 사운드 재생 중지 함수
 void UK_GameInstance::StopCurrentSound()
 {
@@ -137,7 +411,6 @@ void UK_GameInstance::StopCurrentSound()
 		UE_LOG(LogTemp , Warning , TEXT("Stopped current sound"));
 	}
 }
-
 // 현재 사운드 유지 함수(로그인시)
 void UK_GameInstance::ContinueCurrentSound()
 {
@@ -152,6 +425,7 @@ void UK_GameInstance::ContinueCurrentSound()
 		PlayLobbySound();
 	}
 }
+
 
 #pragma endregion
 

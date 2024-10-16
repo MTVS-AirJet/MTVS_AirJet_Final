@@ -126,6 +126,9 @@ public:
 	class UButton* HostMenu_btn_Cancel; // 로비로 돌아가기 버튼
 	
 	UPROPERTY(meta = (BindWidget))
+	class UButton* HostMenu_btn_WebQuit; // 로비로 돌아가기 버튼
+	
+	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* HostMenu_txt_RoomName; // 방이름 입력 텍스트
 
 	UPROPERTY(meta = (BindWidget))
@@ -234,13 +237,16 @@ public:
 	void OpenCreaterWeb(); // 크리에이터툴 웹서비스로 접속하는 함수
 
 	UFUNCTION(BlueprintCallable)
+	void QuitCreaterWeb(); // 웹브라우저 위젯 종료 함수
+
+	UFUNCTION(BlueprintCallable)
 	void ReqMapInfo(); //mapName입력내용 기준으로 서버에 요청하는 함수
 
 	UFUNCTION(BlueprintCallable)
 	void ResMapInfo(const FMapInfoResponse& resData); //서버요청 콜백 바인딩_해당 맵정보를 받아와 HOST MENU와 SESSION MENU에 세팅하는 함수
 
 	UFUNCTION(BlueprintCallable)
-	void CreateRoom(); // Interface에서 Host 함수를 호출하는 함수
+	void CreateRoom(); // (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
 
 
 	// Ready Menu ===================================================

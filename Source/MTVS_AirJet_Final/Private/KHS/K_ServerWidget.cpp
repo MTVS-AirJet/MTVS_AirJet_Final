@@ -75,6 +75,10 @@ bool UK_ServerWidget::Initialize()
 	{
 		HostMenu_btn_Cancel->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenServerMenuFromHost);
 	}
+	if ( HostMenu_btn_WebQuit ) //웹에디터 종료 버튼 바인딩
+	{
+		HostMenu_btn_WebQuit->OnClicked.AddDynamic(this , &UK_ServerWidget::QuitCreaterWeb);
+	}
 
 	// Ready Menu Button Binding ===============================================
 
@@ -149,7 +153,11 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 		if ( MenuSwitcher )
 		{
 			MenuSwitcher->SetActiveWidget(HostMenu); // HostMenu로 전환하여 활성화
+			
+			//숨겨둬야하는 위젯들 설정
 			HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
+			HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
+
 			PlayAnimation(ShowHostMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 		}
@@ -294,6 +302,17 @@ void UK_ServerWidget::OpenCreaterWeb()
 	{
 		HostMenu_web_Popup->LoadURL(URL);
 		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Visible);
+		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+// 웹브라우저 위젯 종료 함수
+void UK_ServerWidget::QuitCreaterWeb()
+{
+	if ( HostMenu_web_Popup )
+	{
+		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
+		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -356,11 +375,17 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	ReadyMenu_txt_CommandList->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.commandNo)));
 }
 
-// Interface에서 Host 함수를 호출하는 함수
+// (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
 void UK_ServerWidget::CreateRoom()
 {
-		
+	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
 
+	// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
+	if ( SessionInterface )
+	{
+		FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
+		SessionInterface->Host(ServerName);
+	}
 }
 
 

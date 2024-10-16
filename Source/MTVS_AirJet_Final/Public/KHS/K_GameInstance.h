@@ -6,10 +6,11 @@
 #include "KHS/K_SessionInterface.h"
 #include "K_JsonParseLib.h"
 #include "JBS/J_GameInstance.h"
+#include <JBS/J_Utility.h>
 #include "Engine/GameInstance.h"
+#include "Engine/StreamableManager.h"
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineSessionInterface.h"
 #include "UObject/Interface.h"
-#include <JBS/J_Utility.h>
 #include <JsonObjectConverter.h>
 #include "K_GameInstance.generated.h"
 
@@ -38,11 +39,33 @@ public:
 	// 전역 인스턴스, 클래스 참조
 	//===============================================================
 	IOnlineSessionPtr SessionInterface; // 세션 인터페이스를 전역인수로 선언
+
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch; // 온라인 세션 검색을 할 수 있는 클래스 인스턴스 선언
+
+	FString DesiredServerName; // Host 시 서버 이름을 지정하여 설정하기 위한 변수
 
 	//===============================================================
 	// Functions
 	//===============================================================
+
+	// 생성자 & 초기화 함수==========================================
+
+	UK_GameInstance(const FObjectInitializer& ObjectInitializer); // 생성자 초기화
+
+	virtual void Init() override; 
+
+	virtual void OnStart() override; 
+
+	// 델리게이트 바인딩 함수 구간 ====================================
+
+	void OnCreateSessionComplete(FName SessionName , bool Success); // 세션 생성 완료 시 호출될 바인딩 함수
+	void OnDestroySessionComplete(FName SessionName , bool Success); // 세션 파괴 완료 시 호출될 바인딩 함수
+	void OnFindSessionComplete(bool Success); // 세션 찾기 완료 시 호출될 바인딩 함수.
+	void OnJoinSessionComplete(FName SessionName , EOnJoinSessionCompleteResult::Type Result); // 세션 Join 완료시 호출된 바인딩 함수
+	void OnNetworkFailure(UWorld* World , UNetDriver* NetDriver , ENetworkFailure::Type FailureType , const FString& ErrorString); //네트워크서버 찾기 실패시 호출
+
+	// 세션 관리 함수 구간 ===========================================
+
 #pragma  region Session Management Functions
 	// 1) 세션 관련 함수 --------------------------------------------------------------------------------------
 	UFUNCTION(Exec) // Exec: 콘솔창에 입력할 수 있도록 만든다.
@@ -57,6 +80,8 @@ public:
 	UFUNCTION()
 	void RefreshServerList(); // 서버목록을 찾는 함수
 
+    UFUNCTION()
+    void OnMapPreloadComplete(); // Map 비동기 load 함수
 
 	// 2) UI 생성 관련 함수 -----------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "Create Widget")
@@ -74,8 +99,8 @@ public:
 
 	// 5) 사운드 관련 함수 --------------------------------------------------------------------------------------
 	void PlayLobbySound(); // 로비 사운드 재생 함수
-	//UFUNCTION()
-	//void PlayStageSound(); // 시뮬레이션 스테이지 사운드 재생 함수
+	UFUNCTION()
+	void PlayStageSound(); // 시뮬레이션 스테이지 사운드 재생 함수
 	void StopCurrentSound(); // 현재 사운드 재생 중지 함수
 	void ContinueCurrentSound(); // 현재 사운드 유지 함수
 
@@ -87,7 +112,10 @@ public:
 	//===============================================================
 #pragma region Session Management Variables
 
-	// 1) UI 관련 참조 ------------------------------------------------------------------------------------------
+	// 1) 세션 관련 참조 ------------------------------------------------------------------------------------------
+	FStreamableManager StreamableManager; //Map 비동기함수 관련
+
+	// 2) UI 관련 참조 ------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UK_LoginRegisterWidget> LoginWidgetFactory; // LoginWidget(UI) 공장
 	class UK_LoginRegisterWidget* LoginWidget; // LoginWidget(UI) 참조 선언
@@ -96,7 +124,11 @@ public:
 	TSubclassOf<class UK_ServerWidget> ServerWidgetFactory; // ServerWidget(UI) 공장
 	class UK_ServerWidget* ServerWidget; // ServerWidget(UI) 참조 선언
 
-	// 2) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UK_LoadingWidget> LoadingWidgetFactory; // LoadingWidget(UI) 공장
+	class UK_LoadingWidget* LoadingWidget; // LoadingWidget(UI) 참조 선언
+
+	// 1) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundWave* LobbySound; // 로비 사운드
 
