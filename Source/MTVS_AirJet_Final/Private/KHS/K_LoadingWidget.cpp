@@ -11,8 +11,10 @@ bool UK_LoadingWidget::Initialize()
 
 void UK_LoadingWidget::SetUI()
 {
+	Super::SetUI();
 }
 
 void UK_LoadingWidget::RemoveUI()
 {
+	Super::RemoveUI();
 }
