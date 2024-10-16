@@ -32,10 +32,6 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USkeletalMeshComponent* JetMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class USpringArmComponent* JetSprintArm;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class UCameraComponent* JetCamera;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetArrow;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
@@ -45,6 +41,17 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UCharacterMovementComponent* movement;
 
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class USpringArmComponent* JetSprintArm;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class UCameraComponent* JetCamera;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class USpringArmComponent* JetSprintArmFPS;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class UCameraComponent* JetCameraFPS;
+
+private:
 	UFUNCTION()
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
@@ -75,6 +82,10 @@ private: // Input
 	class UInputAction* IA_ViperBreak;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperShoot;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperFPS;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperTPS;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -116,6 +127,10 @@ private: // Input
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperShootStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperFpsStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperTpsStarted(const struct FInputActionValue& value);
 
 private:
 	bool bFristEngine;

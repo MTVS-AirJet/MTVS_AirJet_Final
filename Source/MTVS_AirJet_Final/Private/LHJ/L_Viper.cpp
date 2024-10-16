@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_HUDWidget.h"
 
 
@@ -40,12 +41,8 @@ AL_Viper::AL_Viper()
 	JetSprintArm->SetupAttachment(JetMesh);
 
 	// 3인칭 뷰
-	//JetSprintArm->SetRelativeLocationAndRotation(FVector(-160 , 0 , 400) , FRotator(-10 , 0 , 0));
-	//JetSprintArm->TargetArmLength = 2000.f;
-
-	// 조종석 뷰
-	JetSprintArm->SetRelativeLocationAndRotation(FVector(350 , 0 , 310) , FRotator(0 , -30 , 0));
-	JetSprintArm->TargetArmLength = 0.f;
+	JetSprintArm->SetRelativeLocationAndRotation(FVector(-160 , 0 , 400) , FRotator(-10 , 0 , 0));
+	JetSprintArm->TargetArmLength = 2000.f;
 
 	JetSprintArm->bEnableCameraRotationLag = true;
 	JetSprintArm->CameraRotationLagSpeed = 3.5f;
@@ -73,6 +70,18 @@ AL_Viper::AL_Viper()
 	JetWidget->SetDrawSize(FVector2D(300 , 200));
 
 	movement = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movement"));
+
+	//============================================
+	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
+	JetSprintArmFPS->SetupAttachment(JetMesh);
+	// 조종석 뷰
+	JetSprintArmFPS->SetRelativeLocationAndRotation(FVector(350 , 0 , 310) , FRotator(-30 , 0 , 0));
+	JetSprintArmFPS->TargetArmLength = 0.f;
+	JetSprintArmFPS->bEnableCameraRotationLag = true;
+	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
+	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
+	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
+	JetCameraFPS->SetActive(false);
 }
 #pragma endregion
 
@@ -116,6 +125,9 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ViperResetRotation , ETriggerEvent::Started , this , &AL_Viper::F_ViperResetRotation);
 
 		input->BindAction(IA_ViperShoot , ETriggerEvent::Started , this , &AL_Viper::F_ViperShootStarted);
+
+		input->BindAction(IA_ViperFPS , ETriggerEvent::Started , this , &AL_Viper::F_ViperFpsStarted);
+		input->BindAction(IA_ViperTPS , ETriggerEvent::Started , this , &AL_Viper::F_ViperTpsStarted);
 	}
 }
 
@@ -138,6 +150,27 @@ void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
 {
+	auto v = value.Get<FVector2D>();
+	// AddControllerYawInput(v.X);
+	// AddControllerPitchInput(v.Y);
+	if (JetCamera->IsActive())
+	{
+		FRotator FPSrot = JetSprintArm->GetRelativeRotation();
+		float newFpsYaw = FPSrot.Yaw + v.X;
+		float newFpsPitch = FPSrot.Pitch + v.Y;
+		newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -360.f , 360.f);
+		newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
+		JetSprintArm->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
+	}
+	else
+	{
+		FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+		float newFpsYaw = FPSrot.Yaw + v.X;
+		float newFpsPitch = FPSrot.Pitch + v.Y;
+		newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -150.f , 150.f);
+		newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
+		JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
+	}
 }
 
 void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
@@ -251,14 +284,30 @@ void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
-	if(LockOnTarget)
+	if (LockOnTarget)
 	{
-		LOG_S(Warning, TEXT("미사일 발사!! 타겟은 %s"), *LockOnTarget->GetName());
+		LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
 	}
 	else
 	{
-		LOG_S(Warning, TEXT("타겟이 없습니다!!"));
-	}	
+		LOG_S(Warning , TEXT("타겟이 없습니다!!"));
+	}
+}
+
+void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
+{
+	if (JetCamera)
+		JetCamera->SetActive(false);
+	if (JetCameraFPS)
+		JetCameraFPS->SetActive(true);
+}
+
+void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
+{
+	if (JetCamera)
+		JetCamera->SetActive(true);
+	if (JetCameraFPS)
+		JetCameraFPS->SetActive(false);
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -513,14 +562,14 @@ bool AL_Viper::IsLockOn()
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
 		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
 		{
-			for(auto hit:OutHit)
+			for (auto hit : OutHit)
 			{
 				if (hit.GetActor()->ActorHasTag("target"))
 				{
 					LockOnTarget = hit.GetActor();
 					bLockOn = true;
 				}
-			}			
+			}
 		}
 	}
 
