@@ -18,7 +18,6 @@ void AJ_StreamingActor::BeginPlay()
 {
     Super::BeginPlay();
 
-
 }
 
 void AJ_StreamingActor::Tick(float DeltaTime)
@@ -37,6 +36,8 @@ void AJ_StreamingActor::Tick(float DeltaTime)
 
 bool AJ_StreamingActor::TryInitScreen()
 {
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("0. 스크린 생성"));
+
     // 로컬 플레이어 찾기
     APawn* playerPawn = UGameplayStatics::GetPlayerPawn(GetWorld() , 0);
     if(!playerPawn) return false;
@@ -64,6 +65,7 @@ bool AJ_StreamingActor::TryInitScreen()
     if ( !(RenderTarget && SceneCapture) )
     {
         UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
+        GEngine->AddOnScreenDebugMessage(-1, 33.f, FColor::Red, TEXT("Initialization failed in BeginPlay"));
 
         return false;
     }

@@ -5,6 +5,8 @@
 #include "Components/SceneComponent.h"
 #include "Components/WidgetComponent.h"
 #include "JBS/J_PilotViewTabletUI.h"
+#include "JBS/J_StreamingActor.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AJ_PilotViewTablet::AJ_PilotViewTablet()
@@ -27,7 +29,9 @@ void AJ_PilotViewTablet::BeginPlay()
 
 	// ui 가져오기
 	tabletUI = Cast<UJ_PilotViewTabletUI>(tabletUIComp->GetWidget());
-	
+
+	// FIXME 화면 공유 시작 이거 공유 버튼 눌러야하는거 내장 시켜야함.
+	StartViewScreenShare();
 }
 
 // Called every frame
@@ -37,3 +41,13 @@ void AJ_PilotViewTablet::Tick(float DeltaTime)
 
 }
 
+void AJ_PilotViewTablet::StartViewScreenShare()
+{
+	auto* tempSA = Cast<AJ_StreamingActor>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), AJ_StreamingActor::StaticClass()));
+	if(tempSA)
+	{
+		//해당 액터로 뭔가 하기
+		tempSA->ChangeLookSharingScreen();
+	}
+}

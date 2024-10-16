@@ -103,10 +103,11 @@ void AJ_MissionPlayerController::OnPossess(APawn *newPawn)
     
     if(this->IsLocalPlayerController())
     {
+        // @@
         InitStreamingUI(CastChecked<AJ_BaseMissionPawn>(newPawn));
     }
 }
-
+// @@
 void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 {
 	this->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , this->StreamingUIFactory));

@@ -17,6 +17,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool isInitScreen = false;
 
+	// ps서버 url
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString psServerURL = TEXT("ws://125.132.216.190:7755");
+
+
 public:
 
 protected:

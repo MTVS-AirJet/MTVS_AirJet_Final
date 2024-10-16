@@ -30,10 +30,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
 	class UJ_PilotViewTabletUI* tabletUI; 
 
+	// 디버그용 로컬 rt 사용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enableLocalScreenShare = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	class UTextureRenderTarget* debugRT;
+
 public:
 
 protected:
-
+    void StartViewScreenShare();
 
 public:
 };

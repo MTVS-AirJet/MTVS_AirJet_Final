@@ -92,15 +92,15 @@ void UK_StreamingUI::OnButtonWindowScreen()
 
 		streamID = GetCurrentSessionID(); //세션 아이디 받아오기
 
-		if ( ScreenActor )
-		{
-			//ScreenActor->WindowScreenPlaneMesh->SetVisibility(true); //송출되는 자기화면 확인용
-			SetUserID(streamID , true);
-		}
-		else
-		{
-			UE_LOG(LogTemp , Error , TEXT("ScreenActor nullptr"));
-		}
+		// if ( ScreenActor )
+		// {
+		// 	//ScreenActor->WindowScreenPlaneMesh->SetVisibility(true); //송출되는 자기화면 확인용
+		// 	SetUserID(streamID , true);
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogTemp , Error , TEXT("ScreenActor nullptr"));
+		// }
 
 		//streamID = GetCurrentSessionID(); //세션 아이디 받아오기(위치변경)
 
