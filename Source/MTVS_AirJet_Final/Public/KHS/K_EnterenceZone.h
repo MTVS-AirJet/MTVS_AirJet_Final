@@ -32,6 +32,8 @@ public:
 	//Component기반 충돌
 	UFUNCTION()
 	void OnMySphereBeginOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
-
+	
+	//세션 UI보는중인지 체크
+	bool bIsEntered = false;
 
 };

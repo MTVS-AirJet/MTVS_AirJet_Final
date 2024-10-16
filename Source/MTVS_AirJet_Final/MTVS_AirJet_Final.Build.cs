@@ -29,6 +29,9 @@ public class MTVS_AirJet_Final : ModuleRules
 			, "AudioMixer"
 			, "OpenCVHelper"
 			, "OpenCV" 
+			, "WebBrowser"
+			, "Slate"
+			, "SlateCore"
 		});
 	}
 }
