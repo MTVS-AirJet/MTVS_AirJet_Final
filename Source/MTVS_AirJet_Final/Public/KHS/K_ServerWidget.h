@@ -134,8 +134,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* HostMenu_txt_LoadedMapName; // 불러온 맵의 맵이름
 
-	//UPROPERTY(meta = (BindWidget))
-	//class UWebBrowser* HostMenu_web_Popup; // 맵불러오기URL팝업
+	UPROPERTY(meta = (BindWidget))
+	class UWebBrowser* HostMenu_web_Popup; // 맵불러오기URL팝업
 	
 
 	// Ready Menu ===================================================

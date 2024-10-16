@@ -16,6 +16,7 @@
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "../../../../Plugins/Runtime/WebBrowserWidget/Source/WebBrowserWidget/Public/WebBrowser.h"
 
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/Texture2D.h"
@@ -148,6 +149,7 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 		if ( MenuSwitcher )
 		{
 			MenuSwitcher->SetActiveWidget(HostMenu); // HostMenu로 전환하여 활성화
+			HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
 			PlayAnimation(ShowHostMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 		}
@@ -286,7 +288,13 @@ void UK_ServerWidget::JoinRoom()
 // 크리에이터툴 웹서비스로 접속하는 함수
 void UK_ServerWidget::OpenCreaterWeb()
 {	
-	
+	// 웹 브라우저 팝업을 열고 특정 URL을 설정
+	FString URL = TEXT("https://www.naver.com"); // 원하는 URL 입력
+	if ( HostMenu_web_Popup )
+	{
+		HostMenu_web_Popup->LoadURL(URL);
+		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 //mapName입력내용 기준으로 서버에 요청하는 함수
