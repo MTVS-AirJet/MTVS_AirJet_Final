@@ -114,6 +114,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ViperBreak , ETriggerEvent::Completed , this , &AL_Viper::F_ViperBreakCompleted);
 
 		input->BindAction(IA_ViperResetRotation , ETriggerEvent::Started , this , &AL_Viper::F_ViperResetRotation);
+
+		input->BindAction(IA_ViperShoot , ETriggerEvent::Started , this , &AL_Viper::F_ViperShootStarted);
 	}
 }
 
@@ -245,6 +247,18 @@ void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 {
 	KeyDownAccel = 0.f;
 	IsBreak = false;
+}
+
+void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
+{
+	if(LockOnTarget)
+	{
+		LOG_S(Warning, TEXT("미사일 발사!! 타겟은 %s"), *LockOnTarget->GetName());
+	}
+	else
+	{
+		LOG_S(Warning, TEXT("타겟이 없습니다!!"));
+	}	
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -380,13 +394,13 @@ void AL_Viper::Tick(float DeltaTime)
 		// Move Up & Down
 		jetRot = JetArrow->GetRelativeRotation();
 		float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-		LOG_S(Warning , TEXT("zRot %f") , zRot);
+		//LOG_S(Warning , TEXT("zRot %f") , zRot);
 		JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
 
 
 		// Rotate
 		jetRot = JetArrow->GetRelativeRotation();
-		LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
+		//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
 		JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
 
 		if (IsLeftRoll)
@@ -419,6 +433,11 @@ void AL_Viper::Tick(float DeltaTime)
 		{
 			HUDui->UpdateHeightText(ValueOfMoveForceInNote);
 		}
+#pragma endregion
+
+#pragma region LockOn
+		//bool bLockOn = IsLockOn();
+		//LOG_SCREEN("%s" , LockOnTarget?*LockOnTarget->GetName():*FString("nullptr"));
 #pragma endregion
 	}
 }
@@ -476,5 +495,37 @@ float AL_Viper::GetAddTickSpeed()
 	}
 
 	return fRtn;
+}
+
+bool AL_Viper::IsLockOn()
+{
+	bool bLockOn = false;
+	LockOnTarget = nullptr;
+	FVector Start = JetMesh->GetComponentLocation();
+	FVector ForwardVector = JetMesh->GetForwardVector();
+
+	TArray<AActor*> Overlaps;
+	TArray<FHitResult> OutHit;
+	for (int i = 0; i < 6; i++)
+	{
+		Diametr *= 2.f;
+		Start += (ForwardVector * Diametr / 2);
+		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
+		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
+		{
+			for(auto hit:OutHit)
+			{
+				if (hit.GetActor()->ActorHasTag("target"))
+				{
+					LockOnTarget = hit.GetActor();
+					bLockOn = true;
+				}
+			}			
+		}
+	}
+
+	Diametr = 30.f;
+
+	return bLockOn;
 }
 #pragma endregion

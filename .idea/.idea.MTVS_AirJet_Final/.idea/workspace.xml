@@ -13,8 +13,17 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_HUD.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_HUD.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/Resource/Compass_Marker.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/Resource/Compass_Points.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/Resource/hight.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/Resource/hight_.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/WBP_HUD.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/LHJ/WBP_HUD.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Input/LHJ/IA/IA_ViperMove.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Input/LHJ/IMC_Viper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Input/LHJ/IMC_Viper.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Maps/LHJ/LHJ_TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Maps/LHJ/LHJ_TestLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_Viper.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_Viper.h" afterDir="false" />
     </list>
@@ -48,6 +57,7 @@
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -64,9 +74,34 @@
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="cidr-memory-view://9" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://98" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_HUDWidget.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectBase.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/Engine/Classes/Engine/EngineTypes.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/InputCore/Classes/InputCoreTypes.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
@@ -87,7 +122,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.gutterIcons",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -204,6 +239,7 @@
       <workItem from="1728623222626" duration="116000" />
       <workItem from="1728623455301" duration="18032000" />
       <workItem from="1728705098119" duration="13011000" />
+      <workItem from="1728915606645" duration="20249000" />
     </task>
     <servers />
   </component>

@@ -42,7 +42,7 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
-	UPROPERTY(EditDefaultsOnly, category="Components")
+	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UCharacterMovementComponent* movement;
 
 	UFUNCTION()
@@ -73,6 +73,8 @@ private: // Input
 	class UInputAction* IA_ViperAccel;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperBreak;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperShoot;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -112,6 +114,8 @@ private: // Input
 	void F_ViperBreakStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperShootStarted(const struct FInputActionValue& value);
 
 private:
 	bool bFristEngine;
@@ -206,4 +210,11 @@ private:
 	float HeightOfSea = -480000; // Cesium 해수면 높이
 	UPROPERTY(EditDefaultsOnly , Category="HUD")
 	TSubclassOf<class UUserWidget> HUD_UI;
+
+private:
+	UFUNCTION()
+	bool IsLockOn();
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	AActor* LockOnTarget = nullptr;
+	float Diametr = 30.f;
 };
