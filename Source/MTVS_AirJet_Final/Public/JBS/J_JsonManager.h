@@ -34,10 +34,16 @@ protected:
 	FSignupReq tempSignup;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FLoginReq tempLogin;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString tempReqMapName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FMissionDataRes tempGetMissionData;
 
 public:
 
 protected:
+#pragma region 웹 통신 테스트
 	UFUNCTION(BlueprintCallable)
 	void ReqTemp();
 
@@ -48,6 +54,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ReqLogin();
 
+	// @@ 5. 테스트용 로그인 했을때 반환 데이터 받기
+	UFUNCTION(BlueprintCallable)
+	void OnLoginData(const FLoginRes &resData);
+
 	UFUNCTION(BlueprintCallable)
 	void ReqTempAuth();
 
@@ -55,9 +65,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void OnLoginAuthData(const FResSimple &resData);
 
-	// @@ 5. 테스트용 로그인 했을때 반환 데이터 받기
 	UFUNCTION(BlueprintCallable)
-	void OnLoginData(const FLoginRes &resData);
+	void ReqGetMissionData();
 
+	UFUNCTION(BlueprintCallable)
+	void OnGetMissionData(const FMissionDataRes &resData);
+
+#pragma endregion
     public:
 };

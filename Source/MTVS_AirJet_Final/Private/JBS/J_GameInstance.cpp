@@ -49,6 +49,12 @@ void UJ_GameInstance::RequestToServerByType(EJsonType type, const FString &sendJ
             RequestData(tempLoginAuthDel, sendJsonData, TEXT("test"));
             break;
         }
+		case EJsonType::MISSION_DATA_RECEIVE:
+        {
+            missionDataGetDel.BindUObject(this, &UJ_GameInstance::ResMissionDataReceive);
+            RequestData(missionDataGetDel, sendJsonData, TEXT("map/data"));
+            break;
+        }
     }
 }
 
@@ -68,6 +74,7 @@ void UJ_GameInstance::RequestData(FResponseDelegate resDel, const FString& jsonD
 		// 성공 여부 확인
 		if(isSuccess)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 1단계 성공"));
 			// 로그인 시에만 작동, 인증 값 저장해두기
 			authorValue = res->GetHeader(TEXT("Authorization"));
 			// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("인증 값 : %s"), *authorValue));
@@ -173,6 +180,15 @@ void UJ_GameInstance::ResLoginAuth(const FString &jsonData, bool isSuccess)
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
 
 	tempLoginAuthUseDel.ExecuteIfBound(resData);
+}
+
+void UJ_GameInstance::ResMissionDataReceive(const FString &jsonData, bool isSuccess)
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 2단계 성공"));
+	FMissionDataRes resData;
+	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
+
+	missionDataResDelegate.ExecuteIfBound(resData);
 }
 
 
