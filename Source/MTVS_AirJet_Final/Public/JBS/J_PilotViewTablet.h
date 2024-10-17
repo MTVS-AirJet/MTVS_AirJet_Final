@@ -41,5 +41,9 @@ public:
 protected:
     void StartViewScreenShare();
 
-public:
+	// 플레이어 id 배열 가져와서 UI 에 슬롯 생성
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerSlotUI(TArray<FString> playerIdAry);
+
+    public:
 };

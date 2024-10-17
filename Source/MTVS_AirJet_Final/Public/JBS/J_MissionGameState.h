@@ -24,4 +24,9 @@ protected:
 public:
 	// 화면 공유 플레이어 목록 UI 생성하는 부분 재정의
     virtual void OnRep_StreamingID() override;
+
+	// 스트리밍 유저 id 추가 | ServerRPC_SetStreamingPlayer_Implementation 에서 하던것 여기로 이동함
+    void AddStreamUserId(const FString &userId);
+    // 스트리밍 유저 id 제거 | ServerRPC_SetStreamingPlayer_Implementation 에서 하던것 여기로 이동함
+    void RemoveStreamUserId(const FString &userId);
 };

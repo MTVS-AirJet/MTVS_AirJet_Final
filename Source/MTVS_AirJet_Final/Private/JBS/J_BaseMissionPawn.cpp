@@ -9,7 +9,7 @@
 #include "IPixelStreamingModule.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "JBS/J_MissionPlayerController.h"
-#include "KHS/K_GameState.h"
+#include "JBS/J_MissionGameState.h"
 #include <KHS/K_PlayerController.h>
 #include <JBS/J_Utility.h>
 #include "KHS/K_StreamingUI.h"
@@ -34,7 +34,7 @@ void AJ_BaseMissionPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// @@ 플레이어가 포제스하면 화면 공유 시작
+	// solved 플레이어가 포제스하면 화면 공유 시작
 	if(this->IsLocallyControlled())
 	{
 		StartScreenShare();	
@@ -65,31 +65,22 @@ void AJ_BaseMissionPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void AJ_BaseMissionPawn::ServerRPC_SetStreamingPlayer_Implementation(const FString &playerId, bool bAddPlayer)
 {
 	// k 게임 스테이트 가져오기
-	auto* gs = UJ_Utility::GetKGameState(GetWorld());
+	auto* gs = UJ_Utility::GetMissionGameState(GetWorld());
 	// userId 배열에 추가 or 제거
 	if(bAddPlayer)
-	{
-		if(gs->ArrStreamingUserID.Find(playerId) >= 0)
-			return;
-
-		gs->ArrStreamingUserID.Add(playerId);
-	}
+		gs->AddStreamUserId(playerId);
 	else
-	{
-		if(gs->ArrStreamingUserID.Num() == 0 
-		|| gs->ArrStreamingUserID.Find(playerId) < 0 )
-			return;
-
-		gs->ArrStreamingUserID.Remove(playerId);
-	}
-	// 동기화
-	if(this->HasAuthority())
-		gs->OnRep_StreamingID();
+		gs->RemoveStreamUserId(playerId);
+	
+	// XXX 동기화 | ui 보여줄거 아닌데 필요없는듯?
+	// if(this->HasAuthority())
+	// 	gs->OnRep_StreamingID();
 }
 
 // 화면 공유 시작 
 void AJ_BaseMissionPawn::StartScreenShare()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("0. 화면 공유 시작"));
 	// 세션 아이디 가져오기
 	streamId = GetSessionId();
 	
@@ -100,16 +91,15 @@ void AJ_BaseMissionPawn::StartScreenShare()
 	auto curStreamer = psModule.CreateStreamer(streamId);
 	if(!curStreamer) return;
 
-	// @@ SA의 현재 스트리머 변수에 자기 할당
-	STREAM_ACTOR->CurrentStreamer = curStreamer;
+	
+	// solved SA의 현재 스트리머 변수에 자기 할당
+	// STREAM_ACTOR->CurrentStreamer = curStreamer;
 	STREAM_ACTOR->UserID = streamId;
-	// SA->curst = curst;
-	// SA->userId = streamid;
 	
 	// 비디오 입력 처리 방법 ui 위젯 라우팅으로 설정
 	curStreamer->SetInputHandlerType(EPixelStreamingInputType::RouteToWidget);
-	// @@ SA->scenecapture -> active();
-	STREAM_ACTOR->SceneCapture->Activate();
+	// solved 캡쳐 활성화
+	// STREAM_ACTOR->SceneCapture->Activate();
 
 	// 화면 공유 플레이어 배열에 자신 추가
 	ServerRPC_SetStreamingPlayer(streamId, true);
@@ -121,15 +111,16 @@ void AJ_BaseMissionPawn::StartScreenShare()
 	curStreamer->SetSignallingServerURL(psServerURL);
 
 	// 스트리밍 시작
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("2. 플레이어 화면 공유 시작"));
 	curStreamer->StartStreaming();
+
+
 	// @@ 생각해보니 SA 사실상 컴포넌트 처럼 작동하는데 아예 컴포넌트화 해도 되지않을까? 화면공유 컴포넌트 마냥, findorcreate해서 프리팹에 있으면 그걸로 하고 없으면 컴포넌트 생성하는 식으로
-	// 태블릿 화면 공유 시작
-	// @@
-	// STREAM_ACTOR->ChangeLookSharingScreen();
 }
 
 FString AJ_BaseMissionPawn::GetSessionId()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("1. 세션 id 가져오기"));
 	// UK_StreamingUI::GetCurrentSessionID() 인용
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if ( OnlineSubsystem )

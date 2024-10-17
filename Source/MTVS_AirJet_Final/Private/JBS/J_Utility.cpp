@@ -3,6 +3,7 @@
 
 #include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_MissionGameState.h"
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include <JBS/J_GameInstance.h>
@@ -37,6 +38,14 @@ AJ_MissionGamemode* UJ_Utility::GetMissionGamemode(const UWorld* world)
 AK_GameState *UJ_Utility::GetKGameState(const UWorld *world)
 {
     auto* gs = world->GetGameState<AK_GameState>();
+    check(gs);
+
+    return gs;
+}
+
+AJ_MissionGameState* UJ_Utility::GetMissionGameState(const UWorld* world)
+{
+    auto* gs = world->GetGameState<AJ_MissionGameState>();
     check(gs);
 
     return gs;

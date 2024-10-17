@@ -21,6 +21,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FString psServerURL = TEXT("ws://125.132.216.190:7755");
 
+	// 캡쳐 내용 표시할 머티리얼 프리팹
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	class UMaterialInterface* captureMaterialPrefab;
+	// 캡쳐 내용 표시할 동적 머티리얼 인스턴스 | 부모 쪽에 정의됨
+	// DynamicMaterial 
 
 public:
 

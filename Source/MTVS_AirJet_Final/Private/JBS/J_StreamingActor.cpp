@@ -7,12 +7,15 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "GameFramework/Pawn.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_Utility.h"
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystem.h"
 
 void AJ_StreamingActor::BeginPlay()
 {
@@ -50,7 +53,7 @@ bool AJ_StreamingActor::TryInitScreen()
     sceneComp->AttachToComponent(playerCamera , FAttachmentTransformRules::SnapToTargetIncludingScale);
 
     // Z 축이 카메라를 향하도록 회전
-	DynamicMaterial = UMaterialInstanceDynamic::Create(StreamingScreen->GetMaterial(0) , this);
+	DynamicMaterial = UMaterialInstanceDynamic::Create(captureMaterialPrefab, this);
 	StreamingScreen->SetMaterial(0 , DynamicMaterial);
 	StreamingScreen->SetRelativeLocationAndRotation(FVector(400 , 0 , 0) , FRotator(0 , 90 , 90));
 
@@ -58,7 +61,7 @@ bool AJ_StreamingActor::TryInitScreen()
     auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
     check(gs)
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Current Streaming Player Num : %d"), gs->ArrStreamingUserID.Num()));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Current Streaming Player Num : %d"), gs->ArrStreamingUserID.Num()));
     // LOG_S(Warning , TEXT("Current Streaming Player Num : %d") , gs->ArrStreamingUserID.Num());
 
     //SceneCapture2D 초기화 한번더
