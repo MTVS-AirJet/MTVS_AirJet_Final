@@ -40,7 +40,11 @@ private: // Component
 
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UCharacterMovementComponent* movement;
-
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UNiagaraComponent* BoosterLeftVFX;
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UNiagaraComponent* BoosterRightVFX;
+	
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
 	class USpringArmComponent* JetSprintArm;
@@ -232,4 +236,8 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
 	AActor* LockOnTarget = nullptr;
 	float Diametr = 30.f;
+
+private:
+	UFUNCTION()
+	void ChangeBooster();
 };

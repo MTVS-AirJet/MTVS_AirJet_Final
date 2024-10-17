@@ -3,6 +3,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "MTVS_AirJet_Final.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
@@ -82,6 +84,27 @@ AL_Viper::AL_Viper()
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
+
+	//============================================
+	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
+	BoosterLeftVFX->SetupAttachment(JetMesh);
+	BoosterLeftVFX->SetRelativeLocationAndRotation(FVector(-750 , -50 , 180) , FRotator(0 , 180 , 0));
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> LeftVFX(TEXT(
+		"/Script/Niagara.NiagaraSystem'/Game/Asset/RocketThrusterExhaustFX/FX/NS_RocketExhaust_Red.NS_RocketExhaust_Red'"));
+	if (LeftVFX.Succeeded())
+	{
+		BoosterLeftVFX->SetAsset(LeftVFX.Object);
+	}
+
+	BoosterRightVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterRightVFX"));
+	BoosterRightVFX->SetupAttachment(JetMesh);
+	BoosterRightVFX->SetRelativeLocationAndRotation(FVector(-750 , 50 , 180) , FRotator(0 , 180 , 0));
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> RightVFX(TEXT(
+		"/Script/Niagara.NiagaraSystem'/Game/Asset/RocketThrusterExhaustFX/FX/NS_RocketExhaust_Red.NS_RocketExhaust_Red'"));
+	if (RightVFX.Succeeded())
+	{
+		BoosterRightVFX->SetAsset(RightVFX.Object);
+	}
 }
 #pragma endregion
 
@@ -488,6 +511,8 @@ void AL_Viper::Tick(float DeltaTime)
 		//bool bLockOn = IsLockOn();
 		//LOG_SCREEN("%s" , LockOnTarget?*LockOnTarget->GetName():*FString("nullptr"));
 #pragma endregion
+
+		ChangeBooster();
 	}
 }
 
@@ -578,3 +603,43 @@ bool AL_Viper::IsLockOn()
 	return bLockOn;
 }
 #pragma endregion
+
+void AL_Viper::ChangeBooster()
+{
+	if (IsEngineOn && AccelGear == 3)
+	{
+		// 엔진부스터 켜기
+		if (BoosterLeftVFX)
+		{
+			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+		}
+		if (BoosterRightVFX)
+		{
+			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+		}
+	}
+	else
+	{
+		// 엔진부스터 끄기
+		if (BoosterLeftVFX)
+		{
+			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+		}
+		if (BoosterRightVFX)
+		{
+			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+		}
+	}
+}
