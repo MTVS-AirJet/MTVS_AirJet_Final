@@ -12,6 +12,8 @@
 #include "../../../../Plugins/Online/OnlineSubsystem/Source/Public/Interfaces/OnlineSessionInterface.h"
 #include "UObject/Interface.h"
 #include <JsonObjectConverter.h>
+#include <map>
+
 #include "K_GameInstance.generated.h"
 
 /**
@@ -43,6 +45,9 @@ public:
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch; // 온라인 세션 검색을 할 수 있는 클래스 인스턴스 선언
 
 	FString DesiredServerName; // Host 시 서버 이름을 지정하여 설정하기 위한 변수
+	FString DesiredServerData;
+
+	std::map<int32, FString> ServerDataList;
 
 	//===============================================================
 	// Functions
@@ -69,7 +74,7 @@ public:
 #pragma  region Session Management Functions
 	// 1) 세션 관련 함수 --------------------------------------------------------------------------------------
 	UFUNCTION(Exec) // Exec: 콘솔창에 입력할 수 있도록 만든다.
-	void Host(FString ServerName) override; // 서버 열기 함수
+	void Host(FString ServerName, const FString& MapDataStruct) override; // 서버 열기 함수
 	
 	UFUNCTION(Exec)
 	void Join(uint32 Index); // 서버 접속 함수

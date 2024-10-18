@@ -181,6 +181,22 @@ struct FMapInfoResponse
 
         return str;
     }
+
+    FString ResponseToServerData() const
+    {
+        FString str = FString::Printf(
+        TEXT("%s|%.2f|%.2f|%s|%d|%d|%d|%d")
+        , *producer
+        , latitude
+        , longitude
+        , *mapName
+        , startPointX, startPointY
+        , pinNo
+        , commandNo
+        );
+
+        return str;
+    }
 };
 
 #pragma endregion
