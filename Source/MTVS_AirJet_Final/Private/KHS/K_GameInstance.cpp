@@ -230,8 +230,14 @@ void UK_GameInstance::RefreshServerList()
 
 	if ( SessionSearch.IsValid() )
 	{
-		//SessionSearch->bIsLanQuery = true; // LAN 사용 여부, true 면 LAN 세션을 찾고 false 면 인터넷 세션을 찾음.
-		SessionSearch->bIsLanQuery = false; // LAN 세션 검색 여부 설정
+		if ( IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ) // OnlineSubsystem 이 NULL 로 세팅되면 (NULL : 로컬 연결 설정)
+		{
+			SessionSearch->bIsLanQuery = true; // LAN 사용 여부, true 면 LAN 세션을 찾고 false 면 인터넷 세션을 찾음.
+		}
+		else
+		{
+			SessionSearch->bIsLanQuery = false; // LAN 사용 여부, true 면 LAN 세션을 찾고 false 면 인터넷 세션을 찾음. (Steam, XBox 등 공식플랫폼 연결 설정)
+		}
 		SessionSearch->MaxSearchResults = 50; // 한번 세션을 찾을때 최대 50개까지만 검색
 		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE , true , EOnlineComparisonOp::Equals);
 
