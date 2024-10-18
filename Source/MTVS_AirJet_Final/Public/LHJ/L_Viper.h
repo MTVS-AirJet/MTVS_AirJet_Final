@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "JBS/J_BaseMissionPawn.h"
 #include "L_Viper.generated.h"
 
 UCLASS()
-class MTVS_AIRJET_FINAL_API AL_Viper : public APawn
+class MTVS_AIRJET_FINAL_API AL_Viper : public AJ_BaseMissionPawn
 {
 	GENERATED_BODY()
 
@@ -137,7 +137,7 @@ private: // Input
 	void F_ViperTpsStarted(const struct FInputActionValue& value);
 
 private:
-	bool bFristEngine;
+	bool bFirstEngine;
 	// For Engine Using 
 	bool IsEngineOn;
 	// For Change Arrow Rotate

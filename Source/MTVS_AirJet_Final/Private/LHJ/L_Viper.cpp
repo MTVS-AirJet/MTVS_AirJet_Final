@@ -156,11 +156,11 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	if (!bFristEngine)
+	if (!bFirstEngine)
 	{
 		LOG_SCREEN("Clicked!!");
 		AccelGear = 1;
-		bFristEngine = true;
+		bFirstEngine = true;
 	}
 }
 
@@ -508,7 +508,7 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region LockOn
-		//bool bLockOn = IsLockOn();
+		bool bLockOn = IsLockOn();
 		//LOG_SCREEN("%s" , LockOnTarget?*LockOnTarget->GetName():*FString("nullptr"));
 #pragma endregion
 
