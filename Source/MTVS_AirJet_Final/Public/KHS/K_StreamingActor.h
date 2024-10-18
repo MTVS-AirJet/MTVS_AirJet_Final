@@ -76,6 +76,10 @@ public:
     class USceneComponent* sceneComp;  // 액터의 루트 컴포넌트 역할을 하는 SceneComponent
 
     class UMaterialInstanceDynamic* DynamicMaterial;  // 동적 머티리얼 인스턴스 (캡처된 화면을 표시할 머티리얼)
+
+    // / jbs 추가 beginplay 실행 끄기
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+    bool enableOrgBeginPlay = true;
     
 public:
     //==========================================================================

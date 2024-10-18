@@ -96,6 +96,8 @@ AK_StreamingActor::AK_StreamingActor()
 void AK_StreamingActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+    if(!enableOrgBeginPlay) return;
 	
     APawn* playerPawn = UGameplayStatics::GetPlayerPawn(GetWorld() , 0);
     UCameraComponent* playerCamera = playerPawn->GetComponentByClass<UCameraComponent>();

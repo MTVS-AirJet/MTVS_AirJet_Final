@@ -29,6 +29,12 @@ protected:
     FMissionPlayerSpawnPoints spawnPoints;
 
 public:
+    // 로드할 미션 맵 이름
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString curMissionName;
+    // 미션 데이터
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FMissionDataRes curMissionData;
 
 protected:
     virtual void BeginPlay() override;

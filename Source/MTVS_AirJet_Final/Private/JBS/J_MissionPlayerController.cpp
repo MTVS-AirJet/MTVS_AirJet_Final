@@ -103,10 +103,11 @@ void AJ_MissionPlayerController::OnPossess(APawn *newPawn)
     
     if(this->IsLocalPlayerController())
     {
-        InitStreamingUI(CastChecked<AJ_BaseMissionPawn>(newPawn));
+        // XXX 스트리밍 ui 의존성 제거
+        // InitStreamingUI(CastChecked<AJ_BaseMissionPawn>(newPawn));
     }
 }
-
+// XXX 이제 안씀
 void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 {
 	this->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , this->StreamingUIFactory));

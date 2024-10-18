@@ -3,6 +3,7 @@
 
 #include "JBS/J_StreamingUI.h"
 #include "Components/Image.h"
+#include "Components/SlateWrapperTypes.h"
 #include "Engine/Engine.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "KHS/K_StreamingActor.h"
@@ -54,5 +55,15 @@ void UJ_StreamingUI::OnButtonLookSharingScreen()
 {
     Super::OnButtonLookSharingScreen();
 
-    
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("6. 화면 공유 시작"));
+
+    ButtonLookSharingScreen->SetVisibility(ESlateVisibility::Visible);
+
+}
+
+void UJ_StreamingUI::SetUserID(FString ID, const bool &bAddPlayer)
+{
+    Super::SetUserID(ID, bAddPlayer);
+
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("4. 유저 아이디 설정"));
 }

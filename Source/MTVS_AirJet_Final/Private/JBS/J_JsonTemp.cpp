@@ -119,7 +119,7 @@ void AJ_JsonTemp::ResPost(FHttpRequestPtr req, FHttpResponsePtr res, bool isSucc
 	}
 }
 
-// @@
+// solved
 void AJ_JsonTemp::ReqPostTemp(const FString &url, bool useDefaultUrl)
 {
 	// json 만들기
@@ -170,7 +170,7 @@ void AJ_JsonTemp::ResPostTemp(FHttpRequestPtr req, FHttpResponsePtr res, bool is
 	}
 }
 
-// @@
+// solved
 void AJ_JsonTemp::ReqPostTempAry(const FString &url, bool useDefaultUrl)
 {
 	// json 만들기

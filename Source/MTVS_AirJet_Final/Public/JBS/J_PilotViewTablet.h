@@ -30,10 +30,20 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
 	class UJ_PilotViewTabletUI* tabletUI; 
 
+	// 디버그용 로컬 rt 사용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enableLocalScreenShare = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	class UTextureRenderTarget* debugRT;
+
 public:
 
 protected:
+    void StartViewScreenShare();
 
+	// 플레이어 id 배열 가져와서 UI 에 슬롯 생성
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerSlotUI(TArray<FString> playerIdAry);
 
-public:
+    public:
 };

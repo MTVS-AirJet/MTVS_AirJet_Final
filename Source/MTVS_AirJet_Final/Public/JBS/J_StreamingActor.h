@@ -17,6 +17,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool isInitScreen = false;
 
+	// ps서버 url
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString psServerURL = TEXT("ws://125.132.216.190:7755");
+
+	// 캡쳐 내용 표시할 머티리얼 프리팹
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	class UMaterialInterface* captureMaterialPrefab;
+	// 캡쳐 내용 표시할 동적 머티리얼 인스턴스 | 부모 쪽에 정의됨
+	// DynamicMaterial 
+
 public:
 
 protected:
@@ -30,4 +40,16 @@ public:
 
 	// 주어진 사용자 ID를 설정하여 화면 공유를 시작하는 함수 | 캐릭터 클래스 변경
     virtual void SetViewSharingUserID(FString ID, const bool &bAddPlayer) override;
+
+	// 화면 공유를 다른 사용자 시점으로 변경하는 함수 : bp 함수 쓰던걸 변경
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void ChangeLookSharingScreen() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void BeginLookSharingScreen() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void StopLookSharingScreen() override;
+
+	// FIXME 연결 되니깐 이제 화면공유를 태블릿쪽으로 변경하고 플레이어와 UI 분리 하기
 };
