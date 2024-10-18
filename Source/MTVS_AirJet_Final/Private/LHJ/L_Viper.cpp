@@ -484,10 +484,10 @@ void AL_Viper::Tick(float DeltaTime)
 	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
 
-#pragma region 고도계
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if (CurrentMapName == TEXT("LHJ_TestLevel"))
+	if (CurrentMapName == TEXT("LHJ_TestLevel") || CurrentMapName == TEXT("CesiumTest"))
 	{
+#pragma region 고도계
 		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
 		float CurrFeet = CurrHeight / 30.48; // cm to feet
 		if (CurrFeet < 0)
@@ -511,9 +511,8 @@ void AL_Viper::Tick(float DeltaTime)
 		bool bLockOn = IsLockOn();
 		//LOG_SCREEN("%s" , LockOnTarget?*LockOnTarget->GetName():*FString("nullptr"));
 #pragma endregion
-
-		ChangeBooster();
 	}
+	ChangeBooster();
 }
 
 #pragma region Get Force
@@ -606,40 +605,47 @@ bool AL_Viper::IsLockOn()
 
 void AL_Viper::ChangeBooster()
 {
-	if (IsEngineOn && AccelGear == 3)
+	if (BoosterLeftVFX)
 	{
-		// 엔진부스터 켜기
-		if (BoosterLeftVFX)
-		{
-			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
-			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
-		}
-		if (BoosterRightVFX)
-		{
-			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
-			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
-		}
+		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.5f);
+		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.5f);
+		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.5f);
+		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.5f);
 	}
-	else
-	{
-		// 엔진부스터 끄기
-		if (BoosterLeftVFX)
-		{
-			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
-			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
-			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
-			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
-		}
-		if (BoosterRightVFX)
-		{
-			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
-			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
-			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
-			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
-		}
-	}
+	// if (IsEngineOn && AccelGear == 3)
+	// {
+	// 	// 엔진부스터 켜기
+	// 	if (BoosterLeftVFX)
+	// 	{
+	// 		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+	// 	}
+	// 	if (BoosterRightVFX)
+	// 	{
+	// 		BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+	// 	}
+	// }
+	// else
+	// {
+	// 	// 엔진부스터 끄기
+	// 	if (BoosterLeftVFX)
+	// 	{
+	// 		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+	// 		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+	// 	}
+	// 	if (BoosterRightVFX)
+	// 	{
+	// 		BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+	// 		BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+	// 	}
+	// }
 }
