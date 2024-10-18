@@ -13,9 +13,6 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/BP_K_GameMode.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/BP_K_GameMode.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Maps/KHS/CesiumTest.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Maps/KHS/CesiumTest.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -152,7 +149,7 @@
     "C++ Project.MTVS_AirJet_Final.executor": "Debug",
     "C++ 프로젝트.MTVS_AirJet_Final.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "LHJ__Proto",
+    "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
@@ -276,7 +273,7 @@
       <workItem from="1728705098119" duration="13011000" />
       <workItem from="1728915606645" duration="28519000" />
       <workItem from="1729244177058" duration="996000" />
-      <workItem from="1729249876768" duration="6706000" />
+      <workItem from="1729249876768" duration="7310000" />
     </task>
     <servers />
   </component>

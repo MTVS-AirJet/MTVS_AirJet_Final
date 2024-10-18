@@ -605,47 +605,40 @@ bool AL_Viper::IsLockOn()
 
 void AL_Viper::ChangeBooster()
 {
-	if (BoosterLeftVFX)
+	if (IsEngineOn && AccelGear == 3)
 	{
-		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.5f);
-		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.5f);
-		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.5f);
-		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.5f);
+		// 엔진부스터 켜기
+		if (BoosterLeftVFX)
+		{
+			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+		}
+		if (BoosterRightVFX)
+		{
+			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
+		}
 	}
-	// if (IsEngineOn && AccelGear == 3)
-	// {
-	// 	// 엔진부스터 켜기
-	// 	if (BoosterLeftVFX)
-	// 	{
-	// 		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
-	// 	}
-	// 	if (BoosterRightVFX)
-	// 	{
-	// 		BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
-	// 	}
-	// }
-	// else
-	// {
-	// 	// 엔진부스터 끄기
-	// 	if (BoosterLeftVFX)
-	// 	{
-	// 		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
-	// 		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
-	// 	}
-	// 	if (BoosterRightVFX)
-	// 	{
-	// 		BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
-	// 		BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
-	// 	}
-	// }
+	else
+	{
+		// 엔진부스터 끄기
+		if (BoosterLeftVFX)
+		{
+			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+		}
+		if (BoosterRightVFX)
+		{
+			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
+		}
+	}
 }
