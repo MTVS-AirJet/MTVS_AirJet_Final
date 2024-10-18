@@ -39,6 +39,8 @@ void UK_ServerWidget::NativeConstruct()
 		PlayAnimation(ShowServerMenuAnim);
 	}
 
+	if ( SessionInterface )
+		SessionInterface->RefreshServerList();
 }
 
 bool UK_ServerWidget::Initialize()
@@ -116,6 +118,9 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 		MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
 		PlayAnimation(ShowServerMenuAnim);
 		UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+
+		if ( SessionInterface )
+			SessionInterface->RefreshServerList();
 	}
 	} , 1.0f , false);
 	
@@ -136,6 +141,9 @@ void UK_ServerWidget::OpenServerMenuFromReady()
 			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
 			PlayAnimation(ShowServerMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+
+			if ( SessionInterface )
+				SessionInterface->RefreshServerList();
 		}
 	} , 1.0f , false);
 }
@@ -182,7 +190,7 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 	//기존목록을 지우고
 	ServerMenu_ServerList->ClearChildren();
 	
-	//uint32 i =0;
+	uint32 i =0;
 	for ( const FServerData& ServerData : ServerNames )
 	{
 		//팩토리를 통해 ServerListUI버튼 생성
@@ -195,8 +203,9 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 		ServerList->ConnectedPlayer->SetText(FText::FromString(FString::Printf(TEXT("%d/%d") , ServerData.curPlayers , ServerData.maxPlayers)));
 		
 		//ServerListUI 인덱스 부여
-		ServerList->Setup(this, ServerData.sessionIdx);
-		//i++;
+		//ServerList->Setup(this, ServerData.sessionIdx);
+		ServerList->Setup(this, i);
+		i++;
 
 		//ServerListUI버튼추가
 		ServerMenu_ServerList->AddChild(ServerList);
