@@ -35,12 +35,13 @@ protected:
 	// gi에서 프리팹 가져와서 플레이어 스폰
     UFUNCTION(Server, Reliable)
     void SRPC_SpawnMyPlayer(TSubclassOf<class APawn> playerPrefab);
+
 	// 스폰한 플레이어 포제스
 	UFUNCTION(Client, Reliable)
 	void CRPC_SpawnMyPlayer(APawn *newPawn);
 
-        // streaming ui 생성
-        void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
+	// XXX streaming ui 생성 | 의존성 제거됨
+	void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
 
     public:
 	virtual void Tick(float deltaTime);

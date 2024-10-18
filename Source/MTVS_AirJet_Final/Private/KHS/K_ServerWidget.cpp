@@ -32,13 +32,15 @@ void UK_ServerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if ( ShowServerMenuAnim )
+	if (ShowServerMenuAnim)
 	{
 		// 메인 애니메이션 재생
 		PlayAnimation(ShowTransitionAnim);
 		PlayAnimation(ShowServerMenuAnim);
 	}
 
+	if (SessionInterface)
+		SessionInterface->RefreshServerList();
 }
 
 bool UK_ServerWidget::Initialize()
@@ -46,47 +48,47 @@ bool UK_ServerWidget::Initialize()
 	Super::Initialize();
 
 	// Server Menu Button Binding =============================================
-	if ( ServerMenu_btn_Create ) //방생성 버튼 바인딩
+	if (ServerMenu_btn_Create) //방생성 버튼 바인딩
 	{
-		ServerMenu_btn_Create->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenHostMenuFromServer); 
+		ServerMenu_btn_Create->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenHostMenuFromServer);
 	}
-	if ( ServerMenu_btn_Join ) //방참여 버튼 바인딩
+	if (ServerMenu_btn_Join) //방참여 버튼 바인딩
 	{
-		ServerMenu_btn_Join->OnClicked.AddDynamic(this , &UK_ServerWidget::JoinRoom); 
+		ServerMenu_btn_Join->OnClicked.AddDynamic(this , &UK_ServerWidget::JoinRoom);
 	}
-	if ( ServerMenu_btn_Home ) //홈 버튼 바인딩
+	if (ServerMenu_btn_Home) //홈 버튼 바인딩
 	{
 		ServerMenu_btn_Home->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenLobbyLevel);
 	}
-	if ( ServerMenu_btn_Reset ) //리셋 버튼 바인딩
+	if (ServerMenu_btn_Reset) //리셋 버튼 바인딩
 	{
 		ServerMenu_btn_Reset->OnClicked.AddDynamic(this , &UK_ServerWidget::ServerListUpdateChildren);
 	}
 	// Host Menu Button Binding ==============================================
-	if ( HostMenu_btn_Create ) //방생성 버튼 바인딩
+	if (HostMenu_btn_Create) //방생성 버튼 바인딩
 	{
 		HostMenu_btn_Create->OnClicked.AddDynamic(this , &UK_ServerWidget::CreateRoom);
 	}
-	if ( HostMenu_btn_LoadMap ) //웹에디터 정보 불러오기 버튼 바인딩
+	if (HostMenu_btn_LoadMap) //웹에디터 정보 불러오기 버튼 바인딩
 	{
 		HostMenu_btn_LoadMap->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenCreaterWeb);
 	}
-	if ( HostMenu_btn_Cancel ) //생성취소 버튼 바인딩
+	if (HostMenu_btn_Cancel) //생성취소 버튼 바인딩
 	{
 		HostMenu_btn_Cancel->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenServerMenuFromHost);
 	}
-	if ( HostMenu_btn_WebQuit ) //웹에디터 종료 버튼 바인딩
+	if (HostMenu_btn_WebQuit) //웹에디터 종료 버튼 바인딩
 	{
 		HostMenu_btn_WebQuit->OnClicked.AddDynamic(this , &UK_ServerWidget::QuitCreaterWeb);
 	}
 
 	// Ready Menu Button Binding ===============================================
 
-	if ( ReadyMenu_btn_Start ) //게임시작 버튼 바인딩(게임맵 트래블)
+	if (ReadyMenu_btn_Start) //게임시작 버튼 바인딩(게임맵 트래블)
 	{
 		ReadyMenu_btn_Start->OnClicked.AddDynamic(this , &UK_ServerWidget::LoadGameMap);
 	}
-	if ( ReadyMenu_btn_Home ) //홈 버튼 바인딩
+	if (ReadyMenu_btn_Home) //홈 버튼 바인딩
 	{
 		ReadyMenu_btn_Home->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenServerMenuFromReady);
 	}
@@ -104,38 +106,43 @@ bool UK_ServerWidget::Initialize()
 // 서버메뉴로 돌아가는 함수
 void UK_ServerWidget::OpenServerMenuFromHost()
 {
-	if ( HideHostMenuAnim )
+	if (HideHostMenuAnim)
 		PlayAnimation(HideHostMenuAnim);
 
 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
 	{
-	if ( MenuSwitcher )
-	{
-		MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
-		PlayAnimation(ShowServerMenuAnim);
-		UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
-	}
+		if (MenuSwitcher)
+		{
+			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
+			PlayAnimation(ShowServerMenuAnim);
+			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+
+			if (SessionInterface)
+				SessionInterface->RefreshServerList();
+		}
 	} , 1.0f , false);
-	
 }
 
 // 서버메뉴로 돌아가는 함수
 void UK_ServerWidget::OpenServerMenuFromReady()
 {
-	if ( HideReadyMenuAnim )
+	if (HideReadyMenuAnim)
 		PlayAnimation(HideReadyMenuAnim);
 
 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
 	{
-		if ( MenuSwitcher )
+		if (MenuSwitcher)
 		{
 			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
 			PlayAnimation(ShowServerMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+
+			if (SessionInterface)
+				SessionInterface->RefreshServerList();
 		}
 	} , 1.0f , false);
 }
@@ -143,17 +150,17 @@ void UK_ServerWidget::OpenServerMenuFromReady()
 // Host 메뉴로 접속하는 함수
 void UK_ServerWidget::OpenHostMenuFromServer()
 {
-	if ( HideServerMenuAnim )
+	if (HideServerMenuAnim)
 		PlayAnimation(HideServerMenuAnim);
 
 	// 타이머로 시간 제어를 통해 HostMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
 	{
-		if ( MenuSwitcher )
+		if (MenuSwitcher)
 		{
 			MenuSwitcher->SetActiveWidget(HostMenu); // HostMenu로 전환하여 활성화
-			
+
 			//숨겨둬야하는 위젯들 설정
 			HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
 			HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
@@ -181,22 +188,24 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 {
 	//기존목록을 지우고
 	ServerMenu_ServerList->ClearChildren();
-	
-	//uint32 i =0;
-	for ( const FServerData& ServerData : ServerNames )
+
+	uint32 i = 0;
+	for (const FServerData& ServerData : ServerNames)
 	{
 		//팩토리를 통해 ServerListUI버튼 생성
-		ServerList = CreateWidget<UK_ServerList>(this, ServerListFactory);
-		
+		ServerList = CreateWidget<UK_ServerList>(this , ServerListFactory);
+
 		//ServerList SetText
 		ServerList->sessionIdx->SetText(FText::FromString(FString::Printf(TEXT("%d") , ServerData.sessionIdx)));
 		ServerList->SessionName->SetText(FText::FromString(ServerData.sessionName));
 		ServerList->HostName->SetText(FText::FromString(ServerData.hostUserName));
-		ServerList->ConnectedPlayer->SetText(FText::FromString(FString::Printf(TEXT("%d/%d") , ServerData.curPlayers , ServerData.maxPlayers)));
-		
+		ServerList->ConnectedPlayer->SetText(
+			FText::FromString(FString::Printf(TEXT("%d/%d") , ServerData.curPlayers , ServerData.maxPlayers)));
+
 		//ServerListUI 인덱스 부여
-		ServerList->Setup(this, ServerData.sessionIdx);
-		//i++;
+		//ServerList->Setup(this, ServerData.sessionIdx);
+		ServerList->Setup(this , i);
+		i++;
 
 		//ServerListUI버튼추가
 		ServerMenu_ServerList->AddChild(ServerList);
@@ -206,10 +215,10 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 //ServerList업데이트(PanelWidget 내장기능 사용)
 void UK_ServerWidget::ServerListUpdateChildren()
 {
-	for ( int32 i = 0; i < ServerMenu_ServerList->GetChildrenCount(); ++i )
+	for (int32 i = 0; i < ServerMenu_ServerList->GetChildrenCount(); ++i)
 	{
 		UK_ServerList* List = Cast<UK_ServerList>(ServerMenu_ServerList->GetChildAt(i));
-		if ( List )
+		if (List)
 		{
 			List->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
 		}
@@ -234,7 +243,6 @@ void UK_ServerWidget::ReqSessionInfo(const FMapInfoRequest& mapName)
 
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
 	UK_GameInstance::MyServerRequest<FMapInfoRequest>(GetWorld() , EEventType::MAPINFO , data);
-	
 }
 
 //FMapData구조체로 맵정보 란에 정보를 업데이트 하는 함수
@@ -247,11 +255,11 @@ void UK_ServerWidget::OnResSessionInfo(const FMapInfoResponse& resData)
 	FString ImgDataString = resData.mapImage;
 	TArray<uint8> MapImgData;
 	// Base64 문자열을 디코딩하여 TArray<uint8>에 저장
-	if ( FBase64::Decode(ImgDataString , MapImgData) )
+	if (FBase64::Decode(ImgDataString , MapImgData))
 	{
 		// 이미지 데이터를 Texture2D로 변환
 		UTexture2D* imgTexture = FImageUtils::ImportBufferAsTexture2D(MapImgData);
-		if ( imgTexture && ServerMenu_img_Map )
+		if (imgTexture && ServerMenu_img_Map)
 		{
 			ServerMenu_img_Map->SetBrushFromTexture(imgTexture); // UI에 적용
 		}
@@ -271,7 +279,7 @@ void UK_ServerWidget::OnResSessionInfo(const FMapInfoResponse& resData)
 void UK_ServerWidget::JoinRoom()
 {
 	//인덱스가 Set되고, Interface클래스 변수가 부모에 존재하면
-	if ( SelectedIndex.IsSet() && SessionInterface != nullptr )
+	if (SelectedIndex.IsSet() && SessionInterface != nullptr)
 	{
 		//WidgetBase를 통해 Interface의 Join 가상함수 호출 -> GameInstance에 있는 구현부가 호출됨
 		SessionInterface->Join(SelectedIndex.GetValue());
@@ -285,7 +293,6 @@ void UK_ServerWidget::JoinRoom()
 }
 
 
-
 #pragma endregion
 
 // Host Menu ====================================================
@@ -295,10 +302,10 @@ void UK_ServerWidget::JoinRoom()
 
 // 크리에이터툴 웹서비스로 접속하는 함수
 void UK_ServerWidget::OpenCreaterWeb()
-{	
+{
 	// 웹 브라우저 팝업을 열고 특정 URL을 설정
 	FString URL = TEXT("https://www.naver.com"); // 원하는 URL 입력
-	if ( HostMenu_web_Popup )
+	if (HostMenu_web_Popup)
 	{
 		HostMenu_web_Popup->LoadURL(URL);
 		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Visible);
@@ -309,7 +316,7 @@ void UK_ServerWidget::OpenCreaterWeb()
 // 웹브라우저 위젯 종료 함수
 void UK_ServerWidget::QuitCreaterWeb()
 {
-	if ( HostMenu_web_Popup )
+	if (HostMenu_web_Popup)
 	{
 		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
 		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
@@ -330,62 +337,68 @@ void UK_ServerWidget::ReqMapInfo()
 
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
 	UK_GameInstance::MyServerRequest<FMapInfoRequest>(GetWorld() , EEventType::MAPINFO , data);
-
 }
 
 //서버요청 콜백 바인딩_해당 맵정보를 받아와 Ready MENU와 Server MENU에 세팅하는 함수
 void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 {
-	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow , FString::Printf(TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+	                                 FString::Printf(
+		                                 TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+	CreatedMapData = resData.ResponseToServerData();
 
-	//방생성정보 저장(Room Name, PW)
-	FString RoomName = HostMenu_txt_RoomName->GetText().ToString();
-	FString RoomePW = HostMenu_txt_RoomPW->GetText().ToString();
-
-	//ReadyMenu에 세팅(기본)
-	ReadyMenu_txt_RoomName->SetText(FText::FromString(resData.mapName));
-	ReadyMenu_txt_Producer->SetText(FText::FromString(resData.producer));
-	ReadyMenu_txt_MapName->SetText(FText::FromString(resData.mapName));
-	ReadyMenu_txt_Latitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.latitude)));
-	ReadyMenu_txt_Longitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.longitude)));
+	// 여기에 실행할 작업을 추가하십시오.
+	// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
+	if (SessionInterface)
+	{
+		FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
+		SessionInterface->Host(ServerName , CreatedMapData);
+	}
 	
-	//ReadyMenu Image 세팅
-	FString ImgDataString = resData.mapImage;
-	TArray<uint8> SessionMapImgData;
-	// Base64 문자열을 디코딩하여 TArray<uint8>에 저장
-	if ( FBase64::Decode(ImgDataString , SessionMapImgData) )
-	{
-		// 이미지 데이터를 Texture2D로 변환
-		UTexture2D* imgTexture = FImageUtils::ImportBufferAsTexture2D(SessionMapImgData);
-		if ( imgTexture && ReadyMenu_img_Map )
-		{
-			ReadyMenu_img_Map->SetBrushFromTexture(imgTexture); // UI에 적용
-		}
-		else
-		{
-			LOG_S(Warning , TEXT("Can not find Texture"));
-		}
-	}
-	else
-	{
-		LOG_S(Warning , TEXT("Failed to decode Base64 string"));
-	}
-
-	//RedayMenu Command 세팅
-	ReadyMenu_txt_CommandList->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.commandNo)));
+	// //방생성정보 저장(Room Name, PW)
+	// FString RoomName = HostMenu_txt_RoomName->GetText().ToString();
+	// FString RoomePW = HostMenu_txt_RoomPW->GetText().ToString();
+	//
+	// //ReadyMenu에 세팅(기본)
+	// ReadyMenu_txt_RoomName->SetText(FText::FromString(resData.mapName));
+	// ReadyMenu_txt_Producer->SetText(FText::FromString(resData.producer));
+	// ReadyMenu_txt_MapName->SetText(FText::FromString(resData.mapName));
+	// ReadyMenu_txt_Latitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.latitude)));
+	// ReadyMenu_txt_Longitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.longitude)));
+	//
+	// //ReadyMenu Image 세팅
+	// FString ImgDataString = resData.mapImage;
+	// TArray<uint8> SessionMapImgData;
+	// // Base64 문자열을 디코딩하여 TArray<uint8>에 저장
+	// if ( FBase64::Decode(ImgDataString , SessionMapImgData) )
+	// {
+	// 	// 이미지 데이터를 Texture2D로 변환
+	// 	UTexture2D* imgTexture = FImageUtils::ImportBufferAsTexture2D(SessionMapImgData);
+	// 	if ( imgTexture && ReadyMenu_img_Map )
+	// 	{
+	// 		ReadyMenu_img_Map->SetBrushFromTexture(imgTexture); // UI에 적용
+	// 	}
+	// 	else
+	// 	{
+	// 		LOG_S(Warning , TEXT("Can not find Texture"));
+	// 	}
+	// }
+	// else
+	// {
+	// 	LOG_S(Warning , TEXT("Failed to decode Base64 string"));
+	// }
+	//
+	// //RedayMenu Command 세팅
+	// ReadyMenu_txt_CommandList->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.commandNo)));
 }
 
 // (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
 void UK_ServerWidget::CreateRoom()
 {
 	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
+	ReqMapInfo(); //  요청 완료 후 실행할 것을 컬백으로 설정
 
-	// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
-	if ( SessionInterface )
-	{
-		FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
-		SessionInterface->Host(ServerName);
-	}
+	
 }
 
 
@@ -403,10 +416,10 @@ void UK_ServerWidget::SetPlayerList()
 // PlayerList 3초마다 업데이트
 void UK_ServerWidget::PlayerListUpdateChildren()
 {
-	for ( int32 i = 0; i < ReadyMenu_PlayerList->GetChildrenCount(); ++i )
+	for (int32 i = 0; i < ReadyMenu_PlayerList->GetChildrenCount(); ++i)
 	{
 		UK_PlayerList* List = Cast<UK_PlayerList>(ReadyMenu_PlayerList->GetChildAt(i));
-		if ( List )
+		if (List)
 		{
 			List->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
 		}

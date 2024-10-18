@@ -234,6 +234,19 @@ struct FMissionDataRes
     // @@ 이미지 변환하는거 내장할까?
 };
 
+// 전체 미션 데이터 
+USTRUCT(BlueprintType)
+struct FAllMissionDataRes
+{
+    GENERATED_BODY()
+    
+    // @@ 이름 나중에 확인 필요
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FMissionDataRes> allMissionData;
+
+    // @@ 모든 미션 썸네일 이미지 받아오는 기능 추가
+};
+
 
 
 #pragma endregion
@@ -317,6 +330,8 @@ public:
     static class AJ_MissionGamemode* GetMissionGamemode(const UWorld* world);
     // 게임 스테이트 가져오기
     static class AK_GameState *GetKGameState(const UWorld *world);
+    // 미션 게임 스테이트 가져오기
+    static class AJ_MissionGameState* GetMissionGameState(const UWorld* world);
     // 미션맵 로컬 플레이어 가져오기
     static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
 };
