@@ -38,21 +38,20 @@ public:
 	// Variables    ================================================
 
 	UPROPERTY()
-	class UK_ServerWidget* Parent;
-	uint32 Index;
+	class UK_GameInstance* GameInstance; // GameInstance 참조를 위한 변수
 
+	UPROPERTY()
+	class UK_ServerWidget* Parent;
+	int Index;
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool Selected = false; // 서버를 선택했는지, 아닌지 선언(Event Graph에서 사용)
 
 	// Functions    ================================================
-	void Setup(class UK_ServerWidget* Parent, uint32 Index);
+	void Setup(class UK_ServerWidget* Parent, int Index);
 
 	UFUNCTION()
 	void OnHovered();
-
-	UFUNCTION()
-	void OnHoveredReq(const FMapInfoRequest& mapName);
 
 	UFUNCTION()
 	void OnClicked();

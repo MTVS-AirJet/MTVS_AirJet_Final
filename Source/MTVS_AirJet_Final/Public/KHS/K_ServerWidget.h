@@ -181,7 +181,7 @@ public:
 	//===============================================================
 	// 클래스 및 인스턴스
 	//===============================================================
-	TOptional <uint32> SelectedIndex; // 서버의 인덱스를 참조 선언
+	TOptional <int> SelectedIndex; // 서버의 인덱스를 참조 선언
 
 	class UK_GameInstance* GameInstance; // GameInstance 참조 선언
 
@@ -219,7 +219,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ServerListUpdateChildren(); //ServerList업데이트
 
-	void SelecetIndex(uint32 Index); // 서버의 인덱스를 선택하는 함수
+	void SelecetIndex(int Index); // 서버의 인덱스를 선택하는 함수
+
 
 	UFUNCTION(BlueprintCallable)
 	void ReqSessionInfo(const FMapInfoRequest& mapName); //선택한 인덱스의 세션정보에서 MapData정보를 얻어오는 함수

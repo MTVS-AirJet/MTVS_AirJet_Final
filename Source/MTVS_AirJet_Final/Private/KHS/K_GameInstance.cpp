@@ -147,9 +147,11 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 
 	TArray<FServerData> ServerNames;
 
+	int index = 0;
 	for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 	{
 		FServerData Data;
+		Data.sessionIdx = index++; //결과 순서대로 인덱스 부여
 		Data.sessionName = SearchResult.GetSessionIdStr();
 		Data.maxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections; // 입장가능한 최대 플레이어 수
 		Data.curPlayers = Data.maxPlayers - SearchResult.Session.NumOpenPublicConnections;
@@ -166,7 +168,8 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 			Data.sessionName = SearchResult.GetSessionIdStr(); // 서버 이름을 찾을 수 없는 경우, 고유 아이디를 가져옴
 		}
 
-		//sessionIdx
+		// 세션에 저장된 MapData를 가져와서 Map변수에 저장->ServerList에서 Index값을 가지고 있고
+		// -> Index값 기준으로 ServerWidget에 접근해 위젯 SetText
 		FString ServerData;
 		if (SearchResult.Session.SessionSettings.Get(SERVER_DATA_SETTINGS_KEY , ServerData))
 		{
@@ -346,9 +349,9 @@ void UK_GameInstance::CreateSession()
 		SessionSettings.bUseLobbiesIfAvailable = true; // 로비기능을 활성화한다. (Host 하려면 필요)
 		SessionSettings.bUsesPresence = true;
 		SessionSettings.Set(SERVER_NAME_SETTINGS_KEY , DesiredServerName ,
-		                    EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		                    EOnlineDataAdvertisementType::ViaOnlineServiceAndPing); // ServerName 키 세팅
 		SessionSettings.Set(SERVER_DATA_SETTINGS_KEY , DesiredServerData ,
-		                    EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+		                    EOnlineDataAdvertisementType::ViaOnlineServiceAndPing); // ServerData 키 세팅
 
 		SessionInterface->CreateSession(0 , SESSION_NAME , SessionSettings); // 세션을 생성한다. 
 		// 실행되면 'CreateSession'이 델리게이트 호출 // 인자(플레이어번호, TEXT("세션이름"), 세션세팅)

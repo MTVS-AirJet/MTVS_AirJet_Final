@@ -21,6 +21,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/Texture2D.h"
 #include "ImageUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 #pragma region Initialize Settings
 
@@ -41,6 +42,13 @@ void UK_ServerWidget::NativeConstruct()
 
 	if (SessionInterface)
 		SessionInterface->RefreshServerList();
+
+	// GameInstance 가져오기
+	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if ( !GameInstance )
+	{
+		UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
+	}
 }
 
 bool UK_ServerWidget::Initialize()
@@ -189,7 +197,7 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 	//기존목록을 지우고
 	ServerMenu_ServerList->ClearChildren();
 
-	uint32 i = 0;
+	//uint32 i = 0;
 	for (const FServerData& ServerData : ServerNames)
 	{
 		//팩토리를 통해 ServerListUI버튼 생성
@@ -203,9 +211,9 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 			FText::FromString(FString::Printf(TEXT("%d/%d") , ServerData.curPlayers , ServerData.maxPlayers)));
 
 		//ServerListUI 인덱스 부여
-		//ServerList->Setup(this, ServerData.sessionIdx);
-		ServerList->Setup(this , i);
-		i++;
+		ServerList->Setup(this, ServerData.sessionIdx);
+		//ServerList->Setup(this , i);
+		//i++;
 
 		//ServerListUI버튼추가
 		ServerMenu_ServerList->AddChild(ServerList);
@@ -226,11 +234,12 @@ void UK_ServerWidget::ServerListUpdateChildren()
 }
 
 // 서버의 인덱스를 선택하는 함수
-void UK_ServerWidget::SelecetIndex(uint32 Index)
+void UK_ServerWidget::SelecetIndex(int Index)
 {
 	SelectedIndex = Index;
 	ServerListUpdateChildren();
 }
+
 
 //선택한 인덱스의 세션정보에서 MapData정보를 얻어오는 함수
 void UK_ServerWidget::ReqSessionInfo(const FMapInfoRequest& mapName)
@@ -345,9 +354,10 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
 	                                 FString::Printf(
 		                                 TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+	
 	CreatedMapData = resData.ResponseToServerData();
 
-	// 여기에 실행할 작업을 추가하십시오.
+	// 정보를 받아온 것이 도착해야(ResMapInfo가 실행되야) Host가 시작되도록 함.
 	// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
 	if (SessionInterface)
 	{
@@ -396,9 +406,18 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 void UK_ServerWidget::CreateRoom()
 {
 	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
-	ReqMapInfo(); //  요청 완료 후 실행할 것을 컬백으로 설정
 
+	//Editable Text에 적은 MapName기준으로 백엔드서버에 요청하고
+	//콜백함수에 Create Room관련 내용들을 설정(정보를 받아두고 세션을 열기 위함)
+	ReqMapInfo(); 
 	
+	//// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
+	//if ( SessionInterface )
+	//{
+	//	FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
+	//	SessionInterface->Host(ServerName , CreatedMapData);
+	//}
+
 }
 
 
