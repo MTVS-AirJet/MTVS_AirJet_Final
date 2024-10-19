@@ -35,6 +35,14 @@ private: // Component
 	class UArrowComponent* JetArrow;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetMic;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineControl;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetFuelStarter;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -58,6 +66,14 @@ public:
 private:
 	UFUNCTION()
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
