@@ -52,7 +52,7 @@ private: // Component
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
 	class USpringArmComponent* JetSprintArm;
@@ -249,9 +249,20 @@ private:
 private:
 	UFUNCTION()
 	bool IsLockOn();
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
-	AActor* LockOnTarget = nullptr;
+
 	float Diametr = 30.f;
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	TSubclassOf<class AL_Missile> Missile;
+
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	int32 RangeCnt = 6;
+
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	AActor* LockOnTarget = nullptr;
+	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	class USceneComponent* MissileMoveLoc;
 
 private:
 	UFUNCTION()

@@ -10,8 +10,8 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API AL_Missile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AL_Missile();
 
@@ -19,12 +19,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
 	class UStaticMeshComponent* MissileMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* MissileBoxComp;

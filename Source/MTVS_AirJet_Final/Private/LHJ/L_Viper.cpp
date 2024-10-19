@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_HUDWidget.h"
+#include "LHJ/L_Missile.h"
 
 
 #pragma region Construct
@@ -136,6 +137,11 @@ AL_Viper::AL_Viper()
 	{
 		BoosterRightVFX->SetAsset(RightVFX.Object);
 	}
+
+	//============================================
+	MissileMoveLoc=CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
+	MissileMoveLoc->SetupAttachment(RootComponent);
+	MissileMoveLoc->SetRelativeLocation(FVector(0 , 0 , -200));
 }
 #pragma endregion
 
@@ -360,7 +366,25 @@ void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
 	if (LockOnTarget)
 	{
-		LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
+		if(Missile)
+		{
+			
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			FRotator SpawnRotation = FRotator::ZeroRotator;  // Update this with the desired rotation for the missile
+			FVector SpawnLocation = GetActorLocation();	  // Update this with the desired location for the missile
+			
+			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(Missile, SpawnLocation, SpawnRotation, SpawnParams);
+			if (SpawnedMissile)
+			{
+				// Optionally add any initialization for the spawned missile here
+				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());		
+			}
+		}
+		else
+		{
+			LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
+		}
 	}
 	else
 	{
@@ -630,7 +654,7 @@ bool AL_Viper::IsLockOn()
 
 	TArray<AActor*> Overlaps;
 	TArray<FHitResult> OutHit;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < RangeCnt; i++)
 	{
 		Diametr *= 2.f;
 		Start += (ForwardVector * Diametr / 2);
