@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_HUDWidget.h"
+#include "LHJ/L_Missile.h"
 
 
 #pragma region Construct
@@ -63,8 +64,39 @@ AL_Viper::AL_Viper()
 	JetFirstEngine->SetRelativeLocation(FVector(390 , -25 , 240));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
-	//JetFirstEngine->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	JetFirstEngine->SetHiddenInGame(false); // For Test
+
+	JetMic = CreateDefaultSubobject<UBoxComponent>(TEXT("JetMic"));
+	JetMic->SetupAttachment(JetMesh);
+	JetMic->SetRelativeScale3D(FVector(.1f , .1f , .2f));
+	JetMic->SetRelativeLocation(FVector(410 , -15 , 280));
+	JetMic->SetGenerateOverlapEvents(true);
+	JetMic->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
+	JetMic->SetHiddenInGame(false); // For Test
+
+	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
+	JetEngineMaster->SetupAttachment(JetMesh);
+	JetEngineMaster->SetRelativeScale3D(FVector(.1f , .1f , .2f));
+	JetEngineMaster->SetRelativeLocation(FVector(410 , -5 , 280));
+	JetEngineMaster->SetGenerateOverlapEvents(true);
+	JetEngineMaster->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMasterClicked);
+	JetEngineMaster->SetHiddenInGame(false); // For Test
+
+	JetEngineControl = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl"));
+	JetEngineControl->SetupAttachment(JetMesh);
+	JetEngineControl->SetRelativeScale3D(FVector(.1f , .1f , .2f));
+	JetEngineControl->SetRelativeLocation(FVector(410 , 5 , 280));
+	JetEngineControl->SetGenerateOverlapEvents(true);
+	JetEngineControl->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControlClicked);
+	JetEngineControl->SetHiddenInGame(false); // For Test
+
+	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
+	JetFuelStarter->SetupAttachment(JetMesh);
+	JetFuelStarter->SetRelativeScale3D(FVector(.1f , .1f , .2f));
+	JetFuelStarter->SetRelativeLocation(FVector(410 , 15 , 280));
+	JetFuelStarter->SetGenerateOverlapEvents(true);
+	JetFuelStarter->OnClicked.AddDynamic(this , &AL_Viper::OnMyJetFuelStarterClicked);
+	JetFuelStarter->SetHiddenInGame(false); // For Test
 
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
@@ -105,6 +137,11 @@ AL_Viper::AL_Viper()
 	{
 		BoosterRightVFX->SetAsset(RightVFX.Object);
 	}
+
+	//============================================
+	MissileMoveLoc=CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
+	MissileMoveLoc->SetupAttachment(RootComponent);
+	MissileMoveLoc->SetRelativeLocation(FVector(0 , 0 , -200));
 }
 #pragma endregion
 
@@ -162,6 +199,26 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 		AccelGear = 1;
 		bFirstEngine = true;
 	}
+}
+
+void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+{
+	LOG_SCREEN("MIC 클릭");
+}
+
+void AL_Viper::OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+{
+	LOG_SCREEN("EngineMaster 클릭");
+}
+
+void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+{
+	LOG_SCREEN("EngineControl 클릭");
+}
+
+void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+{
+	LOG_SCREEN("JFS 클릭");
 }
 
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
@@ -309,7 +366,25 @@ void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
 	if (LockOnTarget)
 	{
-		LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
+		if(Missile)
+		{
+			
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			FRotator SpawnRotation = FRotator::ZeroRotator;  // Update this with the desired rotation for the missile
+			FVector SpawnLocation = GetActorLocation();	  // Update this with the desired location for the missile
+			
+			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(Missile, SpawnLocation, SpawnRotation, SpawnParams);
+			if (SpawnedMissile)
+			{
+				// Optionally add any initialization for the spawned missile here
+				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());		
+			}
+		}
+		else
+		{
+			LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
+		}
 	}
 	else
 	{
@@ -579,7 +654,7 @@ bool AL_Viper::IsLockOn()
 
 	TArray<AActor*> Overlaps;
 	TArray<FHitResult> OutHit;
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < RangeCnt; i++)
 	{
 		Diametr *= 2.f;
 		Start += (ForwardVector * Diametr / 2);

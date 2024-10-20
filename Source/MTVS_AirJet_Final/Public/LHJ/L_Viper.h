@@ -35,6 +35,14 @@ private: // Component
 	class UArrowComponent* JetArrow;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetMic;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineControl;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetFuelStarter;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -44,7 +52,7 @@ private: // Component
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
 	class USpringArmComponent* JetSprintArm;
@@ -58,6 +66,14 @@ public:
 private:
 	UFUNCTION()
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -233,9 +249,20 @@ private:
 private:
 	UFUNCTION()
 	bool IsLockOn();
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
-	AActor* LockOnTarget = nullptr;
+
 	float Diametr = 30.f;
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	TSubclassOf<class AL_Missile> Missile;
+
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	int32 RangeCnt = 6;
+
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	AActor* LockOnTarget = nullptr;
+	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	class USceneComponent* MissileMoveLoc;
 
 private:
 	UFUNCTION()
