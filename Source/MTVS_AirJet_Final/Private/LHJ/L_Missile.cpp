@@ -62,7 +62,7 @@ void AL_Missile::Tick(float DeltaTime)
 		FVector P0 = GetActorLocation();
 		FVector v = (Target->GetActorLocation() - P0);
 		v.Normalize();
-		FVector vt = v * DeltaTime;
+		FVector vt = v * MoveSpeed * DeltaTime;
 
 		this->SetActorLocation(P0 + vt);
 		this->SetActorRotation(v.Rotation());
