@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "L_Missile.generated.h"
 
@@ -28,4 +29,33 @@ public:
 	class UStaticMeshComponent* MissileMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* MissileBoxComp;
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Missile")
+	class UCurveFloat* MissileCurve;
+	UPROPERTY()
+	FTimeline MissileTimeline;
+	UFUNCTION()
+	void MissileUpdate(float Alpha);
+	UFUNCTION()
+	void MissileFinished();
+
+	FVector BezierMissile(FVector P1 , FVector P2 , FVector P3 , FVector P4 , float Alpha);
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	AActor* Target = nullptr;
+
+	TArray<FVector> MoveLoc;
+
+	bool bPursuit;
+
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	float MoveSpeed = 500.f;
+
+private:
+	UFUNCTION()
+	void OnMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
+	                           UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+	                           const FHitResult& SweepResult);
 };

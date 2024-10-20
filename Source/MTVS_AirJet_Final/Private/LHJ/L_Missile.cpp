@@ -3,7 +3,9 @@
 
 #include "LHJ/L_Missile.h"
 
+#include "MTVS_AirJet_Final.h"
 #include "Components/BoxComponent.h"
+#include "LHJ/L_Viper.h"
 
 // Sets default values
 AL_Missile::AL_Missile()
@@ -16,16 +18,93 @@ AL_Missile::AL_Missile()
 
 	MissileBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("MissileBoxComp"));
 	MissileBoxComp->SetupAttachment(RootComponent);
+	MissileBoxComp->OnComponentBeginOverlap.AddDynamic(this , &AL_Missile::OnMissileBeginOverlap);
+
+	SetLifeSpan(10.f);
 }
 
 // Called when the game starts or when spawned
 void AL_Missile::BeginPlay()
 {
 	Super::BeginPlay();
+
+#pragma region TimeLine Settings
+	FOnTimelineFloat ProgressUpdate;
+	ProgressUpdate.BindUFunction(this , FName("MissileUpdate"));
+
+	FOnTimelineEvent FinishedEvent;
+	FinishedEvent.BindUFunction(this , FName("MissileFinished"));
+
+	MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
+	MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
+#pragma endregion
+
+	if (auto viper = Cast<AL_Viper>(GetOwner()))
+	{
+		Target = viper->LockOnTarget;
+		MoveLoc.Add(viper->GetActorLocation());
+		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+		MoveLoc.Add(Target->GetActorLocation());
+	}
+
+	MissileTimeline.Play();
 }
 
 // Called every frame
 void AL_Missile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!bPursuit)
+		MissileTimeline.TickTimeline(DeltaTime);
+	else
+	{
+		FVector P0 = GetActorLocation();
+		FVector v = (Target->GetActorLocation() - P0);
+		v.Normalize();
+		FVector vt = v * DeltaTime;
+
+		this->SetActorLocation(P0 + vt);
+		this->SetActorRotation(v.Rotation());
+	}
+}
+
+void AL_Missile::MissileUpdate(float Alpha)
+{
+	//LOG_S(Warning, TEXT("%f"), Alpha);
+	FVector newLoc = BezierMissile(MoveLoc[0] , MoveLoc[1] , MoveLoc[2] , MoveLoc[3] , Alpha);
+	this->SetActorLocation(newLoc);
+}
+
+void AL_Missile::MissileFinished()
+{
+	bPursuit = true;
+}
+
+FVector AL_Missile::BezierMissile(FVector P1 , FVector P2 , FVector P3 , FVector P4 , float Alpha)
+{
+	//UKismetMathLibrary::VLerp
+	//A + V * (B - A)
+	FVector L1 = P1 + Alpha * (P2 - P1); //P1, P2
+	FVector L2 = P2 + Alpha * (P3 - P2); //P2, P3
+	FVector L3 = P3 + Alpha * (P4 - P3); //P3, P4
+
+	FVector L4 = L1 + Alpha * (L2 - L1); //L1, L2
+	FVector L5 = L2 + Alpha * (L3 - L2); //L2, L3
+
+	FVector L6 = L4 + Alpha * (L5 - L4); //L4, L5
+
+	return L6;
+}
+
+void AL_Missile::OnMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
+                                       UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+                                       const FHitResult& SweepResult)
+{
+	if (OtherActor->ActorHasTag(FName("target")))
+	{
+		LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *OtherActor->GetName());
+	}
+
+	this->Destroy();
 }
