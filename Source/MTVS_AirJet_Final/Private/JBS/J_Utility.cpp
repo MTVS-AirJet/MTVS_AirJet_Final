@@ -6,6 +6,7 @@
 #include "JBS/J_MissionGameState.h"
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Math/MathFwd.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
 #include <JBS/J_MissionGamemode.h>
@@ -59,4 +60,32 @@ AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 pl
     check(player);
 
     return player;
+}
+
+// === 구조체 함수 구현
+
+ETacticalOrder FMissionObject::GetOrderType() const
+{
+    ETacticalOrder type;
+
+    switch(this->commandNo)
+    {
+        case 0: type = ETacticalOrder::MOVE_THIS_POINT; break;
+        case 1: type = ETacticalOrder::FORMATION_FLIGHT; break;
+        case 2: type = ETacticalOrder::NEUTRALIZE_TARGET; break;
+
+        default: type = ETacticalOrder::NONE; break;
+    }
+
+    return type;
+}
+
+FTransform FMissionObject::GetTransform() const
+{
+    // @@
+    // x,y 값 이랑 정해진 고도 값을 가지고 변환
+    // 기본 z 값
+    UJ_Utility::missionObjDefaultHeight;
+
+    return FTransform();
 }

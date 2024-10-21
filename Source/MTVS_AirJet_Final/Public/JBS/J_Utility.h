@@ -177,6 +177,10 @@ struct FMissionObject : public FJVector2D
 
         return str;
     }
+    // 명령 enum 변환
+    virtual ETacticalOrder GetOrderType() const;
+    // x,y 위치 transform으로 변환
+    virtual FTransform GetTransform() const;
 };
 
 USTRUCT(BlueprintType)
@@ -255,11 +259,23 @@ struct FAllMissionDataRes
 
 #pragma region 미션 관련
 
+// XXX 플레이어 역할 : 현재 파일럿만 있음
 UENUM(BlueprintType)
 enum class EPlayerRole : uint8
 {
     COMMANDER = 0
     ,PILOT = 1
+};
+
+// 전술명령
+UENUM(BlueprintType)
+enum class ETacticalOrder : uint8
+{
+    NONE
+    ,MOVE_THIS_POINT = 1
+    ,FORMATION_FLIGHT
+    ,NEUTRALIZE_TARGET
+
 };
 
 USTRUCT(BlueprintType)
@@ -334,4 +350,7 @@ public:
     static class AJ_MissionGameState* GetMissionGameState(const UWorld* world);
     // 미션맵 로컬 플레이어 가져오기
     static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
+
+    // 기본 목표 지점 고도
+    constexpr static const float missionObjDefaultHeight = 500000.f;
 };
