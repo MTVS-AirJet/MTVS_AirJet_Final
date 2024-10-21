@@ -21,7 +21,7 @@
 AL_Viper::AL_Viper()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	JetRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRoot"));
 	RootComponent = JetRoot;
 	JetRoot->SetSimulatePhysics(true);
@@ -104,7 +104,6 @@ AL_Viper::AL_Viper()
 	JetWidget->SetDrawSize(FVector2D(300 , 200));
 
 	movement = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movement"));
-
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -139,11 +138,19 @@ AL_Viper::AL_Viper()
 	}
 
 	//============================================
-	MissileMoveLoc=CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
+	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
 	MissileMoveLoc->SetupAttachment(RootComponent);
 	MissileMoveLoc->SetRelativeLocation(FVector(0 , 0 , -200));
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 #pragma endregion
+
+void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
 
 #pragma region Input
 // Called to bind functionality to input
@@ -201,22 +208,22 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 	}
 }
 
-void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("MIC 클릭");
 }
 
-void AL_Viper::OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineMaster 클릭");
 }
 
-void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineControl 클릭");
 }
 
-void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("JFS 클릭");
 }
@@ -224,8 +231,9 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent, 
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 {
 	bool b = value.Get<bool>();
-	IsEngineOn = !IsEngineOn;
-	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
+	ServerRPCEngine(!IsEngineOn);
+	// IsEngineOn = !IsEngineOn;
+	// LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
 }
 
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
@@ -309,12 +317,14 @@ void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperTurnRightTrigger(const FInputActionValue& value)
 {
-	IsRightRoll = true;
+	ServerRPCTurnRight_Implementation(true);
+	//IsRightRoll = true;
 }
 
 void AL_Viper::F_ViperTurnRightCompleted(const FInputActionValue& value)
 {
-	IsRightRoll = false;
+	ServerRPCTurnRight_Implementation(false);
+	//IsRightRoll = false;
 }
 
 void AL_Viper::F_ViperTurnLeftTrigger(const FInputActionValue& value)
@@ -366,19 +376,19 @@ void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
 	if (LockOnTarget)
 	{
-		if(Missile)
+		if (Missile)
 		{
-			
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
-			FRotator SpawnRotation = FRotator::ZeroRotator;  // Update this with the desired rotation for the missile
-			FVector SpawnLocation = GetActorLocation();	  // Update this with the desired location for the missile
-			
-			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(Missile, SpawnLocation, SpawnRotation, SpawnParams);
+			FRotator SpawnRotation = FRotator::ZeroRotator; // Update this with the desired rotation for the missile
+			FVector SpawnLocation = GetActorLocation(); // Update this with the desired location for the missile
+
+			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(
+				Missile , SpawnLocation , SpawnRotation , SpawnParams);
 			if (SpawnedMissile)
 			{
 				// Optionally add any initialization for the spawned missile here
-				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());		
+				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
 			}
 		}
 		else
@@ -439,6 +449,8 @@ void AL_Viper::BeginPlay()
 void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	PrintNetLog();
 
 	CurrentTime += DeltaTime;
 
@@ -519,15 +531,16 @@ void AL_Viper::Tick(float DeltaTime)
 				AccelGear = 0;
 		}
 	}
+#pragma endregion
 
+#pragma region Jet Move
+	// ServerRPCAddForce(jetRot);
 	ValueOfMoveForce += GetAddTickSpeed();
 	if (ValueOfMoveForce < 0)
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
 		ValueOfMoveForce = MaxValueOfMoveForce;
-#pragma endregion
-
-#pragma region Jet Move
+	
 	if (IsEngineOn)
 	{
 		// Add Force
@@ -555,12 +568,10 @@ void AL_Viper::Tick(float DeltaTime)
 		if (IsRightRoll)
 			JetRoot->AddRelativeRotation(RotateValue);
 	}
-
 	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
 
-	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if (CurrentMapName == TEXT("LHJ_TestLevel") || CurrentMapName == TEXT("CesiumTest"))
+	if (IsLocallyControlled())
 	{
 #pragma region 고도계
 		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
@@ -715,5 +726,68 @@ void AL_Viper::ChangeBooster()
 			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
 			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
 		}
+	}
+}
+
+void AL_Viper::PrintNetLog()
+{
+	const FString conStr = GetNetConnection() ? TEXT("Valid Connection") : TEXT("Invalid Connection");
+	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
+
+	FString logStr = FString::Printf(TEXT("Connection : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr , *ownerName , *LOCALROLE , *REMOTEROLE);
+	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
+	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
+}
+
+void AL_Viper::ClientRPCEngine_Implementation(bool isEngine)
+{
+	IsEngineOn=isEngine;
+	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
+}
+
+void AL_Viper::ServerRPCEngine_Implementation(bool isEngine)
+{
+	ClientRPCEngine(isEngine);
+}
+
+void AL_Viper::ServerRPCTurnRight_Implementation(bool isTurnRight)
+{
+	IsRightRoll=isTurnRight;
+}
+
+void AL_Viper::ServerRPCAddForce_Implementation(FRotator jetRot)
+{
+	ValueOfMoveForce += GetAddTickSpeed();
+	if (ValueOfMoveForce < 0)
+		ValueOfMoveForce = 0;
+	else if (ValueOfMoveForce > MaxValueOfMoveForce)
+		ValueOfMoveForce = MaxValueOfMoveForce;
+	
+	if (IsEngineOn)
+	{
+		// Add Force
+		// LOG_S(Warning , TEXT("======================="));
+		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+		FVector forceLoc = JetRoot->GetComponentLocation();
+		// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
+		if (JetRoot->IsSimulatingPhysics())
+			JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+		// Move Up & Down
+		jetRot = JetArrow->GetRelativeRotation();
+		float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+		//LOG_S(Warning , TEXT("zRot %f") , zRot);
+		JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+
+
+		// Rotate
+		jetRot = JetArrow->GetRelativeRotation();
+		//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
+		JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
+
+		if (IsLeftRoll)
+			JetRoot->AddRelativeRotation(-1 * RotateValue);
+		if (IsRightRoll)
+			JetRoot->AddRelativeRotation(RotateValue);
 	}
 }

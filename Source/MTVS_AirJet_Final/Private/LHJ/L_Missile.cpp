@@ -12,6 +12,7 @@ AL_Missile::AL_Missile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
 	SetRootComponent(MissileMesh);
@@ -38,17 +39,20 @@ void AL_Missile::BeginPlay()
 	MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
 	MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
 #pragma endregion
-
+	
 	if (auto viper = Cast<AL_Viper>(GetOwner()))
 	{
-		Target = viper->LockOnTarget;
-		MoveLoc.Add(viper->GetActorLocation());
-		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-		MoveLoc.Add(Target->GetActorLocation());
-	}
+		if(viper->IsLocallyControlled())
+		{
+			Target = viper->LockOnTarget;
+			MoveLoc.Add(viper->GetActorLocation());
+			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+			MoveLoc.Add(Target->GetActorLocation());
 
-	MissileTimeline.Play();
+			MissileTimeline.Play();
+		}		
+	}	
 }
 
 // Called every frame

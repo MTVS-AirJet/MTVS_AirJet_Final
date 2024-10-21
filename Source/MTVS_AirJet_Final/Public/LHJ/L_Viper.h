@@ -25,6 +25,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
@@ -267,4 +268,18 @@ public:
 private:
 	UFUNCTION()
 	void ChangeBooster();
+
+private:
+	UFUNCTION()
+	void PrintNetLog();
+
+private:
+	UFUNCTION(Server,Reliable)
+	void ServerRPCEngine(bool isEngine);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCEngine(bool isEngine);
+	UFUNCTION(Server,Reliable)
+	void ServerRPCTurnRight(bool isTurnRight);
+	UFUNCTION(Server, Unreliable)
+	void ServerRPCAddForce(FRotator jetRot);
 };
