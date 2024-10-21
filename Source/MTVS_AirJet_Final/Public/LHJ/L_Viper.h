@@ -249,7 +249,7 @@ private:
 
 private:
 	UFUNCTION()
-	bool IsLockOn();
+	void IsLockOn();
 
 	float Diametr = 30.f;
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
@@ -266,6 +266,7 @@ public:
 	class USceneComponent* MissileMoveLoc;
 
 private:
+	
 	UFUNCTION()
 	void ChangeBooster();
 
@@ -274,12 +275,23 @@ private:
 	void PrintNetLog();
 
 private:
-	UFUNCTION(Server,Reliable)
-	void ServerRPCEngine(bool isEngine);
-	UFUNCTION(Client,Reliable)
-	void ClientRPCEngine(bool isEngine);
-	UFUNCTION(Server,Reliable)
-	void ServerRPCTurnRight(bool isTurnRight);
-	UFUNCTION(Server, Unreliable)
-	void ServerRPCAddForce(FRotator jetRot);
+	UFUNCTION(Server, Reliable)
+	void ServerRPCLocationAndRotation(FVector newLocaction, FRotator newRotator);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCLocationAndRotation(FVector newLocaction, FRotator newRotator);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCBoost(bool isOn);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCBoost(bool isOn);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCLockOn();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCLockOn(AActor* target);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPCMissile(AActor* newOwner);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCMissile(AActor* newOwner);
 };

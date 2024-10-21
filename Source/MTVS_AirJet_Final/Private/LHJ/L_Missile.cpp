@@ -12,8 +12,7 @@ AL_Missile::AL_Missile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
-
+	
 	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
 	SetRootComponent(MissileMesh);
 
@@ -22,6 +21,9 @@ AL_Missile::AL_Missile()
 	MissileBoxComp->OnComponentBeginOverlap.AddDynamic(this , &AL_Missile::OnMissileBeginOverlap);
 
 	SetLifeSpan(10.f);
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -42,16 +44,13 @@ void AL_Missile::BeginPlay()
 	
 	if (auto viper = Cast<AL_Viper>(GetOwner()))
 	{
-		if(viper->IsLocallyControlled())
-		{
-			Target = viper->LockOnTarget;
-			MoveLoc.Add(viper->GetActorLocation());
-			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-			MoveLoc.Add(Target->GetActorLocation());
+		Target = viper->LockOnTarget;
+		MoveLoc.Add(viper->GetActorLocation());
+		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+		MoveLoc.Add(Target->GetActorLocation());
 
-			MissileTimeline.Play();
-		}		
+		MissileTimeline.Play();
 	}	
 }
 

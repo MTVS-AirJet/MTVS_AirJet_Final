@@ -21,7 +21,7 @@
 AL_Viper::AL_Viper()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	JetRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRoot"));
 	RootComponent = JetRoot;
 	JetRoot->SetSimulatePhysics(true);
@@ -231,9 +231,8 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 {
 	bool b = value.Get<bool>();
-	ServerRPCEngine(!IsEngineOn);
-	// IsEngineOn = !IsEngineOn;
-	// LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
+	IsEngineOn = !IsEngineOn;
+	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
 }
 
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
@@ -317,14 +316,12 @@ void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperTurnRightTrigger(const FInputActionValue& value)
 {
-	ServerRPCTurnRight_Implementation(true);
-	//IsRightRoll = true;
+	IsRightRoll = true;
 }
 
 void AL_Viper::F_ViperTurnRightCompleted(const FInputActionValue& value)
 {
-	ServerRPCTurnRight_Implementation(false);
-	//IsRightRoll = false;
+	IsRightRoll = false;
 }
 
 void AL_Viper::F_ViperTurnLeftTrigger(const FInputActionValue& value)
@@ -374,32 +371,7 @@ void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
-	if (LockOnTarget)
-	{
-		if (Missile)
-		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			FRotator SpawnRotation = FRotator::ZeroRotator; // Update this with the desired rotation for the missile
-			FVector SpawnLocation = GetActorLocation(); // Update this with the desired location for the missile
-
-			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(
-				Missile , SpawnLocation , SpawnRotation , SpawnParams);
-			if (SpawnedMissile)
-			{
-				// Optionally add any initialization for the spawned missile here
-				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
-			}
-		}
-		else
-		{
-			LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
-		}
-	}
-	else
-	{
-		LOG_S(Warning , TEXT("타겟이 없습니다!!"));
-	}
+	ServerRPCMissile(this);
 }
 
 void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
@@ -449,7 +421,7 @@ void AL_Viper::BeginPlay()
 void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	PrintNetLog();
 
 	CurrentTime += DeltaTime;
@@ -534,13 +506,12 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Jet Move
-	// ServerRPCAddForce(jetRot);
 	ValueOfMoveForce += GetAddTickSpeed();
 	if (ValueOfMoveForce < 0)
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
 		ValueOfMoveForce = MaxValueOfMoveForce;
-	
+
 	if (IsEngineOn)
 	{
 		// Add Force
@@ -567,6 +538,11 @@ void AL_Viper::Tick(float DeltaTime)
 			JetRoot->AddRelativeRotation(-1 * RotateValue);
 		if (IsRightRoll)
 			JetRoot->AddRelativeRotation(RotateValue);
+
+		if (IsLocallyControlled())
+		{
+			ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
+		}
 	}
 	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
@@ -594,11 +570,11 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region LockOn
-		bool bLockOn = IsLockOn();
-		//LOG_SCREEN("%s" , LockOnTarget?*LockOnTarget->GetName():*FString("nullptr"));
+		IsLockOn();
 #pragma endregion
+
+		ChangeBooster();
 	}
-	ChangeBooster();
 }
 
 #pragma region Get Force
@@ -656,42 +632,44 @@ float AL_Viper::GetAddTickSpeed()
 	return fRtn;
 }
 
-bool AL_Viper::IsLockOn()
+void AL_Viper::IsLockOn()
 {
-	bool bLockOn = false;
-	LockOnTarget = nullptr;
-	FVector Start = JetMesh->GetComponentLocation();
-	FVector ForwardVector = JetMesh->GetForwardVector();
-
-	TArray<AActor*> Overlaps;
-	TArray<FHitResult> OutHit;
-	for (int i = 0; i < RangeCnt; i++)
-	{
-		Diametr *= 2.f;
-		Start += (ForwardVector * Diametr / 2);
-		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
-		{
-			for (auto hit : OutHit)
-			{
-				if (hit.GetActor()->ActorHasTag("target"))
-				{
-					LockOnTarget = hit.GetActor();
-					bLockOn = true;
-				}
-			}
-		}
-	}
-
-	Diametr = 30.f;
-
-	return bLockOn;
+	ServerRPCLockOn();
 }
 #pragma endregion
 
 void AL_Viper::ChangeBooster()
 {
 	if (IsEngineOn && AccelGear == 3)
+	{
+		ServerRPCBoost(true);
+	}
+	else
+	{
+		ServerRPCBoost(false);
+	}
+}
+
+void AL_Viper::PrintNetLog()
+{
+	const FString conStr = GetNetConnection() ? TEXT("Valid Connection") : TEXT("Invalid Connection");
+	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
+
+	FString logStr = FString::Printf(
+		TEXT("Connection : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr , *ownerName ,
+		*LOCALROLE , *REMOTEROLE);
+	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
+	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
+}
+
+void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
+{
+	MulticastRPCBoost(isOn);
+}
+
+void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
+{
+	if (isOn)
 	{
 		// 엔진부스터 켜기
 		if (BoosterLeftVFX)
@@ -729,65 +707,86 @@ void AL_Viper::ChangeBooster()
 	}
 }
 
-void AL_Viper::PrintNetLog()
+void AL_Viper::ServerRPCLocationAndRotation_Implementation(FVector newLocaction , FRotator newRotator)
 {
-	const FString conStr = GetNetConnection() ? TEXT("Valid Connection") : TEXT("Invalid Connection");
-	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
-
-	FString logStr = FString::Printf(TEXT("Connection : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr , *ownerName , *LOCALROLE , *REMOTEROLE);
-	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
-	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
+	MulticastRPCLocationAndRotation(newLocaction , newRotator);
 }
 
-void AL_Viper::ClientRPCEngine_Implementation(bool isEngine)
+void AL_Viper::MulticastRPCLocationAndRotation_Implementation(FVector newLocaction , FRotator newRotator)
 {
-	IsEngineOn=isEngine;
-	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
-}
-
-void AL_Viper::ServerRPCEngine_Implementation(bool isEngine)
-{
-	ClientRPCEngine(isEngine);
-}
-
-void AL_Viper::ServerRPCTurnRight_Implementation(bool isTurnRight)
-{
-	IsRightRoll=isTurnRight;
-}
-
-void AL_Viper::ServerRPCAddForce_Implementation(FRotator jetRot)
-{
-	ValueOfMoveForce += GetAddTickSpeed();
-	if (ValueOfMoveForce < 0)
-		ValueOfMoveForce = 0;
-	else if (ValueOfMoveForce > MaxValueOfMoveForce)
-		ValueOfMoveForce = MaxValueOfMoveForce;
-	
-	if (IsEngineOn)
+	if (!IsLocallyControlled())
 	{
-		// Add Force
-		// LOG_S(Warning , TEXT("======================="));
-		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-		FVector forceLoc = JetRoot->GetComponentLocation();
-		// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
-		if (JetRoot->IsSimulatingPhysics())
-			JetRoot->AddForceAtLocation(forceVec , forceLoc);
-
-		// Move Up & Down
-		jetRot = JetArrow->GetRelativeRotation();
-		float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-		//LOG_S(Warning , TEXT("zRot %f") , zRot);
-		JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-
-
-		// Rotate
-		jetRot = JetArrow->GetRelativeRotation();
-		//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
-		JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
-
-		if (IsLeftRoll)
-			JetRoot->AddRelativeRotation(-1 * RotateValue);
-		if (IsRightRoll)
-			JetRoot->AddRelativeRotation(RotateValue);
+		SetActorLocation(newLocaction);
+		SetActorRotation(newRotator);
 	}
+}
+
+void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
+{
+	if (LockOnTarget)
+	{
+		if (Missile)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = newOwner;
+			FRotator SpawnRotation = FRotator::ZeroRotator; // Update this with the desired rotation for the missile
+			FVector SpawnLocation = GetActorLocation(); // Update this with the desired location for the missile
+
+			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(
+				Missile , SpawnLocation , SpawnRotation , SpawnParams);
+			if (SpawnedMissile)
+			{
+				// Optionally add any initialization for the spawned missile here
+				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
+			}
+		}
+		else
+		{
+			LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
+		}
+	}
+	else
+	{
+		LOG_S(Warning , TEXT("타겟이 없습니다!!"));
+	}
+	//MulticastRPCMissile(newOwner);
+}
+
+void AL_Viper::MulticastRPCMissile_Implementation(AActor* newOwner)
+{
+}
+
+void AL_Viper::ServerRPCLockOn_Implementation()
+{
+	LockOnTarget = nullptr;
+	FVector Start = JetMesh->GetComponentLocation();
+	FVector ForwardVector = JetMesh->GetForwardVector();
+
+	TArray<AActor*> Overlaps;
+	TArray<FHitResult> OutHit;
+	for (int i = 0; i < RangeCnt; i++)
+	{
+		Diametr *= 2.f;
+		Start += (ForwardVector * Diametr / 2);
+		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
+		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
+		{
+			for (auto hit : OutHit)
+			{
+				if (hit.GetActor()->ActorHasTag("target"))
+				{
+					MulticastRPCLockOn(hit.GetActor());					
+				}
+			}
+		}
+	}
+
+	Diametr = 30.f;
+}
+
+void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
+{
+	LockOnTarget = target;
+	// LOG_S(Warning , TEXT("Viper Name : %s, LockOnTarget Name : %s") , *GetName() ,
+	// 					  *LockOnTarget->GetName());
 }
