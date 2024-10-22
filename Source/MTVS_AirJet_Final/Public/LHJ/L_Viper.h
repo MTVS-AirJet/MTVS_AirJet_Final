@@ -6,6 +6,16 @@
 #include "JBS/J_BaseMissionPawn.h"
 #include "L_Viper.generated.h"
 
+UENUM()
+enum class EWeapon
+{
+	Missile = 0,
+	Flare,
+	// 항상 마지막에 추가하여 열거형의 크기를 구할 수 있게 함
+	Max
+};
+
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API AL_Viper : public AJ_BaseMissionPawn
 {
@@ -26,6 +36,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	UFUNCTION()
+	void PrintNetLog();
 
 private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
@@ -107,6 +121,8 @@ private: // Input
 	class UInputAction* IA_ViperFPS;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperTPS;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperChangeWeapon;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -152,6 +168,8 @@ private: // Input
 	void F_ViperFpsStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperTpsStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperChangeWeaponStarted(const struct FInputActionValue& value);
 
 private:
 	bool bFirstEngine;
@@ -214,32 +232,32 @@ private:
 	float GetAddTickSpeed();
 	// 기어 0
 	UPROPERTY(EditDefaultsOnly , category = "ZeroGear")
-	float ZeroGearFlight = -20.f;
+	float ZeroGearFlight = -3000.f;
 	// 수평비행
 	UPROPERTY(EditDefaultsOnly , category = "BasicFlight")
-	float BasicFlight50 = 20.f;
+	float BasicFlight50 = 2000.f;
 	UPROPERTY(EditDefaultsOnly , category = "BasicFlight")
-	float BasicFlight100 = 50.f;
+	float BasicFlight100 = 6000.f;
 	UPROPERTY(EditDefaultsOnly , category = "BasicFlight")
-	float BasicFlightAB = 100.f;
+	float BasicFlightAB = 8000.f;
 	UPROPERTY(EditDefaultsOnly , category = "UpFlight")
-	float UpFlight50 = -20.f;
+	float UpFlight50 = 1000.f;
 	UPROPERTY(EditDefaultsOnly , category = "UpFlight")
-	float UpFlight100 = 0.f;
+	float UpFlight100 = 4000.f;
 	UPROPERTY(EditDefaultsOnly , category = "UpFlight")
-	float UpFlightAB = 10.f;
+	float UpFlightAB = 6000.f;
 	UPROPERTY(EditDefaultsOnly , category = "DownFlight")
-	float DownFlight50 = 70.f;
+	float DownFlight50 = 3000.f;
 	UPROPERTY(EditDefaultsOnly , category = "DownFlight")
-	float DownFlight100 = 110.f;
+	float DownFlight100 = 7000.f;
 	UPROPERTY(EditDefaultsOnly , category = "DownFlight")
-	float DownFlightAB = 150.f;
+	float DownFlightAB = 9000.f;
 	UPROPERTY(EditDefaultsOnly , category = "TurnFlight")
-	float TurnFlight50 = -30.f;
+	float TurnFlight50 = 1500.f;
 	UPROPERTY(EditDefaultsOnly , category = "TurnFlight")
-	float TurnFlight100 = -5.f;
+	float TurnFlight100 = 5500.f;
 	UPROPERTY(EditDefaultsOnly , category = "TurnFlight")
-	float TurnFlightAB = 20.f;
+	float TurnFlightAB = 6500.f;
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="HUD")
@@ -255,6 +273,11 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
 	TSubclassOf<class AL_Missile> Missile;
 
+	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	TSubclassOf<class AL_Flare> FlareFactory;
+	UPROPERTY(EditDefaultsOnly, Category=Grenade)
+	float ThrowingForce=1.f;
+
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
 	int32 RangeCnt = 6;
@@ -265,14 +288,9 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
 	class USceneComponent* MissileMoveLoc;
 
-private:
-	
+private:	
 	UFUNCTION()
 	void ChangeBooster();
-
-private:
-	UFUNCTION()
-	void PrintNetLog();
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -294,4 +312,11 @@ private:
 	void ServerRPCMissile(AActor* newOwner);
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastRPCMissile(AActor* newOwner);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCFlare(AActor* newOwner);
+	
+private:
+	UPROPERTY(replicated)
+	EWeapon CurrentWeapon=EWeapon::Missile;
 };

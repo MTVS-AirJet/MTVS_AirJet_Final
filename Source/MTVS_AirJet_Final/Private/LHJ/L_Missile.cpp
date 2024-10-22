@@ -112,11 +112,12 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 	if (HitActor->ActorHasTag(FName("target")))
 	{
 		LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
+		// 데미지 처리
 	}
 	this->Destroy();
 }
 
 void AL_Missile::MulticastRPCDamage_Implementation(AActor* HitActor)
 {
-	
+		
 }

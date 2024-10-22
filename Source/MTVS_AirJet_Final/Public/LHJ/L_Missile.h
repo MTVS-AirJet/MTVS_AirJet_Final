@@ -24,8 +24,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-public:
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Components" )
 	class UStaticMeshComponent* MissileMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* MissileBoxComp;

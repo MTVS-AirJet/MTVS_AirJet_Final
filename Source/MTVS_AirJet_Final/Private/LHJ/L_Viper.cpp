@@ -10,11 +10,14 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "LHJ/L_Flare.h"
 #include "LHJ/L_HUDWidget.h"
 #include "LHJ/L_Missile.h"
+#include "Net/UnrealNetwork.h"
 
 
 #pragma region Construct
@@ -153,6 +156,8 @@ AL_Viper::AL_Viper()
 void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AL_Viper , CurrentWeapon);
 }
 
 #pragma region Input
@@ -198,6 +203,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperFPS , ETriggerEvent::Started , this , &AL_Viper::F_ViperFpsStarted);
 		input->BindAction(IA_ViperTPS , ETriggerEvent::Started , this , &AL_Viper::F_ViperTpsStarted);
+
+		input->BindAction(IA_ViperChangeWeapon , ETriggerEvent::Started , this , &AL_Viper::F_ViperChangeWeaponStarted);
 	}
 }
 
@@ -374,7 +381,10 @@ void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 {
-	ServerRPCMissile(this);
+	if (CurrentWeapon == EWeapon::Missile)
+		ServerRPCMissile(this);
+	else if (CurrentWeapon == EWeapon::Flare)
+		ServerRPCFlare(this);
 }
 
 void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
@@ -391,6 +401,12 @@ void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 		JetCamera->SetActive(true);
 	if (JetCameraFPS)
 		JetCameraFPS->SetActive(false);
+}
+
+void AL_Viper::F_ViperChangeWeaponStarted(const struct FInputActionValue& value)
+{
+	// 현재 값에서 1을 더하고, Max로 나눈 나머지를 사용하여 순환
+	CurrentWeapon = static_cast<EWeapon>((static_cast<int32>(CurrentWeapon) + 1) % static_cast<int32>(EWeapon::Max));
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -756,6 +772,34 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 
 void AL_Viper::MulticastRPCMissile_Implementation(AActor* newOwner)
 {
+}
+
+void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
+{
+	if (FlareFactory)
+	{
+		// 수류탄을 던질 위치 계산(캐릭터 위치에서 위로 조정)
+		FVector SpawnLocation = GetActorLocation() + FVector(0 , 0 , 500);
+		// 캐릭터의 회전방향을 얻어둠
+		FRotator SpawnRotation = FRotator(0, 0 , 0);
+		// FlareFactory 이용해서 수류탄 스폰
+		AL_Flare* Flare = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
+
+		if (Flare)
+		{
+			Flare->SetOwner(newOwner);
+			// 던지는 방향을 설정할 벡터얻기
+			FVector LaunchDirection = GetActorForwardVector() * 1.2 + GetActorUpVector();
+			// 수류탄의 움직임을 설정하기 위해 UProjectileMovement의 Velocity속성을 사용
+			// 수류탄이 던져지는 방향과 속력에 대한 정의
+			Flare->GetProjectileMovementComponent()->Velocity = LaunchDirection * ThrowingForce;
+			Flare->GetProjectileMovementComponent()->SetVelocityInLocalSpace(LaunchDirection * ThrowingForce);
+		}
+	}
+	else
+	{
+		LOG_S(Warning , TEXT("FlareFactory가 없습니다."));
+	}
 }
 
 void AL_Viper::ServerRPCLockOn_Implementation()
