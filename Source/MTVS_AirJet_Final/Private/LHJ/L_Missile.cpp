@@ -12,7 +12,7 @@ AL_Missile::AL_Missile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
 	SetRootComponent(MissileMesh);
 
@@ -41,7 +41,7 @@ void AL_Missile::BeginPlay()
 	MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
 	MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
 #pragma endregion
-	
+
 	if (auto viper = Cast<AL_Viper>(GetOwner()))
 	{
 		Target = viper->LockOnTarget;
@@ -51,7 +51,7 @@ void AL_Missile::BeginPlay()
 		MoveLoc.Add(Target->GetActorLocation());
 
 		MissileTimeline.Play();
-	}	
+	}
 }
 
 // Called every frame
@@ -104,10 +104,19 @@ void AL_Missile::OnMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent 
                                        UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
                                        const FHitResult& SweepResult)
 {
-	if (OtherActor->ActorHasTag(FName("target")))
-	{
-		LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *OtherActor->GetName());
-	}
+	ServerRPCDamage(OtherActor);
+}
 
+void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
+{
+	if (HitActor->ActorHasTag(FName("target")))
+	{
+		LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
+	}
 	this->Destroy();
+}
+
+void AL_Missile::MulticastRPCDamage_Implementation(AActor* HitActor)
+{
+	
 }
