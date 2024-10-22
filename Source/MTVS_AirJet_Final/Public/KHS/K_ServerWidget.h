@@ -221,7 +221,6 @@ public:
 
 	void SelecetIndex(int Index); // 서버의 인덱스를 선택하는 함수
 
-
 	UFUNCTION(BlueprintCallable)
 	void ReqSessionInfo(const FMapInfoRequest& mapName); //선택한 인덱스의 세션정보에서 MapData정보를 얻어오는 함수
 

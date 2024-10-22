@@ -24,6 +24,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveUI(); // ServerUI 제거 함수(공통)
 
-	class IK_SessionInterface* SessionInterface; //Interface인스턴스
+	class IK_SessionInterface* WidgetInterface; //Interface인스턴스
 	
 };

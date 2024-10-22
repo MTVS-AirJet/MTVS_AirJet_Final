@@ -45,6 +45,7 @@ public:
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch; // 온라인 세션 검색을 할 수 있는 클래스 인스턴스 선언
 
 	FString DesiredServerName; // Host 시 서버 이름을 지정하여 설정하기 위한 변수
+	
 	FString DesiredServerData;
 
 	std::map<int32, FString> ServerDataList;

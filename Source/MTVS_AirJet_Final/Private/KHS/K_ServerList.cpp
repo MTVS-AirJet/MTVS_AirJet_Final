@@ -13,18 +13,20 @@ void UK_ServerList::Setup(class UK_ServerWidget* InParent , int InIndex)
 	Parent = InParent;
 	Index = InIndex;
 	RowButton->OnClicked.AddDynamic(this , &UK_ServerList::OnClicked);
-	RowButton->OnHovered.AddDynamic(this, &UK_ServerList::OnHovered);
 }
 
-void UK_ServerList::OnHovered()
+
+void UK_ServerList::OnClicked()
 {
+	Parent->SelecetIndex(Index);
+
     UE_LOG(LogTemp , Warning , TEXT("Hovered on ServerList index: %d") , Index);
 
     // 세션 인덱스에 맞는 ServerData를 가져옴
     if ( Parent && Parent->GameInstance )
     {
         //해당 인덱스 Iterator를 받고, Index검색결과가 있다면(.end()가 아니라면)
-        auto It = Parent->GameInstance->ServerDataList.find(Index); 
+        auto It = Parent->GameInstance->ServerDataList.find(Index);
         if ( It != Parent->GameInstance->ServerDataList.end() )
         {
             FString ServerData = It->second;  // iterator Pair에서 FString멤버(Value) 값을 가져옴
@@ -42,13 +44,10 @@ void UK_ServerList::OnHovered()
                 Parent->ServerMenu_txt_MapName->SetText(FText::FromString(ParsedData[3]));
 
                 //이제 Img정보도 다시 불러와서 세팅하는 작업을 해야함
+                FMapInfoRequest mapName = ParsedData[3];
+                Parent->ReqSessionInfo(mapName);
+
             }
         }
     }
-}
-
-
-void UK_ServerList::OnClicked()
-{
-	Parent->SelecetIndex(Index);
 }

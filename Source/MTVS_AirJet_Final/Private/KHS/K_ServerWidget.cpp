@@ -40,8 +40,8 @@ void UK_ServerWidget::NativeConstruct()
 		PlayAnimation(ShowServerMenuAnim);
 	}
 
-	if (SessionInterface)
-		SessionInterface->RefreshServerList();
+	if (WidgetInterface)
+		WidgetInterface->RefreshServerList();
 
 	// GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -127,8 +127,8 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 			PlayAnimation(ShowServerMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 
-			if (SessionInterface)
-				SessionInterface->RefreshServerList();
+			if (WidgetInterface)
+				WidgetInterface->RefreshServerList();
 		}
 	} , 1.0f , false);
 }
@@ -149,8 +149,8 @@ void UK_ServerWidget::OpenServerMenuFromReady()
 			PlayAnimation(ShowServerMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 
-			if (SessionInterface)
-				SessionInterface->RefreshServerList();
+			if (WidgetInterface)
+				WidgetInterface->RefreshServerList();
 		}
 	} , 1.0f , false);
 }
@@ -220,6 +220,14 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 	}
 }
 
+// 서버의 인덱스를 선택하는 함수
+void UK_ServerWidget::SelecetIndex(int Index)
+{
+	SelectedIndex = Index;
+	ServerListUpdateChildren();
+}
+
+
 //ServerList업데이트(PanelWidget 내장기능 사용)
 void UK_ServerWidget::ServerListUpdateChildren()
 {
@@ -232,14 +240,6 @@ void UK_ServerWidget::ServerListUpdateChildren()
 		}
 	}
 }
-
-// 서버의 인덱스를 선택하는 함수
-void UK_ServerWidget::SelecetIndex(int Index)
-{
-	SelectedIndex = Index;
-	ServerListUpdateChildren();
-}
-
 
 //선택한 인덱스의 세션정보에서 MapData정보를 얻어오는 함수
 void UK_ServerWidget::ReqSessionInfo(const FMapInfoRequest& mapName)
@@ -288,10 +288,10 @@ void UK_ServerWidget::OnResSessionInfo(const FMapInfoResponse& resData)
 void UK_ServerWidget::JoinRoom()
 {
 	//인덱스가 Set되고, Interface클래스 변수가 부모에 존재하면
-	if (SelectedIndex.IsSet() && SessionInterface != nullptr)
+	if (SelectedIndex.IsSet() && WidgetInterface != nullptr)
 	{
 		//WidgetBase를 통해 Interface의 Join 가상함수 호출 -> GameInstance에 있는 구현부가 호출됨
-		SessionInterface->Join(SelectedIndex.GetValue());
+		WidgetInterface->Join(SelectedIndex.GetValue());
 		UE_LOG(LogTemp , Warning , TEXT("Selected Index is %d.") , SelectedIndex.GetValue());
 	}
 
@@ -332,6 +332,24 @@ void UK_ServerWidget::QuitCreaterWeb()
 	}
 }
 
+// (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
+void UK_ServerWidget::CreateRoom()
+{
+	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
+
+	//Editable Text에 적은 MapName기준으로 백엔드서버에 요청하고
+	//콜백함수에 Create Room관련 내용들을 설정(정보를 받아두고 세션을 열기 위함)
+	ReqMapInfo();
+
+	//// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
+	//if ( SessionInterface )
+	//{
+	//	FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
+	//	SessionInterface->Host(ServerName , CreatedMapData);
+	//}
+
+}
+
 //mapName입력내용 기준으로 서버에 요청하는 함수
 void UK_ServerWidget::ReqMapInfo()
 {
@@ -359,10 +377,10 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 
 	// 정보를 받아온 것이 도착해야(ResMapInfo가 실행되야) Host가 시작되도록 함.
 	// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
-	if (SessionInterface)
+	if (WidgetInterface)
 	{
 		FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
-		SessionInterface->Host(ServerName , CreatedMapData);
+		WidgetInterface->Host(ServerName , CreatedMapData);
 	}
 	
 	//인게임에서 사용할 미션데이터를 인스턴스에 저장
@@ -413,23 +431,7 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	// ReadyMenu_txt_CommandList->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.commandNo)));
 }
 
-// (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
-void UK_ServerWidget::CreateRoom()
-{
-	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
 
-	//Editable Text에 적은 MapName기준으로 백엔드서버에 요청하고
-	//콜백함수에 Create Room관련 내용들을 설정(정보를 받아두고 세션을 열기 위함)
-	ReqMapInfo(); 
-	
-	//// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
-	//if ( SessionInterface )
-	//{
-	//	FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
-	//	SessionInterface->Host(ServerName , CreatedMapData);
-	//}
-
-}
 
 
 #pragma endregion
