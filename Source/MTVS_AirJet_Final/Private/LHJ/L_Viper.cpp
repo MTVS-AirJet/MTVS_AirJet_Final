@@ -24,6 +24,7 @@ AL_Viper::AL_Viper()
 
 	JetRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRoot"));
 	RootComponent = JetRoot;
+	JetRoot->SetRelativeScale3D(FVector(10.f , 1.f , 2.f));
 	JetRoot->SetSimulatePhysics(true);
 	JetRoot->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
@@ -33,6 +34,8 @@ AL_Viper::AL_Viper()
 
 	JetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("JetMesh"));
 	JetMesh->SetupAttachment(JetRoot);
+	JetMesh->SetRelativeScale3D(FVector(.1f , 1.f , .5f));
+	JetMesh->SetRelativeLocation(FVector(0 , 0 , -28));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh(TEXT(
 		"/Script/Engine.SkeletalMesh'/Game/Asset/VigilanteContent/Vehicles/West_Fighter_F18C/SK_West_Fighter_F18C.SK_West_Fighter_F18C'"));
 	if (tmpMesh.Succeeded())
@@ -119,7 +122,7 @@ AL_Viper::AL_Viper()
 	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
 	BoosterLeftVFX->SetupAttachment(JetMesh);
-	BoosterLeftVFX->SetRelativeLocationAndRotation(FVector(-750 , -50 , 180) , FRotator(0 , 180 , 0));
+	BoosterLeftVFX->SetRelativeLocationAndRotation(FVector(-780 , -50 , 180) , FRotator(0 , 180 , 0));
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> LeftVFX(TEXT(
 		"/Script/Niagara.NiagaraSystem'/Game/Asset/RocketThrusterExhaustFX/FX/NS_RocketExhaust_Red.NS_RocketExhaust_Red'"));
 	if (LeftVFX.Succeeded())
@@ -129,7 +132,7 @@ AL_Viper::AL_Viper()
 
 	BoosterRightVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterRightVFX"));
 	BoosterRightVFX->SetupAttachment(JetMesh);
-	BoosterRightVFX->SetRelativeLocationAndRotation(FVector(-750 , 50 , 180) , FRotator(0 , 180 , 0));
+	BoosterRightVFX->SetRelativeLocationAndRotation(FVector(-780 , 50 , 180) , FRotator(0 , 180 , 0));
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> RightVFX(TEXT(
 		"/Script/Niagara.NiagaraSystem'/Game/Asset/RocketThrusterExhaustFX/FX/NS_RocketExhaust_Red.NS_RocketExhaust_Red'"));
 	if (RightVFX.Succeeded())
@@ -671,19 +674,18 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 {
 	if (isOn)
 	{
-		// 엔진부스터 켜기
 		if (BoosterLeftVFX)
 		{
-			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.7f);
+			BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , .1f);
+			BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.05f);
 			BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
 		}
 		if (BoosterRightVFX)
 		{
-			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.1f);
-			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.1f);
-			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.1f);
+			BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.7f);
+			BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , .1f);
+			BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.05f);
 			BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.1f);
 		}
 	}
@@ -775,7 +777,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 			{
 				if (hit.GetActor()->ActorHasTag("target"))
 				{
-					MulticastRPCLockOn(hit.GetActor());					
+					MulticastRPCLockOn(hit.GetActor());
 				}
 			}
 		}
