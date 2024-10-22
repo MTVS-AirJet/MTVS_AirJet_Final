@@ -80,12 +80,21 @@ ETacticalOrder FMissionObject::GetOrderType() const
     return type;
 }
 
-FTransform FMissionObject::GetTransform() const
+FTransform FJVector2D::GetTransform() const
 {
-    // @@
     // x,y 값 이랑 정해진 고도 값을 가지고 변환
-    // 기본 z 값
-    UJ_Utility::missionObjDefaultHeight;
+    // 범위 == 5킬로 기준 -25만 ~ 25만
+    float minValue = UJ_Utility::defaultMissionMapSize * -.5f;
+    float maxValue = UJ_Utility::defaultMissionMapSize * .5f;
+    // x,y,z 계산
+    float mapX = FMath::Lerp(minValue, maxValue, this->x / 100.f);
+    float mapY = FMath::Lerp(minValue, maxValue, this->y / 100.f);
+    float mapZ = UJ_Utility::defaultMissionObjectHeight;
 
-    return FTransform();
+    FVector vec = FVector(mapX, mapY, mapZ);
+    
+    // @@ 회전 값 받도록 요청해야 할 지도?
+    FTransform tr = FTransform(FRotator::ZeroRotator,vec,  FVector::OneVector);
+
+    return tr;
 }

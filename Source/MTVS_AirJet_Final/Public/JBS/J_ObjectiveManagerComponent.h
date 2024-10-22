@@ -58,23 +58,24 @@ protected:
 	{
 		return curActiveMissionIdx;
 	}
-	void SetCurActiveMissionIdx(int value)
-	{
-		curActiveMissionIdx = value;
-		// 활성 미션 액터 설정
-		CUR_ACTIVE_MISSION = objectiveAry[value];
-	}
-		protected:
+	void SetCurActiveMissionIdx(int value);
+
+    protected:
+
+	// 미션 클리어
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isMissionComplete = false;
 
 	// 목표 액터 프리팹 맵
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<ETacticalOrder, TSubclassOf<class AJ_BaseMissionObjective>> objectiveActorPrefabMap;
 public:
 protected:
+	// 미션 클리어
+	UFUNCTION(BlueprintCallable)
+	void MissionComplete();
 
-
-public:
-	// @@ 게임모드에서 데이터 얻고 호출 해야함
+    public:
 	// 미션 시작 시 목표 리스트 설정
     void InitObjectiveList(TArray<struct FMissionObject> missions);
 

@@ -34,6 +34,7 @@ void AJ_BaseMissionObjective::BeginPlay()
 	{
 		iconWorldUI = tempUI;
 	}
+
 }
 
 // Called every frame
@@ -83,14 +84,18 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 {
 	isObjectiveActive = value;
 
+	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 	{
-
+		objectiveActiveDel.Broadcast();
 	}
 	else
 	{
-		
+		objectiveDeactiveDel.Broadcast();
 	}
+
+	iconWorldUIComp->SetActive(isObjectiveActive);
+
 }
 
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
@@ -98,3 +103,15 @@ void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive
 	orderType = type;
 	IS_OBJECTIVE_ACTIVE = initActive;
 }
+
+void AJ_BaseMissionObjective::ObjectiveActive()
+{
+	
+}
+
+void AJ_BaseMissionObjective::ObjectiveDeactive()
+{
+	
+}
+
+

@@ -37,6 +37,9 @@ void AJ_MissionGamemode::StartMission()
     // 목표 매니저 컴포넌트 설정
     check(objectiveManagerComp);
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
+
+    // @@ 0번 목표 시작
+    objectiveManagerComp->ActiveNextObjective();
     
     
 

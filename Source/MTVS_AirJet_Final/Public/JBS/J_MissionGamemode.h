@@ -43,6 +43,17 @@ public:
     // 미션 데이터
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FMissionDataRes curMissionData;
+        public:
+    __declspec(property(get = GetCurMissionData, put = SetCurMissionData)) FMissionDataRes CUR_MISSION_DATA;
+    FMissionDataRes GetCurMissionData()
+    {
+        return curMissionData;
+    }
+    void SetCurMissionData(FMissionDataRes value)
+    {
+        curMissionData = value;
+    }
+        protected:
 
     // 디버그용 더미 미션 데이터
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")

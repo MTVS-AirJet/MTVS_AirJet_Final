@@ -5,6 +5,7 @@
 #include "Engine/World.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
+#include "JBS/J_Utility.h"
 
 // Sets default values for this component's properties
 UJ_ObjectiveManagerComponent::UJ_ObjectiveManagerComponent()
@@ -56,7 +57,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 		auto* objectiveActor = GetWorld()->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR);
 
 		// 목표 액터 설정
-		objectiveActor->InitObjective(type);
+		objectiveActor->InitObjective(type, false);
 		// 목표 완료시 다음 목표 활성화 바인드
 		objectiveActor->objectiveEndDel.AddUObject(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
 		// 목표 액터 배열에 추가
@@ -82,14 +83,32 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 {
 	// 인덱스 증가
 	CUR_ACTIVE_MISSION_IDX++;
-	// 인덱스 범위 체크
-	if(CUR_ACTIVE_MISSION_IDX >= objectiveAry.Num())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("목표 종료됨"));
-		
-		// FIXME 미션 결산 UI
-	}
-
+	// 여기서 목표 다했으면 결산으로 넘어가짐 setcuractive~~
+	if(isMissionComplete) return;
 	// 해당 목표 활성화
 	ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
+}
+
+void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
+{
+    curActiveMissionIdx = value;
+    if (CUR_ACTIVE_MISSION_IDX >= objectiveAry.Num())
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 종료됨"));
+
+        // 미션 결산
+		MissionComplete();
+
+		return;
+    }
+
+    // 활성 미션 액터 설정
+    CUR_ACTIVE_MISSION = objectiveAry[value];
+}
+
+void UJ_ObjectiveManagerComponent::MissionComplete()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("미션 종료 결산 화면으로"));
+
+	isMissionComplete = true;
 }

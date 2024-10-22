@@ -11,6 +11,7 @@
 
 
 DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate)
+DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate)
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
@@ -64,13 +65,26 @@ public:
 	// 미션 실패 시 실행 딜리게이트
 	FObjectiveEndDelegate objectiveFailDel;
 
+	// 미션 활성화 시 실행 딜리게이트
+	FObjectiveActiveDelegate objectiveActiveDel;
+
+	// 미션 비활성화 시 실행 딜리게이트
+	FObjectiveActiveDelegate objectiveDeactiveDel;
+
 protected:
+	// 목표 성공/실패
 	UFUNCTION(BlueprintCallable)
     virtual void ObjectiveSuccess();
 	UFUNCTION(BlueprintCallable)
     virtual void ObjectiveFail();
 
-public:
+	// 목표 활성화/비활성화
+	UFUNCTION(BlueprintCallable)
+	virtual void ObjectiveActive();
+	UFUNCTION(BlueprintCallable)
+	virtual void ObjectiveDeactive();
+
+    public:
 	// 미션 종료 처리
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveEnd(bool isSuccess = true);

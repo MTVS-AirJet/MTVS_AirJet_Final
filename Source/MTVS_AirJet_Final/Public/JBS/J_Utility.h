@@ -141,12 +141,19 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     float y;
 
+    FJVector2D() : x(-1.f), y(-1.f) {}
+
+    FJVector2D(float x, float y) : x(x), y(y) {}
+
     virtual FString ToString() const
     {
         FString str = FString::Printf(TEXT("x : %.2f, y : %.2f"), x,y);
 
         return str;
     }
+
+    // x,y 위치 transform으로 변환
+    virtual FTransform GetTransform() const;
 };
 
 USTRUCT(BlueprintType)
@@ -170,6 +177,14 @@ struct FMissionObject : public FJVector2D
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int commandNo;
 
+    FMissionObject() : FJVector2D(), pinNo(-1), commandNo(-1) {}
+
+    FMissionObject(float x, float y, int pinNo, int commandNo)
+        : FJVector2D(x, y), pinNo(pinNo), commandNo(commandNo) {}
+
+    FMissionObject(const FJVector2D& vec2D)
+        : FJVector2D(vec2D) {}
+
     virtual FString ToString() const override
     {
         FString str = FString::Printf(TEXT("핀 No : %d\n명령 No : %d\nx : %.2f, y : %.2f")
@@ -179,8 +194,14 @@ struct FMissionObject : public FJVector2D
     }
     // 명령 enum 변환
     virtual ETacticalOrder GetOrderType() const;
-    // x,y 위치 transform으로 변환
-    virtual FTransform GetTransform() const;
+
+    // 변환 연산자
+    operator FJVector2D() const
+    {
+        return FJVector2D(x,y);
+    }
+
+    
 };
 
 USTRUCT(BlueprintType)
@@ -236,6 +257,7 @@ struct FMissionDataRes
     }
 
     // @@ 이미지 변환하는거 내장할까?
+    
 };
 
 // 전체 미션 데이터 
@@ -351,6 +373,8 @@ public:
     // 미션맵 로컬 플레이어 가져오기
     static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
 
+    // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
+    constexpr static const float defaultMissionMapSize = 500000.f;
     // 기본 목표 지점 고도
-    constexpr static const float missionObjDefaultHeight = 500000.f;
+    constexpr static const float defaultMissionObjectHeight = 130000.f;
 };
