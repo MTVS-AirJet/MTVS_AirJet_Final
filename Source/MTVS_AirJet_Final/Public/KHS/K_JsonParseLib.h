@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Templates/SubclassOf.h"
+#include "JBS/J_Utility.h"
 #include "K_JsonParseLib.generated.h"
 
 // 전송요청 타입(GET, POST)
@@ -134,6 +135,29 @@ struct FLoginResponse : public FRegisterResponse
     }
 };
 
+//미션 리스트 구조체
+USTRUCT(BlueprintType)
+struct FMissionInfo : public FJVector2D
+{
+    GENERATED_BODY()
+    
+    // FJVector2D 상속 받아서 기본 내장 x, y값 존재
+    // 핀 순서
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    int pinNo; // 핀 Num
+    // 명령 ENUM
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    int commandNo; // 지휘명령 Num
+
+    virtual FString ToString() const override
+    {
+        FString str = FString::Printf(TEXT("핀 No : %d\n명령 No : %d\nx : %.2f, y : %.2f")
+        , pinNo, commandNo, x,y);
+
+        return str;
+    }
+};
+
 //맵정보 사용 구조체
 USTRUCT(BlueprintType)
 struct FMapInfoResponse
@@ -151,32 +175,43 @@ struct FMapInfoResponse
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members | Image")
     FString mapImage; // 썸네일 이미지 바이트 배열
     //TArray<uint8> mapImage;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    int pinNo; // 핀 Num
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    int missionX; // 핀 X값
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    int missionY; // 핀 Y값
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    //int pinNo; // 핀 Num
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    //int missionX; // 핀 X값
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    //int missionY; // 핀 Y값
+    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
+    //int commandNo; // 지휘명령 Num
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
     int startPointX; // 시작점 X값
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
     int startPointY; // 시작점 Y값
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    int commandNo; // 지휘명령 Num
+    // 목표 데이터 배열
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FMissionObject> missionData; //미션정보 구조체 배열
 
 
     FString ResponseToString() const
     {
+        FString missionList = TEXT("[");
+        for ( auto m : missionData )
+        {
+            FString temp = FString::Printf(TEXT("{\n    %s\n    },") , *m.ToString());
+            missionList.Append(temp);
+
+        }
+        missionList.Append(TEXT("]"));
+
         FString str = FString::Printf(
-        TEXT("맵 제작자 : %s\n위도 : %.2f , 경도 : %.2f\n맵 이름 : %s\n썸네일 이미지 존재 : %s\n시작 지점 : %d,%d\n핀Num : %d\n지휘명령Num : %d")
+        TEXT("맵 제작자 : %s\n위도 : %.2f , 경도 : %.2f\n맵 이름 : %s\n썸네일 이미지 존재 : %s\n시작 지점 : %d,%d\n지휘명령Num : %s")
         , *producer
         , latitude
         , longitude
         , *mapName
         , mapImage.IsEmpty() ? TEXT("FALSE") : TEXT("TRUE")
         , startPointX, startPointY
-        , pinNo
-        , commandNo
+        , *missionList
         );
 
         return str;
@@ -184,15 +219,23 @@ struct FMapInfoResponse
 
     FString ResponseToServerData() const
     {
+        FString missionList = TEXT("[");
+        for ( auto m : missionData )
+        {
+            FString temp = FString::Printf(TEXT("{\n    %s\n    },") , *m.ToString());
+            missionList.Append(temp);
+
+        }
+        missionList.Append(TEXT("]"));
+
         FString str = FString::Printf(
-        TEXT("%s|%.2f|%.2f|%s|%d|%d|%d|%d")
+        TEXT("%s|%.2f|%.2f|%s|%d|%d|%s")
         , *producer
         , latitude
         , longitude
         , *mapName
         , startPointX, startPointY
-        , pinNo
-        , commandNo
+        , *missionList
         );
 
         return str;

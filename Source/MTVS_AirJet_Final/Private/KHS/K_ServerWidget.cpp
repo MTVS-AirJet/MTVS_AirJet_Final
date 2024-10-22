@@ -365,6 +365,17 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 		SessionInterface->Host(ServerName , CreatedMapData);
 	}
 	
+	//인게임에서 사용할 미션데이터를 인스턴스에 저장
+	GameInstance->MissionData.producer = resData.producer;
+	GameInstance->MissionData.latitude = resData.latitude;
+	GameInstance->MissionData.longitude = resData.longitude;
+	GameInstance->MissionData.mapName = resData.mapName;
+	GameInstance->MissionData.mapImage = resData.mapImage;
+	GameInstance->MissionData.startPoint.x = resData.startPointX;
+	GameInstance->MissionData.startPoint.y = resData.startPointY;
+	GameInstance->MissionData.mission = resData.missionData;
+
+
 	// //방생성정보 저장(Room Name, PW)
 	// FString RoomName = HostMenu_txt_RoomName->GetText().ToString();
 	// FString RoomePW = HostMenu_txt_RoomPW->GetText().ToString();
