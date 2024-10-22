@@ -36,10 +36,10 @@ void AJ_MissionPlayerController::Tick(float deltaTime)
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(playerRole)));
 
-    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("현재 입력 모드 : %s"), *GetCurrentInputModeDebugString()));
+    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("현재 입력 모드 : %s"), *GetCurrentInputModeDebugString()));
 
-    auto* player = this->GetPawn();
-    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("포제스 중인 폰 이름 : %s"), player ? *player->GetName() : TEXT("폰 없음")));
+    // auto* player = this->GetPawn();
+    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("포제스 중인 폰 이름 : %s"), player ? *player->GetName() : TEXT("폰 없음")));
 }
 
 // 미션 게임모드에서 역할 설정 후 실행됨.
@@ -113,7 +113,7 @@ void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 	this->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , this->StreamingUIFactory));
 	if ( this->StreamingUI )
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2. StreaingUI is not null"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2. StreaingUI is not null"));
 		UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
 
         newPawn->streamingUI = this->StreamingUI;
@@ -126,7 +126,7 @@ void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2-2. streamingUI is null"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2-2. streamingUI is null"));
 		UE_LOG(LogTemp , Warning , TEXT("streamingUI is null"));
 	}
 }

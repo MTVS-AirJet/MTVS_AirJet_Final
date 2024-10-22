@@ -8,6 +8,7 @@
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
+#include "JBS/J_ObjectiveManagerComponent.h"
 #include <JBS/J_MissionSpawnPointActor.h>
 #include <Engine/World.h>
 
@@ -17,8 +18,30 @@ void AJ_MissionGamemode::BeginPlay()
 {
     Super::BeginPlay();
 
+    
+}
+
+// 사실상 beginplay
+void AJ_MissionGamemode::StartMission()
+{
     // FIXME 미션 데이터 불러올 수 있게되면 아래 함수들 통합 필요
-    // LoadMissionData();
+
+    if(enableUsingDummyMissionData)
+    {
+        curMissionData = dummyMissionData;
+    }
+    else {
+        // LoadMissionData();
+    }
+
+    // 목표 매니저 컴포넌트 설정
+    check(objectiveManagerComp);
+    objectiveManagerComp->InitObjectiveList(curMissionData.mission);
+
+    // @@ 0번 목표 시작
+    objectiveManagerComp->ActiveNextObjective();
+    
+    
 
     // 미션 맵 로드
     LoadMissionMap();
@@ -31,7 +54,7 @@ void AJ_MissionGamemode::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-
+    
 }
 
 void AJ_MissionGamemode::LoadMissionMap()
@@ -102,9 +125,11 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
     Super::PostLogin(newPlayer);
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("플레이어 id : %d"), pIdx));
-    // FIXME 임시로 첫 플레이어는 지휘관 이후는 파일럿으로 역할 설정
-    auto* gi = newPlayer->GetGameInstance<UJ_GameInstance>();
-    gi->SetPlayerRole(pIdx == 0 ? EPlayerRole::COMMANDER : EPlayerRole::PILOT);
+    // solved 임시로 첫 플레이어는 지휘관 이후는 파일럿으로 역할 설정 | 사용 끝
+    // auto* gi = newPlayer->GetGameInstance<UJ_GameInstance>();
+    // gi->SetPlayerRole(pIdx == 0 ? EPlayerRole::COMMANDER : EPlayerRole::PILOT);
+    
+    
     // 역할 설정후 플레이어 스폰
     auto* pc = Cast<AJ_MissionPlayerController>(newPlayer);
     pc->SpawnMyPlayer();

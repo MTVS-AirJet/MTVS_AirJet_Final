@@ -32,7 +32,11 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
 {
     // 현재 row 가 없거나 child 가 2개로 꽉 찼다면 새 hbox 생성
     if(curHBox == nullptr) 
-        curHBox = CreateNewPlayerSlotHBox(); GEngine->AddOnScreenDebugMessage(-1, 32.f, FColor::Green, TEXT("새 hbox 생성 1"));
+    {
+        curHBox = CreateNewPlayerSlotHBox();
+        // GEngine->AddOnScreenDebugMessage(-1, 32.f, FColor::Green, TEXT("새 hbox 생성 1"));
+    }
+         
 
     bool hBoxFull = false;
     // hBox가 슬롯으로 꽉차있는지 확인
@@ -43,7 +47,11 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
         if(child->IsA<UJ_PlayerSlotUI>())
             slotCnt++;
     }
-    if(slotCnt >= playerSlotRowSize) curHBox = CreateNewPlayerSlotHBox(); GEngine->AddOnScreenDebugMessage(-1, 32.f, FColor::Green, TEXT("새 hbox 생성 2"));
+    if(slotCnt >= playerSlotRowSize)
+    {
+        curHBox = CreateNewPlayerSlotHBox();
+        // GEngine->AddOnScreenDebugMessage(-1, 32.f, FColor::Green, TEXT("새 hbox 생성 2"));
+    } 
 
     
     // hbox 가 비어있는지 확인
@@ -91,7 +99,7 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
 
 void UJ_PilotViewTabletUI::AddPlayerSlot(TArray<FString> playerIdAry)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%d 번 생성할게"), tempPlayerIds.Num()));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%d 번 생성할게"), tempPlayerIds.Num()));
     // FIXME 테스트용으로 자체 변수 사용
     for(FString playerId : tempPlayerIds)
     {

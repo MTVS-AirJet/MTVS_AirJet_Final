@@ -48,14 +48,14 @@ void UJ_StreamingUI::OnButtonWindowScreen()
 {
     Super::OnButtonWindowScreen();
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("3. 공유 버튼 클릭"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("3. 공유 버튼 클릭"));
 }
 
 void UJ_StreamingUI::OnButtonLookSharingScreen()
 {
     Super::OnButtonLookSharingScreen();
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("6. 화면 공유 시작"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("6. 화면 공유 시작"));
 
     ButtonLookSharingScreen->SetVisibility(ESlateVisibility::Visible);
 

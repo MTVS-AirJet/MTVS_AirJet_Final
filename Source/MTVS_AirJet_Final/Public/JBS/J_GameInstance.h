@@ -118,6 +118,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<EPlayerRole, TSubclassOf<class APawn>> playerPrefabMap;
 
+	// // 목표 지점 등 기본 고도 (단위 cm)
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	// float missionObjDefaultHeight = 500'000;
 public:
 
 protected:
@@ -153,4 +156,5 @@ public:
 
 	// 자신 플레이어 역할에 맞는 프리팹 주기
 	virtual TSubclassOf<APawn> GetMissionPlayerPrefab();
+
 };
