@@ -48,6 +48,7 @@ private: // Component
 	class USkeletalMeshComponent* JetMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetArrow;
+	
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
@@ -55,15 +56,20 @@ private: // Component
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineMaster1;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
-	class UBoxComponent* JetEngineMaster;
+	class UBoxComponent* JetEngineGen;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
-	class UBoxComponent* JetEngineMaster2;
+	class UBoxComponent* JetEngineGen2;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineControl;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineControl2;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFuelStarter;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster2;
+	
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -98,15 +104,19 @@ private:
 	UFUNCTION()
 	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
-	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	void OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
-	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	void OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -355,11 +365,11 @@ private:
 	bool bMIC;
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
-	class UStaticMeshComponent* DummyEngineMasterMesh1;
+	class UStaticMeshComponent* DummyEngineGenerMesh1;
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
-	class UStaticMeshComponent* DummyEngineMasterMesh2;
-	bool bEngineMaster1;
-	bool bEngineMaster2;
+	class UStaticMeshComponent* DummyEngineGenerMesh2;
+	bool bEngineGen1;
+	bool bEngineGen2;
 	
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyEngineControlMesh1;
@@ -371,4 +381,11 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyJFSMesh;
 	bool bJFS;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineMasterMesh1;
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineMasterMesh2;
+	bool bEngineMaster1;
+	bool bEngineMaster2;
 };
