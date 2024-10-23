@@ -33,7 +33,7 @@ protected:
 
 	// 미션 목표 리스트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
-	TArray<class AJ_BaseMissionObjective*> objectiveAry;
+	TArray<FObjectiveData> objectiveDataAry;
 
 	// 현재 진행 중인 미션 | Set 은 인덱스를 통하기
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
@@ -42,13 +42,14 @@ protected:
 	__declspec(property(get = GetCurActiveMission, put = SetCurActiveMission)) class AJ_BaseMissionObjective* CUR_ACTIVE_MISSION;
 	class AJ_BaseMissionObjective* GetCurActiveMission()
 	{
-		return objectiveAry[curActiveMissionIdx];
+		return curActiveMission;
 	}
 	void SetCurActiveMission(class AJ_BaseMissionObjective* value)
 	{
 		curActiveMission = value;
 	}
 		protected:
+
 	// 현재 진행 중인 인덱스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	int curActiveMissionIdx = -1;
@@ -61,6 +62,7 @@ protected:
 	void SetCurActiveMissionIdx(int value);
 
     protected:
+
 
 	// 미션 클리어
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -79,9 +81,13 @@ protected:
 	// 미션 시작 시 목표 리스트 설정
     void InitObjectiveList(TArray<struct FMissionObject> missions);
 
-	// 해당 미션 활성화
+	// 해당 목표 활성화
     void ActiveObjectiveByIdx(int mIdx);
 
-	// 다음 미션 활성화 | 미션에 바인드
+	// 다음 목표 활성화 | 목표에 바인드
     void ActiveNextObjective();
+
+	// 목표 수행도 갱신
+	UFUNCTION(BlueprintCallable)
+	void UpdateObjectiveSuccess(int mIdx, float successPercent);
 };

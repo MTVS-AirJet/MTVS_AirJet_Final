@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JBS/J_MissionObjectiveMovePoint.h"
+#include "JBS/J_ObjectiveMovePoint.h"
 #include "Components/CapsuleComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/HitResult.h"
@@ -11,7 +11,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 
-AJ_MissionObjectiveMovePoint::AJ_MissionObjectiveMovePoint() : AJ_BaseMissionObjective()
+AJ_ObjectiveMovePoint::AJ_ObjectiveMovePoint() : AJ_BaseMissionObjective()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,17 +21,21 @@ AJ_MissionObjectiveMovePoint::AJ_MissionObjectiveMovePoint() : AJ_BaseMissionObj
     checkCapsuleComp->SetCapsuleHalfHeight(40000);
 }
 
-void AJ_MissionObjectiveMovePoint::BeginPlay()
+void AJ_ObjectiveMovePoint::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 오버랩 바인드
-    checkCapsuleComp->OnComponentBeginOverlap.AddDynamic( this, &AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap);
+    checkCapsuleComp->SetCapsuleHalfHeight(beamLength);
+    checkCapsuleComp->SetCapsuleRadius(beamRadius);
 
-    objectiveActiveDel.AddUObject(this, &AJ_MissionObjectiveMovePoint::InitBeamVFX);
+
+    // 오버랩 바인드
+    checkCapsuleComp->OnComponentBeginOverlap.AddDynamic( this, &AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap);
+
+    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveMovePoint::InitBeamVFX);
 }
 
-void AJ_MissionObjectiveMovePoint::InitBeamVFX()
+void AJ_ObjectiveMovePoint::InitBeamVFX()
 {
     // 내 위치 아래에 ray 쏴서 바닥 가져오기
     FHitResult outHit;
@@ -84,7 +88,7 @@ void AJ_MissionObjectiveMovePoint::InitBeamVFX()
     GEngine->AddOnScreenDebugMessage(-1, 22, FColor::Green, FString::Printf(TEXT("빔 생성 %s"), isHit ? TEXT("성공") : TEXT("실패")));
 }
 
-void AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
+void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     UPrimitiveComponent *OverlappedComponent,
     AActor *OtherActor, UPrimitiveComponent *OtherComp,
     int32 OtherBodyIndex, bool bFromSweep,
@@ -94,17 +98,21 @@ void AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     if(OtherActor->IsA<AJ_BaseMissionPawn>())
     {
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이동 목표 성공"));
-        
+        // 수행도 1
+        // FIXME 이거 프로퍼티 안되는 것 부터 시작 성공 퍼센트 갱신을 따로 딜리게이트로 하려했음.
+        SUCCESS_PERCENT = 1.f;
         this->ObjectiveEnd(true);
     }   
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("암튼 뭔가 충돌함 %s"), *OtherActor->GetName()));
 }
 
-void AJ_MissionObjectiveMovePoint::ObjectiveEnd(bool isSuccess)
+void AJ_ObjectiveMovePoint::ObjectiveEnd(bool isSuccess)
 {
     Super::ObjectiveEnd(isSuccess);
 }
 
-void AJ_MissionObjectiveMovePoint::SetObjectiveActive(bool value)
+void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
 {
     Super::SetObjectiveActive(value);
 
@@ -116,4 +124,13 @@ void AJ_MissionObjectiveMovePoint::SetObjectiveActive(bool value)
         // @@
         GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
+}
+
+void AJ_ObjectiveMovePoint::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d"), checkCapsuleComp->IsActive()));
+    
+    
 }
