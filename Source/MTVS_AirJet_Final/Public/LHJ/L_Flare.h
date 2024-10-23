@@ -31,6 +31,12 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Speed")
 	float FlareSpeed = 1000.f;
 
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class UNiagaraComponent* FlareEffect;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class USplineComponent* FlareSpline;
+
 private:
 	UFUNCTION()
 	void OnFlareBeginOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -39,4 +45,20 @@ private:
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare();
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float MaxLifeTime = 20.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float MinLifeTime = 10.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float MaxScaleSprite = 800.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float MinScaleSprite = 200.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float SpawnRadius = 0.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	float SpawnRate = 8.f;
+	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	FLinearColor LColor = FLinearColor(0.147027 , 0.147027 , 0.147027 , 1);
 };

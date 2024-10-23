@@ -3,7 +3,9 @@
 
 #include "LHJ/L_Flare.h"
 
+#include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SplineComponent.h"
 
 // Sets default values
 AL_Flare::AL_Flare()
@@ -19,6 +21,13 @@ AL_Flare::AL_Flare()
 	FlareMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FlareMesh"));
 	FlareMesh->SetupAttachment(RootComponent);
 
+	FlareEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FlareEffect"));
+	FlareEffect->SetupAttachment(RootComponent);
+
+	FlareSpline = CreateDefaultSubobject<USplineComponent>(TEXT("FlareSpline"));
+	FlareSpline->SetupAttachment(FlareEffect);
+
+
 	SetLifeSpan(10.f);
 
 	bReplicates = true;
@@ -29,6 +38,15 @@ AL_Flare::AL_Flare()
 void AL_Flare::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FlareEffect->SetVariableObject(FName("SplineObject") , FlareSpline);
+	FlareEffect->SetFloatParameter(FName("MaxLifetime") , MaxLifeTime);
+	FlareEffect->SetFloatParameter(FName("MinLifetime") , MinLifeTime);
+	FlareEffect->SetFloatParameter(FName("MaxScaleSprite") , MaxScaleSprite);
+	FlareEffect->SetFloatParameter(FName("MinScaleSprite") , MinScaleSprite);
+	FlareEffect->SetFloatParameter(FName("SpawnRadius") , SpawnRadius);
+	FlareEffect->SetFloatParameter(FName("SpawnRate") , SpawnRate);
+	FlareEffect->SetColorParameter(FName("Color") , LColor);
 }
 
 // Called every frame
