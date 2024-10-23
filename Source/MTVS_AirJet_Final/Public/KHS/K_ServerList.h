@@ -51,9 +51,6 @@ public:
 	void Setup(class UK_ServerWidget* Parent, int Index);
 
 	UFUNCTION()
-	void OnHovered();
-
-	UFUNCTION()
 	void OnClicked();
 
 };

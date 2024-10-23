@@ -6,7 +6,7 @@
 //Interface 할당
 void UK_WidgetBase::SetInterface(IK_SessionInterface* Interface)
 {
-	this->SessionInterface = Interface;
+	this->WidgetInterface = Interface;
 }
 
 // ServerUI 생성 함수(공통)

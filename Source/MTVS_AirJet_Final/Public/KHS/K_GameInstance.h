@@ -45,6 +45,7 @@ public:
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch; // 온라인 세션 검색을 할 수 있는 클래스 인스턴스 선언
 
 	FString DesiredServerName; // Host 시 서버 이름을 지정하여 설정하기 위한 변수
+	
 	FString DesiredServerData;
 
 	std::map<int32, FString> ServerDataList;
@@ -134,6 +135,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UK_LoadingWidget> LoadingWidgetFactory; // LoadingWidget(UI) 공장
 	class UK_LoadingWidget* LoadingWidget; // LoadingWidget(UI) 참조 선언
+
+	//UPROPERTY(EditAnywhere, Category = "UI")
+	//TSubclassOf<class UK_IngameWidget> IngameWidgetFactory; // IngameWidget(UI) 공장
+	//class UK_IngameWidget* IngmaeWidget; // IngameWidget(UI) 참조 선언
 
 	// 1) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Sound")

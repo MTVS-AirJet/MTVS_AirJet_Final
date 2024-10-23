@@ -378,6 +378,15 @@ void UK_GameInstance::CreateServerWidget()
 	ServerWidget->SetUI(); //부모함수 호출
 }
 
+//// 인게임 UI를 생성하는 함수
+//void UK_GameInstance::CreateInGameWidget()
+//{
+//	// ServerUIFactory를 통해 ServerUI 위젯 생성
+//	IngameWidget = CreateWidget<UK_IngameWidget>(this , IngameWidgetFactory);
+//	IngameWidget->SetInterface(this); //부모함수 호출
+//	IngameWidget->SetUI(); //부모함수 호출
+//}
+
 // 3) Travel 관련 함수 ------------------------------------------------------------------------------------
 void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
 {
