@@ -147,6 +147,15 @@ AL_Viper::AL_Viper()
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
 	MissileMoveLoc->SetupAttachment(RootComponent);
 	MissileMoveLoc->SetRelativeLocation(FVector(0 , 0 , -200));
+	//============================================
+	JetFlareArrow1 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow1"));
+	JetFlareArrow1->SetupAttachment(JetMesh);
+	JetFlareArrow1->SetRelativeLocationAndRotation(FVector(-500 , 100 , 0) , FRotator(-120 , 0 , 0));
+	JetFlareArrow1->SetHiddenInGame(false); // For Test
+	JetFlareArrow2 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow2"));
+	JetFlareArrow2->SetupAttachment(JetMesh);
+	JetFlareArrow2->SetRelativeLocationAndRotation(FVector(-500 , -100 , 0) , FRotator(-120 , 0 , 0));
+	JetFlareArrow2->SetHiddenInGame(false); // For Test
 
 	bReplicates = true;
 	SetReplicateMovement(true);
@@ -594,6 +603,17 @@ void AL_Viper::Tick(float DeltaTime)
 
 		ChangeBooster();
 	}
+
+#pragma region Flare Arrow Rotation Change
+	if (CurrentWeapon == EWeapon::Flare)
+	{
+		int32 randRot = FMath::RandRange(-150 , -110);
+		LOG_SCREEN("%d", randRot);
+		FRotator newFlareRot = FRotator(randRot , 0 , 0);
+		JetFlareArrow1->SetRelativeRotation(newFlareRot);
+		JetFlareArrow2->SetRelativeRotation(newFlareRot);
+	}
+#pragma endregion
 }
 
 #pragma region Get Force
@@ -778,22 +798,37 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 {
 	if (FlareFactory)
 	{
-		// 수류탄을 던질 위치 계산(캐릭터 위치에서 위로 조정)
-		FVector SpawnLocation = GetActorLocation() + FVector(0 , 0 , 500);
-		// 캐릭터의 회전방향을 얻어둠
-		FRotator SpawnRotation = FRotator(0, 0 , 0);
-		// FlareFactory 이용해서 수류탄 스폰
-		AL_Flare* Flare = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
-
-		if (Flare)
+		if(FlareCurCnt>0)
 		{
-			Flare->SetOwner(newOwner);
-			// 던지는 방향을 설정할 벡터얻기
-			FVector LaunchDirection = GetActorForwardVector() * 1.2 + GetActorUpVector();
-			// 수류탄의 움직임을 설정하기 위해 UProjectileMovement의 Velocity속성을 사용
-			// 수류탄이 던져지는 방향과 속력에 대한 정의
-			Flare->GetProjectileMovementComponent()->Velocity = LaunchDirection * ThrowingForce;
-			Flare->GetProjectileMovementComponent()->SetVelocityInLocalSpace(LaunchDirection * ThrowingForce);
+			// 던질 위치 계산(캐릭터 위치에서 위로 조정)
+			FVector SpawnLocation = JetFlareArrow1->GetComponentLocation();
+			// 던질 각도
+			FRotator SpawnRotation = JetMesh->GetComponentRotation();
+			// FlareFactory 이용해서 수류탄 스폰
+			AL_Flare* Flare1 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
+
+			if (Flare1)
+			{
+				Flare1->SetOwner(newOwner);
+				FlareCurCnt--;
+			}
+
+			// 던질 위치 계산(캐릭터 위치에서 위로 조정)
+			SpawnLocation = JetFlareArrow2->GetComponentLocation();
+			// 던질 각도
+			//SpawnRotation = FRotator::ZeroRotator;
+			// FlareFactory 이용해서 수류탄 스폰
+			AL_Flare* Flare2 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
+
+			if (Flare2)
+			{
+				Flare2->SetOwner(newOwner);
+				FlareCurCnt--;
+			}
+		}
+		else
+		{
+			LOG_S(Warning , TEXT("남은 Flare가 없습니다."));
 		}
 	}
 	else

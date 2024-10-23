@@ -9,8 +9,8 @@
 UENUM()
 enum class EWeapon
 {
-	Missile = 0,
-	Flare,
+	Missile = 0 ,
+	Flare ,
 	// 항상 마지막에 추가하여 열거형의 크기를 구할 수 있게 함
 	Max
 };
@@ -68,15 +68,20 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
 
-public:
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCamera;
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArmFPS;
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCameraFPS;
+
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UArrowComponent* JetFlareArrow1;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UArrowComponent* JetFlareArrow2;
 
 private:
 	UFUNCTION()
@@ -275,8 +280,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
 	TSubclassOf<class AL_Flare> FlareFactory;
-	UPROPERTY(EditDefaultsOnly, Category=Grenade)
-	float ThrowingForce=1.f;
 
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
@@ -288,35 +291,39 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
 	class USceneComponent* MissileMoveLoc;
 
-private:	
+private:
 	UFUNCTION()
 	void ChangeBooster();
 
 private:
-	UFUNCTION(Server, Reliable)
-	void ServerRPCLocationAndRotation(FVector newLocaction, FRotator newRotator);
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCLocationAndRotation(FVector newLocaction, FRotator newRotator);
+	UFUNCTION(Server , Reliable)
+	void ServerRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
+	UFUNCTION(NetMulticast , Reliable)
+	void MulticastRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCBoost(bool isOn);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server , Reliable)
 	void ServerRPCLockOn();
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCLockOn(AActor* target);
-	
-	UFUNCTION(Server, Reliable)
+
+	UFUNCTION(Server , Reliable)
 	void ServerRPCMissile(AActor* newOwner);
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCMissile(AActor* newOwner);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare(AActor* newOwner);
-	
+
 private:
 	UPROPERTY(replicated)
-	EWeapon CurrentWeapon=EWeapon::Missile;
+	EWeapon CurrentWeapon = EWeapon::Missile;
+	UPROPERTY(EditDefaultsOnly)
+	float FlareMaxCnt = 60;
+	UPROPERTY(replicated , EditDefaultsOnly)
+	float FlareCurCnt = FlareMaxCnt;
 };

@@ -28,19 +28,15 @@ private:
 	class UStaticMeshComponent* FlareMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* FlareBoxComp;
-public:
-	//발사체 이동을 담당할 컴포넌트
-	UPROPERTY(EditDefaultsOnly, Category = Movement)
-	class UProjectileMovementComponent* movementComp;
-	
-	class UProjectileMovementComponent* GetProjectileMovementComponent() const;
+	UPROPERTY(EditDefaultsOnly , Category="Speed")
+	float FlareSpeed = 1000.f;
 
 private:
 	UFUNCTION()
 	void OnFlareBeginOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
-	                           UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
-	                           const FHitResult& SweepResult);
+	                         UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+	                         const FHitResult& SweepResult);
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare();
 };
