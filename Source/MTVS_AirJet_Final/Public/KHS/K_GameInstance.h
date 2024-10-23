@@ -136,6 +136,10 @@ public:
 	TSubclassOf<class UK_LoadingWidget> LoadingWidgetFactory; // LoadingWidget(UI) 공장
 	class UK_LoadingWidget* LoadingWidget; // LoadingWidget(UI) 참조 선언
 
+	//UPROPERTY(EditAnywhere, Category = "UI")
+	//TSubclassOf<class UK_IngameWidget> IngameWidgetFactory; // IngameWidget(UI) 공장
+	//class UK_IngameWidget* IngmaeWidget; // IngameWidget(UI) 참조 선언
+
 	// 1) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	class USoundWave* LobbySound; // 로비 사운드
