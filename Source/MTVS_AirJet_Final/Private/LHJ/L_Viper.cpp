@@ -161,6 +161,8 @@ AL_Viper::AL_Viper()
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
 	JetPostProcess->SetupAttachment(JetCameraFPS);
 
+	CreateDumyComp();
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -240,6 +242,16 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("MIC 클릭");
+	if (!bMIC)
+	{
+		bMIC = true;
+		DummyMICMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+	}
+	else
+	{
+		bMIC = false;
+		DummyMICMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
+	}
 }
 
 void AL_Viper::OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
@@ -269,7 +281,7 @@ void AL_Viper::F_ViperLook(const FInputActionValue& value)
 	auto v = value.Get<FVector2D>();
 	// AddControllerYawInput(v.X);
 	// AddControllerPitchInput(v.Y);
-	if(IsRotateTrigger)
+	if (IsRotateTrigger)
 	{
 		if (JetCamera->IsActive())
 		{
@@ -645,20 +657,20 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-	if(!IsRotateTrigger)
+	if (!IsRotateTrigger)
 	{
 		if (JetCamera->IsActive())
 		{
 			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
 			//FRotator(-10 , 0 , 0)
-			auto lerpTPSrot=FMath::Lerp(TPSrot, FRotator(-10 , 0 , 0), DeltaTime);
+			auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
 			JetSprintArm->SetRelativeRotation(lerpTPSrot);
 		}
 		else
 		{
 			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
 			//FRotator(-30 , 0 , 0)
-			auto lerpFPSrot=FMath::Lerp(FPSrot, FRotator(-30 , 0 , 0), DeltaTime);
+			auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
 			JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
 		}
 	}
@@ -919,4 +931,12 @@ void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 	LockOnTarget = target;
 	// LOG_S(Warning , TEXT("Viper Name : %s, LockOnTarget Name : %s") , *GetName() ,
 	// 					  *LockOnTarget->GetName());
+}
+
+void AL_Viper::CreateDumyComp()
+{
+	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
+	DummyMICMesh->SetupAttachment(JetMic);
+	//DummyMICMesh->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
+	DummyMICMesh->SetRelativeScale3D(FVector(.5f));
 }

@@ -336,4 +336,11 @@ private:
 
 private:
 	bool IsRotateTrigger = false;
+
+private:
+	void CreateDumyComp();
+	
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyMICMesh;
+	bool bMIC;
 };
