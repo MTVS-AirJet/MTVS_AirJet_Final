@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/PostProcessComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -54,7 +55,7 @@ AL_Viper::AL_Viper()
 	JetSprintArm->TargetArmLength = 2000.f;
 
 	JetSprintArm->bEnableCameraRotationLag = true;
-	JetSprintArm->CameraRotationLagSpeed = 3.5f;
+	JetSprintArm->CameraRotationLagSpeed = 20.f;
 
 	JetCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCamera"));
 	JetCamera->SetupAttachment(JetSprintArm);
@@ -157,6 +158,9 @@ AL_Viper::AL_Viper()
 	JetFlareArrow2->SetRelativeLocationAndRotation(FVector(-500 , -100 , 0) , FRotator(-120 , 0 , 0));
 	JetFlareArrow2->SetHiddenInGame(false); // For Test
 
+	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
+	JetPostProcess->SetupAttachment(JetCameraFPS);
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -167,7 +171,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
-	DOREPLIFETIME(AL_Viper , FlareMaxCnt);
+	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 }
 
 #pragma region Input
@@ -215,6 +219,11 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ViperTPS , ETriggerEvent::Started , this , &AL_Viper::F_ViperTpsStarted);
 
 		input->BindAction(IA_ViperChangeWeapon , ETriggerEvent::Started , this , &AL_Viper::F_ViperChangeWeaponStarted);
+
+		input->BindAction(IA_ViperRotateViewTrigger , ETriggerEvent::Started , this ,
+		                  &AL_Viper::F_ViperRotateTriggerStarted);
+		input->BindAction(IA_ViperRotateViewTrigger , ETriggerEvent::Completed , this ,
+		                  &AL_Viper::F_ViperRotateTriggerCompleted);
 	}
 }
 
@@ -260,23 +269,26 @@ void AL_Viper::F_ViperLook(const FInputActionValue& value)
 	auto v = value.Get<FVector2D>();
 	// AddControllerYawInput(v.X);
 	// AddControllerPitchInput(v.Y);
-	if (JetCamera->IsActive())
+	if(IsRotateTrigger)
 	{
-		FRotator FPSrot = JetSprintArm->GetRelativeRotation();
-		float newFpsYaw = FPSrot.Yaw + v.X;
-		float newFpsPitch = FPSrot.Pitch + v.Y;
-		newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -360.f , 360.f);
-		newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
-		JetSprintArm->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
-	}
-	else
-	{
-		FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-		float newFpsYaw = FPSrot.Yaw + v.X;
-		float newFpsPitch = FPSrot.Pitch + v.Y;
-		newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -150.f , 150.f);
-		newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
-		JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
+		if (JetCamera->IsActive())
+		{
+			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+			float newTpsYaw = TPSrot.Yaw + v.X;
+			float newTpsPitch = TPSrot.Pitch + v.Y;
+			newTpsYaw = UKismetMathLibrary::FClamp(newTpsYaw , -360.f , 360.f);
+			newTpsPitch = UKismetMathLibrary::FClamp(newTpsPitch , -80.f , 80.f);
+			JetSprintArm->SetRelativeRotation(FRotator(newTpsPitch , newTpsYaw , 0));
+		}
+		else
+		{
+			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+			float newFpsYaw = FPSrot.Yaw + v.X;
+			float newFpsPitch = FPSrot.Pitch + v.Y;
+			newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -150.f , 150.f);
+			newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
+			JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
+		}
 	}
 }
 
@@ -402,7 +414,10 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 	if (JetCamera)
 		JetCamera->SetActive(false);
 	if (JetCameraFPS)
+	{
+		// RenderCustomDepthJPass 활성화
 		JetCameraFPS->SetActive(true);
+	}
 }
 
 void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
@@ -410,13 +425,26 @@ void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 	if (JetCamera)
 		JetCamera->SetActive(true);
 	if (JetCameraFPS)
+	{
+		// RenderCustomDepthJPass 비활성화
 		JetCameraFPS->SetActive(false);
+	}
 }
 
 void AL_Viper::F_ViperChangeWeaponStarted(const struct FInputActionValue& value)
 {
 	// 현재 값에서 1을 더하고, Max로 나눈 나머지를 사용하여 순환
 	CurrentWeapon = static_cast<EWeapon>((static_cast<int32>(CurrentWeapon) + 1) % static_cast<int32>(EWeapon::Max));
+}
+
+void AL_Viper::F_ViperRotateTriggerStarted(const struct FInputActionValue& value)
+{
+	IsRotateTrigger = true;
+}
+
+void AL_Viper::F_ViperRotateTriggerCompleted(const struct FInputActionValue& value)
+{
+	IsRotateTrigger = false;
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -609,10 +637,30 @@ void AL_Viper::Tick(float DeltaTime)
 	if (CurrentWeapon == EWeapon::Flare)
 	{
 		int32 randRot = FMath::RandRange(-150 , -110);
-		LOG_SCREEN("%d", randRot);
+		LOG_SCREEN("%d" , randRot);
 		FRotator newFlareRot = FRotator(randRot , 0 , 0);
 		JetFlareArrow1->SetRelativeRotation(newFlareRot);
 		JetFlareArrow2->SetRelativeRotation(newFlareRot);
+	}
+#pragma endregion
+
+#pragma region Recover CameraArm Rotation
+	if(!IsRotateTrigger)
+	{
+		if (JetCamera->IsActive())
+		{
+			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+			//FRotator(-10 , 0 , 0)
+			auto lerpTPSrot=FMath::Lerp(TPSrot, FRotator(-10 , 0 , 0), DeltaTime);
+			JetSprintArm->SetRelativeRotation(lerpTPSrot);
+		}
+		else
+		{
+			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+			//FRotator(-30 , 0 , 0)
+			auto lerpFPSrot=FMath::Lerp(FPSrot, FRotator(-30 , 0 , 0), DeltaTime);
+			JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+		}
 	}
 #pragma endregion
 }
@@ -799,7 +847,7 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 {
 	if (FlareFactory)
 	{
-		if(FlareCurCnt>0)
+		if (FlareCurCnt > 0)
 		{
 			// 던질 위치 계산(캐릭터 위치에서 위로 조정)
 			FVector SpawnLocation = JetFlareArrow1->GetComponentLocation();

@@ -77,6 +77,9 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCameraFPS;
 
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UPostProcessComponent* JetPostProcess;
+
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow1;
@@ -128,6 +131,8 @@ private: // Input
 	class UInputAction* IA_ViperTPS;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperChangeWeapon;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperRotateViewTrigger;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -175,6 +180,10 @@ private: // Input
 	void F_ViperTpsStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperChangeWeaponStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperRotateTriggerStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperRotateTriggerCompleted(const struct FInputActionValue& value);
 
 private:
 	bool bFirstEngine;
@@ -322,8 +331,9 @@ private:
 private:
 	UPROPERTY(replicated)
 	EWeapon CurrentWeapon = EWeapon::Missile;
-	UPROPERTY(EditDefaultsOnly)
-	float FlareMaxCnt = 60;
 	UPROPERTY(replicated , EditDefaultsOnly)
-	float FlareCurCnt = FlareMaxCnt;
+	float FlareCurCnt = 60;
+
+private:
+	bool IsRotateTrigger = false;
 };
