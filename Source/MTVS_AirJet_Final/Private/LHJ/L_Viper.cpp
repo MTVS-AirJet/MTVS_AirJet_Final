@@ -167,6 +167,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
+	DOREPLIFETIME(AL_Viper , FlareMaxCnt);
 }
 
 #pragma region Input
