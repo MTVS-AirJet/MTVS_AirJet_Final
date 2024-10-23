@@ -53,9 +53,15 @@ private: // Component
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetMic;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster1;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineMaster;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineMaster2;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineControl;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetEngineControl2;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFuelStarter;
 	UPROPERTY(EditDefaultsOnly , category="Components")
@@ -92,9 +98,13 @@ private:
 	UFUNCTION()
 	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
-	void OnMyEngineMasterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
@@ -343,4 +353,22 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyMICMesh;
 	bool bMIC;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineMasterMesh1;
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineMasterMesh2;
+	bool bEngineMaster1;
+	bool bEngineMaster2;
+	
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineControlMesh1;
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyEngineControlMesh2;
+	bool bEngineControl1;
+	bool bEngineControl2;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyJFSMesh;
+	bool bJFS;
 };
