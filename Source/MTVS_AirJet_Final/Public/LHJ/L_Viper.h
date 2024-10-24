@@ -69,6 +69,8 @@ private: // Component
 	class UBoxComponent* JetEngineMaster;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineMaster2;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetJFSHandle;
 	
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
@@ -117,6 +119,8 @@ private:
 	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -410,4 +414,8 @@ private:
 	class UStaticMeshComponent* DummyEngineMasterMesh2;
 	bool bEngineMaster1;
 	bool bEngineMaster2;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyJFSHandleMesh;
+	bool bJFSHandle;
 };

@@ -136,6 +136,14 @@ AL_Viper::AL_Viper()
 	JetEngineMaster2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster2Clicked);
 	JetEngineMaster2->SetHiddenInGame(false); // For Test
 
+	JetJFSHandle = CreateDefaultSubobject<UBoxComponent>(TEXT("JetJFSHandle"));
+	JetJFSHandle->SetupAttachment(JetMesh);
+	JetJFSHandle->SetRelativeScale3D(FVector(.1f , .1f , .2f));
+	JetJFSHandle->SetRelativeLocation(FVector(410 , 15 , 260));
+	JetJFSHandle->SetGenerateOverlapEvents(true);
+	JetJFSHandle->OnClicked.AddDynamic(this , &AL_Viper::OnMyJFSHandle1Clicked);
+	JetJFSHandle->SetHiddenInGame(false); // For Test
+
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
@@ -397,6 +405,21 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineMaster2 = false;
 		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(0 , 0 , 0));
+	}
+}
+
+void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+{
+	LOG_SCREEN("JFS 핸들 클릭");
+	if (!bJFSHandle)
+	{
+		bJFSHandle = true;
+		DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+	}
+	else
+	{
+		bJFSHandle = false;
+		DummyJFSHandleMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
 	}
 }
 
@@ -1142,4 +1165,8 @@ void AL_Viper::CreateDumyComp()
 	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
 	DummyEngineMasterMesh2->SetupAttachment(JetEngineMaster2);
 	DummyEngineMasterMesh2->SetRelativeScale3D(FVector(.5f));
+
+	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
+	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
+	DummyJFSHandleMesh->SetRelativeScale3D(FVector(.5f));
 }
