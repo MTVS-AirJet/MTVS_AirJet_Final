@@ -126,6 +126,10 @@ private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperLook;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperZoonIn;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperZoonOut;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperUp;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperDown;
@@ -158,6 +162,14 @@ private: // Input
 	void F_ViperEngine(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperLook(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperZoomInStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperZoomInCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperZoomOutStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperZoomOutCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperUpTrigger(const struct FInputActionValue& value);
 	UFUNCTION()
@@ -221,6 +233,10 @@ private:
 	// Rotate vector
 	bool IsRightRoll;
 	bool IsLeftRoll;
+	// Zoom
+	bool IsZoomIn;
+	bool IsZoomOut;
+	
 	UPROPERTY(EditDefaultsOnly)
 	FVector ChangeMoveVector = FVector(0 , .5f , 0);
 	UPROPERTY(EditDefaultsOnly)
@@ -356,6 +372,12 @@ private:
 
 private:
 	bool IsRotateTrigger = false;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomInValue=25;
+	UPROPERTY(EditDefaultsOnly)
+	float ZoomOutValue=140;
 
 private:
 	void CreateDumyComp();

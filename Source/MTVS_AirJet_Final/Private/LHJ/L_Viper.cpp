@@ -91,7 +91,7 @@ AL_Viper::AL_Viper()
 	JetEngineGen2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen2"));
 	JetEngineGen2->SetupAttachment(JetMesh);
 	JetEngineGen2->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineGen2->SetRelativeLocation(FVector(410 , 0, 280));
+	JetEngineGen2->SetRelativeLocation(FVector(410 , 0 , 280));
 	JetEngineGen2->SetGenerateOverlapEvents(true);
 	JetEngineGen2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen2Clicked);
 	JetEngineGen2->SetHiddenInGame(false); // For Test
@@ -120,7 +120,7 @@ AL_Viper::AL_Viper()
 	JetFuelStarter->OnClicked.AddDynamic(this , &AL_Viper::OnMyJetFuelStarterClicked);
 	JetFuelStarter->SetHiddenInGame(false); // For Test
 
-	JetEngineMaster= CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
+	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
 	JetEngineMaster->SetupAttachment(JetMesh);
 	JetEngineMaster->SetRelativeScale3D(FVector(.1f , .1f , .2f));
 	JetEngineMaster->SetRelativeLocation(FVector(410 , 7 , 260));
@@ -257,6 +257,16 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		                  &AL_Viper::F_ViperRotateTriggerStarted);
 		input->BindAction(IA_ViperRotateViewTrigger , ETriggerEvent::Completed , this ,
 		                  &AL_Viper::F_ViperRotateTriggerCompleted);
+
+		input->BindAction(IA_ViperZoonIn , ETriggerEvent::Started , this ,
+		                  &AL_Viper::F_ViperZoomInStarted);
+		input->BindAction(IA_ViperZoonIn , ETriggerEvent::Completed , this ,
+		                  &AL_Viper::F_ViperZoomInCompleted);
+
+		input->BindAction(IA_ViperZoonOut , ETriggerEvent::Started , this ,
+		                  &AL_Viper::F_ViperZoomOutStarted);
+		input->BindAction(IA_ViperZoonOut , ETriggerEvent::Completed , this ,
+		                  &AL_Viper::F_ViperZoomOutCompleted);
 	}
 }
 
@@ -270,7 +280,7 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 	}
 }
 
-void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("MIC 클릭");
 	if (!bMIC)
@@ -285,7 +295,7 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKe
 	}
 }
 
-void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineGen 클릭");
 	if (!bEngineGen1)
@@ -300,7 +310,7 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , str
 	}
 }
 
-void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineGen2 클릭");
 	if (!bEngineGen2)
@@ -315,7 +325,7 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , str
 	}
 }
 
-void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineControl 클릭");
 	if (!bEngineControl1)
@@ -330,7 +340,7 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 	}
 }
 
-void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("EngineControl2 클릭");
 	if (!bEngineControl2)
@@ -345,7 +355,7 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent, 
 	}
 }
 
-void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("JFS 클릭");
 	if (!bJFS)
@@ -360,7 +370,7 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 	}
 }
 
-void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("Engine Master1 클릭");
 	if (!bEngineMaster1)
@@ -375,7 +385,7 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent, s
 	}
 }
 
-void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	LOG_SCREEN("Engine Master2 클릭");
 	if (!bEngineMaster2)
@@ -423,6 +433,30 @@ void AL_Viper::F_ViperLook(const FInputActionValue& value)
 			JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
 		}
 	}
+}
+
+void AL_Viper::F_ViperZoomInStarted(const struct FInputActionValue& value)
+{
+	// 중복 키입력 방지용
+	if (!IsZoomOut)
+		IsZoomIn = true;
+}
+
+void AL_Viper::F_ViperZoomInCompleted(const struct FInputActionValue& value)
+{
+	IsZoomIn = false;
+}
+
+void AL_Viper::F_ViperZoomOutStarted(const struct FInputActionValue& value)
+{
+	// 중복 키입력 방지용
+	if (!IsZoomIn)
+		IsZoomOut = true;
+}
+
+void AL_Viper::F_ViperZoomOutCompleted(const struct FInputActionValue& value)
+{
+	IsZoomOut = false;
 }
 
 void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
@@ -764,6 +798,27 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 		ChangeBooster();
+
+#pragma region Zoom In/Out
+		if (JetCameraFPS->IsActive())
+		{
+			if (IsZoomIn)
+			{
+				// 현재 FieldOfView 수치와 줌 인 수치(25)를 Lerp해서 적용
+				float currViewValue = JetCameraFPS->FieldOfView;
+				float newViewValue = FMath::Lerp(currViewValue , ZoomInValue , DeltaTime);
+				JetCameraFPS->SetFieldOfView(newViewValue);
+			}
+
+			if (IsZoomOut)
+			{
+				// 현재 FieldOfView 수치와 줌 아웃 수치(140)를 Lerp해서 적용
+				float currViewValue = JetCameraFPS->FieldOfView;
+				float newViewValue = FMath::Lerp(currViewValue , ZoomOutValue , DeltaTime);
+				JetCameraFPS->SetFieldOfView(newViewValue);
+			}
+		}
+#pragma endregion
 	}
 
 #pragma region Flare Arrow Rotation Change
