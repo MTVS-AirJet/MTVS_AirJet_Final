@@ -89,5 +89,5 @@ protected:
 
 	// 목표 수행도 갱신
 	UFUNCTION(BlueprintCallable)
-	void UpdateObjectiveSuccess(int mIdx, float successPercent);
+	void UpdateObjectiveSuccess(class AJ_BaseMissionObjective* objActor, float successPercent);
 };

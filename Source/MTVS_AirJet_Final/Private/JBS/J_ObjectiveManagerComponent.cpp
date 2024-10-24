@@ -2,6 +2,7 @@
 
 
 #include "JBS/J_ObjectiveManagerComponent.h"
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
@@ -132,15 +133,14 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	isMissionComplete = true;
 }
 
-void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(int mIdx, float successPercent)
+void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
 {
-	// mIdx 범위 체크
-	if(mIdx < 0 || mIdx > objectiveDataAry.Num())
+	// 인덱스 찾기
+	FObjectiveData data = *objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("수행도 갱신 인덱스 오류"));
+		return objData.objectiveActor == objActor;
+	});
 
-		return;
-	}
 	// 갱신
-	objectiveDataAry[mIdx].successPercent = successPercent;
+	data.successPercent = successPercent;
 }

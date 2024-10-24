@@ -2,9 +2,12 @@
 
 
 #include "JBS/J_MissionGameState.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_Utility.h"
 #include "KHS/K_StreamingUI.h"
+#include "UObject/ObjectPtr.h"
 
 void AJ_MissionGameState::OnRep_StreamingID()
 {
@@ -29,4 +32,18 @@ void AJ_MissionGameState::RemoveStreamUserId(const FString &userId)
 {
     // 요소 제거
     ArrStreamingUserID.Remove(userId);
+}
+
+TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
+{
+    // 플레이어 스테이트 가져오기
+    // this->PlayerArray[0]->GetPlayerController()->GetPawn()
+    // 플레이어 스테이트->PS->폰 으로 가져오기
+    TArray<APawn*> allPawns;
+    Algo::Transform(this->PlayerArray, allPawns, [](TObjectPtr<APlayerState> temp){
+        check(temp);
+        return temp->GetPlayerController()->GetPawn();
+    });
+    
+    return allPawns;
 }

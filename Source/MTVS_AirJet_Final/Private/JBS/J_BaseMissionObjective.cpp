@@ -109,8 +109,8 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 
 	if(objectiveEndDel.IsBound())
 	{
-		// 수행도 전달
-		objectiveEndDel.Broadcast(successPercent);
+		// 목표 완료 딜리게이트 실행
+		objectiveEndDel.Broadcast();
 	}
 
 	// 성공 여부에 따라 함수 실행
@@ -151,4 +151,9 @@ void AJ_BaseMissionObjective::ObjectiveDeactive()
 	
 }
 
-
+void AJ_BaseMissionObjective::SetSuccessPercent(float value)
+{
+	successPercent = value;
+	// 점수 갱신 딜리게이트 실행
+	sendObjSuccessDel.Broadcast(this, SUCCESS_PERCENT);
+}

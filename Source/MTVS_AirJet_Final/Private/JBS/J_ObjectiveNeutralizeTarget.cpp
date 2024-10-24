@@ -3,6 +3,7 @@
 
 #include "JBS/J_ObjectiveNeutralizeTarget.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/HitResult.h"
 #include "JBS/J_GroundTarget.h"
@@ -73,12 +74,13 @@ void AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed()
 {
     destroyedTargetAmt++;
 
+    // 수행도 갱신
+    SUCCESS_PERCENT = static_cast<float>(destroyedTargetAmt) / spawnTargetAmt;
+
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("현재 파괴된 수 : %d, 남은 수 : %d"), destroyedTargetAmt, (spawnTargetAmt - destroyedTargetAmt)));
 
     if(destroyedTargetAmt == spawnTargetAmt)
     {
-        // 수행도
-        successPercent = 1.f;
         this->ObjectiveEnd(true);
     }
 }

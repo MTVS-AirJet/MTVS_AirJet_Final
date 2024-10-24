@@ -9,7 +9,7 @@
 #include "J_BaseMissionObjective.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, int, float)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float)
 DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate)
 DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate)
 
@@ -52,10 +52,12 @@ protected:
 	bool isObjectiveActive = false;
 		public:
 	__declspec(property(get = GetObjectiveActive, put = SetObjectiveActive)) bool IS_OBJECTIVE_ACTIVE;
+	UFUNCTION(BlueprintCallable)
 	virtual bool GetObjectiveActive()
 	{
 		return isObjectiveActive;
 	}
+	UFUNCTION(BlueprintCallable)
 	virtual void SetObjectiveActive(bool value);
 		protected:
 
@@ -68,14 +70,10 @@ protected:
 	{
 		return successPercent;
 	}
-	void SetSuccessPercent(float value)
-	{
-		successPercent = value;
-	}
-		protected:
+	void SetSuccessPercent(float value);
 
-
-public:
+    protected:
+    public:
 	// 명령 종류
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	ETacticalOrder orderType = ETacticalOrder::NONE;

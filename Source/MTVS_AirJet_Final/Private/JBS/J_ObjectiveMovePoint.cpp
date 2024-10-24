@@ -4,6 +4,7 @@
 #include "JBS/J_ObjectiveMovePoint.h"
 #include "Components/CapsuleComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 #include "Engine/HitResult.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_BaseMissionPawn.h"
@@ -69,7 +70,7 @@ void AJ_ObjectiveMovePoint::InitBeamVFX()
     }
 
     // 해당 포인트에서 상공 아주 높게 빔 생성
-    // @@ 임시로 디버그 라인 생성
+    // FIXME 임시로 디버그 라인 생성
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this,beamStartLoc,beamEndLoc]() mutable
     {
@@ -121,7 +122,7 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
     if(!value)
     {
         // 빔 이펙트 종료
-        // @@
+        // @@ VFx 로 변경하면 제거해야함
         GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
 }
