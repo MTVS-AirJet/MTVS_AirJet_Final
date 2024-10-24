@@ -48,7 +48,7 @@ private: // Component
 	class USkeletalMeshComponent* JetMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetArrow;
-	
+
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetFirstEngine;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
@@ -71,7 +71,7 @@ private: // Component
 	class UBoxComponent* JetEngineMaster2;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetJFSHandle;
-	
+
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -240,7 +240,7 @@ private:
 	// Zoom
 	bool IsZoomIn;
 	bool IsZoomOut;
-	
+
 	UPROPERTY(EditDefaultsOnly)
 	FVector ChangeMoveVector = FVector(0 , .5f , 0);
 	UPROPERTY(EditDefaultsOnly)
@@ -379,13 +379,13 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float ZoomInValue=25;
+	float ZoomInValue = 25;
 	UPROPERTY(EditDefaultsOnly)
-	float ZoomOutValue=140;
+	float ZoomOutValue = 140;
 
 private:
 	void CreateDumyComp();
-	
+
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyMICMesh;
 	bool bMIC;
@@ -396,7 +396,7 @@ private:
 	class UStaticMeshComponent* DummyEngineGenerMesh2;
 	bool bEngineGen1;
 	bool bEngineGen2;
-	
+
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyEngineControlMesh1;
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
@@ -418,4 +418,17 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyJFSHandleMesh;
 	bool bJFSHandle;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyThrottleMesh;
+	bool bThrottleAccel;
+	bool bThrottleBreak;
+	FVector ThrottleOffLoc = FVector(385 , -28 , 237);
+	FVector ThrottleMilLoc = FVector(395 , -28 , 237);
+	FVector ThrottleMaxLoc = FVector(405 , -28 , 237);
+	UPROPERTY(EditDefaultsOnly, Category="ThrottleSpeed")
+	float ThrottleMoveSpeed1 = .15f;
+	UPROPERTY(EditDefaultsOnly, Category="ThrottleSpeed")
+	float ThrottleMoveSpeed2 = .25f;
+	void SetAccelGear();
 };

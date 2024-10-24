@@ -66,8 +66,8 @@ AL_Viper::AL_Viper()
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(JetMesh);
-	JetFirstEngine->SetRelativeScale3D(FVector(.3f));
-	JetFirstEngine->SetRelativeLocation(FVector(390 , -25 , 240));
+	JetFirstEngine->SetRelativeScale3D(FVector(.1f));
+	JetFirstEngine->SetRelativeLocation(FVector(385 , -28 , 237));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
 	JetFirstEngine->SetHiddenInGame(false); // For Test
@@ -282,7 +282,10 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 {
 	if (!bFirstEngine)
 	{
-		LOG_SCREEN("Clicked!!");
+		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+		auto per = SizeValue * 25 / 100;
+		JetFirstEngine->SetRelativeLocation(FVector(ThrottleOffLoc.X + per , JetFirstEngine->GetRelativeLocation().Y ,
+		                                            JetFirstEngine->GetRelativeLocation().Z));
 		AccelGear = 1;
 		bFirstEngine = true;
 	}
@@ -408,7 +411,7 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	}
 }
 
-void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent, struct FKey ButtonPressed)
+void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	LOG_SCREEN("JFS 핸들 클릭");
 	if (!bJFSHandle)
@@ -565,30 +568,36 @@ void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
 
 void AL_Viper::F_ViperAccelStarted(const FInputActionValue& value)
 {
-	AccelGear++;
-	if (AccelGear > 3)
-		AccelGear = 3;
-	IsAccel = true;
+	if (!bThrottleBreak)
+		bThrottleAccel = true;
+	// AccelGear++;
+	// if (AccelGear > 3)
+	// 	AccelGear = 3;
+	// IsAccel = true;
 }
 
 void AL_Viper::F_ViperAccelCompleted(const FInputActionValue& value)
 {
-	KeyDownAccel = 0.f;
-	IsAccel = false;
+	bThrottleAccel = false;
+	// KeyDownAccel = 0.f;
+	// IsAccel = false;
 }
 
 void AL_Viper::F_ViperBreakStarted(const FInputActionValue& value)
 {
-	AccelGear--;
-	if (AccelGear < 0)
-		AccelGear = 0;
-	IsBreak = true;
+	if (!bThrottleAccel)
+		bThrottleBreak = true;
+	// AccelGear--;
+	// if (AccelGear < 0)
+	// 	AccelGear = 0;
+	// IsBreak = true;
 }
 
 void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 {
-	KeyDownAccel = 0.f;
-	IsBreak = false;
+	bThrottleBreak = false;
+	// KeyDownAccel = 0.f;
+	// IsBreak = false;
 }
 
 void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
@@ -723,32 +732,69 @@ void AL_Viper::Tick(float DeltaTime)
 	//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
 #pragma endregion
 
-#pragma region Change Accel Value
-	if (IsAccel)
-	{
-		KeyDownAccel += DeltaTime;
-		if (KeyDownAccel >= ChangeAccelTime)
-		{
-			KeyDownAccel = 0.f;
+#pragma region Change Accel Value (backUp)
+	// if (IsAccel)
+	// {
+	// 	KeyDownAccel += DeltaTime;
+	// 	if (KeyDownAccel >= ChangeAccelTime)
+	// 	{
+	// 		KeyDownAccel = 0.f;
+	//
+	// 		// 기어 변경
+	// 		AccelGear++;
+	// 		if (AccelGear > 3)
+	// 			AccelGear = 3;
+	// 	}
+	// }
+	// else if (IsBreak)
+	// {
+	// 	KeyDownAccel += DeltaTime;
+	// 	if (KeyDownAccel >= ChangeAccelTime)
+	// 	{
+	// 		KeyDownAccel = 0.f;
+	//
+	// 		// 기어 변경
+	// 		AccelGear--;
+	// 		if (AccelGear < 0)
+	// 			AccelGear = 0;
+	// 	}
+	// }
+#pragma endregion
 
-			// 기어 변경
-			AccelGear++;
-			if (AccelGear > 3)
-				AccelGear = 3;
+#pragma region Change Accel Value2
+	FVector engineLoc = JetFirstEngine->GetRelativeLocation();
+	if (bThrottleAccel)
+	{
+		if (engineLoc.X < ThrottleMilLoc.X)
+		{
+			auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 		}
+		else if (engineLoc.X < ThrottleMaxLoc.X)
+		{
+			auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
+			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+		}
+		SetAccelGear();
 	}
-	else if (IsBreak)
-	{
-		KeyDownAccel += DeltaTime;
-		if (KeyDownAccel >= ChangeAccelTime)
-		{
-			KeyDownAccel = 0.f;
 
-			// 기어 변경
-			AccelGear--;
-			if (AccelGear < 0)
-				AccelGear = 0;
+	if (bThrottleBreak)
+	{
+		if (engineLoc.X > ThrottleMilLoc.X)
+		{
+			auto newEngineX = engineLoc.X - ThrottleMoveSpeed2;
+			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
+			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 		}
+		else if (engineLoc.X > ThrottleOffLoc.X)
+		{
+			auto newEngineX = engineLoc.X - ThrottleMoveSpeed1;
+			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+		}
+		SetAccelGear();
 	}
 #pragma endregion
 
@@ -1169,4 +1215,26 @@ void AL_Viper::CreateDumyComp()
 	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
 	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
 	DummyJFSHandleMesh->SetRelativeScale3D(FVector(.5f));
+
+	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
+	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
+	DummyThrottleMesh->SetRelativeScale3D(FVector(.5f));
+}
+
+void AL_Viper::SetAccelGear()
+{
+	// 기어 변동 구간
+	// 0%, 50%, 90%
+	auto currAccelGear = JetFirstEngine->GetRelativeLocation().X;
+	auto currValue = currAccelGear - ThrottleOffLoc.X;
+	auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+	auto per = currValue / SizeValue * 100;
+	if (per <= 0)
+		AccelGear = 0;
+	else if (per <= 50)
+		AccelGear = 1;
+	else if (per <= 90)
+		AccelGear = 2;
+	else
+		AccelGear = 3;
 }
