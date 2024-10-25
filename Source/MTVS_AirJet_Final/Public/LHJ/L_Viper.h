@@ -229,7 +229,7 @@ private: // Input
 private:
 	bool bFirstEngine;
 	// For Engine Using
-	UPROPERTY(EditDefaultsOnly, Category="Engine")
+	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsEngineOn;
 	// For Change Arrow Rotate
 	float CurrentTime;
@@ -441,11 +441,13 @@ private:
 	// 시동 절차
 	std::queue<FString> StartScenario;
 	void PushQueue();
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsStart;
-	UPROPERTY(EditDefaultsOnly , Category="CanFly")
+	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
-	int32 intTriggerNum = 0;	// 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
+	int32 intTriggerNum = 0; // 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
 	UFUNCTION()
-	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
+	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+	                     const FHitResult& SweepResult);
 };
