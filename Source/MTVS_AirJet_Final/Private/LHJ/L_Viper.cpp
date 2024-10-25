@@ -666,9 +666,8 @@ void AL_Viper::F_ViperTurnLeftCompleted(const FInputActionValue& value)
 
 void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
 {
-	SetActorRotation(FRotator(0 , 0 , 0));
-	SetActorRelativeRotation(FRotator(0 , 0 , 0));
-	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
+	SetActorRotation(FRotator(0 , JetMesh->GetComponentRotation().Yaw , 0));
+	JetArrow->SetRelativeRotation(FRotator(0 , JetArrow->GetRelativeRotation().Yaw , 0));
 }
 
 void AL_Viper::F_ViperAccelStarted(const FInputActionValue& value)
