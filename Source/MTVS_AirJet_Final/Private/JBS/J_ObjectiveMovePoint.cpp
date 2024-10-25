@@ -100,7 +100,6 @@ void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     {
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이동 목표 성공"));
         // 수행도 1
-        // FIXME 이거 프로퍼티 안되는 것 부터 시작 성공 퍼센트 갱신을 따로 딜리게이트로 하려했음.
         SUCCESS_PERCENT = 1.f;
         this->ObjectiveEnd(true);
     }   

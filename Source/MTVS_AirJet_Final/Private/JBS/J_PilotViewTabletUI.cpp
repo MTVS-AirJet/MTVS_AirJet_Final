@@ -94,13 +94,13 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
         curHBox->RemoveChildAt(spaceIdx);
     }
 
-    // @@ 딜리게이트, text 설정 등 init 하기
+    // XXX 딜리게이트, text 설정 등 init 하기
 }
 
 void UJ_PilotViewTabletUI::AddPlayerSlot(TArray<FString> playerIdAry)
 {
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%d 번 생성할게"), tempPlayerIds.Num()));
-    // FIXME 테스트용으로 자체 변수 사용
+    // XXX 테스트용으로 자체 변수 사용
     for(FString playerId : tempPlayerIds)
     {
         AddPlayerSlot(playerId);

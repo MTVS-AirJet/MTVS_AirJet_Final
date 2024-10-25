@@ -119,9 +119,9 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawn
     return spPoint;
 }
 
+// XXX 이제 안쓰니깐 산개 로직 미적용
 FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role)
 {
-    // FIXME 나중에 여러 파일럿일때 적절히 산개시키는 로직 추가해야함
     auto tr = this->GetSpawnPoint(role)->GetActorTransform();
 
     return tr;

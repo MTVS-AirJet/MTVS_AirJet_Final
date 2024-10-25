@@ -32,7 +32,7 @@ void AJ_PilotViewTablet::BeginPlay()
 
 	// ui 가져오기
 	tabletUI = Cast<UJ_PilotViewTabletUI>(tabletUIComp->GetWidget());
-	// FIXME 테스트용 플레이어 슬롯 ui 생성
+	// XXX 테스트용 플레이어 슬롯 ui 생성
 	AddPlayerSlotUI(TArray<FString>());
 
 	// 화면 시청 시작
@@ -52,7 +52,7 @@ void AJ_PilotViewTablet::StartViewScreenShare()
 		UGameplayStatics::GetActorOfClass(GetWorld(), AJ_StreamingActor::StaticClass()));
 	if(tempSA)
 	{
-		//  @@ 유저 id 갱신?
+		//  XXX 유저 id 갱신?
 		
 		//해당 액터로 뭔가 하기
 		// 시청 시작

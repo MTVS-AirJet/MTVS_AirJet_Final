@@ -42,7 +42,12 @@ TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
     TArray<APawn*> allPawns;
     Algo::Transform(this->PlayerArray, allPawns, [](TObjectPtr<APlayerState> temp){
         check(temp);
-        return temp->GetPlayerController()->GetPawn();
+        auto* tempPC = temp->GetPlayerController();
+        check(tempPC);
+        auto* tempPawn = tempPC->GetPawn();
+        check(tempPawn);
+
+        return tempPawn;
     });
     
     return allPawns;
