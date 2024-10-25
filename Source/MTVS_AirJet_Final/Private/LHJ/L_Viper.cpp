@@ -1012,8 +1012,6 @@ void AL_Viper::Tick(float DeltaTime)
 		IsLockOn();
 #pragma endregion
 
-		ChangeBooster();
-
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
 		{
@@ -1025,9 +1023,11 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 #pragma endregion
 	}
-	
+
 	if (IsLocallyControlled())
 	{
+		ChangeBooster();
+
 #pragma region 고도계
 		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
 		float CurrFeet = CurrHeight / 30.48; // cm to feet
