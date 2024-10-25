@@ -32,26 +32,29 @@ void AL_Missile::BeginPlay()
 {
 	Super::BeginPlay();
 
-#pragma region TimeLine Settings
-	FOnTimelineFloat ProgressUpdate;
-	ProgressUpdate.BindUFunction(this , FName("MissileUpdate"));
-
-	FOnTimelineEvent FinishedEvent;
-	FinishedEvent.BindUFunction(this , FName("MissileFinished"));
-
-	MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
-	MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
-#pragma endregion
-
-	if (auto viper = Cast<AL_Viper>(GetOwner()))
+	if(HasAuthority())
 	{
-		Target = viper->LockOnTarget;
-		MoveLoc.Add(viper->GetActorLocation());
-		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-		MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
-		MoveLoc.Add(Target->GetActorLocation());
+#pragma region TimeLine Settings
+		FOnTimelineFloat ProgressUpdate;
+		ProgressUpdate.BindUFunction(this , FName("MissileUpdate"));
 
-		MissileTimeline.Play();
+		FOnTimelineEvent FinishedEvent;
+		FinishedEvent.BindUFunction(this , FName("MissileFinished"));
+
+		MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
+		MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
+#pragma endregion
+		
+		if (auto viper = Cast<AL_Viper>(GetOwner()))
+		{
+			Target = viper->LockOnTarget;
+			MoveLoc.Add(viper->GetActorLocation());
+			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+			MoveLoc.Add(viper->MissileMoveLoc->GetComponentLocation());
+			MoveLoc.Add(Target->GetActorLocation());
+
+			MissileTimeline.Play();
+		}
 	}
 }
 
@@ -59,18 +62,28 @@ void AL_Missile::BeginPlay()
 void AL_Missile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (!bPursuit)
-		MissileTimeline.TickTimeline(DeltaTime);
-	else
+	if(HasAuthority())
 	{
-		FVector P0 = GetActorLocation();
-		FVector v = (Target->GetActorLocation() - P0);
-		v.Normalize();
-		FVector vt = v * MoveSpeed * DeltaTime;
+		if (!bPursuit)
+			MissileTimeline.TickTimeline(DeltaTime);
+		else
+		{
+			if(!Target->IsPendingKillPending())
+			{
+				FVector P0 = GetActorLocation();
+				FVector v = (Target->GetActorLocation() - P0);
+				v.Normalize();
+				FVector vt = v * MoveSpeed * DeltaTime;
 
-		this->SetActorLocation(P0 + vt);
-		this->SetActorRotation(v.Rotation());
-	}
+				this->SetActorLocation(P0 + vt);
+				this->SetActorRotation(v.Rotation());
+			}
+			else
+			{
+				this->Destroy();
+			}
+		}
+	}	
 }
 
 void AL_Missile::MissileUpdate(float Alpha)

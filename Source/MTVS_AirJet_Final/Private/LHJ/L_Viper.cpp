@@ -839,7 +839,11 @@ void AL_Viper::Tick(float DeltaTime)
 			}
 		}
 		else
+		{
+			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
+		}
 	}
 	// 운행 단계
 	else
@@ -1004,55 +1008,11 @@ void AL_Viper::Tick(float DeltaTime)
 		JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
 
-		if (IsLocallyControlled())
-		{
-#pragma region 고도계
-			float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
-			float CurrFeet = CurrHeight / 30.48; // cm to feet
-			if (CurrFeet < 0)
-				CurrFeet = 0;
-
-			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
-			{
-				HUDui->UpdateHeightBar(CurrFeet);
-			}
-#pragma endregion
-
-#pragma region 속도계
-			int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
-			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
-			{
-				HUDui->UpdateHeightText(ValueOfMoveForceInNote);
-			}
-#pragma endregion
-
 #pragma region LockOn
-			IsLockOn();
+		IsLockOn();
 #pragma endregion
 
-			ChangeBooster();
-
-#pragma region Zoom In/Out
-			if (JetCameraFPS->IsActive())
-			{
-				if (IsZoomIn)
-				{
-					// 현재 FieldOfView 수치와 줌 인 수치(25)를 Lerp해서 적용
-					float currViewValue = JetCameraFPS->FieldOfView;
-					float newViewValue = FMath::Lerp(currViewValue , ZoomInValue , DeltaTime);
-					JetCameraFPS->SetFieldOfView(newViewValue);
-				}
-
-				if (IsZoomOut)
-				{
-					// 현재 FieldOfView 수치와 줌 아웃 수치(140)를 Lerp해서 적용
-					float currViewValue = JetCameraFPS->FieldOfView;
-					float newViewValue = FMath::Lerp(currViewValue , ZoomOutValue , DeltaTime);
-					JetCameraFPS->SetFieldOfView(newViewValue);
-				}
-			}
-#pragma endregion
-		}
+		ChangeBooster();
 
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
@@ -1064,27 +1024,71 @@ void AL_Viper::Tick(float DeltaTime)
 			JetFlareArrow2->SetRelativeRotation(newFlareRot);
 		}
 #pragma endregion
+	}
+	
+	if (IsLocallyControlled())
+	{
+#pragma region 고도계
+		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
+		float CurrFeet = CurrHeight / 30.48; // cm to feet
+		if (CurrFeet < 0)
+			CurrFeet = 0;
 
-#pragma region Recover CameraArm Rotation
-		if (!IsRotateTrigger)
+		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
 		{
-			if (JetCamera->IsActive())
+			HUDui->UpdateHeightBar(CurrFeet);
+		}
+#pragma endregion
+
+#pragma region 속도계
+		int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
+		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+		{
+			HUDui->UpdateHeightText(ValueOfMoveForceInNote);
+		}
+#pragma endregion
+
+#pragma region Zoom In/Out
+		if (JetCameraFPS->IsActive())
+		{
+			if (IsZoomIn)
 			{
-				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-				//FRotator(-10 , 0 , 0)
-				auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-				JetSprintArm->SetRelativeRotation(lerpTPSrot);
+				// 현재 FieldOfView 수치와 줌 인 수치(25)를 Lerp해서 적용
+				float currViewValue = JetCameraFPS->FieldOfView;
+				float newViewValue = FMath::Lerp(currViewValue , ZoomInValue , DeltaTime);
+				JetCameraFPS->SetFieldOfView(newViewValue);
 			}
-			else
+
+			if (IsZoomOut)
 			{
-				FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-				//FRotator(-30 , 0 , 0)
-				auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-				JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+				// 현재 FieldOfView 수치와 줌 아웃 수치(140)를 Lerp해서 적용
+				float currViewValue = JetCameraFPS->FieldOfView;
+				float newViewValue = FMath::Lerp(currViewValue , ZoomOutValue , DeltaTime);
+				JetCameraFPS->SetFieldOfView(newViewValue);
 			}
 		}
 #pragma endregion
 	}
+
+#pragma region Recover CameraArm Rotation
+	if (!IsRotateTrigger)
+	{
+		if (JetCamera->IsActive())
+		{
+			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+			//FRotator(-10 , 0 , 0)
+			auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
+			JetSprintArm->SetRelativeRotation(lerpTPSrot);
+		}
+		else
+		{
+			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+			//FRotator(-30 , 0 , 0)
+			auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+			JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+		}
+	}
+#pragma endregion
 }
 
 #pragma region Get Force
@@ -1325,10 +1329,8 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 		{
 			for (auto hit : OutHit)
 			{
-				LOG_S(Warning, TEXT("%s"), *hit.GetActor()->GetName());
-				if(auto mai=Cast<IJ_MissionActorInterface>(hit.GetActor()))
+				if (auto mai = Cast<IJ_MissionActorInterface>(hit.GetActor()))
 				{
-					
 					MulticastRPCLockOn(hit.GetActor());
 				}
 				// if (hit.GetActor()->ActorHasTag("target"))
