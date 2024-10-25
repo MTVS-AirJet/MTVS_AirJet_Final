@@ -18,6 +18,7 @@
 #include "LHJ/L_Flare.h"
 #include "LHJ/L_HUDWidget.h"
 #include "LHJ/L_Missile.h"
+#include "LHJ/L_RoadTrigger.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -32,7 +33,7 @@ AL_Viper::AL_Viper()
 	JetRoot->SetRelativeScale3D(FVector(10.f , 1.f , 2.f));
 	JetRoot->SetSimulatePhysics(true);
 	JetRoot->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	JetRoot->OnComponentBeginOverlap.AddDynamic(this, &AL_Viper::OnMyMeshOverlap);
+	JetRoot->OnComponentBeginOverlap.AddDynamic(this , &AL_Viper::OnMyMeshOverlap);
 
 	// 공기저항
 	JetRoot->SetLinearDamping(1.f);
@@ -226,10 +227,23 @@ void AL_Viper::PushQueue()
 	StartScenario.push("Throttle");
 }
 
-void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
+                               UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+                               const FHitResult& SweepResult)
 {
-	LOG_SCREEN("%s", *OtherActor->GetName());
+	LOG_SCREEN("%s" , *OtherActor->GetName());
+	if (auto RT = Cast<AL_RoadTrigger>(OtherActor))
+	{
+		if (RT->TriggerIdx == 0)
+		{
+			intTriggerNum = 1;
+		}
+		else if (RT->TriggerIdx == 1)
+		{
+			intTriggerNum = 2;
+			IsFlyStart = true;
+		}
+	}
 }
 
 void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -971,22 +985,64 @@ void AL_Viper::Tick(float DeltaTime)
 		SetAccelGear();
 		if (bThrottleAccel)
 		{
-			if (engineLoc.X < ThrottleMilLoc.X)
+			if (intTriggerNum == 0)
 			{
-				auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
-				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-				if (ThrottleMilLoc.X - newEngineX < 0.2)
-					JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
-				else
+				auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+				auto per = SizeValue * 25 / 100;
+				FVector VecTrigger0 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+				if (engineLoc.X < VecTrigger0.X)
+				{
+					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
+					if (VecTrigger0.X - newEngineX < 0.2)
+						JetFirstEngine->SetRelativeLocation(VecTrigger0);
+					else
+						JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				}
+			}
+			else if (intTriggerNum == 1)
+			{
+				auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+				auto per = SizeValue * 80 / 100;
+				FVector VecTrigger1 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+				
+				if (engineLoc.X < ThrottleMilLoc.X)
+				{
+					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+					if (ThrottleMilLoc.X - newEngineX < 0.2)
+						JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
+					else
+						JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				}
+				if (engineLoc.X < VecTrigger1.X)
+				{
+					auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
+					if (VecTrigger1.X - newEngineX < 0.2)
+						JetFirstEngine->SetRelativeLocation(VecTrigger1);
+					else
+						JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				}
+			}
+			else if (intTriggerNum == 2)
+			{
+				if (engineLoc.X < ThrottleMilLoc.X)
+				{
+					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+					if (ThrottleMilLoc.X - newEngineX < 0.2)
+						JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
+					else
+						JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				}
+				else if (engineLoc.X < ThrottleMaxLoc.X)
+				{
+					auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
 					JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				}
 			}
-			else if (engineLoc.X < ThrottleMaxLoc.X)
-			{
-				auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
-				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-			}
-			// SetAccelGear();
 		}
 
 		if (bThrottleBreak)
@@ -1006,7 +1062,6 @@ void AL_Viper::Tick(float DeltaTime)
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
-			// SetAccelGear();
 		}
 #pragma endregion
 
