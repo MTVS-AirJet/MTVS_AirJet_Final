@@ -5,6 +5,8 @@
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/PlayerController.h"
+#include "JBS/J_GroundTarget.h"
+#include "JBS/J_MissionActorInterface.h"
 #include "JBS/J_TacticalViewMonitor.h"
 #include "Kismet/GameplayStatics.h"
 

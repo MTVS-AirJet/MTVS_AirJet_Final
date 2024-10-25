@@ -115,7 +115,7 @@ void AJ_BaseMissionPawn::StartScreenShare()
 	curStreamer->StartStreaming();
 
 
-	// @@ 생각해보니 SA 사실상 컴포넌트 처럼 작동하는데 아예 컴포넌트화 해도 되지않을까? 화면공유 컴포넌트 마냥, findorcreate해서 프리팹에 있으면 그걸로 하고 없으면 컴포넌트 생성하는 식으로
+	// XXX 생각해보니 SA 사실상 컴포넌트 처럼 작동하는데 아예 컴포넌트화 해도 되지않을까? 화면공유 컴포넌트 마냥, findorcreate해서 프리팹에 있으면 그걸로 하고 없으면 컴포넌트 생성하는 식으로
 }
 
 FString AJ_BaseMissionPawn::GetSessionId()
@@ -143,7 +143,7 @@ FString AJ_BaseMissionPawn::GetSessionId()
 AK_StreamingActor *AJ_BaseMissionPawn::GetStreamActor()
 {
 	// 없으면 맵에서 찾아오기
-	// @@ 컴포넌트 화 할꺼면 자기 꺼에서 찾겠지
+	// XXX 컴포넌트 화 할꺼면 자기 꺼에서 찾겠지
 	if(!streamActor)
 	{
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("SA 찾아오기"));

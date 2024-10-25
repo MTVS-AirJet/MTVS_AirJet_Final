@@ -29,4 +29,8 @@ public:
     void AddStreamUserId(const FString &userId);
     // 스트리밍 유저 id 제거 | ServerRPC_SetStreamingPlayer_Implementation 에서 하던것 여기로 이동함
     void RemoveStreamUserId(const FString &userId);
+
+    // @@ 아마 나중에 캐스팅 필요할지도
+    // 현재 레벨 모든 플레이어 폰 가져오기
+    virtual TArray<class APawn *> GetAllPlayerPawn();
 };

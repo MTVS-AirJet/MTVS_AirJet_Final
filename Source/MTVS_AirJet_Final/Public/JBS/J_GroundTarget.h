@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "JBS/J_MissionActorInterface.h"
 #include "J_GroundTarget.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FDestroyedTargetDelegate)
+
 UCLASS()
-class MTVS_AIRJET_FINAL_API AJ_GroundTarget : public ACharacter
+class MTVS_AIRJET_FINAL_API AJ_GroundTarget : public ACharacter, public IJ_MissionActorInterface
 {
 	GENERATED_BODY()
 
@@ -26,12 +29,24 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 protected:
+	
 
+	// 디버그용 타이머 자괴
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool debugDestroySelf = false;
 
 public:
+	// 파괴 딜리게이트
+	FDestroyedTargetDelegate destroyedDelegate;
 
 protected:
-
+	// 파괴
+    void Death();
 
 public:
+	// 피격
+    virtual void GetDamage(AActor *attacker = nullptr, FVector hitPoint = FVector::ZeroVector,
+                           FVector hitNormal = FVector::ZeroVector);
+
+	
 };

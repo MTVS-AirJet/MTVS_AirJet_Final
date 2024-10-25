@@ -78,7 +78,7 @@ void AJ_MissionPlayerController::SpawnMyPlayer()
 
 void AJ_MissionPlayerController::SRPC_SpawnMyPlayer_Implementation(TSubclassOf<class APawn> playerPrefab)
 {
-    // FIXME spawnTR 게임모드에서 역할에 맞는 위치 가져올 수 있도록 해야할 듯
+    // 자기 역할에 맞는 스폰 위치 가져오기
     auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
     FTransform spawnTR = gm->GetPlayerSpawnTransfrom(playerRole);
     // 항상 생성

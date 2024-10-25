@@ -2,9 +2,14 @@
 
 
 #include "JBS/J_BaseMissionObjective.h"
+#include "Components/ArrowComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/StaticMesh.h"
 #include "JBS/J_Utility.h"
+#include "Materials/Material.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AJ_BaseMissionObjective::AJ_BaseMissionObjective()
@@ -14,6 +19,37 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 
 	rootComp = CreateDefaultSubobject<USceneComponent>(TEXT("rootComp"));
 	SetRootComponent(rootComp);
+
+	sphereComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sphereComp"));
+
+	// 메시 및 머티리얼 로드
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSphere(
+		TEXT("/Script/Engine.StaticMesh'/Engine/EngineMeshes/Sphere.Sphere'"));
+	// 로드 성공시
+	if(tempSphere.Succeeded())
+	{
+		sphereComp->SetStaticMesh(tempSphere.Object);
+
+		// 머티리얼 가져오기
+		ConstructorHelpers::FObjectFinder<UMaterialInterface> tempBasicMat(
+			TEXT("/Script/Engine.Material'/Engine/MapTemplates/Materials/BasicAsset01.BasicAsset01'"));
+		// 로드 성공시
+		if(tempBasicMat.Succeeded())
+		{
+			sphereComp->SetMaterial(0, tempBasicMat.Object);
+		}
+	}
+	// 게임에서 숨기기
+	sphereComp->SetHiddenInGame(true);
+
+	sphereComp->SetupAttachment(rootComp);
+
+	forWComp = CreateDefaultSubobject<UArrowComponent>(TEXT("forWComp"));
+	forWComp->SetupAttachment(sphereComp);
+	forWComp->SetArrowSize(15.f);
+	forWComp->SetArrowLength(75.f);
+
+
 
 	iconWorldUIComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("iconWorldUIComp"));
 	iconWorldUIComp->SetupAttachment(RootComponent);
@@ -73,6 +109,7 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 
 	if(objectiveEndDel.IsBound())
 	{
+		// 목표 완료 딜리게이트 실행
 		objectiveEndDel.Broadcast();
 	}
 
@@ -114,4 +151,9 @@ void AJ_BaseMissionObjective::ObjectiveDeactive()
 	
 }
 
-
+void AJ_BaseMissionObjective::SetSuccessPercent(float value)
+{
+	successPercent = value;
+	// 점수 갱신 딜리게이트 실행
+	sendObjSuccessDel.Broadcast(this, SUCCESS_PERCENT);
+}

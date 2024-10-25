@@ -321,6 +321,45 @@ struct FMissionPlayerSpawnPoints
     // TSubclassOf<AActor> spawnPointPrefab;
 };
 
+USTRUCT(BlueprintType)
+struct FObjectiveData
+{
+    GENERATED_BODY()
+public:
+    // 목표 액터
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    class AJ_BaseMissionObjective* objectiveActor = nullptr;
+    // 목표 수행도 | 목표 완료시 갱신됨
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float successPercent = 0.f;
+};
+
+// 편대 역할
+UENUM(BlueprintType)
+enum class EPilotRole : uint8
+{
+    WING_COMMANDER = 0
+    ,LEFT_WINGER = 1
+    ,RIGHT_WINGER = 2
+};
+
+// 편대 비행 델타 용 값 | 삼각형 조건
+USTRUCT(BlueprintType)
+struct FFormationValue
+{
+    GENERATED_BODY()
+    
+    // 시작 지점 + forv 할 리더 위치
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float height = 200.f;
+    // 밑변 길이
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float baseLength = 1220.f;
+    // 빗변 길이
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float sideLength = 681.f;
+};
+
 #pragma endregion
 
 // @@ 테스트 용

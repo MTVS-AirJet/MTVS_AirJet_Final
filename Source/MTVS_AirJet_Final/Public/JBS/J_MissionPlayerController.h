@@ -23,8 +23,9 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	// FTransform spawnTR;
 
-
-	
+	// 디버그용 인풋 사용 유무
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enableDebugInput = false;
 
 public:
 
@@ -48,5 +49,4 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnMyPlayer();
-	
 };
