@@ -930,6 +930,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 #pragma region Change Accel Value2
 		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
+		SetAccelGear();
 		if (bThrottleAccel)
 		{
 			if (engineLoc.X < ThrottleMilLoc.X)
@@ -944,7 +945,7 @@ void AL_Viper::Tick(float DeltaTime)
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
 				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
-			SetAccelGear();
+			// SetAccelGear();
 		}
 
 		if (bThrottleBreak)
@@ -961,7 +962,7 @@ void AL_Viper::Tick(float DeltaTime)
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
-			SetAccelGear();
+			// SetAccelGear();
 		}
 #pragma endregion
 
