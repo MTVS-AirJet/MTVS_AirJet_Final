@@ -1,22 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JBS/J_NeutralizeTarget.h"
+#include "JBS/J_ObjectiveNeutralizeTarget.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/HitResult.h"
 #include "JBS/J_GroundTarget.h"
 #include "Math/MathFwd.h"
 #include <cfloat>
 
-void AJ_NeutralizeTarget::BeginPlay()
+void AJ_ObjectiveNeutralizeTarget::BeginPlay()
 {
     Super::BeginPlay();
 
-    objectiveActiveDel.AddUObject(this, &AJ_NeutralizeTarget::SpawnGroundTarget);
+    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget);
 }
 
-FTransform AJ_NeutralizeTarget::CalcSpawnTransform()
+FTransform AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform()
 {
     // 아래로 레이 쏴서 지면 포인트 찾기
     FHitResult outHit;
@@ -55,7 +56,7 @@ FTransform AJ_NeutralizeTarget::CalcSpawnTransform()
 }
 
 // 활성화 딜리게이트에서 실행됨
-void AJ_NeutralizeTarget::SpawnGroundTarget()
+void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
 {
     // 스폰 위치 계산
     spawnTR = CalcSpawnTransform();
@@ -64,14 +65,17 @@ void AJ_NeutralizeTarget::SpawnGroundTarget()
     for(int i = 0; i < spawnTargetAmt; i++)
     {
         auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
-        // FIXME 이녀석 파괴 딜리게이트에 함수 넣기
-        // CountTargetDestroyed
+        // 파괴 딜리게이트에 함수 넣기
+        groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
     }
 }
 
-void AJ_NeutralizeTarget::CountTargetDestroyed()
+void AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed()
 {
     destroyedTargetAmt++;
+
+    // 수행도 갱신
+    SUCCESS_PERCENT = static_cast<float>(destroyedTargetAmt) / spawnTargetAmt;
 
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("현재 파괴된 수 : %d, 남은 수 : %d"), destroyedTargetAmt, (spawnTargetAmt - destroyedTargetAmt)));
 
@@ -81,7 +85,7 @@ void AJ_NeutralizeTarget::CountTargetDestroyed()
     }
 }
 
-void AJ_NeutralizeTarget::Tick(float deltaTime)
+void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
 

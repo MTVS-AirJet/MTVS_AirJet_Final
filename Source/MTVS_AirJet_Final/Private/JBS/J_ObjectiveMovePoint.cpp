@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JBS/J_MissionObjectiveMovePoint.h"
+#include "JBS/J_ObjectiveMovePoint.h"
 #include "Components/CapsuleComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
 #include "Engine/HitResult.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_BaseMissionPawn.h"
@@ -11,7 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 
-AJ_MissionObjectiveMovePoint::AJ_MissionObjectiveMovePoint() : AJ_BaseMissionObjective()
+AJ_ObjectiveMovePoint::AJ_ObjectiveMovePoint() : AJ_BaseMissionObjective()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,17 +22,21 @@ AJ_MissionObjectiveMovePoint::AJ_MissionObjectiveMovePoint() : AJ_BaseMissionObj
     checkCapsuleComp->SetCapsuleHalfHeight(40000);
 }
 
-void AJ_MissionObjectiveMovePoint::BeginPlay()
+void AJ_ObjectiveMovePoint::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 오버랩 바인드
-    checkCapsuleComp->OnComponentBeginOverlap.AddDynamic( this, &AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap);
+    checkCapsuleComp->SetCapsuleHalfHeight(beamLength);
+    checkCapsuleComp->SetCapsuleRadius(beamRadius);
 
-    objectiveActiveDel.AddUObject(this, &AJ_MissionObjectiveMovePoint::InitBeamVFX);
+
+    // 오버랩 바인드
+    checkCapsuleComp->OnComponentBeginOverlap.AddDynamic( this, &AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap);
+
+    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveMovePoint::InitBeamVFX);
 }
 
-void AJ_MissionObjectiveMovePoint::InitBeamVFX()
+void AJ_ObjectiveMovePoint::InitBeamVFX()
 {
     // 내 위치 아래에 ray 쏴서 바닥 가져오기
     FHitResult outHit;
@@ -65,7 +70,7 @@ void AJ_MissionObjectiveMovePoint::InitBeamVFX()
     }
 
     // 해당 포인트에서 상공 아주 높게 빔 생성
-    // @@ 임시로 디버그 라인 생성
+    // FIXME 임시로 디버그 라인 생성
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this,beamStartLoc,beamEndLoc]() mutable
     {
@@ -84,7 +89,7 @@ void AJ_MissionObjectiveMovePoint::InitBeamVFX()
     GEngine->AddOnScreenDebugMessage(-1, 22, FColor::Green, FString::Printf(TEXT("빔 생성 %s"), isHit ? TEXT("성공") : TEXT("실패")));
 }
 
-void AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
+void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     UPrimitiveComponent *OverlappedComponent,
     AActor *OtherActor, UPrimitiveComponent *OtherComp,
     int32 OtherBodyIndex, bool bFromSweep,
@@ -94,17 +99,20 @@ void AJ_MissionObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     if(OtherActor->IsA<AJ_BaseMissionPawn>())
     {
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이동 목표 성공"));
-        
+        // 수행도 1
+        SUCCESS_PERCENT = 1.f;
         this->ObjectiveEnd(true);
     }   
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("암튼 뭔가 충돌함 %s"), *OtherActor->GetName()));
 }
 
-void AJ_MissionObjectiveMovePoint::ObjectiveEnd(bool isSuccess)
+void AJ_ObjectiveMovePoint::ObjectiveEnd(bool isSuccess)
 {
     Super::ObjectiveEnd(isSuccess);
 }
 
-void AJ_MissionObjectiveMovePoint::SetObjectiveActive(bool value)
+void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
 {
     Super::SetObjectiveActive(value);
 
@@ -113,7 +121,16 @@ void AJ_MissionObjectiveMovePoint::SetObjectiveActive(bool value)
     if(!value)
     {
         // 빔 이펙트 종료
-        // @@
+        // @@ VFx 로 변경하면 제거해야함
         GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
+}
+
+void AJ_ObjectiveMovePoint::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d"), checkCapsuleComp->IsActive()));
+    
+    
 }

@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionObjective.h"
-#include "J_NeutralizeTarget.generated.h"
+#include "J_ObjectiveNeutralizeTarget.generated.h"
 
 /**
  * 
  */
+
+
 UCLASS()
-class MTVS_AIRJET_FINAL_API AJ_NeutralizeTarget : public AJ_BaseMissionObjective
+class MTVS_AIRJET_FINAL_API AJ_ObjectiveNeutralizeTarget : public AJ_BaseMissionObjective
 {
 	GENERATED_BODY()
 protected:
@@ -23,12 +25,14 @@ protected:
 	int spawnTargetAmt = 1;
 
 	// 스폰 지점
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FTransform spawnTR;
 
 	// 파괴 카운트
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	int destroyedTargetAmt = 0;
+
+	
 public:
 
 protected:

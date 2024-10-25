@@ -90,11 +90,14 @@ FTransform FJVector2D::GetTransform() const
     float mapX = FMath::Lerp(minValue, maxValue, this->x / 100.f);
     float mapY = FMath::Lerp(minValue, maxValue, this->y / 100.f);
     float mapZ = UJ_Utility::defaultMissionObjectHeight;
+    // 위치 값
+    FVector vec(mapX, mapY, mapZ);
+    // @@ 회전 값 | 임시로 0,0,mapZ 를 바라보도록 | 받아와야 할지도?
+    FVector targetLoc(0,0,mapZ);
+    FRotator rot = (targetLoc - vec).GetSafeNormal().Rotation();
 
-    FVector vec = FVector(mapX, mapY, mapZ);
     
-    // @@ 회전 값 받도록 요청해야 할 지도?
-    FTransform tr = FTransform(FRotator::ZeroRotator,vec,  FVector::OneVector);
+    FTransform tr = FTransform(rot,vec,  FVector::OneVector);
 
     return tr;
 }

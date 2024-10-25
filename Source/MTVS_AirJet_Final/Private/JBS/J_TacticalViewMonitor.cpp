@@ -53,7 +53,7 @@ void AJ_TacticalViewMonitor::Tick(float DeltaTime)
 
 void AJ_TacticalViewMonitor::SetMapFov(float value)
 {
-	// @@ 지도 확대 축소 로직 커서 위치에 맞게 옮겨가면 좋을듯
+	// XXX 지도 확대 축소 로직 커서 위치에 맞게 옮겨가면 좋을듯
 
 	// 일단 임시로 value / 100 을 alpha 값에 넣는 식으로
 	fovPercent += value / 100.f;

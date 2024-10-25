@@ -36,6 +36,31 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
     bool enableUsingDummyMissionData = false;
 
+    // 디버그용 옛날 스폰 시스템 사용
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+    bool enableUseOldSpawnSystem = false;
+
+    // 시작 지점 액터 프리팹
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+    TSubclassOf<class AJ_MissionStartPointActor> startPointActorPrefab;
+    // 시작 지점 액터
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects", BlueprintGetter=GetStartPointActor, BlueprintSetter=SetStartPointActor)
+    class AJ_MissionStartPointActor* startPointActor;
+        public:
+    __declspec(property(get = GetStartPointActor, put = SetStartPointActor)) class AJ_MissionStartPointActor* START_POINT_ACTOR;
+    UFUNCTION(BlueprintGetter)
+    class AJ_MissionStartPointActor *GetStartPointActor();
+    UFUNCTION(BlueprintSetter)
+    void SetStartPointActor(class AJ_MissionStartPointActor* value)
+    {
+        startPointActor = value;
+    }
+        protected:
+
+    // 편대 진형 데이터
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FFormationValue formationData;
+
 public:
     // 로드할 미션 맵 이름
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -59,6 +84,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
     FMissionDataRes dummyMissionData;
 
+    int pIdx = 0;
+
 protected:
     virtual void BeginPlay() override;
 
@@ -77,7 +104,17 @@ protected:
     // 스폰 포인트 액터 추가
     class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole);
 
-    int pIdx = 0;
+    // 1. 미션 시작지점 액터 추가
+    void InitMissionStartPoint(const FMissionStartPos &startPointData);
+
+    // 2. 미션 시작지점으로 전이
+    UFUNCTION(BlueprintCallable)
+    void TeleportAllStartPoint(class AJ_MissionStartPointActor *startPoint);
+
+    // 2-1. 시작 지점 산개하여 배치되기 위해 위치 계산
+    FTransform CalcTeleportTransform(int idx);
+
+    FTransform CalcTeleportTransform(EPilotRole role);
 
 public:
     virtual void Tick(float DeltaSeconds) override;
