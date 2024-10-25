@@ -25,6 +25,7 @@ AL_Viper::AL_Viper()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+#pragma region Components
 	JetRoot = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRoot"));
 	RootComponent = JetRoot;
 	JetRoot->SetRelativeScale3D(FVector(10.f , 1.f , 2.f));
@@ -198,14 +199,27 @@ AL_Viper::AL_Viper()
 	JetFlareArrow2->SetHiddenInGame(false); // For Test
 
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
-	JetPostProcess->SetupAttachment(JetCameraFPS);
+#pragma endregion
 
 	CreateDumyComp();
+
+	PushQueue();
 
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
 #pragma endregion
+
+void AL_Viper::PushQueue()
+{
+	StartScenario.push("MIC");
+	StartScenario.push("EngineGen");
+	StartScenario.push("EngineControl");
+	StartScenario.push("JFS_Switch");
+	StartScenario.push("EngineMaster");
+	StartScenario.push("JFS_Handle");
+	StartScenario.push("Throttle");
+}
 
 void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -288,6 +302,12 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 		                                            JetFirstEngine->GetRelativeLocation().Z));
 		AccelGear = 1;
 		bFirstEngine = true;
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("Throttle"))
+		{
+			StartScenario.pop();
+			DummyThrottleMesh->SetRenderCustomDepth(false);
+			DummyThrottleMesh->CustomDepthStencilValue = 0;
+		}
 	}
 }
 
@@ -298,6 +318,12 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 	{
 		bMIC = true;
 		DummyMICMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("MIC"))
+		{
+			StartScenario.pop();
+			DummyMICMesh->SetRenderCustomDepth(false);
+			DummyMICMesh->CustomDepthStencilValue = 0;
+		}
 	}
 	else
 	{
@@ -313,6 +339,17 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	{
 		bEngineGen1 = true;
 		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
+		{
+			if (bEngineGen1 && bEngineGen2)
+			{
+				StartScenario.pop();
+				DummyEngineGenerMesh1->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
+				DummyEngineGenerMesh2->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -328,6 +365,17 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	{
 		bEngineGen2 = true;
 		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
+		{
+			if (bEngineGen1 && bEngineGen2)
+			{
+				StartScenario.pop();
+				DummyEngineGenerMesh1->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
+				DummyEngineGenerMesh2->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -343,6 +391,17 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineControl1 = true;
 		DummyEngineControlMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
+		{
+			if (bEngineControl1 && bEngineControl2)
+			{
+				StartScenario.pop();
+				DummyEngineControlMesh1->SetRenderCustomDepth(false);
+				DummyEngineControlMesh1->CustomDepthStencilValue = 0;
+				DummyEngineControlMesh2->SetRenderCustomDepth(false);
+				DummyEngineControlMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -358,6 +417,17 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 	{
 		bEngineControl2 = true;
 		DummyEngineControlMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
+		{
+			if (bEngineControl1 && bEngineControl2)
+			{
+				StartScenario.pop();
+				DummyEngineControlMesh1->SetRenderCustomDepth(false);
+				DummyEngineControlMesh1->CustomDepthStencilValue = 0;
+				DummyEngineControlMesh2->SetRenderCustomDepth(false);
+				DummyEngineControlMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -373,6 +443,12 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 	{
 		bJFS = true;
 		DummyJFSMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Switch"))
+		{
+			StartScenario.pop();
+			DummyJFSMesh->SetRenderCustomDepth(false);
+			DummyJFSMesh->CustomDepthStencilValue = 0;
+		}
 	}
 	else
 	{
@@ -388,6 +464,17 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineMaster1 = true;
 		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
+		{
+			if (bEngineMaster1 && bEngineMaster2)
+			{
+				StartScenario.pop();
+				DummyEngineMasterMesh1->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
+				DummyEngineMasterMesh2->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -403,6 +490,17 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineMaster2 = true;
 		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
+		{
+			if (bEngineMaster1 && bEngineMaster2)
+			{
+				StartScenario.pop();
+				DummyEngineMasterMesh1->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
+				DummyEngineMasterMesh2->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
+			}
+		}
 	}
 	else
 	{
@@ -418,6 +516,12 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	{
 		bJFSHandle = true;
 		DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Handle"))
+		{
+			StartScenario.pop();
+			DummyJFSHandleMesh->SetRenderCustomDepth(false);
+			DummyJFSHandleMesh->CustomDepthStencilValue = 0;
+		}
 	}
 	else
 	{
@@ -614,7 +718,8 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 		JetCamera->SetActive(false);
 	if (JetCameraFPS)
 	{
-		// RenderCustomDepthJPass 활성화
+		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
 		JetCameraFPS->SetActive(true);
 	}
 }
@@ -625,7 +730,8 @@ void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 		JetCamera->SetActive(true);
 	if (JetCameraFPS)
 	{
-		// RenderCustomDepthJPass 비활성화
+		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 		JetCameraFPS->SetActive(false);
 	}
 }
@@ -672,254 +778,312 @@ void AL_Viper::BeginPlay()
 	}
 
 	JetWidget->SetWidgetClass(HUD_UI);
+	if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 }
 
 void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	PrintNetLog();
+	//PrintNetLog();
 
-	CurrentTime += DeltaTime;
-
-#pragma region Rotate JetArrow
-	FRotator jetRot = JetArrow->GetRelativeRotation();
-	// Check Distance Into Area
-	if (IsKeyUpPress || IsKeyDownPress)
+	// 시동 절차 단계
+	if (!IsStart)
 	{
-		if (jetRot.Pitch > MaxPitchValue)
+		if (StartScenario.size() > 0)
 		{
-			JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
-			ForceUnitRot = FRotator(0 , 0 , 0);
-		}
-		else if (jetRot.Pitch < MinPitchValue)
-		{
-			JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
-			ForceUnitRot = FRotator(0 , 0 , 0);
+			FString ScenarioFront = StartScenario.front();
+			UStaticMeshComponent* ScenarioComponent = nullptr;
+			if (ScenarioFront.Equals("MIC"))
+			{
+				DummyMICMesh->SetRenderCustomDepth(true);
+				DummyMICMesh->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("EngineGen"))
+			{
+				DummyEngineGenerMesh1->SetRenderCustomDepth(true);
+				DummyEngineGenerMesh1->CustomDepthStencilValue = 1;
+				DummyEngineGenerMesh2->SetRenderCustomDepth(true);
+				DummyEngineGenerMesh2->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("EngineControl"))
+			{
+				DummyEngineControlMesh1->SetRenderCustomDepth(true);
+				DummyEngineControlMesh1->CustomDepthStencilValue = 1;
+				DummyEngineControlMesh2->SetRenderCustomDepth(true);
+				DummyEngineControlMesh2->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("JFS_Switch"))
+			{
+				DummyJFSMesh->SetRenderCustomDepth(true);
+				DummyJFSMesh->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("EngineMaster"))
+			{
+				DummyEngineMasterMesh1->SetRenderCustomDepth(true);
+				DummyEngineMasterMesh1->CustomDepthStencilValue = 1;
+				DummyEngineMasterMesh2->SetRenderCustomDepth(true);
+				DummyEngineMasterMesh2->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("JFS_Handle"))
+			{
+				DummyJFSHandleMesh->SetRenderCustomDepth(true);
+				DummyJFSHandleMesh->CustomDepthStencilValue = 1;
+			}
+			else if (ScenarioFront.Equals("Throttle"))
+			{
+				DummyThrottleMesh->SetRenderCustomDepth(true);
+				DummyThrottleMesh->CustomDepthStencilValue = 1;
+			}
 		}
 		else
-		{
-			JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
-		}
+			IsStart = true;
 	}
-
-	if (IsKeyLeftPress)
+	// 운행 단계
+	else
 	{
-		if (!IsKeyRightPress)
-		{
-			FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-			JetArrow->SetRelativeRotation(resetRot);
-			FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
-			JetArrow->AddRelativeRotation(newRot);
-		}
-	}
-	else if (IsKeyRightPress)
-	{
-		if (!IsKeyLeftPress)
-		{
-			FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-			JetArrow->SetRelativeRotation(resetRot);
-			FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
-			JetArrow->AddRelativeRotation(newRot);
-		}
-	}
+		CurrentTime += DeltaTime;
 
-	// 방향전환중이 아니라면 방향을 가운데로 변환
-	if (!IsKeyLeftPress && !IsKeyRightPress)
-		JetArrow->SetRelativeRotation(FRotator(JetArrow->GetRelativeRotation().Pitch , 0 ,
-		                                       JetArrow->GetRelativeRotation().Roll));
+#pragma region Rotate JetArrow
+		FRotator jetRot = JetArrow->GetRelativeRotation();
+		// Check Distance Into Area
+		if (IsKeyUpPress || IsKeyDownPress)
+		{
+			if (jetRot.Pitch > MaxPitchValue)
+			{
+				JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
+				ForceUnitRot = FRotator(0 , 0 , 0);
+			}
+			else if (jetRot.Pitch < MinPitchValue)
+			{
+				JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
+				ForceUnitRot = FRotator(0 , 0 , 0);
+			}
+			else
+			{
+				JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
+			}
+		}
 
-	//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
+		if (IsKeyLeftPress)
+		{
+			if (!IsKeyRightPress)
+			{
+				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+				JetArrow->SetRelativeRotation(resetRot);
+				FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
+				JetArrow->AddRelativeRotation(newRot);
+			}
+		}
+		else if (IsKeyRightPress)
+		{
+			if (!IsKeyLeftPress)
+			{
+				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+				JetArrow->SetRelativeRotation(resetRot);
+				FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
+				JetArrow->AddRelativeRotation(newRot);
+			}
+		}
+
+		// 방향전환중이 아니라면 방향을 가운데로 변환
+		if (!IsKeyLeftPress && !IsKeyRightPress)
+			JetArrow->SetRelativeRotation(FRotator(JetArrow->GetRelativeRotation().Pitch , 0 ,
+			                                       JetArrow->GetRelativeRotation().Roll));
+
+		//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
 #pragma endregion
 
 #pragma region Change Accel Value (backUp)
-	// if (IsAccel)
-	// {
-	// 	KeyDownAccel += DeltaTime;
-	// 	if (KeyDownAccel >= ChangeAccelTime)
-	// 	{
-	// 		KeyDownAccel = 0.f;
-	//
-	// 		// 기어 변경
-	// 		AccelGear++;
-	// 		if (AccelGear > 3)
-	// 			AccelGear = 3;
-	// 	}
-	// }
-	// else if (IsBreak)
-	// {
-	// 	KeyDownAccel += DeltaTime;
-	// 	if (KeyDownAccel >= ChangeAccelTime)
-	// 	{
-	// 		KeyDownAccel = 0.f;
-	//
-	// 		// 기어 변경
-	// 		AccelGear--;
-	// 		if (AccelGear < 0)
-	// 			AccelGear = 0;
-	// 	}
-	// }
+		// if (IsAccel)
+		// {
+		// 	KeyDownAccel += DeltaTime;
+		// 	if (KeyDownAccel >= ChangeAccelTime)
+		// 	{
+		// 		KeyDownAccel = 0.f;
+		//
+		// 		// 기어 변경
+		// 		AccelGear++;
+		// 		if (AccelGear > 3)
+		// 			AccelGear = 3;
+		// 	}
+		// }
+		// else if (IsBreak)
+		// {
+		// 	KeyDownAccel += DeltaTime;
+		// 	if (KeyDownAccel >= ChangeAccelTime)
+		// 	{
+		// 		KeyDownAccel = 0.f;
+		//
+		// 		// 기어 변경
+		// 		AccelGear--;
+		// 		if (AccelGear < 0)
+		// 			AccelGear = 0;
+		// 	}
+		// }
 #pragma endregion
 
 #pragma region Change Accel Value2
-	FVector engineLoc = JetFirstEngine->GetRelativeLocation();
-	if (bThrottleAccel)
-	{
-		if (engineLoc.X < ThrottleMilLoc.X)
+		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
+		if (bThrottleAccel)
 		{
-			auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
-			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			if (engineLoc.X < ThrottleMilLoc.X)
+			{
+				auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			}
+			else if (engineLoc.X < ThrottleMaxLoc.X)
+			{
+				auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
+				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			}
+			SetAccelGear();
 		}
-		else if (engineLoc.X < ThrottleMaxLoc.X)
-		{
-			auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
-			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-		}
-		SetAccelGear();
-	}
 
-	if (bThrottleBreak)
-	{
-		if (engineLoc.X > ThrottleMilLoc.X)
+		if (bThrottleBreak)
 		{
-			auto newEngineX = engineLoc.X - ThrottleMoveSpeed2;
-			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			if (engineLoc.X > ThrottleMilLoc.X)
+			{
+				auto newEngineX = engineLoc.X - ThrottleMoveSpeed2;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
+				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			}
+			else if (engineLoc.X > ThrottleOffLoc.X)
+			{
+				auto newEngineX = engineLoc.X - ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			}
+			SetAccelGear();
 		}
-		else if (engineLoc.X > ThrottleOffLoc.X)
-		{
-			auto newEngineX = engineLoc.X - ThrottleMoveSpeed1;
-			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-		}
-		SetAccelGear();
-	}
 #pragma endregion
 
 #pragma region Jet Move
-	ValueOfMoveForce += GetAddTickSpeed();
-	if (ValueOfMoveForce < 0)
-		ValueOfMoveForce = 0;
-	else if (ValueOfMoveForce > MaxValueOfMoveForce)
-		ValueOfMoveForce = MaxValueOfMoveForce;
+		ValueOfMoveForce += GetAddTickSpeed();
+		if (ValueOfMoveForce < 0)
+			ValueOfMoveForce = 0;
+		else if (ValueOfMoveForce > MaxValueOfMoveForce)
+			ValueOfMoveForce = MaxValueOfMoveForce;
 
-	if (IsEngineOn)
-	{
-		// Add Force
-		// LOG_S(Warning , TEXT("======================="));
-		FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-		FVector forceLoc = JetRoot->GetComponentLocation();
-		// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
-		if (JetRoot->IsSimulatingPhysics())
-			JetRoot->AddForceAtLocation(forceVec , forceLoc);
+		if (IsEngineOn)
+		{
+			// Add Force
+			// LOG_S(Warning , TEXT("======================="));
+			FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+			FVector forceLoc = JetRoot->GetComponentLocation();
+			// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
+			if (JetRoot->IsSimulatingPhysics())
+				JetRoot->AddForceAtLocation(forceVec , forceLoc);
 
-		// Move Up & Down
-		jetRot = JetArrow->GetRelativeRotation();
-		float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-		//LOG_S(Warning , TEXT("zRot %f") , zRot);
-		JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+			// Move Up & Down
+			jetRot = JetArrow->GetRelativeRotation();
+			float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+			//LOG_S(Warning , TEXT("zRot %f") , zRot);
+			JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
 
 
-		// Rotate
-		jetRot = JetArrow->GetRelativeRotation();
-		//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
-		JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
+			// Rotate
+			jetRot = JetArrow->GetRelativeRotation();
+			//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
+			JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
 
-		if (IsLeftRoll)
-			JetRoot->AddRelativeRotation(-1 * RotateValue);
-		if (IsRightRoll)
-			JetRoot->AddRelativeRotation(RotateValue);
+			if (IsLeftRoll)
+				JetRoot->AddRelativeRotation(-1 * RotateValue);
+			if (IsRightRoll)
+				JetRoot->AddRelativeRotation(RotateValue);
+
+			if (IsLocallyControlled())
+			{
+				ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
+			}
+		}
+		JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
+#pragma endregion
 
 		if (IsLocallyControlled())
 		{
-			ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
-		}
-	}
-	JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
-#pragma endregion
-
-	if (IsLocallyControlled())
-	{
 #pragma region 고도계
-		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
-		float CurrFeet = CurrHeight / 30.48; // cm to feet
-		if (CurrFeet < 0)
-			CurrFeet = 0;
+			float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
+			float CurrFeet = CurrHeight / 30.48; // cm to feet
+			if (CurrFeet < 0)
+				CurrFeet = 0;
 
-		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
-		{
-			HUDui->UpdateHeightBar(CurrFeet);
-		}
+			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+			{
+				HUDui->UpdateHeightBar(CurrFeet);
+			}
 #pragma endregion
 
 #pragma region 속도계
-		int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
-		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
-		{
-			HUDui->UpdateHeightText(ValueOfMoveForceInNote);
-		}
+			int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
+			if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
+			{
+				HUDui->UpdateHeightText(ValueOfMoveForceInNote);
+			}
 #pragma endregion
 
 #pragma region LockOn
-		IsLockOn();
+			IsLockOn();
 #pragma endregion
 
-		ChangeBooster();
+			ChangeBooster();
 
 #pragma region Zoom In/Out
-		if (JetCameraFPS->IsActive())
-		{
-			if (IsZoomIn)
+			if (JetCameraFPS->IsActive())
 			{
-				// 현재 FieldOfView 수치와 줌 인 수치(25)를 Lerp해서 적용
-				float currViewValue = JetCameraFPS->FieldOfView;
-				float newViewValue = FMath::Lerp(currViewValue , ZoomInValue , DeltaTime);
-				JetCameraFPS->SetFieldOfView(newViewValue);
-			}
+				if (IsZoomIn)
+				{
+					// 현재 FieldOfView 수치와 줌 인 수치(25)를 Lerp해서 적용
+					float currViewValue = JetCameraFPS->FieldOfView;
+					float newViewValue = FMath::Lerp(currViewValue , ZoomInValue , DeltaTime);
+					JetCameraFPS->SetFieldOfView(newViewValue);
+				}
 
-			if (IsZoomOut)
-			{
-				// 현재 FieldOfView 수치와 줌 아웃 수치(140)를 Lerp해서 적용
-				float currViewValue = JetCameraFPS->FieldOfView;
-				float newViewValue = FMath::Lerp(currViewValue , ZoomOutValue , DeltaTime);
-				JetCameraFPS->SetFieldOfView(newViewValue);
+				if (IsZoomOut)
+				{
+					// 현재 FieldOfView 수치와 줌 아웃 수치(140)를 Lerp해서 적용
+					float currViewValue = JetCameraFPS->FieldOfView;
+					float newViewValue = FMath::Lerp(currViewValue , ZoomOutValue , DeltaTime);
+					JetCameraFPS->SetFieldOfView(newViewValue);
+				}
 			}
-		}
 #pragma endregion
-	}
+		}
 
 #pragma region Flare Arrow Rotation Change
-	if (CurrentWeapon == EWeapon::Flare)
-	{
-		int32 randRot = FMath::RandRange(-150 , -110);
-		LOG_SCREEN("%d" , randRot);
-		FRotator newFlareRot = FRotator(randRot , 0 , 0);
-		JetFlareArrow1->SetRelativeRotation(newFlareRot);
-		JetFlareArrow2->SetRelativeRotation(newFlareRot);
-	}
+		if (CurrentWeapon == EWeapon::Flare)
+		{
+			int32 randRot = FMath::RandRange(-150 , -110);
+			LOG_SCREEN("%d" , randRot);
+			FRotator newFlareRot = FRotator(randRot , 0 , 0);
+			JetFlareArrow1->SetRelativeRotation(newFlareRot);
+			JetFlareArrow2->SetRelativeRotation(newFlareRot);
+		}
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-	if (!IsRotateTrigger)
-	{
-		if (JetCamera->IsActive())
+		if (!IsRotateTrigger)
 		{
-			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-			//FRotator(-10 , 0 , 0)
-			auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-			JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			if (JetCamera->IsActive())
+			{
+				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+				//FRotator(-10 , 0 , 0)
+				auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
+				JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			}
+			else
+			{
+				FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+				//FRotator(-30 , 0 , 0)
+				auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+				JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+			}
 		}
-		else
-		{
-			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-			//FRotator(-30 , 0 , 0)
-			auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-			JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
-		}
-	}
 #pragma endregion
+	}
 }
 
 #pragma region Get Force

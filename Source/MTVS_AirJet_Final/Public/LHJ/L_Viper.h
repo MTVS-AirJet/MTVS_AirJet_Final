@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <queue>
+#include <queue>
+
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "L_Viper.generated.h"
@@ -426,9 +429,14 @@ private:
 	FVector ThrottleOffLoc = FVector(385 , -28 , 237);
 	FVector ThrottleMilLoc = FVector(395 , -28 , 237);
 	FVector ThrottleMaxLoc = FVector(405 , -28 , 237);
-	UPROPERTY(EditDefaultsOnly, Category="ThrottleSpeed")
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
 	float ThrottleMoveSpeed1 = .15f;
-	UPROPERTY(EditDefaultsOnly, Category="ThrottleSpeed")
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
 	float ThrottleMoveSpeed2 = .25f;
 	void SetAccelGear();
+	//==================================
+	// 시동 절차
+	std::queue<FString> StartScenario;
+	void PushQueue();
+	bool IsStart;
 };
