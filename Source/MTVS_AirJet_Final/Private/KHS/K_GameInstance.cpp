@@ -378,6 +378,15 @@ void UK_GameInstance::CreateServerWidget()
 	ServerWidget->SetUI(); //부모함수 호출
 }
 
+// Loading UI를 생성하는 함수
+void UK_GameInstance::CreateLoadingWidget()
+{
+	// LoadingUIFactory를 통해 LoadingUI 위젯 생성
+	LoadingWidget = CreateWidget<UK_LoadingWidget>(this , LoadingWidgetFactory);
+	LoadingWidget->SetInterface(this); //부모함수 호출
+	LoadingWidget->SetUI(); //부모함수 호출
+}
+
 //// 인게임 UI를 생성하는 함수
 //void UK_GameInstance::CreateInGameWidget()
 //{

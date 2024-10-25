@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	void CreateServerWidget(); // Server UI를 생성하는 함수
 
+	UFUNCTION(BlueprintCallable, Category = "Create Widget")
+	void CreateLoadingWidget(); // Loading UI를 생성하는 함수
+
 	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	//void CreateInGameWidget(); // 인게임 UI를 생성하는 함수
 
