@@ -32,6 +32,7 @@ AL_Viper::AL_Viper()
 	JetRoot->SetRelativeScale3D(FVector(10.f , 1.f , 2.f));
 	JetRoot->SetSimulatePhysics(true);
 	JetRoot->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	JetRoot->OnComponentBeginOverlap.AddDynamic(this, &AL_Viper::OnMyMeshOverlap);
 
 	// 공기저항
 	JetRoot->SetLinearDamping(1.f);
@@ -206,6 +207,9 @@ AL_Viper::AL_Viper()
 
 	PushQueue();
 
+	this->Tags = TArray<FName>();
+	this->Tags.Add(FName("Viper"));
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -220,6 +224,12 @@ void AL_Viper::PushQueue()
 	StartScenario.push("EngineMaster");
 	StartScenario.push("JFS_Handle");
 	StartScenario.push("Throttle");
+}
+
+void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	LOG_SCREEN("%s", *OtherActor->GetName());
 }
 
 void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -533,9 +543,9 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 {
-	bool b = value.Get<bool>();
-	IsEngineOn = !IsEngineOn;
-	LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
+	// bool b = value.Get<bool>();
+	// IsEngineOn = !IsEngineOn;
+	// LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
 }
 
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
@@ -780,6 +790,16 @@ void AL_Viper::BeginPlay()
 	JetWidget->SetWidgetClass(HUD_UI);
 	if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
+
+	if (!IsStart)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
+		if (PlayerController)
+		{
+			PlayerController->SetIgnoreMoveInput(true);
+			PlayerController->SetIgnoreLookInput(true);
+		}
+	}
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -787,6 +807,23 @@ void AL_Viper::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//PrintNetLog();
+
+	if (IsFlyStart)
+	{
+		auto pc = Cast<APlayerController>(Controller);
+		if (pc)
+		{
+			UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+				pc->GetLocalPlayer());
+			if (subsys)
+			{
+				subsys->AddMappingContext(IMC_Fun , 0);
+			}
+
+			pc->bEnableClickEvents = true;
+		}
+		IsFlyStart = false;
+	}
 
 	// 시동 절차 단계
 	if (!IsStart)
@@ -842,6 +879,7 @@ void AL_Viper::Tick(float DeltaTime)
 			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
+			IsEngineOn = true;
 		}
 	}
 	// 운행 단계
@@ -937,7 +975,10 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				if (ThrottleMilLoc.X - newEngineX < 0.2)
+					JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
+				else
+					JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
 			else if (engineLoc.X < ThrottleMaxLoc.X)
 			{
@@ -954,7 +995,10 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				auto newEngineX = engineLoc.X - ThrottleMoveSpeed2;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				if (ThrottleMaxLoc.X - newEngineX < 0.2)
+					JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
+				else
+					JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
 			else if (engineLoc.X > ThrottleOffLoc.X)
 			{
@@ -1403,11 +1447,23 @@ void AL_Viper::SetAccelGear()
 	auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 	auto per = currValue / SizeValue * 100;
 	if (per <= 0)
+	{
+		// IsEngineOn = false;
 		AccelGear = 0;
+	}
 	else if (per <= 50)
+	{
+		// IsEngineOn = true;
 		AccelGear = 1;
+	}
 	else if (per <= 90)
+	{
+		// IsEngineOn = true;
 		AccelGear = 2;
+	}
 	else
+	{
+		// IsEngineOn = true;
 		AccelGear = 3;
+	}
 }

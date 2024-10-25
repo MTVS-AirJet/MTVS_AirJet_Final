@@ -129,6 +129,8 @@ private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Viper;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputMappingContext* IMC_Fun;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperEngine;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperLook;
@@ -226,7 +228,8 @@ private: // Input
 
 private:
 	bool bFirstEngine;
-	// For Engine Using 
+	// For Engine Using
+	UPROPERTY(EditDefaultsOnly, Category="Engine")
 	bool IsEngineOn;
 	// For Change Arrow Rotate
 	float CurrentTime;
@@ -438,5 +441,11 @@ private:
 	// 시동 절차
 	std::queue<FString> StartScenario;
 	void PushQueue();
+	UPROPERTY(EditDefaultsOnly)
 	bool IsStart;
+	UPROPERTY(EditDefaultsOnly , Category="CanFly")
+	bool IsFlyStart;
+	int32 intTriggerNum = 0;	// 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
+	UFUNCTION()
+	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };
