@@ -16,9 +16,11 @@ class MTVS_AIRJET_FINAL_API AJ_MissionPlayerController : public AK_PlayerControl
 	GENERATED_BODY()
 
 protected:
-	// 플레이어 역할
+	// XXX 플레이어 역할
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	EPlayerRole playerRole;
+
+	
 	// XXX 스폰 위치
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	// FTransform spawnTR;
@@ -28,6 +30,9 @@ protected:
 	bool enableDebugInput = false;
 
 public:
+	// 파일럿 역할
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	EPilotRole pilotRole;
 
 protected:
     virtual void BeginPlay() override;
