@@ -5,6 +5,7 @@
 
 #include "MTVS_AirJet_Final.h"
 #include "Components/BoxComponent.h"
+#include "JBS/J_MissionActorInterface.h"
 #include "LHJ/L_Viper.h"
 
 // Sets default values
@@ -109,11 +110,12 @@ void AL_Missile::OnMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent 
 
 void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 {
-	if (HitActor->ActorHasTag(FName("target")))
+	LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
+	// 데미지 처리
+	if(auto mai=Cast<IJ_MissionActorInterface>(HitActor))
 	{
-		LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
-		// 데미지 처리
-	}
+		mai->GetDamage();
+	}		
 	this->Destroy();
 }
 

@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "JBS/J_MissionActorInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_Flare.h"
@@ -1324,10 +1325,16 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 		{
 			for (auto hit : OutHit)
 			{
-				if (hit.GetActor()->ActorHasTag("target"))
+				LOG_S(Warning, TEXT("%s"), *hit.GetActor()->GetName());
+				if(auto mai=Cast<IJ_MissionActorInterface>(hit.GetActor()))
 				{
+					
 					MulticastRPCLockOn(hit.GetActor());
 				}
+				// if (hit.GetActor()->ActorHasTag("target"))
+				// {
+				// 	
+				// }
 			}
 		}
 	}
