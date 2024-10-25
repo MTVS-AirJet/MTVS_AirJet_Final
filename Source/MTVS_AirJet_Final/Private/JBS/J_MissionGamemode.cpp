@@ -45,8 +45,8 @@ void AJ_MissionGamemode::StartMission()
     check(objectiveManagerComp);
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
 
-    // @@ 0번 목표 시작
-    objectiveManagerComp->ActiveNextObjective();
+    // XXX 0번 목표 시작
+    // objectiveManagerComp->ActiveNextObjective();
     
     
 
@@ -164,22 +164,30 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
     if(!HasAuthority()) return;
 
     // 모든 플레이어의 폰 가져오기
-    auto* gs = this->GetGameState<AJ_MissionGameState>();
-    auto allPawns = gs->GetAllPlayerPawn();
+    auto allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("폰 개수 : %d"), allPawns.Num()));
-    // FIXME 멀티일때 pawn이 로컬 빼고 null인 오류 수정 필요
+
     // 시작 지점으로 위치 이동
     for(int i = 0; i < allPawns.Num(); i++)
     {
-        auto pawn = allPawns[i];
+        auto* pawn = allPawns[i];
+        // 역할 설정
+        auto* pc = pawn->GetController<AJ_MissionPlayerController>();
+        // idx 0,1,2 를 각각 리더, lt 윙맨, rt 윙맨으로 설정
+        pc->pilotRole = static_cast<EPilotRole>(i % 3);
+
         // 순서에 따른 위치 조정 (산개용)
-        FTransform newTR = CalcTeleportTransform(i);
+        FTransform newTR = CalcTeleportTransform(pc->pilotRole);
         // 스케일 조정되지 않도록 변경
         newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
 
         pawn->SetActorTransform(newTR);
+
     }
+
+    // 미션 시작
+    this->objectiveManagerComp->ActiveNextObjective();
 }
 
 AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
@@ -199,7 +207,7 @@ AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
 
 FTransform AJ_MissionGamemode::CalcTeleportTransform(int idx)
 {
-    return CalcTeleportTransform(static_cast<EPilotRole>(idx));
+    return CalcTeleportTransform(static_cast<EPilotRole>(idx % 3));
 }
 
 FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
@@ -233,6 +241,10 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
         addVec = rtV * (rtValue / 2) + forV * -1 * forValue;
         break;
     }
+
+    GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::White, FString::Printf(TEXT("시작 지점 %s\n변경된 지점 %s")
+        , *baseTR.GetLocation().ToString()
+        , *(baseTR.GetLocation() + addVec).ToString()));
 
     baseTR.SetLocation(baseTR.GetLocation() + addVec);
 

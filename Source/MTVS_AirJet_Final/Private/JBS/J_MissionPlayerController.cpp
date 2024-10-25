@@ -89,12 +89,13 @@ void AJ_MissionPlayerController::SRPC_SpawnMyPlayer_Implementation(TSubclassOf<c
     auto* player = GetWorld()->SpawnActor<AJ_BaseMissionPawn>(playerPrefab, spawnTR, SpawnParams);
     check(player);
     // 클라에서 포제스
-    CRPC_SpawnMyPlayer(player);
+    // CRPC_SpawnMyPlayer(player);
+    this->Possess(player);
 }
 
 void AJ_MissionPlayerController::CRPC_SpawnMyPlayer_Implementation(APawn *newPawn)
 {
-    this->Possess(newPawn);
+    // this->Possess(newPawn);
 }
 
 void AJ_MissionPlayerController::OnPossess(APawn *newPawn)

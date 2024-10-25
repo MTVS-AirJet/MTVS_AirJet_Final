@@ -12,6 +12,7 @@
 #include <JBS/J_MissionGamemode.h>
 #include <Engine/World.h>
 
+// 전역 함수
 UJ_GameInstance *UJ_Utility::GetJGameInstance(const UWorld* world)
 {
     auto* gi =  Cast<UJ_GameInstance>(UGameplayStatics::GetGameInstance(world));
@@ -60,6 +61,27 @@ AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 pl
     check(player);
 
     return player;
+}
+
+TArray<APawn*> UJ_Utility::GetAllMissionPawn(const UWorld *world)
+{
+    auto* gs = world->GetGameState<AJ_MissionGameState>();
+    check(gs);
+    // 모든 플레이어의 폰 가져오기
+    auto allPawns = gs->GetAllPlayerPawn();
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("폰 개수 : %d"), allPawns.Num()));
+
+    return allPawns;
+}
+
+bool UJ_Utility::CheckValueRange(float value, float min, float max, bool inClusive)
+{
+    bool result = inClusive ?
+        min <= value && value <= max
+        : min < value && value < max;
+
+    return result;
 }
 
 // === 구조체 함수 구현

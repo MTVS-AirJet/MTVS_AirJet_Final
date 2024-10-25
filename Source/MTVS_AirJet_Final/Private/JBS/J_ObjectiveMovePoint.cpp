@@ -84,9 +84,9 @@ void AJ_ObjectiveMovePoint::InitBeamVFX()
             0,
             250.5f
         );
-    }, 0.1, true);
 
-    GEngine->AddOnScreenDebugMessage(-1, 22, FColor::Green, FString::Printf(TEXT("빔 생성 %s"), isHit ? TEXT("성공") : TEXT("실패")));
+        GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::White, TEXT("빔 생성 중"));
+    }, 0.1, true);
 }
 
 void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(

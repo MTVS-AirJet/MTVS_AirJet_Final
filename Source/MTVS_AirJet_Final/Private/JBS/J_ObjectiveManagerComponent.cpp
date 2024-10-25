@@ -73,7 +73,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("목표 액터 추가 완료 개수 : %d"), objectiveDataAry.Num()));
 
-	// @@ 바로 0번 미션 활성화 할지 고민
+	// XXX 바로 0번 미션 활성화 할지 고민 | 텔포 후 시작으로 변경
 	// ActiveNextObjective();
 }
 

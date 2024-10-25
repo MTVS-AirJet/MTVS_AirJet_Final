@@ -200,8 +200,6 @@ struct FMissionObject : public FJVector2D
     {
         return FJVector2D(x,y);
     }
-
-    
 };
 
 USTRUCT(BlueprintType)
@@ -351,13 +349,24 @@ struct FFormationValue
     
     // 시작 지점 + forv 할 리더 위치
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    float height = 200.f;
+    float height = 20000.f;
     // 밑변 길이
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    float baseLength = 1220.f;
+    float baseLength = 122000.f;
     // 빗변 길이
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    float sideLength = 681.f;
+    float sideLength = 68100.f;
+};
+
+// 편대 비행 조건 비트마스크 enum
+UENUM(BlueprintType)
+enum class EFormationChecklist : uint8
+{
+    NONE = 0
+    // 고도
+    ,FLIGHT_HEIGHT = 1
+    // 진형 유지
+    ,ALIGN_FORMATION = 2
 };
 
 #pragma endregion
@@ -411,9 +420,13 @@ public:
     static class AJ_MissionGameState* GetMissionGameState(const UWorld* world);
     // 미션맵 로컬 플레이어 가져오기
     static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
+    // 미션 모든 플레이어 폰 가져오기
+    static class TArray<APawn*> GetAllMissionPawn(const UWorld *world);
+    // 범위 조건 체크
+    static bool CheckValueRange(float value, float min, float max, bool inClusive = true);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 500000.f;
     // 기본 목표 지점 고도
-    constexpr static const float defaultMissionObjectHeight = 130000.f;
+    constexpr static const float defaultMissionObjectHeight = 400000.f;
 };

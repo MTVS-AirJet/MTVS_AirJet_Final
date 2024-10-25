@@ -6,6 +6,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/Engine.h"
 #include "Engine/StaticMesh.h"
 #include "JBS/J_Utility.h"
 #include "Materials/Material.h"
@@ -143,7 +144,7 @@ void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive
 
 void AJ_BaseMissionObjective::ObjectiveActive()
 {
-	
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
 }
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
