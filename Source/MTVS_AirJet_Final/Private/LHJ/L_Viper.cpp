@@ -567,11 +567,14 @@ void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct 
 {
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
-	if (FVector::Dist(currLoc, CanopyCloseLoc)<=1)
+	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
 		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
-	else if (FVector::Dist(currLoc, CanopyNormalLoc)<=1)
+	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
+	{
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-	else if (FVector::Dist(currLoc, CanopyOpenLoc)<=1)
+		RotateBone(false);
+	}
+	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 }
 
@@ -848,11 +851,11 @@ void AL_Viper::Tick(float DeltaTime)
 	//PrintNetLog();
 
 	auto currCanopyLoc = JetCanopy->GetRelativeLocation();
-	if (currCanopyLoc==CanopyCloseLoc)
+	if (currCanopyLoc == CanopyCloseLoc)
 	{
 		// 캐노피를 닫는다.
 	}
-	else if(currCanopyLoc==CanopyOpenLoc)
+	else if (currCanopyLoc == CanopyOpenLoc)
 	{
 		// 캐노피를 연다.
 	}
@@ -1591,10 +1594,33 @@ void AL_Viper::BackMoveCanopyHandle()
 {
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
-	if (FVector::Dist(currLoc, CanopyHoldLoc)<=1)
+	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-	else if (FVector::Dist(currLoc, CanopyCloseLoc)<=1)
+	else if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
-	else if (FVector::Dist(currLoc, CanopyNormalLoc)<=1)
+	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
+	{
+		RotateBone(true);
 		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+	}
+}
+
+void AL_Viper::RotateBone(bool bOpen)
+{
+	if (JetMesh)
+	{
+		int32 BoneIndex = JetMesh->GetBoneIndex(FName("lantern_jnt"));
+		LOG_SCREEN("%d" , BoneIndex);
+		if (BoneIndex != INDEX_NONE)
+		{
+			if (bOpen)
+			{
+				// 캐노피가 열린다.
+			}
+			else
+			{
+				// 캐노피가 닫힌다.
+			}
+		}
+	}
 }

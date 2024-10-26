@@ -464,4 +464,5 @@ private:
 	FVector CanopyNormalLoc=FVector(370 , 25 , 260);
 	FVector CanopyCloseLoc=FVector(375 , 25 , 260);
 	FVector CanopyHoldLoc=FVector(380 , 25 , 260);
+	void RotateBone(bool bOpen);
 };
