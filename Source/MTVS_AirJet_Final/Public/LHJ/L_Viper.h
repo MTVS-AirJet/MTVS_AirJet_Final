@@ -74,7 +74,9 @@ private: // Component
 	class UBoxComponent* JetEngineMaster2;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetJFSHandle;
-
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UBoxComponent* JetCanopy;
+	
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -93,6 +95,7 @@ private: // Component
 	class USpringArmComponent* JetSprintArmFPS;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCameraFPS;
+	
 
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
@@ -124,6 +127,8 @@ private:
 	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -450,4 +455,13 @@ private:
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
 	                     const FHitResult& SweepResult);
+	//=====================================
+	// 캐노피
+	int iCanopyNum = 0;	//0=잠금, 1=기본, 2=닫기, 3=잠금
+	void PerformLineTrace();
+	void BackMoveCanopyHandle();	
+	FVector CanopyOpenLoc=FVector(365 , 25 , 260);
+	FVector CanopyNormalLoc=FVector(370 , 25 , 260);
+	FVector CanopyCloseLoc=FVector(375 , 25 , 260);
+	FVector CanopyHoldLoc=FVector(380 , 25 , 260);
 };

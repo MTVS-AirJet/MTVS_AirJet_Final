@@ -148,6 +148,14 @@ AL_Viper::AL_Viper()
 	JetJFSHandle->OnClicked.AddDynamic(this , &AL_Viper::OnMyJFSHandle1Clicked);
 	JetJFSHandle->SetHiddenInGame(false); // For Test
 
+	JetCanopy = CreateDefaultSubobject<UBoxComponent>(TEXT("JetCanopy"));
+	JetCanopy->SetupAttachment(JetMesh);
+	JetCanopy->SetRelativeScale3D(FVector(.05f , .2f , .05f));
+	JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+	JetCanopy->SetGenerateOverlapEvents(true);
+	JetCanopy->OnClicked.AddDynamic(this , &AL_Viper::OnMyCanopyClicked);
+	JetCanopy->SetHiddenInGame(false); // For Test
+
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
@@ -555,6 +563,18 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	}
 }
 
+void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+{
+	auto currLoc = JetCanopy->GetRelativeLocation();
+
+	if (currLoc == CanopyCloseLoc)
+		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+	else if (currLoc == CanopyNormalLoc)
+		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+	else if (currLoc == CanopyOpenLoc)
+		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+}
+
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
 {
 	// bool b = value.Get<bool>();
@@ -769,6 +789,11 @@ void AL_Viper::F_ViperChangeWeaponStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperRotateTriggerStarted(const struct FInputActionValue& value)
 {
 	IsRotateTrigger = true;
+	// Value가 True일 때만 처리
+	if (value.Get<bool>())
+	{
+		PerformLineTrace();
+	}
 }
 
 void AL_Viper::F_ViperRotateTriggerCompleted(const struct FInputActionValue& value)
@@ -821,6 +846,16 @@ void AL_Viper::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//PrintNetLog();
+
+	auto currCanopyLoc = JetCanopy->GetRelativeLocation();
+	if (currCanopyLoc==CanopyCloseLoc)
+	{
+		// 캐노피를 닫는다.
+	}
+	else if(currCanopyLoc==CanopyOpenLoc)
+	{
+		// 캐노피를 연다.
+	}
 
 	if (IsFlyStart)
 	{
@@ -1005,7 +1040,7 @@ void AL_Viper::Tick(float DeltaTime)
 				auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 				auto per = SizeValue * 80 / 100;
 				FVector VecTrigger1 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
-				
+
 				if (engineLoc.X < ThrottleMilLoc.X)
 				{
 					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
@@ -1521,4 +1556,45 @@ void AL_Viper::SetAccelGear()
 		// IsEngineOn = true;
 		AccelGear = 3;
 	}
+}
+
+void AL_Viper::PerformLineTrace()
+{
+	FVector WorldLocation , WorldDirection;
+	if (auto pc = GetWorld()->GetFirstPlayerController())
+	{
+		if (pc->DeprojectMousePositionToWorld(WorldLocation , WorldDirection))
+		{
+			// 마우스 위치에서 라인 트레이스 시작
+			FVector Start = WorldLocation;
+			FVector End = Start + (WorldDirection * 10000.0f);
+
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+
+			// 라인 트레이스 수행
+			if (GetWorld()->LineTraceSingleByChannel(HitResult , Start , End , ECC_Visibility , Params))
+			{
+				if (HitResult.GetComponent()->ComponentHasTag("Canopy"))
+				{
+					BackMoveCanopyHandle();
+					//LOG_SCREEN("캐노피 우클릭");
+					// 디버그용 라인 시각화
+					//DrawDebugLine(GetWorld() , Start , End , FColor::Green , false , 2.0f , 0 , 2.0f);
+				}
+			}
+		}
+	}
+}
+
+void AL_Viper::BackMoveCanopyHandle()
+{
+	auto currLoc = JetCanopy->GetRelativeLocation();
+
+	if (currLoc == CanopyHoldLoc)
+		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+	else if (currLoc == CanopyCloseLoc)
+		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+	else if (currLoc == CanopyNormalLoc)
+		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
 }
