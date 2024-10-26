@@ -567,11 +567,11 @@ void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct 
 {
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
-	if (currLoc == CanopyCloseLoc)
+	if (FVector::Dist(currLoc, CanopyCloseLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
-	else if (currLoc == CanopyNormalLoc)
+	else if (FVector::Dist(currLoc, CanopyNormalLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-	else if (currLoc == CanopyOpenLoc)
+	else if (FVector::Dist(currLoc, CanopyOpenLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 }
 
@@ -1591,10 +1591,10 @@ void AL_Viper::BackMoveCanopyHandle()
 {
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
-	if (currLoc == CanopyHoldLoc)
+	if (FVector::Dist(currLoc, CanopyHoldLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-	else if (currLoc == CanopyCloseLoc)
+	else if (FVector::Dist(currLoc, CanopyCloseLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
-	else if (currLoc == CanopyNormalLoc)
+	else if (FVector::Dist(currLoc, CanopyNormalLoc)<=1)
 		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
 }
