@@ -14,11 +14,15 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionPlayerController : public AK_PlayerController
 {
 	GENERATED_BODY()
+public:
+	AJ_MissionPlayerController();
 
 protected:
 	// XXX 플레이어 역할
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	EPlayerRole playerRole;
+
+	
 
 	
 	// XXX 스폰 위치
@@ -30,6 +34,10 @@ protected:
 	bool enableDebugInput = false;
 
 public:
+	// 목표 UI 관리 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
+	class UJ_ObjectiveUIComponent* objUIComp;
+
 	// 파일럿 역할
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	EPilotRole pilotRole;
@@ -49,7 +57,7 @@ protected:
 	// XXX streaming ui 생성 | 의존성 제거됨
 	void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
 
-    public:
+public:
 	virtual void Tick(float deltaTime);
 
 	UFUNCTION(BlueprintCallable)

@@ -155,6 +155,24 @@ void AJ_BaseMissionObjective::ObjectiveDeactive()
 void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 {
 	successPercent = value;
+	// 수행도 갱신 딜리게이트 실행
+	objSuccessUpdateDel.Broadcast();
 	// 점수 갱신 딜리게이트 실행
 	sendObjSuccessDel.Broadcast(this, SUCCESS_PERCENT);
 }
+
+void AJ_BaseMissionObjective::SRPC_StartNewObjUI_Implementation()
+{
+
+}
+
+void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
+{
+
+}
+
+void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
+{
+
+}
+void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation() {}

@@ -287,7 +287,7 @@ enum class EPlayerRole : uint8
     ,PILOT = 1
 };
 
-// 전술명령
+// 전술명령 | 번호 하나 밀려잇는건 목표 매니저 쪽에서 보정해줌
 UENUM(BlueprintType)
 enum class ETacticalOrder : uint8
 {
@@ -369,6 +369,79 @@ enum class EFormationChecklist : uint8
     ,ALIGN_FORMATION = 2
 };
 
+// // XXXUI 텍스트, 완료 유무, 성공 유무
+// USTRUCT(BlueprintType)
+// struct FObjUITextData
+// {
+//     GENERATED_BODY()
+// public:
+//     // 텍스트
+//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+//     FString text;
+//     // 완료 유무
+//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+//     bool isEnd = false;
+//     // 성공 유무
+//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+//     bool isSuccess = true;
+
+//     FObjUITextData() {}
+
+//     FObjUITextData(const FString& text, bool isEnd = false, bool isSuccess = true) 
+//         : text(text), isEnd(isEnd), isSuccess(isSuccess) {}
+// };
+
+// 목표 UI 표시용 
+USTRUCT(BlueprintType)
+struct FObjUIData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString headerText;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FString> bodyTextAry;
+    
+};
+
+
+
+// 1. 편대비행
+USTRUCT(BlueprintType)
+struct FFormationFlightUIData
+{
+    GENERATED_BODY()
+public:
+    // 고도 조건
+
+    // 현재 파일럿 고도
+
+    // 진형 조건
+
+    // 해당 파일럿 역할
+
+    // 진형 위치 충족 여부
+};
+
+// 2. 목표 무력화
+USTRUCT(BlueprintType)
+struct FNeutralizeTargetUIData
+{
+    GENERATED_BODY()
+public:
+    // 전체 목표 갯수
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int allTargetAmt;
+    // 현재 남은 목표 갯수
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int curTargetAmt;
+
+    FNeutralizeTargetUIData() {}
+
+    FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
+};
+
 #pragma endregion
 
 // @@ 테스트 용
@@ -420,6 +493,8 @@ public:
     static class AJ_MissionGameState* GetMissionGameState(const UWorld* world);
     // 미션맵 로컬 플레이어 가져오기
     static class AJ_BaseMissionPawn *GetBaseMissionPawn(const UWorld *world, int32 playerIdx = 0);
+    // 미션 모든 플레이어 컨트롤러 가져오기
+    static class TArray<class AJ_MissionPlayerController *> GetAllMissionPC(const UWorld *world);
     // 미션 모든 플레이어 폰 가져오기
     static class TArray<APawn*> GetAllMissionPawn(const UWorld *world);
     // 범위 조건 체크
