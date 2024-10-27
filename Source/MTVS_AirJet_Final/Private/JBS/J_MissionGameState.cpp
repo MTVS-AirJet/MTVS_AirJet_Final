@@ -2,11 +2,14 @@
 
 
 #include "JBS/J_MissionGameState.h"
+#include "Containers/Array.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "KHS/K_StreamingUI.h"
+#include "Templates/Casts.h"
 #include "UObject/ObjectPtr.h"
 
 void AJ_MissionGameState::OnRep_StreamingID()
@@ -34,16 +37,29 @@ void AJ_MissionGameState::RemoveStreamUserId(const FString &userId)
     ArrStreamingUserID.Remove(userId);
 }
 
+TArray<AJ_MissionPlayerController *> AJ_MissionGameState::GetAllPlayerController()
+{
+    TArray<AJ_MissionPlayerController*> allPC;
+    Algo::Transform(this->PlayerArray, allPC, [](TObjectPtr<APlayerState> temp){
+        check(temp);
+        auto* tempPC = CastChecked<AJ_MissionPlayerController>(temp->GetPlayerController());
+        check(tempPC);
+
+        return tempPC;
+    });
+
+    return allPC;
+}
+
 TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
 {
-    // 플레이어 스테이트 가져오기
-    // this->PlayerArray[0]->GetPlayerController()->GetPawn()
     // 플레이어 스테이트->PS->폰 으로 가져오기
+    // 모든 pc
+    auto allPC = GetAllPlayerController();
+
+    // pc -> apawn 변환
     TArray<APawn*> allPawns;
-    Algo::Transform(this->PlayerArray, allPawns, [](TObjectPtr<APlayerState> temp){
-        check(temp);
-        auto* tempPC = temp->GetPlayerController();
-        check(tempPC);
+    Algo::Transform(allPC, allPawns, [](AJ_MissionPlayerController* tempPC){
         auto* tempPawn = tempPC->GetPawn();
         check(tempPawn);
 

@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GenericPlatform/ICursor.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_ObjectiveUIComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
 #include <KHS/K_GameInstance.h>
@@ -15,6 +16,16 @@
 #include <JBS/J_MissionGamemode.h>
 #include "KHS/K_StreamingUI.h"
 #include "UObject/Linker.h"
+
+AJ_MissionPlayerController::AJ_MissionPlayerController()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryActorTick.bCanEverTick = true;
+    
+	// ...
+    objUIComp = CreateDefaultSubobject<UJ_ObjectiveUIComponent>(TEXT("objUIComp"));
+}
 
 void AJ_MissionPlayerController::BeginPlay()
 {

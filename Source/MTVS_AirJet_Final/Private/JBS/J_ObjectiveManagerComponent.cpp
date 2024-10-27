@@ -63,7 +63,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 		objectiveActor->objectiveEndDel.AddUObject(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
 		// 목표 수행도 갱신함수 바인드
 		objectiveActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
-
+	
 
 		// 목표 액터 배열에 추가
 		// 순서대로 하기위해 pinNo 사용
