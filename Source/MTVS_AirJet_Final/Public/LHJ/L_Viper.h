@@ -76,7 +76,7 @@ private: // Component
 	class UBoxComponent* JetJFSHandle;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* JetCanopy;
-	
+
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 
@@ -95,7 +95,7 @@ private: // Component
 	class USpringArmComponent* JetSprintArmFPS;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCameraFPS;
-	
+
 
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
@@ -457,12 +457,21 @@ private:
 	                     const FHitResult& SweepResult);
 	//=====================================
 	// 캐노피
-	int iCanopyNum = 0;	//0=잠금, 1=기본, 2=닫기, 3=잠금
+	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
 	void PerformLineTrace();
-	void BackMoveCanopyHandle();	
-	FVector CanopyOpenLoc=FVector(365 , 25 , 260);
-	FVector CanopyNormalLoc=FVector(370 , 25 , 260);
-	FVector CanopyCloseLoc=FVector(375 , 25 , 260);
-	FVector CanopyHoldLoc=FVector(380 , 25 , 260);
-	void RotateBone(bool bOpen);
+	void BackMoveCanopyHandle();
+	FVector CanopyOpenLoc = FVector(365 , 25 , 260);
+	FVector CanopyNormalLoc = FVector(370 , 25 , 260);
+	FVector CanopyCloseLoc = FVector(375 , 25 , 260);
+	FVector CanopyHoldLoc = FVector(380 , 25 , 260);
+	UFUNCTION(Server , Reliable)
+	void ServerRPC_Canopy(bool bOpen);
+	UPROPERTY(EditDefaultsOnly , Category="Canopy")
+	float CanopyRotatePitchValue = 2;
+	
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyCanopyMesh;
+public:
+	UPROPERTY(EditAnywhere , Category="Canopy" , Replicated)
+	float CanopyPitch = 80.f;
 };

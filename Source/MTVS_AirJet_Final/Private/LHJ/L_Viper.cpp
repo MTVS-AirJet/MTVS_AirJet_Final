@@ -233,6 +233,7 @@ void AL_Viper::PushQueue()
 	StartScenario.push("EngineMaster");
 	StartScenario.push("JFS_Handle");
 	StartScenario.push("Throttle");
+	StartScenario.push("Canopy");
 }
 
 void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -260,6 +261,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
+	DOREPLIFETIME(AL_Viper , CanopyPitch);
 }
 
 #pragma region Input
@@ -568,14 +570,20 @@ void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct 
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
+	{
 		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+		iCanopyNum = 3;
+	}
 	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-		RotateBone(false);
+		iCanopyNum = 2;
 	}
 	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
+	{
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		iCanopyNum = 1;
+	}
 }
 
 void AL_Viper::F_ViperEngine(const FInputActionValue& value)
@@ -850,14 +858,15 @@ void AL_Viper::Tick(float DeltaTime)
 
 	//PrintNetLog();
 
-	auto currCanopyLoc = JetCanopy->GetRelativeLocation();
-	if (currCanopyLoc == CanopyCloseLoc)
+	if (iCanopyNum == 2)
 	{
 		// 캐노피를 닫는다.
+		ServerRPC_Canopy(false);
 	}
-	else if (currCanopyLoc == CanopyOpenLoc)
+	else if (iCanopyNum == 0)
 	{
 		// 캐노피를 연다.
+		ServerRPC_Canopy(true);
 	}
 
 	if (IsFlyStart)
@@ -924,6 +933,17 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				DummyThrottleMesh->SetRenderCustomDepth(true);
 				DummyThrottleMesh->CustomDepthStencilValue = 1;
+			}
+			else if(ScenarioFront.Equals("Canopy"))
+			{
+				DummyCanopyMesh->SetRenderCustomDepth(true);
+				DummyCanopyMesh->CustomDepthStencilValue = 1;
+				if(CanopyPitch==0.f)
+				{
+					StartScenario.pop();
+					DummyCanopyMesh->SetRenderCustomDepth(false);
+					DummyCanopyMesh->CustomDepthStencilValue = 0;
+				}
 			}
 		}
 		else
@@ -1529,6 +1549,10 @@ void AL_Viper::CreateDumyComp()
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
 	DummyThrottleMesh->SetRelativeScale3D(FVector(.5f));
+
+	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
+	DummyCanopyMesh->SetupAttachment(JetCanopy);
+	DummyCanopyMesh->SetRelativeScale3D(FVector(.5f));
 }
 
 void AL_Viper::SetAccelGear()
@@ -1595,32 +1619,38 @@ void AL_Viper::BackMoveCanopyHandle()
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
+	{
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		iCanopyNum = 2;
+	}
 	else if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
+	{
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		iCanopyNum = 1;
+	}
 	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
 	{
-		RotateBone(true);
 		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+		iCanopyNum = 0;
 	}
 }
 
-void AL_Viper::RotateBone(bool bOpen)
+void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 {
-	if (JetMesh)
+	if (bOpen)
 	{
-		int32 BoneIndex = JetMesh->GetBoneIndex(FName("lantern_jnt"));
-		LOG_SCREEN("%d" , BoneIndex);
-		if (BoneIndex != INDEX_NONE)
-		{
-			if (bOpen)
-			{
-				// 캐노피가 열린다.
-			}
-			else
-			{
-				// 캐노피가 닫힌다.
-			}
-		}
+		// 캐노피가 열린다.
+		float newPitch = CanopyPitch + CanopyRotatePitchValue;
+		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
+		CanopyPitch = newPitch;
+		LOG_S(Warning, TEXT("Open %f"), newPitch);
+	}
+	else
+	{
+		// 캐노피가 닫힌다.
+		float newPitch = CanopyPitch - CanopyRotatePitchValue;
+		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
+		CanopyPitch = newPitch;
+		LOG_S(Warning, TEXT("Close %f"), newPitch);
 	}
 }
