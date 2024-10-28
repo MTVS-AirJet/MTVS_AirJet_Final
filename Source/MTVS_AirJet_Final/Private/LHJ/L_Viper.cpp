@@ -14,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JBS/J_MissionActorInterface.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "KHS/K_CesiumTeleportBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -351,6 +352,9 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		                  &AL_Viper::F_ViperZoomOutStarted);
 		input->BindAction(IA_ViperZoonOut , ETriggerEvent::Completed , this ,
 		                  &AL_Viper::F_ViperZoomOutCompleted);
+
+		input->BindAction(IA_ViperVoice , ETriggerEvent::Started , this ,
+		                  &AL_Viper::F_ViperVoiceStarted);
 	}
 }
 
@@ -842,6 +846,15 @@ void AL_Viper::F_ViperRotateTriggerStarted(const struct FInputActionValue& value
 void AL_Viper::F_ViperRotateTriggerCompleted(const struct FInputActionValue& value)
 {
 	IsRotateTrigger = false;
+}
+
+void AL_Viper::F_ViperVoiceStarted(const struct FInputActionValue& value)
+{
+	bVoice = !bVoice;
+	if (bVoice)
+		StartVoiceChat();
+	else
+		StopVoiceChat();
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -1711,4 +1724,24 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		CanopyPitch = newPitch;
 		LOG_S(Warning , TEXT("Close %f") , newPitch);
 	}
+}
+
+void AL_Viper::StartVoiceChat()
+{
+	// AController* Controller = GetController();
+	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// {
+	// 	PlayerController->StartTalking();
+	// }
+	GetController<AJ_MissionPlayerController>()->StartTalking();
+}
+
+void AL_Viper::StopVoiceChat()
+{
+	// AController* Controller = GetController();
+	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// {
+	// 	PlayerController->StopTalking();
+	// }	 
+	GetController<AJ_MissionPlayerController> ()->StopTalking();
 }

@@ -177,6 +177,8 @@ private: // Input
 	class UInputAction* IA_ViperChangeWeapon;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperRotateViewTrigger;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperVoice;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -236,6 +238,8 @@ private: // Input
 	void F_ViperRotateTriggerStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperRotateTriggerCompleted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperVoiceStarted(const struct FInputActionValue& value);
 
 private:
 	bool bFirstEngine;
@@ -475,23 +479,30 @@ private:
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
 	float CanopyRotatePitchValue = 2;
-	
+
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
+
 public:
 	UPROPERTY(EditAnywhere , Category="Canopy" , Replicated)
 	float CanopyPitch = 80.f;
+
 public:
-	UPROPERTY(EditAnywhere,Category="JetTail" ,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
 	bool bJetTailVFXOn;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	UPROPERTY(EditDefaultsOnly , Category="Sound")
 	class USoundBase* JetReadySound;
-	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	UPROPERTY(EditDefaultsOnly , Category="Sound")
 	class USoundBase* JetRunOnRoad;
-	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	UPROPERTY(EditDefaultsOnly , Category="Sound")
 	class USoundBase* JetFlySound;
-	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	UPROPERTY(EditDefaultsOnly , Category="Sound")
 	class USoundCue* JetSoundCue;
+
+private:
+	bool bVoice;
+	void StartVoiceChat();
+	void StopVoiceChat();
 };
