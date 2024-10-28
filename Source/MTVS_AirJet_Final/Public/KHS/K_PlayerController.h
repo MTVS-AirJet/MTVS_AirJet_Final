@@ -22,4 +22,8 @@ public:
    class UK_StreamingUI* StreamingUI;
 
 
+    // 클라이언트를 로비 레벨로 트래블시키는 함수
+    UFUNCTION(BlueprintCallable)
+    virtual void TravelToLobbyLevel();
+
 };

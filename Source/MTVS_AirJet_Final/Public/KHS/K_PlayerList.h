@@ -22,10 +22,7 @@ public:
 	class UTextBlock* PlayerNum; // PlayerNum
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UTextBlock* PlayerNicName; // PlayerNicName
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UTextBlock* PlayerType; // PlayerType
+	class UTextBlock* PlayerNickName; // PlayerNickName
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UCheckBox* IsCommander; // 지휘관여부
@@ -33,7 +30,7 @@ public:
 	// Variables    ================================================
 
 	UPROPERTY()
-	class UK_ServerWidget* Parent;
+	class UK_StandbyWidget* Parent;
 
 	uint32 Index;
 
@@ -42,7 +39,7 @@ public:
 	bool Selected = false; // 서버를 선택했는지, 아닌지 선언(Event Graph에서 사용)
 
 	// Functions    ================================================
-	void Setup(class UK_ServerWidget* InParent, uint32 InIndex);
+	void Setup(class UK_StandbyWidget* InParent, uint32 InIndex);
 
 	UFUNCTION()
 	bool bIsCommander();

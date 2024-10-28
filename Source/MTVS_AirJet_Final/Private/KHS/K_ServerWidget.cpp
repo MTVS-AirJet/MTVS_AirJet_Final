@@ -90,17 +90,6 @@ bool UK_ServerWidget::Initialize()
 		HostMenu_btn_WebQuit->OnClicked.AddDynamic(this , &UK_ServerWidget::QuitCreaterWeb);
 	}
 
-	// Ready Menu Button Binding ===============================================
-
-	if (ReadyMenu_btn_Start) //게임시작 버튼 바인딩(게임맵 트래블)
-	{
-		ReadyMenu_btn_Start->OnClicked.AddDynamic(this , &UK_ServerWidget::LoadGameMap);
-	}
-	if (ReadyMenu_btn_Home) //홈 버튼 바인딩
-	{
-		ReadyMenu_btn_Home->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenServerMenuFromReady);
-	}
-
 
 	return true;
 }
@@ -136,9 +125,7 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 // 서버메뉴로 돌아가는 함수
 void UK_ServerWidget::OpenServerMenuFromReady()
 {
-	if (HideReadyMenuAnim)
-		PlayAnimation(HideReadyMenuAnim);
-
+	
 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
@@ -393,42 +380,6 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	GameInstance->MissionData.startPoint.y = resData.startPointY;
 	GameInstance->MissionData.mission = resData.missionData;
 
-
-	// //방생성정보 저장(Room Name, PW)
-	// FString RoomName = HostMenu_txt_RoomName->GetText().ToString();
-	// FString RoomePW = HostMenu_txt_RoomPW->GetText().ToString();
-	//
-	// //ReadyMenu에 세팅(기본)
-	// ReadyMenu_txt_RoomName->SetText(FText::FromString(resData.mapName));
-	// ReadyMenu_txt_Producer->SetText(FText::FromString(resData.producer));
-	// ReadyMenu_txt_MapName->SetText(FText::FromString(resData.mapName));
-	// ReadyMenu_txt_Latitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.latitude)));
-	// ReadyMenu_txt_Longitude->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.longitude)));
-	//
-	// //ReadyMenu Image 세팅
-	// FString ImgDataString = resData.mapImage;
-	// TArray<uint8> SessionMapImgData;
-	// // Base64 문자열을 디코딩하여 TArray<uint8>에 저장
-	// if ( FBase64::Decode(ImgDataString , SessionMapImgData) )
-	// {
-	// 	// 이미지 데이터를 Texture2D로 변환
-	// 	UTexture2D* imgTexture = FImageUtils::ImportBufferAsTexture2D(SessionMapImgData);
-	// 	if ( imgTexture && ReadyMenu_img_Map )
-	// 	{
-	// 		ReadyMenu_img_Map->SetBrushFromTexture(imgTexture); // UI에 적용
-	// 	}
-	// 	else
-	// 	{
-	// 		LOG_S(Warning , TEXT("Can not find Texture"));
-	// 	}
-	// }
-	// else
-	// {
-	// 	LOG_S(Warning , TEXT("Failed to decode Base64 string"));
-	// }
-	//
-	// //RedayMenu Command 세팅
-	// ReadyMenu_txt_CommandList->SetText(FText::FromString(FString::Printf(TEXT("%d") , resData.commandNo)));
 }
 
 
@@ -436,31 +387,3 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 
 #pragma endregion
 
-// Ready Menu ===================================================
-
-#pragma region Ready Menu Functions
-
-// PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
-void UK_ServerWidget::SetPlayerList()
-{
-}
-
-// PlayerList 3초마다 업데이트
-void UK_ServerWidget::PlayerListUpdateChildren()
-{
-	for (int32 i = 0; i < ReadyMenu_PlayerList->GetChildrenCount(); ++i)
-	{
-		UK_PlayerList* List = Cast<UK_PlayerList>(ReadyMenu_PlayerList->GetChildAt(i));
-		if (List)
-		{
-			List->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
-		}
-	}
-}
-
-//게임시작 버튼 바인딩 함수(게임맵 트래블)
-void UK_ServerWidget::LoadGameMap()
-{
-}
-
-#pragma endregion

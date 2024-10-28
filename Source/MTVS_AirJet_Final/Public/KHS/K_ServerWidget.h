@@ -48,11 +48,6 @@ public:
 	TSubclassOf<class UUserWidget> ServerListFactory; // ServerList 공장
 	class UK_ServerList* ServerList; // ServerLIst인스턴스
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> PlayerListFactory; // PlayerList 공장
-	class UK_PlayerList* PlayerList; // PlayerLIst인스턴스
-
-
 	//===============================================================
 	// Widget Binding
 	//===============================================================
@@ -77,11 +72,11 @@ public:
 	UPROPERTY(meta = (BindWidgetAnim) , Transient)
 	class UWidgetAnimation* HideHostMenuAnim;
 
-	UPROPERTY(meta = (BindWidgetAnim) , Transient)
-	class UWidgetAnimation* ShowReadyMenuAnim;
+	//UPROPERTY(meta = (BindWidgetAnim) , Transient)
+	//class UWidgetAnimation* ShowReadyMenuAnim;
 	
-	UPROPERTY(meta = (BindWidgetAnim) , Transient)
-	class UWidgetAnimation* HideReadyMenuAnim;
+	//UPROPERTY(meta = (BindWidgetAnim) , Transient)
+	//class UWidgetAnimation* HideReadyMenuAnim;
 
 	// Server Menu ==================================================
 
@@ -140,41 +135,6 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWebBrowser* HostMenu_web_Popup; // 맵불러오기URL팝업
 	
-
-	// Ready Menu ===================================================
-
-	UPROPERTY(meta = (BindWidget))
-	class UWidget* ReadyMenu; // Ready 메뉴 Widget UI
-
-	UPROPERTY(meta = (BindWidget))
-	class UPanelWidget* ReadyMenu_PlayerList; // PlayerList 출력 ScrollBox
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_RoomName; // 생성된 방 이름
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* ReadyMenu_btn_Start; // 게임시작하기 버튼(게임맵 트래블)
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* ReadyMenu_btn_Home; // 로비로 돌아가기 버튼
-
-	UPROPERTY(meta = (BindWidget))
-	class UImage* ReadyMenu_img_Map; // 해당 세션 맵 썸네일
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_Producer; // 해당 세션의 맵제작자 이름
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_MapName; // 해당 세션의 맵 이름
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_Latitude; // 맵 정보(위도)
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_Longitude; // 맵 정보(경도)
-
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* ReadyMenu_txt_CommandList; // 맵 미션목록
 
 #pragma endregion
 	
@@ -247,26 +207,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CreateRoom(); // (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
-
-
-	// Ready Menu ===================================================
-
-	UFUNCTION(BlueprintCallable)
-	void SetPlayerList(); // PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
-
-	UFUNCTION(BlueprintCallable)
-	void PlayerListUpdateChildren(); // PlayerList 3초마다 업데이트
-
-	UFUNCTION(BlueprintCallable)
-	void LoadGameMap(); //게임시작 버튼 바인딩 함수(게임맵 트래블)
-	
-
-
-	
-
-	
-
-	
 
 
 #pragma endregion

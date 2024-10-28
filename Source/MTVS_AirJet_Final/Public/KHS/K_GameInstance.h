@@ -52,6 +52,9 @@ public:
 
 	FMissionDataRes MissionData; //미션관리자가 사용할 미션데이터 구조체
 
+	UPROPERTY(BlueprintReadOnly , Category = "Session")
+	TArray<FString> ConnectedPlayerNames; // 세션에 접속한 플레이어 이름 배열
+
 	//===============================================================
 	// Functions
 	//===============================================================
@@ -101,6 +104,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	void CreateLoadingWidget(); // Loading UI를 생성하는 함수
 
+	UFUNCTION(BlueprintCallable, Category = "Create Widget")
+	void CreateStandbyWidget(); // Standby UI를 생성하는 함수
+
 	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	//void CreateInGameWidget(); // 인게임 UI를 생성하는 함수
 
@@ -108,7 +114,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Load Lobby Map")
 	void TravelMainLobbyMap(bool bKeepCurrentSound); // Lobby 맵으로 트래블시키는 함수
 
-	// 5) 사운드 관련 함수 --------------------------------------------------------------------------------------
+	// 4) 사운드 관련 함수 --------------------------------------------------------------------------------------
 	void PlayLobbySound(); // 로비 사운드 재생 함수
 	UFUNCTION()
 	void PlayStageSound(); // 시뮬레이션 스테이지 사운드 재생 함수
@@ -126,6 +132,8 @@ public:
 	// 1) 세션 관련 참조 ------------------------------------------------------------------------------------------
 	FStreamableManager StreamableManager; //Map 비동기함수 관련
 
+
+
 	// 2) UI 관련 참조 ------------------------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UK_LoginRegisterWidget> LoginWidgetFactory; // LoginWidget(UI) 공장
@@ -138,6 +146,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UK_LoadingWidget> LoadingWidgetFactory; // LoadingWidget(UI) 공장
 	class UK_LoadingWidget* LoadingWidget; // LoadingWidget(UI) 참조 선언
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UK_StandbyWidget> StandbyWidgetFactory; // StandbyWidget(UI) 공장
+	class UK_StandbyWidget* StandbyWidget; // StandbyWidget(UI) 참조 선언
+
 
 	//UPROPERTY(EditAnywhere, Category = "UI")
 	//TSubclassOf<class UK_IngameWidget> IngameWidgetFactory; // IngameWidget(UI) 공장

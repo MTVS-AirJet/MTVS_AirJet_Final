@@ -2,8 +2,9 @@
 
 
 #include "KHS/K_PlayerList.h"
+#include "KHS/K_StandbyWidget.h"
 
-void UK_PlayerList::Setup(UK_ServerWidget* InParent , uint32 InIndex)
+void UK_PlayerList::Setup(UK_StandbyWidget* InParent , uint32 InIndex)
 {
 	Parent = InParent;
 	Index = InIndex;

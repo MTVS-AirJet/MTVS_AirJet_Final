@@ -6,6 +6,7 @@
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_ServerWidget.h"
 #include "KHS/K_LoadingWidget.h"
+#include "KHS/K_StandbyWidget.h"
 #include "KHS/K_JsonParseLib.h"
 #include <MTVS_AirJet_Final.h>
 
@@ -145,6 +146,7 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 
 	UE_LOG(LogTemp , Warning , TEXT("Starting Find Session"));
 
+	//ServerList에 내용 업데이트
 	TArray<FServerData> ServerNames;
 
 	int index = 0;
@@ -189,6 +191,9 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 	{
 		UE_LOG(LogTemp , Error , TEXT("ServerWidget is not valid during SetServerList call."));
 	}
+
+	
+
 }
 
 // 세션 Join 완료시 호출된 바인딩 함수
@@ -220,6 +225,25 @@ void UK_GameInstance::OnJoinSessionComplete(FName SessionName , EOnJoinSessionCo
 		{
 			PlayerController->ClientTravel(Address , ETravelType::TRAVEL_Absolute);
 		}
+	}
+
+	if ( Result == EOnJoinSessionCompleteResult::Success ) {
+		ConnectedPlayerNames.Empty();  // 기존 목록 초기화
+
+		// 세션에 참가한 플레이어 이름을 가져와 추가
+		if ( SessionInterface.IsValid() && SessionSearch.IsValid() ) {
+			for ( const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults ) {
+				FString PlayerName = SearchResult.Session.OwningUserName;
+				ConnectedPlayerNames.Add(PlayerName);  // 플레이어 이름 추가
+			}
+		}
+
+		// 세션에 성공적으로 참가했음을 콘솔에 출력
+		UE_LOG(LogTemp , Log , TEXT("Session Join Success: %s") , *SessionName.ToString());
+	}
+	else {
+		// 실패 시 콘솔에 오류 메시지 출력
+		UE_LOG(LogTemp , Error , TEXT("Session Join Failed: %s") , *SessionName.ToString());
 	}
 }
 
@@ -387,6 +411,15 @@ void UK_GameInstance::CreateLoadingWidget()
 	LoadingWidget->SetUI(); //부모함수 호출
 }
 
+// Standby UI를 생성하는 함수
+void UK_GameInstance::CreateStandbyWidget()
+{
+	// LoadingUIFactory를 통해 LoadingUI 위젯 생성
+	StandbyWidget = CreateWidget<UK_StandbyWidget>(this , StandbyWidgetFactory);
+	StandbyWidget->SetInterface(this); //부모함수 호출
+	StandbyWidget->SetUI(); //부모함수 호출
+}
+
 //// 인게임 UI를 생성하는 함수
 //void UK_GameInstance::CreateInGameWidget()
 //{
@@ -484,7 +517,9 @@ void UK_GameInstance::ContinueCurrentSound()
 }
 
 
+
 #pragma endregion
+
 
 
 #pragma region Server Part Coordination
