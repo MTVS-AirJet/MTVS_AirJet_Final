@@ -80,7 +80,7 @@ void AJ_BaseMissionPawn::ServerRPC_SetStreamingPlayer_Implementation(const FStri
 // 화면 공유 시작 
 void AJ_BaseMissionPawn::StartScreenShare()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("0. 화면 공유 시작"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("0. 화면 공유 시작"));
 	// 세션 아이디 가져오기
 	streamId = GetSessionId();
 	
@@ -111,7 +111,7 @@ void AJ_BaseMissionPawn::StartScreenShare()
 	curStreamer->SetSignallingServerURL(psServerURL);
 
 	// 스트리밍 시작
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("2. 플레이어 화면 공유 시작"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("2. 플레이어 화면 공유 시작"));
 	curStreamer->StartStreaming();
 
 
@@ -120,7 +120,7 @@ void AJ_BaseMissionPawn::StartScreenShare()
 
 FString AJ_BaseMissionPawn::GetSessionId()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("1. 세션 id 가져오기"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("1. 세션 id 가져오기"));
 	// UK_StreamingUI::GetCurrentSessionID() 인용
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if ( OnlineSubsystem )

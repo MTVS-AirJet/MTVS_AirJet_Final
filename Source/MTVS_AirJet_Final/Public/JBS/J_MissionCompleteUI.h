@@ -27,7 +27,7 @@ protected:
 
 	// 수행 결과 요소 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
-	TSubclassOf<class UJ_MissionCompleteObjElement*> objElementPrefab;
+	TSubclassOf<class UJ_MissionCompleteObjElement> objElementPrefab;
 public:
 
 protected:
