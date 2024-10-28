@@ -29,6 +29,10 @@ private:
 	class UStaticMeshComponent* MissileMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* MissileBoxComp;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UNiagaraComponent* EngineVFX;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UNiagaraComponent* SmokeVFX;
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Missile")

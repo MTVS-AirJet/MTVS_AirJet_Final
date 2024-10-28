@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JBS/J_MissionActorInterface.h"
+#include "KHS/K_CesiumTeleportBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_Flare.h"
@@ -195,6 +196,28 @@ AL_Viper::AL_Viper()
 		BoosterRightVFX->SetAsset(RightVFX.Object);
 	}
 
+	JetTailVFXLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("JetTailVFXLeft"));
+	JetTailVFXLeft->SetupAttachment(JetMesh);
+	JetTailVFXLeft->SetRelativeLocationAndRotation(FVector(-390 , -580 , 180) , FRotator(0 , 180 , 0));
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TailLeftVFX(TEXT(
+		"/Script/Niagara.NiagaraSystem'/Game/Asset/ArmyVFX/Niagara/Jet/NS_Jet_Trails.NS_Jet_Trails'"));
+	if (TailLeftVFX.Succeeded())
+	{
+		JetTailVFXLeft->SetAsset(TailLeftVFX.Object);
+		JetTailVFXLeft->SetFloatParameter(FName("Lifetime") , 0.f);
+	}
+	
+	JetTailVFXRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("JetTailVFXRight"));
+	JetTailVFXRight->SetupAttachment(JetMesh);
+	JetTailVFXRight->SetRelativeLocationAndRotation(FVector(-390 , 580 , 180) , FRotator(0 , 180 , 0));
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> TailRightVFX(TEXT(
+		"/Script/Niagara.NiagaraSystem'/Game/Asset/ArmyVFX/Niagara/Jet/NS_Jet_Trails.NS_Jet_Trails'"));
+	if (TailRightVFX.Succeeded())
+	{
+		JetTailVFXRight->SetAsset(TailRightVFX.Object);
+		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 0.f);
+	}
+
 	//============================================
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
 	MissileMoveLoc->SetupAttachment(RootComponent);
@@ -252,6 +275,11 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 			intTriggerNum = 2;
 			IsFlyStart = true;
 		}
+	}
+	else if(auto tp = Cast<AK_CesiumTeleportBox>(OtherActor))
+	{
+		JetTailVFXLeft->SetFloatParameter(FName("Lifetime") , 1.f);
+		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 1.f);
 	}
 }
 
@@ -934,11 +962,11 @@ void AL_Viper::Tick(float DeltaTime)
 				DummyThrottleMesh->SetRenderCustomDepth(true);
 				DummyThrottleMesh->CustomDepthStencilValue = 1;
 			}
-			else if(ScenarioFront.Equals("Canopy"))
+			else if (ScenarioFront.Equals("Canopy"))
 			{
 				DummyCanopyMesh->SetRenderCustomDepth(true);
 				DummyCanopyMesh->CustomDepthStencilValue = 1;
-				if(CanopyPitch==0.f)
+				if (CanopyPitch == 0.f)
 				{
 					StartScenario.pop();
 					DummyCanopyMesh->SetRenderCustomDepth(false);
@@ -1399,7 +1427,9 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = newOwner;
-			FRotator SpawnRotation = FRotator::ZeroRotator; // Update this with the desired rotation for the missile
+
+			FRotator SpawnRotation = FRotator((LockOnTarget->GetActorLocation() - GetActorLocation()).Rotation().Yaw ,
+			                                  0 , 0); // Update this with the desired rotation for the missile
 			FVector SpawnLocation = GetActorLocation(); // Update this with the desired location for the missile
 
 			AL_Missile* SpawnedMissile = GetWorld()->SpawnActor<AL_Missile>(
@@ -1643,7 +1673,7 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch + CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		LOG_S(Warning, TEXT("Open %f"), newPitch);
+		LOG_S(Warning , TEXT("Open %f") , newPitch);
 	}
 	else
 	{
@@ -1651,6 +1681,6 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch - CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		LOG_S(Warning, TEXT("Close %f"), newPitch);
+		LOG_S(Warning , TEXT("Close %f") , newPitch);
 	}
 }
