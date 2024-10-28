@@ -53,4 +53,8 @@ public:
 	// 전술명령 완료 처리
 	UFUNCTION(Client, Reliable)
 	void CRPC_EndObjUI(bool isSuccess = true);
+
+	// 결산 UI 가져오기 | 바로 접근용
+	UFUNCTION(BlueprintCallable)
+	class UJ_MissionCompleteUI *GetMissionCompleteUI();
 };
