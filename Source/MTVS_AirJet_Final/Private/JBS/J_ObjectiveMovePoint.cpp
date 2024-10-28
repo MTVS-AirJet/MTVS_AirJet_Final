@@ -98,6 +98,7 @@ void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     // 충돌한게 미션 폰이면 목표 성공 처리
     if(OtherActor->IsA<AJ_BaseMissionPawn>())
     {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("충돌한 플레이어 : %s"), *OtherActor->GetName()));
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이동 목표 성공"));
         // 수행도 1
         SUCCESS_PERCENT = 1.f;
@@ -118,6 +119,9 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
 
     // 충돌체 활/비활성화
     checkCapsuleComp->SetActive(value);
+    FName profile = value ? FName(TEXT("MovePoint")) : FName(TEXT("NoCollision"));
+    checkCapsuleComp->SetCollisionProfileName(profile);
+
     if(!value)
     {
         // 빔 이펙트 종료

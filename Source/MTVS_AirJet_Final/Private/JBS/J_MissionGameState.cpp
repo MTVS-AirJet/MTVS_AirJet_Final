@@ -68,3 +68,12 @@ TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
     
     return allPawns;
 }
+
+void AJ_MissionGameState::RemoveAllLoadingUI()
+{
+    auto allPC = GetAllPlayerController();
+    for(auto* pc : allPC)
+    {
+        pc->CRPC_RemoveLoadingUI();
+    }
+}

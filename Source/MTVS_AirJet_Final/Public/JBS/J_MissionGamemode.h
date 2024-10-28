@@ -10,6 +10,8 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel)
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionGamemode : public AGameModeBase
 {
@@ -60,6 +62,25 @@ protected:
     // 편대 진형 데이터
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FFormationValue formationData;
+
+    // 제거좀 하자
+    FRemoveLoadingUIDel removeLUIDel;
+
+#pragma region 세슘 관련 액터
+    // 활주로 엔드 포인트 및 위경도 위치 이동 담당
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    class AK_CesiumTeleportBox* cesiumTPBox;
+    // 미션의 정점 (0,0,0) 을 나타내는 액터 | 실제 0,0,0은 세슘으로 인해 내핵이 됨.
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    class AK_CesiumManager* cesiumZeroPos;
+    
+#pragma endregion
+
+    // 이륙한 파일럿 pc 배열
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    TSet<class AJ_MissionPlayerController*> flightedPCAry;
+    
+    
 
 public:
     // 로드할 미션 맵 이름
@@ -116,6 +137,13 @@ protected:
 
     FTransform CalcTeleportTransform(EPilotRole role);
 
+    // 세슘 관련 액터 레벨에서 찾아서 캐시
+    void CacheCesiumActors();
+
+    // 해당 pc에 로딩 스크린 UI 추가
+    UFUNCTION(Server, Reliable)
+    void SRPC_RemoveLoadingUIByPC(class AJ_MissionPlayerController *missionPC);
+
 public:
     virtual void Tick(float DeltaSeconds) override;
 
@@ -125,5 +153,6 @@ public:
     // 해당 역할의 플레이어 스폰 포인트 트랜스폼 가져오기
     FTransform GetPlayerSpawnTransfrom(EPlayerRole role);
 
-   
+    // 이륙한 pc 배열 추가
+    bool AddFlightedPC(class AJ_MissionPlayerController *pc);
 };
