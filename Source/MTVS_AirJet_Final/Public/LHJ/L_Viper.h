@@ -86,6 +86,10 @@ private: // Component
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UNiagaraComponent* JetTailVFXLeft;
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UNiagaraComponent* JetTailVFXRight;
 
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;

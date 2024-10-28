@@ -41,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	double DestLatitude;
 
-	//class ACesiumGeoreference* WorldGeoReference;
+	class ACesiumGeoreference* WorldGeoReference;
 
 	//인스턴스에서 가지고 있던 위경도 조건을 가져오는 함수
 	UFUNCTION()

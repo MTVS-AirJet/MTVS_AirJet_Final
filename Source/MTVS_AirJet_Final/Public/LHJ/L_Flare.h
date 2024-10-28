@@ -48,17 +48,17 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
-	float MaxLifeTime = 20.f;
+	float MaxLifeTime = 3.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
-	float MinLifeTime = 10.f;
+	float MinLifeTime = 50.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
-	float MaxScaleSprite = 800.f;
+	float MaxScaleSprite = 1200.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
-	float MinScaleSprite = 200.f;
+	float MinScaleSprite = 300.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
 	float SpawnRadius = 0.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
-	float SpawnRate = 8.f;
+	float SpawnRate = 50.f;
 	UPROPERTY(EditDefaultsOnly , Category="Effect")
 	FLinearColor LColor = FLinearColor(0.147027 , 0.147027 , 0.147027 , 1);
 };

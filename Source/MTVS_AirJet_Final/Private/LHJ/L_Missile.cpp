@@ -4,6 +4,7 @@
 #include "LHJ/L_Missile.h"
 
 #include "MTVS_AirJet_Final.h"
+#include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "LHJ/L_Viper.h"
@@ -14,12 +15,21 @@ AL_Missile::AL_Missile()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
-	SetRootComponent(MissileMesh);
-
 	MissileBoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("MissileBoxComp"));
-	MissileBoxComp->SetupAttachment(RootComponent);
+	SetRootComponent(MissileBoxComp);
 	MissileBoxComp->OnComponentBeginOverlap.AddDynamic(this , &AL_Missile::OnMissileBeginOverlap);
+	MissileBoxComp->SetBoxExtent(FVector(130 , 32 , 32));
+
+	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
+	MissileMesh->SetupAttachment(RootComponent);
+
+	EngineVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EngineVFX"));
+	EngineVFX->SetupAttachment(RootComponent);
+	EngineVFX->SetRelativeLocationAndRotation(FVector(-110 , 0 , 0) , FRotator(-90 , 180 , 180));
+
+	SmokeVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SmokeVFX"));
+	SmokeVFX->SetupAttachment(RootComponent);
+	SmokeVFX->SetRelativeLocation(FVector(-110 , 0 , 0));
 
 	SetLifeSpan(10.f);
 
@@ -32,7 +42,7 @@ void AL_Missile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(HasAuthority())
+	if (HasAuthority())
 	{
 #pragma region TimeLine Settings
 		FOnTimelineFloat ProgressUpdate;
@@ -44,7 +54,7 @@ void AL_Missile::BeginPlay()
 		MissileTimeline.AddInterpFloat(MissileCurve , ProgressUpdate);
 		MissileTimeline.SetTimelineFinishedFunc(FinishedEvent);
 #pragma endregion
-		
+
 		if (auto viper = Cast<AL_Viper>(GetOwner()))
 		{
 			Target = viper->LockOnTarget;
@@ -62,13 +72,13 @@ void AL_Missile::BeginPlay()
 void AL_Missile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(HasAuthority())
+	if (HasAuthority())
 	{
 		if (!bPursuit)
 			MissileTimeline.TickTimeline(DeltaTime);
 		else
 		{
-			if(!Target->IsPendingKillPending())
+			if (!Target->IsPendingKillPending())
 			{
 				FVector P0 = GetActorLocation();
 				FVector v = (Target->GetActorLocation() - P0);
@@ -83,7 +93,7 @@ void AL_Missile::Tick(float DeltaTime)
 				this->Destroy();
 			}
 		}
-	}	
+	}
 }
 
 void AL_Missile::MissileUpdate(float Alpha)
@@ -125,14 +135,13 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 {
 	LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
 	// 데미지 처리
-	if(auto mai=Cast<IJ_MissionActorInterface>(HitActor))
+	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
 		mai->GetDamage();
-	}		
+	}
 	this->Destroy();
 }
 
 void AL_Missile::MulticastRPCDamage_Implementation(AActor* HitActor)
 {
-		
 }
