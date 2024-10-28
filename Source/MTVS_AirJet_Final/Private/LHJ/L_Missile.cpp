@@ -5,6 +5,8 @@
 
 #include "MTVS_AirJet_Final.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "Components/BoxComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "LHJ/L_Viper.h"
@@ -138,6 +140,7 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
 		mai->GetDamage();
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, GetActorLocation());
 	}
 	this->Destroy();
 }

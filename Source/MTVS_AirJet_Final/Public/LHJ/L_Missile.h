@@ -34,6 +34,9 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UNiagaraComponent* SmokeVFX;
 
+	UPROPERTY(EditDefaultsOnly , category="VFX")
+	class UNiagaraSystem* DistroyVFX;
+
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Missile")
 	class UCurveFloat* MissileCurve;
