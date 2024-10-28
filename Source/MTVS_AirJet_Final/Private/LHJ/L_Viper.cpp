@@ -1728,20 +1728,10 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 
 void AL_Viper::StartVoiceChat()
 {
-	// AController* Controller = GetController();
-	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	// {
-	// 	PlayerController->StartTalking();
-	// }
 	GetController<AJ_MissionPlayerController>()->StartTalking();
 }
 
 void AL_Viper::StopVoiceChat()
 {
-	// AController* Controller = GetController();
-	// if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	// {
-	// 	PlayerController->StopTalking();
-	// }	 
 	GetController<AJ_MissionPlayerController> ()->StopTalking();
 }
