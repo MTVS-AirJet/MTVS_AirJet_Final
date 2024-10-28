@@ -100,9 +100,11 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCameraFPS;
 
-
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
+
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UAudioComponent* JetAudio;
 
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
@@ -454,6 +456,7 @@ private:
 	bool IsStart;
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
+	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	int32 intTriggerNum = 0; // 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
 	UFUNCTION()
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -481,4 +484,14 @@ public:
 public:
 	UPROPERTY(EditAnywhere,Category="JetTail" ,BlueprintReadWrite)
 	bool bJetTailVFXOn;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	class USoundBase* JetReadySound;
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	class USoundBase* JetRunOnRoad;
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	class USoundBase* JetFlySound;
+	UPROPERTY(EditDefaultsOnly, Category="Sound")
+	class USoundCue* JetSoundCue;
 };

@@ -7,6 +7,7 @@
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/WidgetComponent.h"
@@ -218,6 +219,9 @@ AL_Viper::AL_Viper()
 		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 0.f);
 	}
 
+	JetAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAudio"));
+	JetAudio->SetupAttachment(RootComponent);
+
 	//============================================
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
 	MissileMoveLoc->SetupAttachment(RootComponent);
@@ -365,6 +369,11 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 			StartScenario.pop();
 			DummyThrottleMesh->SetRenderCustomDepth(false);
 			DummyThrottleMesh->CustomDepthStencilValue = 0;
+			if (JetAudio && JetAudio->GetSound())
+			{
+				JetAudio->SetIntParameter("JetSoundIdx" , 0);
+				JetAudio->Play(0.f);
+			}
 		}
 	}
 }
@@ -847,6 +856,9 @@ void AL_Viper::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (JetAudio && JetAudio->GetSound())
+		JetAudio->Stop();
+
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -888,6 +900,11 @@ void AL_Viper::Tick(float DeltaTime)
 		if (JetTailVFXRight && JetTailVFXRight->GetAsset())
 			JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 1.f);
 
+		if (JetAudio && JetAudio->GetSound())
+		{
+			JetAudio->SetIntParameter("JetSoundIdx" , 2);
+			JetAudio->Play(0.f);
+		}
 		bJetTailVFXOn = false;
 	}
 
@@ -976,6 +993,12 @@ void AL_Viper::Tick(float DeltaTime)
 					StartScenario.pop();
 					DummyCanopyMesh->SetRenderCustomDepth(false);
 					DummyCanopyMesh->CustomDepthStencilValue = 0;
+
+					if (JetAudio && JetAudio->GetSound())
+					{
+						JetAudio->SetIntParameter("JetSoundIdx" , 1);
+						JetAudio->Play(0.f);
+					}
 				}
 			}
 		}
