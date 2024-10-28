@@ -206,7 +206,7 @@ AL_Viper::AL_Viper()
 		JetTailVFXLeft->SetAsset(TailLeftVFX.Object);
 		JetTailVFXLeft->SetFloatParameter(FName("Lifetime") , 0.f);
 	}
-	
+
 	JetTailVFXRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("JetTailVFXRight"));
 	JetTailVFXRight->SetupAttachment(JetMesh);
 	JetTailVFXRight->SetRelativeLocationAndRotation(FVector(-390 , 580 , 180) , FRotator(0 , 180 , 0));
@@ -275,11 +275,6 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 			intTriggerNum = 2;
 			IsFlyStart = true;
 		}
-	}
-	else if(auto tp = Cast<AK_CesiumTeleportBox>(OtherActor))
-	{
-		JetTailVFXLeft->SetFloatParameter(FName("Lifetime") , 1.f);
-		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 1.f);
 	}
 }
 
@@ -885,6 +880,16 @@ void AL_Viper::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//PrintNetLog();
+
+	if (bJetTailVFXOn)
+	{
+		if (JetTailVFXLeft && JetTailVFXLeft->GetAsset())
+			JetTailVFXLeft->SetFloatParameter(FName("Lifetime") , 1.f);
+		if (JetTailVFXRight && JetTailVFXRight->GetAsset())
+			JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 1.f);
+
+		bJetTailVFXOn = false;
+	}
 
 	if (iCanopyNum == 2)
 	{

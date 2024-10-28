@@ -478,4 +478,7 @@ private:
 public:
 	UPROPERTY(EditAnywhere , Category="Canopy" , Replicated)
 	float CanopyPitch = 80.f;
+public:
+	UPROPERTY(EditAnywhere,Category="JetTail" ,BlueprintReadWrite)
+	bool bJetTailVFXOn;
 };
