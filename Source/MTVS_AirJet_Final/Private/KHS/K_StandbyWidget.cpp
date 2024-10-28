@@ -31,6 +31,13 @@ void UK_StandbyWidget::NativeConstruct()
 		InitializeMissionData();
 	}
 
+    //// 포커스할 위젯 설정
+    //if ( StandbyMenu ) // 포커스할 수 있는 주 위젯
+    //{
+    //    StandbyMenu->SetIsFocusable(true);  // StandbyMenu 위젯을 포커스 가능하도록 설정
+    //    // 필요 시 다른 위젯들도 같은 방식으로 설정 가능
+    //}
+
     // 1초마다 PlayerListUpdateChildren 호출
     GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateTimer , this , &UK_StandbyWidget::PlayerListUpdateChildren , 1.0f , true);
 
