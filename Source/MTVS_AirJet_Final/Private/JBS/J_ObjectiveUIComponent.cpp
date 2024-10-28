@@ -103,3 +103,10 @@ void UJ_ObjectiveUIComponent::CRPC_EndObjUI_Implementation(bool isSuccess)
 {
 	objUI->EndObjUI(isSuccess);
 }
+
+UJ_MissionCompleteUI *UJ_ObjectiveUIComponent::GetMissionCompleteUI()
+{
+	check(objUI);
+	
+	return objUI->missionCompleteUI;
+}

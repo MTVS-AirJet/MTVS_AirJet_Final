@@ -4,6 +4,9 @@
 #include "KHS/K_CesiumTeleportBox.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_Utility.h"
+#include "JBS/J_MissionGamemode.h"
 #include "LHJ/L_Viper.h"
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_GameInstance.h"
@@ -141,3 +144,14 @@ void AK_CesiumTeleportBox::MovePlayerandPolygonToDestination(double Longitude , 
 
 
 
+
+
+// JBS 추가
+void AK_CesiumTeleportBox::NotifyFlight(APawn* flightPawn)
+{
+    // 해당 폰의 pc 가져오기
+    auto* pc = flightPawn->GetController<AJ_MissionPlayerController>();
+    check(pc);
+    
+    pc->SRPC_AddFlightArySelf();
+}

@@ -39,7 +39,7 @@ void AJ_StreamingActor::Tick(float DeltaTime)
 
 bool AJ_StreamingActor::TryInitScreen()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("0. 스크린 생성"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("0. 스크린 생성"));
 
     // 로컬 플레이어 찾기
     APawn* playerPawn = UGameplayStatics::GetPlayerPawn(GetWorld() , 0);
@@ -80,7 +80,7 @@ bool AJ_StreamingActor::TryInitScreen()
 
 void AJ_StreamingActor::SetViewSharingUserID(FString ID, const bool &bAddPlayer)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("5. SA 에서 공유 아이디 설정"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("5. SA 에서 공유 아이디 설정"));
 
     UserID = ID; //UserID에 스트리머 ID 
 

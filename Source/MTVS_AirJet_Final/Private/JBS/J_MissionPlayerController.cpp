@@ -3,12 +3,14 @@
 
 #include "JBS/J_MissionPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SlateWrapperTypes.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GenericPlatform/ICursor.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_ObjectiveUIComponent.h"
+#include "KHS/K_LoadingWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
 #include <KHS/K_GameInstance.h>
@@ -141,4 +143,42 @@ void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2-2. streamingUI is null"));
 		UE_LOG(LogTemp , Warning , TEXT("streamingUI is null"));
 	}
+}
+
+void AJ_MissionPlayerController::SRPC_AddFlightArySelf_Implementation()
+{
+    if(HasAuthority())
+    {
+        // 이륙한 pc 배열에 추가
+        auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
+        check(gm);
+        gm->AddFlightedPC(this);
+    }
+}   
+
+void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
+{
+    // 로딩 ui 생성
+    loadingUI = CreateWidget<UK_LoadingWidget>(GetWorld(), loadingUIPrefab);
+    // 뷰포트에 추가
+    loadingUI->AddToViewport();
+}
+
+void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("asd제거할께 : %s, 로컬 유무 : %s, id : %d")
+        , loadingUI ? TEXT("있어") : TEXT("없어")
+        , IsLocalController() ? TEXT("예스") : TEXT("노")
+        , GetLocalPlayer()->GetControllerId());
+    if(loadingUI)
+    {
+        loadingUI->RemoveFromParent();
+        loadingUI = nullptr;
+    }
+}
+
+void AJ_MissionPlayerController::SRPC_RemoveLoadingUI_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("asd나한테 왜그러는거니 : %s"), *this->GetName());
+    CRPC_RemoveLoadingUI();
 }

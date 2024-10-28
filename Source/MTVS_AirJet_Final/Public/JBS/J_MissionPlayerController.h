@@ -22,16 +22,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	EPlayerRole playerRole;
 
-	
-
-	
-	// XXX 스폰 위치
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	// FTransform spawnTR;
-
 	// 디버그용 인풋 사용 유무
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
 	bool enableDebugInput = false;
+
+	// 로딩 ui
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|UI")
+	class UK_LoadingWidget* loadingUI;
+	// 로딩 ui 프리팹
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TSubclassOf<class UK_LoadingWidget> loadingUIPrefab;
 
 public:
 	// 목표 UI 관리 컴포넌트
@@ -62,4 +62,20 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnMyPlayer();
+
+	// 이륙 pc 배열에 자신 추가
+	UFUNCTION(Server, Reliable)
+	void SRPC_AddFlightArySelf();
+
+	// 로딩 ui 추가
+	UFUNCTION(Client, Reliable)
+	void CRPC_AddLoadingUI();
+
+	// 로딩 ui 제거
+	UFUNCTION(Server, Reliable)
+	void SRPC_RemoveLoadingUI();
+
+        // 로딩 ui 제거
+	UFUNCTION(Client, Reliable)
+	void CRPC_RemoveLoadingUI();
 };

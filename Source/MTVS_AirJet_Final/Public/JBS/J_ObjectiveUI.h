@@ -15,6 +15,10 @@ class MTVS_AIRJET_FINAL_API UJ_ObjectiveUI : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
+	// 위젯 스위쳐 | 목표 UI, 결산 UI
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))	
+	class UWidgetSwitcher* MissionUI_Switcher;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UTextBlock* objHeaderText;
 
@@ -34,6 +38,9 @@ protected:
 	FSlateColor failTextColor;
 
 public:
+	// 결산 UI
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	class UJ_MissionCompleteUI* missionCompleteUI;
 
 protected:
 	// @@ 세부 조건 UI 생성
@@ -61,4 +68,8 @@ public:
     void EndSubObjUI(int idx, bool isSuccess);
     // 전술명령 완료 처리
     void EndObjUI(bool isSuccess);
+
+
+	// 결산 UI 표시
+	void ActiveResultUI() {}
 };

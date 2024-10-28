@@ -80,7 +80,7 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
     // hbox가 원래 비어있었다면 빈 공간 만큼 spacer 생성
     if(hBoxEmpty)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("스페이서 생성"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("스페이서 생성"));
         for(int i = 0; i < playerSlotRowSize -1; i++)
         {
             auto* tempSlot = CastChecked<UHorizontalBoxSlot>(curHBox->AddChildToHorizontalBox(NewObject<USpacer>(this)));
@@ -90,7 +90,7 @@ void UJ_PilotViewTabletUI::AddPlayerSlot(const FString& playerId)
     // spacer가 있다면 하나 제거
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("제거"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("제거"));
         curHBox->RemoveChildAt(spaceIdx);
     }
 

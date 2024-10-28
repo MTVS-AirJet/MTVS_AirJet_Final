@@ -71,7 +71,7 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
     // 스폰 위치 계산
     spawnTR = CalcSpawnTransform();
 
-    // 알고있어야 하려나?
+    // @@ 알고있어야 하려나?
     for(int i = 0; i < spawnTargetAmt; i++)
     {
         auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
@@ -102,12 +102,12 @@ void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
     // DrawDebugLine(
     //     GetWorld(),
     //     this->GetActorLocation(),
-    //     GetActorLocation() + FVector(0,0,-1) * FLT_MAX,
+    //     GetActorLocation() + FVector::DownVector * FLT_MAX,
     //     FColor::Green,
     //     false,
-    //     -1,
+    //     1.f,
     //     0,
-    //     5.5f
+    //     255.5f
     // );
 }
 

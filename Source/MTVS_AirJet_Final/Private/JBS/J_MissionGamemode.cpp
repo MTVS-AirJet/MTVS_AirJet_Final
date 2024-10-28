@@ -9,10 +9,13 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_MissionStartPointActor.h"
 #include "JBS/J_Utility.h"
+#include "KHS/K_CesiumManager.h"
+#include "KHS/K_CesiumTeleportBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
 #include "JBS/J_ObjectiveManagerComponent.h"
 #include "Templates/Casts.h"
+#include "TimerManager.h"
 #include <JBS/J_MissionSpawnPointActor.h>
 #include <Engine/World.h>
 
@@ -45,16 +48,22 @@ void AJ_MissionGamemode::StartMission()
     check(objectiveManagerComp);
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
 
-    // XXX 0번 목표 시작
-    // objectiveManagerComp->ActiveNextObjective();
-    
-    
-
-    // 미션 맵 로드
-    LoadMissionMap();
+    // XXX 미션 맵 로드
+    // LoadMissionMap();
 
     // 스폰포인트 가져와서 설정
     SetSpawnPoints(spawnPoints);
+
+    // 모든 액터가 준비된 시점에 호출
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+    {
+        //타이머에서 할 거
+        // 세슘 관련 액터 캐시
+        CacheCesiumActors();
+    }, .1f, false);
+    
 }
 
 void AJ_MissionGamemode::Tick(float DeltaSeconds)
@@ -150,6 +159,7 @@ void AJ_MissionGamemode::InitMissionStartPoint(const FMissionStartPos &startPoin
 {
     // 시작 지점 위치
     FTransform spawnTR = startPointData.GetTransform();
+    // FIXME 보정 필요
 
     // 액터 생성
     auto* spActor = GetWorld()->SpawnActor<AJ_MissionStartPointActor>(startPointActorPrefab, spawnTR);
@@ -168,12 +178,20 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("폰 개수 : %d"), allPawns.Num()));
 
+    // 로딩 ui 제거
+    // auto* gs = UJ_Utility::GetMissionGameState(GetWorld());
+    // gs->RemoveAllLoadingUI();
+    removeLUIDel.Broadcast();
+
+
     // 시작 지점으로 위치 이동
     for(int i = 0; i < allPawns.Num(); i++)
     {
         auto* pawn = allPawns[i];
         // 역할 설정
         auto* pc = pawn->GetController<AJ_MissionPlayerController>();
+        // // pc 로딩 ui 잇으면 제거
+        // pc->SRPC_RemoveLoadingUI();
         // idx 0,1,2 를 각각 리더, lt 윙맨, rt 윙맨으로 설정
         pc->pilotRole = static_cast<EPilotRole>(i % 3);
 
@@ -183,11 +201,7 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
 
         pawn->SetActorTransform(newTR);
-
     }
-
-    // 미션 시작
-    this->objectiveManagerComp->ActiveNextObjective();
 }
 
 AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
@@ -197,8 +211,8 @@ AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
     {
         GEngine->AddOnScreenDebugMessage(-1, 13.f, FColor::Red, TEXT("미션 시작 지점 미설정 | 기본 위치 적용"));
 
-        FMissionStartPos& dummySPData = dummyMissionData.startPoint;
-        InitMissionStartPoint(dummySPData);
+        FMissionStartPos& curSPData = curMissionData.startPoint;
+        InitMissionStartPoint(curSPData);
     }
 
 
@@ -250,3 +264,61 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
 
     return baseTR;
 }
+
+void AJ_MissionGamemode::CacheCesiumActors()
+{
+    // 텔포 박스 가져오기
+    auto* tempTPBox = Cast<AK_CesiumTeleportBox>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumTeleportBox::StaticClass()));
+    check(tempTPBox);
+    cesiumTPBox = tempTPBox;
+
+    // 정점 액터 가져오기
+    auto* tempZeroPos = Cast<AK_CesiumManager>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumManager::StaticClass()));
+    check(tempZeroPos);
+    cesiumZeroPos = tempZeroPos;
+
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("무사히 세슘 관련 액터 캐시 성공"));
+
+
+    // @@ 임시로 여기서 위경도 설정
+    // cesiumTPBox->DestLatitude = curMissionData.latitude;
+    // cesiumTPBox->DestLongitude = curMissionData.longitude;
+}
+
+bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc)
+{
+    // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("이륙 추가 : %s"), *pc->GetName()));
+
+    flightedPCAry.Add(pc);
+
+    // 해당 pc에게 로딩 UI 추가
+    if(!pc->IsLocalController())
+    {
+        pc->CRPC_AddLoadingUI();
+        pc->SRPC_RemoveLoadingUI();
+    }
+
+    // 배열 크기가 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
+    bool isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
+    if(isTPReady)
+    {
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
+
+        TeleportAllStartPoint(startPointActor);
+
+
+        // 미션 시작
+        this->objectiveManagerComp->ActiveNextObjective();
+    }
+
+    return isTPReady;
+}
+
+void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_MissionPlayerController *missionPC)
+{
+    
+}
+
+
