@@ -7,9 +7,8 @@
 #include "LHJ/L_Viper.h"
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_GameInstance.h"
-//#include "/Plugins/CesiumForUnreal/Source/CesiumRuntime/Public/CesiumGeoreference.h"
-//#include "CesiumForUnreal/Source/CesiumRuntime/Public/CesiumCartographicPolygon.h"
-//#include "Marketplace/CesiumForUnreal/Source/"
+#include "CesiumGeoreference.h"
+//#include "CesiumCartographicPolygon.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
