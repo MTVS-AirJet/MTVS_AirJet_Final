@@ -63,6 +63,16 @@ AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 pl
     return player;
 }
 
+TArray<AJ_MissionPlayerController *> UJ_Utility::GetAllMissionPC(const UWorld *world)
+{
+    auto* gs = world->GetGameState<AJ_MissionGameState>();
+    check(gs);
+    // 모든 pc 가져오기
+    auto allPC = gs->GetAllPlayerController();
+
+    return allPC;
+}
+
 TArray<APawn*> UJ_Utility::GetAllMissionPawn(const UWorld *world)
 {
     auto* gs = world->GetGameState<AJ_MissionGameState>();
@@ -83,6 +93,8 @@ bool UJ_Utility::CheckValueRange(float value, float min, float max, bool inClusi
 
     return result;
 }
+
+
 
 // === 구조체 함수 구현
 

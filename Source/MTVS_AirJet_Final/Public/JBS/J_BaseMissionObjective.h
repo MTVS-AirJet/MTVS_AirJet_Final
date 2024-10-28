@@ -12,6 +12,7 @@
 DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float)
 DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate)
 DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate)
+DECLARE_MULTICAST_DELEGATE(FObjectiveSuccessUpdateDelegate)
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
@@ -92,6 +93,7 @@ protected:
 	FObjectiveActiveDelegate objectiveDeactiveDel;
 
 	// 미션 수행도 갱신 딜리게이트
+	FObjectiveSuccessUpdateDelegate objSuccessUpdateDel;
 	FSendSuccessDelegate sendObjSuccessDel;
 protected:
 	// 목표 성공/실패
@@ -106,11 +108,26 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveDeactive();
 
-    public:
+	// 목표 시점에 따라 모든 PC 에게 호출
+	// 서버에서 실행
+	// 목표 UI 시작 | 목표 활성화 시 호출
+	UFUNCTION(Server, Reliable)
+	virtual void SRPC_StartNewObjUI();
+	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
+	UFUNCTION(Server, Reliable)
+	virtual void SRPC_UpdateObjUI();
+	// 목표 UI 완료 | 목표 완료시 호출
+	UFUNCTION(Server, Reliable)
+	virtual void SRPC_EndObjUI();
+	// 목표 서브 조건 UI 완료 
+	UFUNCTION(Server, Reliable)
+	virtual void SRPC_EndSubObjUI();
+
+public:
 	// 미션 종료 처리
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveEnd(bool isSuccess = true);
 
-	// 목표 값 설정
+	// 목표 값 설정 | 하위 전술명령에서 재정의 필요
 	virtual void InitObjective(ETacticalOrder type, bool initActive = false);
 };

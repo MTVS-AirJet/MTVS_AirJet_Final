@@ -9,12 +9,22 @@
 #include "JBS/J_GroundTarget.h"
 #include "Math/MathFwd.h"
 #include <cfloat>
+#include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_ObjectiveUIComponent.h"
 
 void AJ_ObjectiveNeutralizeTarget::BeginPlay()
 {
     Super::BeginPlay();
 
+    // 활성화시 지상 목표 생성 바인드
     objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget);
+    // 활성화시 목표 UI 생성 바인드
+    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI);
+    // 수행도 갱신시 목표 UI 값 갱신 바인드
+    objSuccessUpdateDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI);
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI);
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI);
 }
 
 FTransform AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform()
@@ -99,4 +109,66 @@ void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
     //     0,
     //     5.5f
     // );
+}
+
+void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
+{
+    Super::SRPC_StartNewObjUI();
+
+    // 보낼 데이터 
+    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt);
+    
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+        pc->objUIComp->CRPC_StartObjUI(this->orderType, data);
+    }
+}
+
+void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
+{
+    Super::SRPC_UpdateObjUI();
+
+    // 보낼 데이터 
+    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt - destroyedTargetAmt);
+    
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+        pc->objUIComp->CRPC_UpdateObjUI(this->orderType, data);
+    }
+}
+
+void AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI()
+{
+    Super::SRPC_EndObjUI();
+
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+        pc->objUIComp->CRPC_EndObjUI();
+    }
+}
+
+void AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI()
+{
+    Super::SRPC_EndSubObjUI();
+
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+        pc->objUIComp->CRPC_EndSubObjUI();
+    }
 }
