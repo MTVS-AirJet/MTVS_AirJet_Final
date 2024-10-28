@@ -32,8 +32,7 @@ public class MTVS_AirJet_Final : ModuleRules
 			, "WebBrowser"
 			, "Slate"
 			, "SlateCore"
-			//, "CesiumRuntime" 
-			//, "CesiumNative"
-		});
+			, "CesiumRuntime"
+        });
 	}
 }
