@@ -43,7 +43,10 @@ public:
 
 	class ACesiumGeoreference* WorldGeoReference;
 
+	class UK_GameInstance* KGameInstance;
+
 	//인스턴스에서 가지고 있던 위경도 조건을 가져오는 함수
+	//ServerWidget쪽에서 호출하여 값을 넣고 있음.
 	UFUNCTION()
 	void SetDestinationLogitudeLatitude(double Logitude, double Latitude);
 
