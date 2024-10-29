@@ -7,6 +7,7 @@
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
+#include "TimerManager.h"
 
 // Sets default values for this component's properties
 UJ_ObjectiveManagerComponent::UJ_ObjectiveManagerComponent()
@@ -99,8 +100,25 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 	CUR_ACTIVE_MISSION_IDX++;
 	// 여기서 목표 다했으면 결산으로 넘어가짐 setcuractive~~
 	if(isMissionComplete) return;
-	// 해당 목표 활성화
-	ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
+
+	// @@ 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
+	if(CUR_ACTIVE_MISSION_IDX > 0)
+	{
+		FTimerHandle timerHandle;
+		GetWorld()->GetTimerManager()
+			.SetTimer(timerHandle, [this]() mutable
+		{
+			//타이머에서 할 거
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
+			// 해당 목표 활성화
+			ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
+			
+		}, 1.5f, false);
+	}
+	else {
+		// 해당 목표 활성화
+		ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
+	}
 }
 
 void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)

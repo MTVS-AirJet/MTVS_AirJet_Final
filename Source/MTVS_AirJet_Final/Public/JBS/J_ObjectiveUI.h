@@ -23,8 +23,13 @@ protected:
 	class UTextBlock* objHeaderText;
 
 	// @@ 조건 2개 이상 (편대비행) 같은 경우를 위해 따로 subUI 구조 필요
+	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	// class UTextBlock* objBodyText;
+
+	// 서브 조건 리스트 VBox
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
-	class UTextBlock* objBodyText;
+	class UVerticalBox* objBodyElementVBox;
+	
 
 
 	// 기본 text color

@@ -17,6 +17,8 @@
 #include <JBS/J_Utility.h>
 #include <JBS/J_MissionGamemode.h>
 #include "KHS/K_StreamingUI.h"
+#include "Net/UnrealNetwork.h"
+#include "UObject/Class.h"
 #include "UObject/Linker.h"
 
 AJ_MissionPlayerController::AJ_MissionPlayerController()
@@ -53,6 +55,8 @@ void AJ_MissionPlayerController::Tick(float deltaTime)
 
     // auto* player = this->GetPawn();
     // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("포제스 중인 폰 이름 : %s"), player ? *player->GetName() : TEXT("폰 없음")));
+
+    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("this -> %s"), *UEnum::GetValueAsString(this->pilotRole)));
 }
 
 // 미션 게임모드에서 역할 설정 후 실행됨.
@@ -181,4 +185,11 @@ void AJ_MissionPlayerController::SRPC_RemoveLoadingUI_Implementation()
 {
     UE_LOG(LogTemp, Warning, TEXT("asd나한테 왜그러는거니 : %s"), *this->GetName());
     CRPC_RemoveLoadingUI();
+}
+
+void AJ_MissionPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AJ_MissionPlayerController, pilotRole);
 }
