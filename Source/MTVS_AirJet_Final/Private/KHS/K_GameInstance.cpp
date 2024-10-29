@@ -27,6 +27,7 @@
 #include "OnlineSessionSettings.h"
 #include "KHS/K_GameState.h"
 #include "JBS/J_MissionGameState.h"
+#include "Net/UnrealNetwork.h"
 
 
 // 세션 생성에 사용할 수 있는 세션 이름을 전역 상수로 정의
@@ -34,6 +35,11 @@ const static FName SESSION_NAME = TEXT("Session Name");
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 const static FName SERVER_DATA_SETTINGS_KEY = TEXT("ServerData");
 
+
+void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps)
+{
+	DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
+}
 
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
@@ -232,12 +238,12 @@ void UK_GameInstance::OnJoinSessionComplete(FName SessionName , EOnJoinSessionCo
 			//ConnectedPlayerNames.Empty();  // 기존 목록 초기화
 
 			// 세션에 참가한 플레이어 이름을 가져와 추가
-			if ( SessionInterface.IsValid() && SessionSearch.IsValid() ) {
-				for ( const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults ) {
-					FString PlayerName = SearchResult.Session.OwningUserName;
-					ConnectedPlayerNames.Add(PlayerName);  // 플레이어 이름 추가
-				}
-			}
+			//if ( SessionInterface.IsValid() && SessionSearch.IsValid() ) {
+			//	for ( const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults ) {
+			//		FString PlayerName = SearchResult.Session.OwningUserName;
+			//		ConnectedPlayerNames.Add(PlayerName);  // 플레이어 이름 추가
+			//	}
+			//}
 
 			// 세션에 성공적으로 참가했음을 콘솔에 출력
 			UE_LOG(LogTemp , Log , TEXT("Session Join Success: %s") , *SessionName.ToString());
@@ -312,7 +318,6 @@ void UK_GameInstance::Host(FString ServerName , const FString& MapDataStruct)
 		FString HostName = PlayerController->PlayerState->GetPlayerName();
 		ConnectedPlayerNames.Add(HostName); // 호스트 이름 추가
 
-		
 		if( KGameState )
 			KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
 	}

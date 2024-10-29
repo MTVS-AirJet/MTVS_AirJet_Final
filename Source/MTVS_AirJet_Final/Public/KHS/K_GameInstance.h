@@ -33,7 +33,8 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API UK_GameInstance : public UJ_GameInstance, public IK_SessionInterface
 {
 	GENERATED_BODY()
-
+private:
+	virtual void GetLifetimeReplicatedProps( TArray<class FLifetimeProperty> & OutLifetimeProps );
 
 public: 
 	
@@ -55,7 +56,7 @@ public:
 
 	FMissionDataRes MissionData; //미션관리자가 사용할 미션데이터 구조체
 
-	UPROPERTY(BlueprintReadOnly , Category = "Session")
+	UPROPERTY(BlueprintReadOnly , Category = "Session", Replicated)
 	TArray<FString> ConnectedPlayerNames; // 세션에 접속한 플레이어 이름 배열
 
 	//===============================================================
