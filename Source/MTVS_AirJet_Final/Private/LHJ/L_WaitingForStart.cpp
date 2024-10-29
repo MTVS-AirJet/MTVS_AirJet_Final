@@ -10,7 +10,7 @@
 void UL_WaitingForStart::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	gm = Cast<UK_GameInstance>(GetWorld()->GetGameInstance());
 	MaxCnt = gm->ConnectedPlayerNames.Num();
 	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
@@ -23,9 +23,9 @@ void UL_WaitingForStart::SetMem(const int32& newMem)
 	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
 	TxtReadyCnt->SetText(FText::FromString(txt));
 
-	if (MaxCnt == CurrentCnt)
+	if (MaxCnt == CurrentCnt || MaxCnt == 0)
 	{
- 		if(auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
+		if (auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
 			viper->ReadyAllMembers();
 	}
 }

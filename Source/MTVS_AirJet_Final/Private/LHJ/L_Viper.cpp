@@ -70,7 +70,7 @@ AL_Viper::AL_Viper()
 	JetArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("JetArrow"));
 	JetArrow->SetupAttachment(JetMesh);
 	JetArrow->SetRelativeLocation(FVector(-1000 , 0 , 0));
-	JetArrow->SetHiddenInGame(false); // For Test
+	//JetArrow->SetHiddenInGame(false); // For Test
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(JetMesh);
@@ -79,7 +79,7 @@ AL_Viper::AL_Viper()
 	JetFirstEngine->SetBoxExtent(FVector(3 , 3 , 5));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
-	JetFirstEngine->SetHiddenInGame(false); // For Test
+	//JetFirstEngine->SetHiddenInGame(false); // For Test
 
 	JetMic = CreateDefaultSubobject<UBoxComponent>(TEXT("JetMic"));
 	JetMic->SetupAttachment(JetMesh);
@@ -88,7 +88,7 @@ AL_Viper::AL_Viper()
 	JetMic->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetMic->SetGenerateOverlapEvents(true);
 	JetMic->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
-	JetMic->SetHiddenInGame(false); // For Test
+	//JetMic->SetHiddenInGame(false); // For Test
 
 	JetEngineGen = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen"));
 	JetEngineGen->SetupAttachment(JetMesh);
@@ -97,7 +97,7 @@ AL_Viper::AL_Viper()
 	JetEngineGen->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen->SetGenerateOverlapEvents(true);
 	JetEngineGen->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen1Clicked);
-	JetEngineGen->SetHiddenInGame(false); // For Test
+	//JetEngineGen->SetHiddenInGame(false); // For Test
 
 	JetEngineGen2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen2"));
 	JetEngineGen2->SetupAttachment(JetMesh);
@@ -106,7 +106,7 @@ AL_Viper::AL_Viper()
 	JetEngineGen2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen2->SetGenerateOverlapEvents(true);
 	JetEngineGen2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen2Clicked);
-	JetEngineGen2->SetHiddenInGame(false); // For Test
+	//JetEngineGen2->SetHiddenInGame(false); // For Test
 
 	JetEngineControl = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl"));
 	JetEngineControl->SetupAttachment(JetMesh);
@@ -115,7 +115,7 @@ AL_Viper::AL_Viper()
 	JetEngineControl->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl->SetGenerateOverlapEvents(true);
 	JetEngineControl->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControlClicked);
-	JetEngineControl->SetHiddenInGame(false); // For Test
+	//JetEngineControl->SetHiddenInGame(false); // For Test
 
 	JetEngineControl2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl2"));
 	JetEngineControl2->SetupAttachment(JetMesh);
@@ -124,7 +124,7 @@ AL_Viper::AL_Viper()
 	JetEngineControl2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl2->SetGenerateOverlapEvents(true);
 	JetEngineControl2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControl2Clicked);
-	JetEngineControl2->SetHiddenInGame(false); // For Test
+	//JetEngineControl2->SetHiddenInGame(false); // For Test
 
 	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
 	JetFuelStarter->SetupAttachment(JetMesh);
@@ -133,7 +133,7 @@ AL_Viper::AL_Viper()
 	JetFuelStarter->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetFuelStarter->SetGenerateOverlapEvents(true);
 	JetFuelStarter->OnClicked.AddDynamic(this , &AL_Viper::OnMyJetFuelStarterClicked);
-	JetFuelStarter->SetHiddenInGame(false); // For Test
+	//JetFuelStarter->SetHiddenInGame(false); // For Test
 
 	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
 	JetEngineMaster->SetupAttachment(JetMesh);
@@ -142,7 +142,7 @@ AL_Viper::AL_Viper()
 	JetEngineMaster->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster->SetGenerateOverlapEvents(true);
 	JetEngineMaster->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster1Clicked);
-	JetEngineMaster->SetHiddenInGame(false); // For Test
+	//JetEngineMaster->SetHiddenInGame(false); // For Test
 
 	JetEngineMaster2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster2"));
 	JetEngineMaster2->SetupAttachment(JetMesh);
@@ -151,7 +151,7 @@ AL_Viper::AL_Viper()
 	JetEngineMaster2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster2->SetGenerateOverlapEvents(true);
 	JetEngineMaster2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster2Clicked);
-	JetEngineMaster2->SetHiddenInGame(false); // For Test
+	//JetEngineMaster2->SetHiddenInGame(false); // For Test
 
 	JetJFSHandle = CreateDefaultSubobject<UBoxComponent>(TEXT("JetJFSHandle"));
 	JetJFSHandle->SetupAttachment(JetMesh);
@@ -160,7 +160,7 @@ AL_Viper::AL_Viper()
 	JetJFSHandle->SetBoxExtent(FVector(3 , 2 , 2));
 	JetJFSHandle->SetGenerateOverlapEvents(true);
 	JetJFSHandle->OnClicked.AddDynamic(this , &AL_Viper::OnMyJFSHandle1Clicked);
-	JetJFSHandle->SetHiddenInGame(false); // For Test
+	//JetJFSHandle->SetHiddenInGame(false); // For Test
 
 	JetCanopy = CreateDefaultSubobject<UBoxComponent>(TEXT("JetCanopy"));
 	JetCanopy->SetupAttachment(JetMesh);
@@ -170,7 +170,7 @@ AL_Viper::AL_Viper()
 	JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 	JetCanopy->SetGenerateOverlapEvents(true);
 	JetCanopy->OnClicked.AddDynamic(this , &AL_Viper::OnMyCanopyClicked);
-	JetCanopy->SetHiddenInGame(false); // For Test
+	//JetCanopy->SetHiddenInGame(false); // For Test
 
 	JetLeftPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetLeftPannel"));
 	JetLeftPannel->SetRelativeLocation(FVector(-298 , 7 , -16.85));
@@ -259,11 +259,11 @@ AL_Viper::AL_Viper()
 	JetFlareArrow1 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow1"));
 	JetFlareArrow1->SetupAttachment(JetMesh);
 	JetFlareArrow1->SetRelativeLocationAndRotation(FVector(-500 , 100 , 0) , FRotator(-120 , 0 , 0));
-	JetFlareArrow1->SetHiddenInGame(false); // For Test
+	//JetFlareArrow1->SetHiddenInGame(false); // For Test
 	JetFlareArrow2 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow2"));
 	JetFlareArrow2->SetupAttachment(JetMesh);
 	JetFlareArrow2->SetRelativeLocationAndRotation(FVector(-500 , -100 , 0) , FRotator(-120 , 0 , 0));
-	JetFlareArrow2->SetHiddenInGame(false); // For Test
+	//JetFlareArrow2->SetHiddenInGame(false); // For Test
 
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
 #pragma endregion
@@ -616,7 +616,13 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	{
 		bJFSHandle = true;
 		// 당기도록 변경
-		DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyJFSHandleMesh->AddRelativeLocation(FVector(-1,0,0));
+		FTimerHandle timerHandle;
+		GetWorld()->GetTimerManager().SetTimer(timerHandle,[&]()
+		{
+			DummyJFSHandleMesh->AddRelativeLocation(FVector(1,0,0));
+		}, 1.f, false);
+		//DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Handle"))
 		{
 			StartScenario.pop();
@@ -627,7 +633,7 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	else
 	{
 		bJFSHandle = false;
-		DummyJFSHandleMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
+		//DummyJFSHandleMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
 	}
 }
 
