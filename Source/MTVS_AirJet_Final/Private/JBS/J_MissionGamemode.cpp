@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "JBS/J_MissionGamemode.h"
@@ -150,6 +150,18 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
         // 역할 설정후 플레이어 스폰
         auto* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
         pc->SpawnMyPlayer();
+    }
+
+    // 클라이언트가 세션에 Join하면 호출됨
+    UE_LOG(LogTemp , Log , TEXT("Player %s has joined the session") , *newPlayer->GetName());
+
+    // PlayerController가 제대로 생성되었는지 확인
+    APawn* PlayerPawn = newPlayer->GetPawn();
+    if ( !PlayerPawn )
+    {
+        PlayerPawn = GetWorld()->SpawnActor<APawn>(DefaultPawnClass , FVector::ZeroVector , FRotator::ZeroRotator);
+        newPlayer->Possess(PlayerPawn);
+        
     }
 
     // pIdx++;

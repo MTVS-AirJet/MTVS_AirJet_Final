@@ -371,15 +371,25 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	}
 	
 	//인게임에서 사용할 미션데이터를 인스턴스에 저장
-	GameInstance->MissionData.producer = resData.producer;
+	FMissionDataRes md;
+	md.producer = resData.producer;
+	md.latitude = resData.latitude;
+	md.longitude = resData.longitude;
+	md.mapName = resData.mapName;
+	md.mapImage = resData.mapImage;
+	md.startPoint.x = resData.startPointX;
+	md.startPoint.y = resData.startPointY;
+	md.mission = resData.missionData;
+	/*GameInstance->MissionData.producer = resData.producer;
 	GameInstance->MissionData.latitude = resData.latitude;
 	GameInstance->MissionData.longitude = resData.longitude;
 	GameInstance->MissionData.mapName = resData.mapName;
 	GameInstance->MissionData.mapImage = resData.mapImage;
 	GameInstance->MissionData.startPoint.x = resData.startPointX;
 	GameInstance->MissionData.startPoint.y = resData.startPointY;
-	GameInstance->MissionData.mission = resData.missionData;
+	GameInstance->MissionData.mission = resData.missionData;*/
 
+	GameInstance->InitializeMission(md);
 }
 
 

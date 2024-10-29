@@ -4,6 +4,8 @@
 #include "KHS/K_StandbyWidget.h"
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_GameInstance.h"
+#include "KHS/K_GameState.h"
+#include "KHS/K_PlayerList.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
@@ -13,7 +15,6 @@
 #include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
 #include "ImageUtils.h"
-#include "KHS/K_PlayerList.h"
 
 UK_StandbyWidget::UK_StandbyWidget(const FObjectInitializer& ObjectInitialize)
 {
@@ -150,6 +151,7 @@ void UK_StandbyWidget::ClientUpdatePlayerList_Implementation(const TArray<FStrin
 //게임시작 버튼 바인딩 함수
 void UK_StandbyWidget::StartMission()
 {
+    RemoveUI();
 }
 
 //로비레벨로 돌아가는 함수
@@ -171,14 +173,11 @@ void UK_StandbyWidget::OpenLobbyLevel()
 // GameInstance의 MissionData로 위젯 설정하는 함수
 void UK_StandbyWidget::InitializeMissionData()
 {
-    if ( !GameInstance )
-    {
-        UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_StandbyWidget"));
-        return;
-    }
+    // GameState에서 MissionData를 가져와 UI에 반영
+    KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+    if ( !KGameState ) return;
 
-    // 미션 데이터를 UI에 설정
-    const auto& MissionData = GameInstance->MissionData;
+    const auto& MissionData = KGameState->MissionData;
 
     StandbyMenu_txt_Producer->SetText(FText::FromString(MissionData.producer));
     StandbyMenu_txt_MapName->SetText(FText::FromString(MissionData.mapName));

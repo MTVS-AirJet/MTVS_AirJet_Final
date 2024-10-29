@@ -36,6 +36,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// 새로운 플레이어 컨트롤러 할당 Possessed 함수
+	virtual void PossessedBy(AController* NewController) override;
+
+	//IMC Rest
+	void ResetEnhancedInputSetting(class APlayerController* pc);
+
+	//NetMulticast로 IMC Reset
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_ResetIMC(class APlayerController* pc);
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -136,7 +146,7 @@ private:
 	UFUNCTION()
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
-private: // Input
+public: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Viper;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")

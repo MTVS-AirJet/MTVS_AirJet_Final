@@ -1,4 +1,4 @@
-#include "LHJ/L_Viper.h"
+﻿#include "LHJ/L_Viper.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -298,7 +298,7 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 	{
 		input->BindAction(IA_ViperEngine , ETriggerEvent::Started , this , &AL_Viper::F_ViperEngine);
@@ -355,6 +355,10 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperVoice , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperVoiceStarted);
+	}
+	else
+	{
+		LOG_S(Warning, TEXT("EnhancedInputComponet is NULLPTR!!!!!!!!!!!!!!!!!"));
 	}
 }
 
@@ -872,7 +876,7 @@ void AL_Viper::BeginPlay()
 	if (JetAudio && JetAudio->GetSound())
 		JetAudio->Stop();
 
-	auto pc = Cast<APlayerController>(Controller);
+	auto pc = Cast<APlayerController>(GetController());
 	if (pc)
 	{
 		UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
@@ -898,6 +902,8 @@ void AL_Viper::BeginPlay()
 			PlayerController->SetIgnoreLookInput(true);
 		}
 	}
+
+	
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1315,6 +1321,59 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 	}
 #pragma endregion
+}
+
+void AL_Viper::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController); // 기본 클래스의 Possess 로직을 다시 실행하여 Pawn과 Controller 간의 연결을 설정
+
+	LOG_S(Warning, TEXT("Viper PossesedBy Called"));
+	// 입력 컴포넌트 초기화
+	// Possess 이후에 입력 컴포넌트를 다시 설정하여 입력 바인딩이 올바르게 이루어지도록 함.
+	auto pc = Cast<APlayerController>(NewController);
+	if (pc)
+	{
+		UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			pc->GetLocalPlayer());
+		if (subsys)
+		{
+			subsys->AddMappingContext(IMC_Viper, 0);
+			LOG_S(Warning, TEXT("Viper PossesedBy IMC Mapping Called"));
+		}
+
+		pc->bEnableClickEvents = true;
+
+		NetMulticast_ResetIMC(pc);
+	}
+}
+//IMC Rest
+void AL_Viper::ResetEnhancedInputSetting(APlayerController* pc)
+{
+	UE_LOG(AIRJET_LOG, Error, TEXT("ResetEnhancedInputSetting Called"));
+	if (pc)
+	{
+		if (pc->GetLocalPlayer() == nullptr)
+		{
+			UE_LOG(AIRJET_LOG, Error, TEXT("Player Load Failed!!!!!!!!!!!!!!!!!!!!"));
+		}
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetWorld()->GetFirstPlayerController()->GetLocalPlayer()))
+		{
+			// 매핑이 위로 쌓이기 떄문에 키가 겹쳐서 안될 수 있음 그래서 매핑콘테스트를 클리어해주고 AddMappingContext
+			Subsystem->ClearAllMappings();
+			Subsystem->AddMappingContext(IMC_Viper, 0);
+			UE_LOG(AIRJET_LOG, Error, TEXT("Player SetupPlayerInputComponent"));
+		}
+		else
+		{
+			UE_LOG(AIRJET_LOG, Error, TEXT("Player IMC Load Failed!!!!!!!!!!!!!!!!!!!!"));
+		}
+	}
+}
+
+void AL_Viper::NetMulticast_ResetIMC_Implementation(class APlayerController* pc)
+{
+	ResetEnhancedInputSetting(pc);
+	LOG_S(Warning, TEXT("NetMulticast_ResetIMC_Implementation Called"));
 }
 
 #pragma region Get Force
