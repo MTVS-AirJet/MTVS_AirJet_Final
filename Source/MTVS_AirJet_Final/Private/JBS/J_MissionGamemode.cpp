@@ -190,7 +190,7 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         auto* pawn = allPawns[i];
         // 역할 설정
         auto* pc = pawn->GetController<AJ_MissionPlayerController>();
-        // // pc 로딩 ui 잇으면 제거
+        // FIXME 로딩 ui 할 꺼면 추가 // pc 로딩 ui 잇으면 제거
         // pc->SRPC_RemoveLoadingUI();
         // idx 0,1,2 를 각각 리더, lt 윙맨, rt 윙맨으로 설정
         pc->pilotRole = static_cast<EPilotRole>(i % 3);
@@ -199,8 +199,10 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         FTransform newTR = CalcTeleportTransform(pc->pilotRole);
         // 스케일 조정되지 않도록 변경
         newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
+        pc->MRPC_TeleportStartPoint(newTR);
 
-        pawn->SetActorTransform(newTR);
+        // UE_LOG(LogTemp, Warning, TEXT("type : tr계산단, 나는 누구인가 : %s, tr : %s"), *pc->GetName(), *newTR.ToString());
+        // UE_LOG(LogTemp, Warning, TEXT("type : pawn적용단, 나는 누구인가 : %s, tr : %s"), *pc->GetName(), *pawn->GetActorTransform().ToString());
     }
 }
 
@@ -306,7 +308,14 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc)
     {
         // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
 
-        TeleportAllStartPoint(startPointActor);
+        FTimerHandle timerHandle;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle, [this]() mutable
+        {
+            //타이머에서 할 거
+            TeleportAllStartPoint(startPointActor);
+            
+        }, .5f, false);
 
 
         // 미션 시작

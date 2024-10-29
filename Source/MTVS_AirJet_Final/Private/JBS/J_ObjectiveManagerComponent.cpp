@@ -7,6 +7,7 @@
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
 // Sets default values for this component's properties
@@ -57,6 +58,8 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 
 		// 목표 액터 스폰
 		auto* objectiveActor = GetWorld()->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR);
+		// 주인 설정
+		// objectiveActor->SetOwner(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 		// 목표 액터 설정
 		objectiveActor->InitObjective(type, false);
@@ -80,6 +83,13 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 
 void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
 {
+	if(mIdx >= objectiveDataAry.Num())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("objAry out of range"));
+
+		return;
+	}
+
 	auto* obj = objectiveDataAry[mIdx].objectiveActor;
 	// 활성화
 	obj->IS_OBJECTIVE_ACTIVE = true;

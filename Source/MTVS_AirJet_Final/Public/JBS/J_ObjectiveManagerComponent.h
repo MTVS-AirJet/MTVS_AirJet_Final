@@ -72,12 +72,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<ETacticalOrder, TSubclassOf<class AJ_BaseMissionObjective>> objectiveActorPrefabMap;
 public:
+
 protected:
 	// 미션 클리어
 	UFUNCTION(BlueprintCallable)
 	void MissionComplete();
 
-    public:
+public:
 	// 미션 시작 시 목표 리스트 설정
     void InitObjectiveList(TArray<struct FMissionObject> missions);
 

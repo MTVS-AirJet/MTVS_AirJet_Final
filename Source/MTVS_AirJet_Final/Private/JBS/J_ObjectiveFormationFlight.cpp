@@ -129,18 +129,18 @@ bool AJ_ObjectiveFormationFlight::CheckAlign()
             switch(pc->pilotRole) 
             {
                 // 나를 제외한 다른 폰들과 내적
-                // 양수 = 내 앞에 있으므로 false
                 case EPilotRole::WING_COMMANDER:
                 {
                     // 앞에 뭔가 있으면 false
                     subPass = !CheckForward(pawn, otherPawn);
+                    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("전방 존재 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
                 }
                     break;
                 // 외적
-                // 양수 = 나보다 왼쪽에 있으므로 false
                 case EPilotRole::LEFT_WINGER:
                 {
                     subPass = CheckLeftRight(pawn, otherPawn);
+                    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("왼쪽 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
                 }
                     break;
                 case EPilotRole::RIGHT_WINGER:
@@ -227,6 +227,8 @@ void AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI()
         data.curHeight = pc->GetPawn()->GetActorLocation().Z;
         data.pilotRole = pc->pilotRole;
         data.checkFormation = isFormation;
+        // 진형 유지 성공 여부
+        data.isCorrectPosition = checklistValue >= static_cast<int>(EFormationChecklist::ALIGN_FORMATION);
 
         pc->objUIComp->CRPC_UpdateFFObjUI(this->orderType, data);
     }

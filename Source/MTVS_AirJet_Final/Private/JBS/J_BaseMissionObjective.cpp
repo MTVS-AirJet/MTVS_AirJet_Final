@@ -6,17 +6,26 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Containers/UnrealString.h"
 #include "Engine/Engine.h"
 #include "Engine/StaticMesh.h"
+#include "GameFramework/Pawn.h"
+#include "JBS/J_ObjectiveIconUI.h"
 #include "JBS/J_Utility.h"
 #include "Materials/Material.h"
+#include "JBS/J_CustomWidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Templates/Casts.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UObject/UObjectGlobals.h"
 
 // Sets default values
 AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	rootComp = CreateDefaultSubobject<USceneComponent>(TEXT("rootComp"));
 	SetRootComponent(rootComp);
@@ -52,11 +61,18 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 
 
 
-	iconWorldUIComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("iconWorldUIComp"));
-	iconWorldUIComp->SetupAttachment(RootComponent);
-	
-	
+	// iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
 
+	iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
+	iconWorldUIComp->SetupAttachment(RootComponent);
+
+	// 위젯 블루프린트를 찾습니다.
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Blueprints/UI/JBS/WBP_Objective3DIconUI"));
+	// 위젯 클래스를 설정합니다.
+	if (WidgetClassFinder.Succeeded())
+		iconWorldUIComp->SetWidgetClass(WidgetClassFinder.Class);
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -64,14 +80,23 @@ void AJ_BaseMissionObjective::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// @@ 나중에 만들면 캐스팅해서 가져오기
 	// 아이콘 ui 설정
-	auto* tempUI = iconWorldUIComp->GetWidget();
+	auto* tempUI = CastChecked<UJ_ObjectiveIconUI>(iconWorldUIComp->GetWidget());
 	if(tempUI)
-	{
 		iconWorldUI = tempUI;
-	}
 
+	objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
+	objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
+
+
+	// 로컬 pc 가져와서 pawn 넣기
+	auto* pc =GetWorld()->GetFirstPlayerController();
+	check(pc);
+	if(pc->IsLocalPlayerController() || !pc->IsLocalPlayerController() && HasAuthority())
+	{
+		APawn* localPawn = pc->GetPawn();
+		iconWorldUIComp->SetTargetActor(Cast<AActor>(localPawn));
+	}
 }
 
 // Called every frame
@@ -79,14 +104,26 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 로컬 폰 과의 거리 설정
+	auto* localPC = GetWorld()->GetFirstPlayerController();
+	if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
+	{
+		auto* localPawn = localPC->GetPawn();
+		float dis = FVector::Dist(this->GetActorLocation(), localPawn->GetActorLocation());
+		iconWorldUI->SetObjDisText(dis);
+	}
+	
 	// init 되기 전까지 무시
 	if(orderType == ETacticalOrder::NONE) return;
 
-
+	
+	if(!HasAuthority()) return;
+	
 }
 
 void AJ_BaseMissionObjective::ObjectiveSuccess()
 {
+	if(!HasAuthority()) return;
 	// 미션 성공 딜리게이트 실행
 	if(objectiveSuccessDel.IsBound())
 	{
@@ -96,6 +133,7 @@ void AJ_BaseMissionObjective::ObjectiveSuccess()
 
 void AJ_BaseMissionObjective::ObjectiveFail()
 {
+	if(!HasAuthority()) return;
 	// 미션 실패 딜리게이트 실행
 	if(objectiveFailDel.IsBound())
 	{
@@ -105,6 +143,7 @@ void AJ_BaseMissionObjective::ObjectiveFail()
 
 void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 {
+	if(!HasAuthority()) return;
 	// 미션 비활성화
 	IS_OBJECTIVE_ACTIVE = false;
 
@@ -120,8 +159,13 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 
 void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 {
+	
 	isObjectiveActive = value;
 
+	iconWorldUIComp->SetActive(isObjectiveActive);
+	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
+
+	if(!HasAuthority()) return;
 	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 	{
@@ -132,7 +176,9 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 		objectiveDeactiveDel.Broadcast();
 	}
 
-	iconWorldUIComp->SetActive(isObjectiveActive);
+	
+	//@@
+	// iconWorldUIComp->SetHiddenInGame(false);
 
 }
 
@@ -144,16 +190,20 @@ void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive
 
 void AJ_BaseMissionObjective::ObjectiveActive()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
+	if(!HasAuthority()) return;
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
+	
 }
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
 {
+	if(!HasAuthority()) return;
 	
 }
 
 void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 {
+	if(!HasAuthority()) return;
 	successPercent = value;
 	// 수행도 갱신 딜리게이트 실행
 	objSuccessUpdateDel.Broadcast();
@@ -163,16 +213,29 @@ void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 
 void AJ_BaseMissionObjective::SRPC_StartNewObjUI_Implementation()
 {
-
+	if(!HasAuthority()) return;
 }
 
 void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
 {
-
+	if(!HasAuthority()) return;
 }
 
 void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
 {
-
+	if(!HasAuthority()) return;
 }
-void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation() {}
+void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation() {if(!HasAuthority()) return;}
+
+void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AJ_BaseMissionObjective, isObjectiveActive);
+}
+
+void AJ_BaseMissionObjective::OnRep_ObjActive()
+{
+	iconWorldUIComp->SetActive(isObjectiveActive);
+	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
+}
