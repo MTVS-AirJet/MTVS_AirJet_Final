@@ -78,4 +78,8 @@ public:
         // 로딩 ui 제거
 	UFUNCTION(Client, Reliable)
 	void CRPC_RemoveLoadingUI();
+
+	// LHJ 추가
+	UPROPERTY(EditDefaultsOnly , Category="UI")
+	TSubclassOf<class UUserWidget> WaitingForStartFac;
 };

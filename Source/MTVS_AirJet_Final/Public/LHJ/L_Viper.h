@@ -505,4 +505,7 @@ private:
 	bool bVoice;
 	void StartVoiceChat();
 	void StopVoiceChat();
+	
+	UPROPERTY(Category="UI", EditDefaultsOnly)
+	class UL_WaitingForStart* WaitingForStartFacUI;
 };

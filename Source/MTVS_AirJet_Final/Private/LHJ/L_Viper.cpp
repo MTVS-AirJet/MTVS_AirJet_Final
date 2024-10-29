@@ -22,6 +22,7 @@
 #include "LHJ/L_HUDWidget.h"
 #include "LHJ/L_Missile.h"
 #include "LHJ/L_RoadTrigger.h"
+#include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -1020,7 +1021,30 @@ void AL_Viper::Tick(float DeltaTime)
 			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
-			IsEngineOn = true;
+   
+			if (auto pc = Cast<AJ_MissionPlayerController>(GetOwner()))
+			{
+				UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<
+					UEnhancedInputLocalPlayerSubsystem>(
+					pc->GetLocalPlayer());
+				if (subsys)
+				{
+					FModifyContextOptions options;
+					subsys->RemoveMappingContext(IMC_Viper , options);
+				}
+
+				if (pc->WaitingForStartFac)
+				{
+					WaitingForStartFacUI = CreateWidget<UL_WaitingForStart>(GetWorld() , pc->WaitingForStartFac);
+					if (WaitingForStartFacUI)
+					{
+						WaitingForStartFacUI->AddToViewport(0);
+					}
+				}
+			}
+
+			// WaitingForStart 
+			// IsEngineOn = true;
 		}
 	}
 	// 운행 단계
@@ -1733,5 +1757,5 @@ void AL_Viper::StartVoiceChat()
 
 void AL_Viper::StopVoiceChat()
 {
-	GetController<AJ_MissionPlayerController> ()->StopTalking();
+	GetController<AJ_MissionPlayerController>()->StopTalking();
 }
