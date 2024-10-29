@@ -42,17 +42,13 @@ protected:
 
 	// world UI 아이콘 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
-	class UWidgetComponent* iconWorldUIComp;
+	class UJ_CustomWidgetComponent* iconWorldUIComp;
 	// 아이콘 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
-	class UUserWidget* iconWorldUI;
-
-	// 아이콘 ui 프리팹
-	
-
+	class UJ_ObjectiveIconUI* iconWorldUI;
 
 	// 전술명령 활성화 여부
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", ReplicatedUsing=OnRep_ObjActive)
 	bool isObjectiveActive = false;
 		public:
 	__declspec(property(get = GetObjectiveActive, put = SetObjectiveActive)) bool IS_OBJECTIVE_ACTIVE;
@@ -63,7 +59,11 @@ protected:
 	}
 	UFUNCTION(BlueprintCallable)
 	virtual void SetObjectiveActive(bool value);
-		protected:
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnRep_ObjActive();
+
+    protected:
 
 	// 수행 성공도 0~1 값
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -130,7 +130,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_EndSubObjUI();
 
-public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
+
+    public:
 	// 미션 종료 처리
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveEnd(bool isSuccess = true);

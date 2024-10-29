@@ -81,7 +81,11 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void CRPC_RemoveLoadingUI();
 
-	// LHJ 추가
+	// 시작 지점 텔레포트
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_TeleportStartPoint(FTransform tpTR);
+
+        // LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")
 	TSubclassOf<class UUserWidget> WaitingForStartFac;
 };

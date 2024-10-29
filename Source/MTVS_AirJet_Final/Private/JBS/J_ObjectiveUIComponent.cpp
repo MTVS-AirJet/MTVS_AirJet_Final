@@ -99,7 +99,7 @@ void UJ_ObjectiveUIComponent::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder o
 			uiData.headerText = TEXT("편대 비행");
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("편대 비행 중 : %s"), data.checkFormation ? TEXT("TRUE") : TEXT("FALSE")));
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("목표 고도 %.0f : \n현재 %.0f"), data.checkHeight, data.curHeight));
-			uiData.bodyTextAry.Add(FString::Printf(TEXT("올바른 위치 : %s"), data.checkFormation ? TEXT("TRUE") : TEXT("FALSE")));
+			uiData.bodyTextAry.Add(FString::Printf(TEXT("올바른 위치 : %s"), data.isCorrectPosition ? TEXT("TRUE") : TEXT("FALSE")));
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("당신의 역할 : %s")
 				, *UJ_Utility::PilotRoleToString(data.pilotRole)));
 		}
