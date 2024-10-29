@@ -339,6 +339,7 @@ enum class EPilotRole : uint8
     WING_COMMANDER = 0
     ,LEFT_WINGER = 1
     ,RIGHT_WINGER = 2
+    ,None = 3
 };
 
 // 편대 비행 델타 용 값 | 삼각형 조건
@@ -413,15 +414,27 @@ struct FFormationFlightUIData
 {
     GENERATED_BODY()
 public:
-    // 고도 조건
-
+    // 고도 조건 체크
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float checkHeight;
     // 현재 파일럿 고도
-
-    // 진형 조건
-
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float curHeight;
     // 해당 파일럿 역할
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    EPilotRole pilotRole = EPilotRole::None;
+    // 진형 조건 체크 | 전체 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool checkFormation;
+    // 진형 위치 충족 여부 | 개인
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isCorrectPosition;
 
-    // 진형 위치 충족 여부
+    FFormationFlightUIData() {}
+
+    FFormationFlightUIData(
+        float checkHeight, float curHeight, EPilotRole pilotRole, bool checkFormation, bool isCorrectPosition) :
+        checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), checkFormation(checkFormation), isCorrectPosition(isCorrectPosition) {}
 };
 
 // 2. 목표 무력화
@@ -499,6 +512,8 @@ public:
     static class TArray<APawn*> GetAllMissionPawn(const UWorld *world);
     // 범위 조건 체크
     static bool CheckValueRange(float value, float min, float max, bool inClusive = true);
+    // 파일럿 역할 enum -> string 변환
+    static FString PilotRoleToString(EPilotRole role);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 500000.f;

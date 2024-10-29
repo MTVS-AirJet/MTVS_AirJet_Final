@@ -39,7 +39,7 @@ protected:
 	//
     virtual void BeginPlay() override;
     // 스폰 지점 계산
-    FTransform CalcSpawnTransform();
+    bool CalcSpawnTransform(FTransform& outSpawnTR);
     // 지상 타겟 스폰
     void SpawnGroundTarget();
 	// 타겟 파괴 카운트

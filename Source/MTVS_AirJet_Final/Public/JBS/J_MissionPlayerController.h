@@ -39,7 +39,7 @@ public:
 	class UJ_ObjectiveUIComponent* objUIComp;
 
 	// 파일럿 역할
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", Replicated)
 	EPilotRole pilotRole;
 
 protected:
@@ -57,7 +57,9 @@ protected:
 	// XXX streaming ui 생성 | 의존성 제거됨
 	void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
 
-public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
+
+    public:
 	virtual void Tick(float deltaTime);
 
 	UFUNCTION(BlueprintCallable)

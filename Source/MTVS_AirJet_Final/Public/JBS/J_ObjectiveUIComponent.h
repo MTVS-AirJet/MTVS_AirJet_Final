@@ -42,11 +42,24 @@ protected:
 
 public:
 	// 목표 UI 시작 및 갱신
+	// 편대 비행
+	UFUNCTION(Client, Reliable)
+    void CRPC_StartFFObjUI(ETacticalOrder orderType, FFormationFlightUIData data);
+	// 지상 타겟 무력화
 	UFUNCTION(Client, Reliable)
     void CRPC_StartObjUI(ETacticalOrder orderType, FNeutralizeTargetUIData data);
+
+
     // 목표 UI 갱신
+	// 편대 비행
+	UFUNCTION(Client, Reliable)
+    void CRPC_UpdateFFObjUI(ETacticalOrder orderType, FFormationFlightUIData data);
+	// 지상 타겟 무력화
 	UFUNCTION(Client, Reliable)
     void CRPC_UpdateObjUI(ETacticalOrder orderType, FNeutralizeTargetUIData data);
+
+
+
 	// 서브 조건 완료 처리
 	UFUNCTION(Client, Reliable)
     void CRPC_EndSubObjUI(int idx = 0, bool isSuccess = true);
