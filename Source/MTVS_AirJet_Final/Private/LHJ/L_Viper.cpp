@@ -291,6 +291,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
+	DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
 }
 
 #pragma region Input
@@ -889,16 +890,6 @@ void AL_Viper::BeginPlay()
 	JetWidget->SetWidgetClass(HUD_UI);
 	if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
-
-	if (!IsStart)
-	{
-		APlayerController* PlayerController = Cast<APlayerController>(GetWorld()->GetFirstLocalPlayerFromController());
-		if (PlayerController)
-		{
-			PlayerController->SetIgnoreMoveInput(true);
-			PlayerController->SetIgnoreLookInput(true);
-		}
-	}
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1021,7 +1012,7 @@ void AL_Viper::Tick(float DeltaTime)
 			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
-   
+
 			if (auto pc = Cast<AJ_MissionPlayerController>(GetOwner()))
 			{
 				UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<
@@ -1035,16 +1026,18 @@ void AL_Viper::Tick(float DeltaTime)
 
 				if (pc->WaitingForStartFac)
 				{
-					WaitingForStartFacUI = CreateWidget<UL_WaitingForStart>(GetWorld() , pc->WaitingForStartFac);
-					if (WaitingForStartFacUI)
+					WaitingForStartUI = CreateWidget<UL_WaitingForStart>(GetWorld() , pc->WaitingForStartFac);
+					if (WaitingForStartUI)
 					{
-						WaitingForStartFacUI->AddToViewport(0);
+						WaitingForStartUI->AddToViewport(0);
+						ReadyMemeberCnt++;
+						if(HasAuthority())
+						{
+							OnMyMemberReFresh();
+						}
 					}
 				}
 			}
-
-			// WaitingForStart 
-			// IsEngineOn = true;
 		}
 	}
 	// 운행 단계
@@ -1758,4 +1751,33 @@ void AL_Viper::StartVoiceChat()
 void AL_Viper::StopVoiceChat()
 {
 	GetController<AJ_MissionPlayerController>()->StopTalking();
+}
+
+void AL_Viper::OnMyMemberReFresh()
+{
+	if (WaitingForStartUI)
+	{
+		WaitingForStartUI->SetMem(ReadyMemeberCnt);
+	}
+}
+
+void AL_Viper::ReadyAllMembers()
+{
+	if(WaitingForStartUI)
+	{
+		WaitingForStartUI->RemoveFromParent();
+	}
+	IsEngineOn = true;
+	auto pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			pc->GetLocalPlayer());
+		if (subsys)
+		{
+			subsys->AddMappingContext(IMC_Viper , 0);
+		}
+
+		pc->bEnableClickEvents = true;
+	}
 }

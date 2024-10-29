@@ -505,7 +505,14 @@ private:
 	bool bVoice;
 	void StartVoiceChat();
 	void StopVoiceChat();
-	
-	UPROPERTY(Category="UI", EditDefaultsOnly)
-	class UL_WaitingForStart* WaitingForStartFacUI;
+
+	UPROPERTY(Category="UI" , EditDefaultsOnly)
+	class UL_WaitingForStart* WaitingForStartUI;
+
+	UPROPERTY(ReplicatedUsing=OnMyMemberReFresh)
+	int32 ReadyMemeberCnt = 0;
+	UFUNCTION()
+	void OnMyMemberReFresh();
+public:
+	void ReadyAllMembers();
 };

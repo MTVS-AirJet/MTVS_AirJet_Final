@@ -10,19 +10,22 @@
 void UL_WaitingForStart::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	viper = Cast<AL_Viper>(GetOwningPlayer());
+	
 	gm = Cast<UK_GameInstance>(GetWorld()->GetGameInstance());
 	MaxCnt = gm->ConnectedPlayerNames.Num();
-	FString txt=FString::Printf(TEXT("%d/%d"), CurrentCnt , MaxCnt);
+	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
 	TxtReadyCnt->SetText(FText::FromString(txt));
 }
 
-void UL_WaitingForStart::NativeTick(const FGeometry& MyGeometry , float InDeltaTime)
+void UL_WaitingForStart::SetMem(const int32& newMem)
 {
-	Super::NativeTick(MyGeometry , InDeltaTime);
+	CurrentCnt = newMem;
+	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
+	TxtReadyCnt->SetText(FText::FromString(txt));
 
-	// MaxCnt = gm->ConnectedPlayerNames.Num();
-	// FString txt=FString::Printf(TEXT("%d/%d"), CurrentCnt , MaxCnt);
-	// TxtReadyCnt->SetText(FText::FromString(txt));
+	if (MaxCnt == CurrentCnt)
+	{
+ 		if(auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
+			viper->ReadyAllMembers();
+	}
 }

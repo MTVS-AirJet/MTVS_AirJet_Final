@@ -16,9 +16,6 @@ class MTVS_AIRJET_FINAL_API UL_WaitingForStart : public UUserWidget
 
 private:
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry , float InDeltaTime) override;
-	UPROPERTY()
-	class AL_Viper* viper;
 	UPROPERTY()
 	class UK_GameInstance* gm;
 	int32 MaxCnt = 0;
@@ -28,4 +25,6 @@ public:
 	class UTextBlock* TxtReadyCnt;
 
 	int32 CurrentCnt = 0;
+
+	void SetMem(const int32& newMem);
 };
