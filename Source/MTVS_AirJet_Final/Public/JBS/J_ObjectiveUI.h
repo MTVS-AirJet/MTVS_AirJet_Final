@@ -76,5 +76,5 @@ public:
 
 
 	// 결산 UI 표시
-	void ActiveResultUI() {}
+    void ActiveResultUI();
 };

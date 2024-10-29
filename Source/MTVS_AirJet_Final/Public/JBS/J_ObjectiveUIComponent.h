@@ -67,7 +67,10 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_EndObjUI(bool isSuccess = true);
 
-	// 결산 UI 가져오기 | 바로 접근용
+	// 미션 결산 화면 전환 UI
+	void CRPC_SwitchResultUI();
+
+        // 결산 UI 가져오기 | 바로 접근용
 	UFUNCTION(BlueprintCallable)
 	class UJ_MissionCompleteUI *GetMissionCompleteUI();
 };
