@@ -615,13 +615,12 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	if (!bJFSHandle)
 	{
 		bJFSHandle = true;
-		// 당기도록 변경
-		DummyJFSHandleMesh->AddRelativeLocation(FVector(-1,0,0));
+		DummyJFSHandleMesh->AddRelativeLocation(FVector(-1 , 0 , 0));
 		FTimerHandle timerHandle;
-		GetWorld()->GetTimerManager().SetTimer(timerHandle,[&]()
+		GetWorld()->GetTimerManager().SetTimer(timerHandle , [&]()
 		{
-			DummyJFSHandleMesh->AddRelativeLocation(FVector(1,0,0));
-		}, 1.f, false);
+			DummyJFSHandleMesh->AddRelativeLocation(FVector(1 , 0 , 0));
+		} , 1.f , false);
 		//DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Handle"))
 		{
@@ -1596,15 +1595,16 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 	LockOnTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
 	FVector ForwardVector = JetMesh->GetForwardVector();
+	FVector DownVector = JetMesh->GetUpVector()*-1;
 
 	TArray<AActor*> Overlaps;
 	TArray<FHitResult> OutHit;
 	for (int i = 0; i < RangeCnt; i++)
 	{
 		Diametr *= 2.f;
-		Start += (ForwardVector * Diametr / 2);
+		Start += (ForwardVector * Diametr / 2) + (DownVector * Diametr / 2);
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
+		                                           false , Overlaps , EDrawDebugTrace::None , OutHit , true))
 		{
 			for (auto hit : OutHit)
 			{
@@ -1639,7 +1639,7 @@ void AL_Viper::CreateDumyComp()
 	DummyEngineGenerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh1"));
 	DummyEngineGenerMesh1->SetupAttachment(JetEngineGen);
 	DummyEngineGenerMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
-	
+
 	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
 	DummyEngineGenerMesh2->SetupAttachment(JetEngineGen2);
 	DummyEngineGenerMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
@@ -1666,7 +1666,7 @@ void AL_Viper::CreateDumyComp()
 
 	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
 	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
-	DummyJFSHandleMesh->SetRelativeLocation(FVector(-550,-33,-253));
+	DummyJFSHandleMesh->SetRelativeLocation(FVector(-550 , -33 , -253));
 
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
@@ -1674,7 +1674,7 @@ void AL_Viper::CreateDumyComp()
 
 	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
 	DummyCanopyMesh->SetupAttachment(JetCanopy);
-	DummyCanopyMesh->SetRelativeLocation(FVector(-521,-40,-268));
+	DummyCanopyMesh->SetRelativeLocation(FVector(-521 , -40 , -268));
 }
 
 void AL_Viper::SetAccelGear()

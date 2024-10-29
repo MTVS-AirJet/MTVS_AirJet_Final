@@ -359,7 +359,7 @@ private:
 
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
-	int32 RangeCnt = 6;
+	int32 RangeCnt = 14;
 
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
