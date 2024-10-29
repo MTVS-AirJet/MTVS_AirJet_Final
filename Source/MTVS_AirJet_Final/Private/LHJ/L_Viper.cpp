@@ -298,7 +298,7 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
                                UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
                                const FHitResult& SweepResult)
 {
-	LOG_SCREEN("%s" , *OtherActor->GetName());
+	//LOG_SCREEN("%s" , *OtherActor->GetName());
 	if (auto RT = Cast<AL_RoadTrigger>(OtherActor))
 	{
 		if (RT->TriggerIdx == 0)
@@ -415,7 +415,7 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 
 void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("MIC 클릭");
+	//LOG_SCREEN("MIC 클릭");
 	if (!bMIC)
 	{
 		bMIC = true;
@@ -436,7 +436,7 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 
 void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("EngineGen 클릭");
+	//LOG_SCREEN("EngineGen 클릭");
 	if (!bEngineGen1)
 	{
 		bEngineGen1 = true;
@@ -462,7 +462,7 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 
 void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("EngineGen2 클릭");
+	//LOG_SCREEN("EngineGen2 클릭");
 	if (!bEngineGen2)
 	{
 		bEngineGen2 = true;
@@ -488,7 +488,7 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 
 void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("EngineControl 클릭");
+	//LOG_SCREEN("EngineControl 클릭");
 	if (!bEngineControl1)
 	{
 		bEngineControl1 = true;
@@ -514,7 +514,7 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("EngineControl2 클릭");
+	//LOG_SCREEN("EngineControl2 클릭");
 	if (!bEngineControl2)
 	{
 		bEngineControl2 = true;
@@ -540,7 +540,7 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 
 void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("JFS 클릭");
+	//LOG_SCREEN("JFS 클릭");
 	if (!bJFS)
 	{
 		bJFS = true;
@@ -561,7 +561,7 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 
 void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("Engine Master1 클릭");
+	//LOG_SCREEN("Engine Master1 클릭");
 	if (!bEngineMaster1)
 	{
 		bEngineMaster1 = true;
@@ -587,7 +587,7 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	LOG_SCREEN("Engine Master2 클릭");
+	//LOG_SCREEN("Engine Master2 클릭");
 	if (!bEngineMaster2)
 	{
 		bEngineMaster2 = true;
@@ -613,7 +613,7 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
-	LOG_SCREEN("JFS 핸들 클릭");
+	//LOG_SCREEN("JFS 핸들 클릭");
 	if (!bJFSHandle)
 	{
 		bJFSHandle = true;
@@ -1308,7 +1308,7 @@ void AL_Viper::Tick(float DeltaTime)
 		if (CurrentWeapon == EWeapon::Flare)
 		{
 			int32 randRot = FMath::RandRange(-150 , -110);
-			LOG_SCREEN("%d" , randRot);
+			//LOG_SCREEN("%d" , randRot);
 			FRotator newFlareRot = FRotator(randRot , 0 , 0);
 			JetFlareArrow1->SetRelativeRotation(newFlareRot);
 			JetFlareArrow2->SetRelativeRotation(newFlareRot);
