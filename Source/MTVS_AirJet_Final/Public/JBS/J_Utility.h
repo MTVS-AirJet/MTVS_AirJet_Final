@@ -414,6 +414,9 @@ struct FFormationFlightUIData
 {
     GENERATED_BODY()
 public:
+    // 진형 조건 체크 | 전체 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool checkFormation;
     // 고도 조건 체크
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     float checkHeight;
@@ -423,10 +426,7 @@ public:
     // 해당 파일럿 역할
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     EPilotRole pilotRole = EPilotRole::None;
-    // 진형 조건 체크 | 전체 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    bool checkFormation;
-    // 진형 위치 충족 여부 | 개인
+    // 진형 위치 충족 여부
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     bool isCorrectPosition;
 

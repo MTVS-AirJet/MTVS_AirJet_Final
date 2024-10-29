@@ -193,3 +193,10 @@ void AJ_MissionPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 
     DOREPLIFETIME(AJ_MissionPlayerController, pilotRole);
 }
+
+void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransform tpTR)
+{
+    // 전송
+    auto* pawn = this->GetPawn();
+    pawn->SetActorTransform(tpTR);
+}
