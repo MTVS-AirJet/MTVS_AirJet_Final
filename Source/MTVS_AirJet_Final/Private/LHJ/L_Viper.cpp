@@ -1,4 +1,4 @@
-#include "LHJ/L_Viper.h"
+﻿#include "LHJ/L_Viper.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -24,6 +24,8 @@
 #include "LHJ/L_RoadTrigger.h"
 #include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
+#include "JBS/J_MissionGameState.h"
+#include "KHS/K_GameInstance.h"
 
 
 #pragma region Construct
@@ -923,6 +925,20 @@ void AL_Viper::BeginPlay()
 	JetWidget->SetWidgetClass(HUD_UI);
 	if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
+
+	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if ( CurrentMapName == FString::Printf(TEXT("CesiumTest")) )
+	{
+		auto KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
+		if ( KGameState )
+		{
+			auto GI = CastChecked<UK_GameInstance>(GetGameInstance());
+			KGameState->SetConnectedPlayerNames(GI->ConnectedPlayerNames);
+		}
+	}
+	
+
+	
 }
 
 void AL_Viper::Tick(float DeltaTime)

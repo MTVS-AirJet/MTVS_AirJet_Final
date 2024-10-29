@@ -37,7 +37,7 @@ void UK_WidgetBase::SetUI()
 		// UI 전용 입력 모드 설정
 		FInputModeUIOnly InputUIModeData; // UI Only 입력모드
 
-		InputUIModeData.SetWidgetToFocus(this->TakeWidget()); // 포커스를 받을 위젯을 설정. 즉, 마우스 입력은 ServerUI 에만 가능함. 다른 곳은 클릭 막음.
+		//InputUIModeData.SetWidgetToFocus(this->TakeWidget()); // 포커스를 받을 위젯을 설정. 즉, 마우스 입력은 ServerUI 에만 가능함. 다른 곳은 클릭 막음.
 		InputUIModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); // 마우스가 Viewport 화면 밖을 벗어날 수 있는가? DoNotLock : 허용
 
 		PlayerController->SetInputMode(InputUIModeData); //플레이어컨트롤러에 UI 전용 입력 모드 적용.

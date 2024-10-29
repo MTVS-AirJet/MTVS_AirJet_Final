@@ -42,6 +42,8 @@ public:
 
 	class AK_PlayerController* PlayerController; //PlayerControler 참조 선언
 
+	class AK_GameState* KGameState; //GameState 참조 선언
+
 	//===============================================================
 	// Widget Binding
 	//===============================================================

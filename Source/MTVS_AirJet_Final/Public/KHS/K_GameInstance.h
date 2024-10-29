@@ -48,6 +48,9 @@ public:
 	
 	FString DesiredServerData;
 
+	class AK_GameState* KGameState;
+	class AJ_MissionGameState* JGameState;
+
 	std::map<int32, FString> ServerDataList;
 
 	FMissionDataRes MissionData; //미션관리자가 사용할 미션데이터 구조체
@@ -106,6 +109,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	void CreateStandbyWidget(); // Standby UI를 생성하는 함수
+
+	UFUNCTION(BlueprintCallable, Category = "Create Widget")
+	void InitializeMission(const FMissionDataRes& newMD); //미션데이터를 GameState를 통해 StandbyUI에 업데이트해주는 함수
+
+	UFUNCTION(Client, Reliable)
+	void SendPlayerListToClient(AK_PlayerController* ClientController); //클라이언트 단에서 Playerlist 업데이트 요청
 
 	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	//void CreateInGameWidget(); // 인게임 UI를 생성하는 함수
