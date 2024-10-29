@@ -75,6 +75,15 @@ protected:
 	// 좌우에 있는지 확인
     bool CheckLeftRight(AActor *actor, AActor* otherActors, bool checkLeft = true);
 
+	// 목표 UI 시작 | 목표 활성화 시 호출
+    virtual void SRPC_StartNewObjUI() override;
+    // 목표 UI 값 갱신 | 수행도 갱신 시 호출
+    virtual void SRPC_UpdateObjUI() override;
+    // 목표 UI 완료 | 목표 완료시 호출
+    virtual void SRPC_EndObjUI() override;
+    // 목표 서브 조건 UI 완료
+    virtual void SRPC_EndSubObjUI() override;
+
 public:
     virtual void Tick(float deltaTime) override;
 };

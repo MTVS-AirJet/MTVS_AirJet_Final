@@ -7,10 +7,12 @@
 #include "Engine/EngineTypes.h"
 #include "Engine/HitResult.h"
 #include "JBS/J_GroundTarget.h"
+#include "JBS/J_Utility.h"
 #include "Math/MathFwd.h"
 #include <cfloat>
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUIComponent.h"
+#include "TimerManager.h"
 
 void AJ_ObjectiveNeutralizeTarget::BeginPlay()
 {
@@ -27,7 +29,7 @@ void AJ_ObjectiveNeutralizeTarget::BeginPlay()
     objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI);
 }
 
-FTransform AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform()
+bool AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform(FTransform& outSpawnTR)
 {
     // 아래로 레이 쏴서 지면 포인트 찾기
     FHitResult outHit;
@@ -45,8 +47,6 @@ FTransform AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform()
         params
     );
 
-    FTransform result;
-
     if(isHit)
     {
         // 위치
@@ -56,25 +56,43 @@ FTransform AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform()
         FQuat spRot = FQuat::FindBetween(FVector::UpVector, outHit.ImpactNormal);
         
         // 스폰 트랜스폼 설정
-        result = FTransform(spRot, spLoc, FVector::OneVector);
+        outSpawnTR = FTransform(spRot, spLoc, FVector::OneVector);
     }
+    // @@ 그냥 지면 = -4km이라 가정
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("바닥 없어 지상 타겟 생성 못함"));
+        FVector spLoc = this->GetActorLocation() + FVector::DownVector * UJ_Utility::defaultMissionObjectHeight;
+        outSpawnTR = FTransform(FRotator::ZeroRotator, spLoc, FVector::OneVector);
     }
 
-    return result;
+    return isHit;
 }
 
 // 활성화 딜리게이트에서 실행됨
 void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
 {
     // 스폰 위치 계산
-    spawnTR = CalcSpawnTransform();
+    bool getSpawnTR = CalcSpawnTransform(spawnTR);
+    if(!getSpawnTR)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("지상 목표 위치 대체 생성"));
+        // FTimerHandle timerHandle;
+        // GetWorld()->GetTimerManager()
+        //     .SetTimer(timerHandle, [this]() mutable
+        // {
+        //     // 다시
+        //     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("다시 지상 목표 스폰 시도"));
+        //     SpawnGroundTarget();
+        // }, 0.1f, false);
+
+        // return;
+    }
 
     // @@ 알고있어야 하려나?
+    // @@ 여러개 소환하려면 분산시켜야 할 듯
     for(int i = 0; i < spawnTargetAmt; i++)
     {
         auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
+        GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Green, FString::Printf(TEXT("스폰 위치 %s"), *spawnTR.ToString()));
         // 파괴 딜리게이트에 함수 넣기
         groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
     }

@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
 	class UUserWidget* iconWorldUI;
 
+	// 아이콘 ui 프리팹
+	
+
 
 	// 전술명령 활성화 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -78,6 +81,10 @@ protected:
 	// 명령 종류
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	ETacticalOrder orderType = ETacticalOrder::NONE;
+
+	/*
+	미션 비활성화(생성) -> 미션 활성화(시작) -> 미션 수행도 갱신 -> 미션 완료(성공/실패) -> 미션 비활성화(종료) 순 호출됨
+	*/
 
 	// 미션 완료 시 실행 딜리게이트
 	FObjectiveEndDelegate objectiveEndDel;

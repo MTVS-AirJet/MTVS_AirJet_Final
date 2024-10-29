@@ -94,6 +94,25 @@ bool UJ_Utility::CheckValueRange(float value, float min, float max, bool inClusi
     return result;
 }
 
+FString UJ_Utility::PilotRoleToString(EPilotRole role)
+{
+    FString result;
+
+    switch (role) {
+    case EPilotRole::WING_COMMANDER:
+        result = TEXT("편대장");
+        break;
+    case EPilotRole::LEFT_WINGER:
+        result = TEXT("Left Winger");
+        break;
+    case EPilotRole::RIGHT_WINGER:
+        result = TEXT("Right Winger");
+        break;
+    }
+
+    return result;
+}
+
 
 
 // === 구조체 함수 구현
@@ -135,3 +154,5 @@ FTransform FJVector2D::GetTransform() const
 
     return tr;
 }
+
+
