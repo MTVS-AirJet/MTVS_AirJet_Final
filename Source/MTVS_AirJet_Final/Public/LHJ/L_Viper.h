@@ -76,6 +76,12 @@ private: // Component
 	class UBoxComponent* JetJFSHandle;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* JetCanopy;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UStaticMeshComponent* JetLeftPannel;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UStaticMeshComponent* JetRightPannel;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UStaticMeshComponent* JetJFSPannel;
 
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
@@ -444,9 +450,9 @@ private:
 	class UStaticMeshComponent* DummyThrottleMesh;
 	bool bThrottleAccel;
 	bool bThrottleBreak;
-	FVector ThrottleOffLoc = FVector(385 , -28 , 237);
-	FVector ThrottleMilLoc = FVector(395 , -28 , 237);
-	FVector ThrottleMaxLoc = FVector(405 , -28 , 237);
+	FVector ThrottleOffLoc = FVector(385 , -28 , 239);
+	FVector ThrottleMilLoc = FVector(395 , -28 , 239);
+	FVector ThrottleMaxLoc = FVector(405 , -28 , 239);
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
 	float ThrottleMoveSpeed1 = .15f;
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")

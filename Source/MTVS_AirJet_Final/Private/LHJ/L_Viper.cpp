@@ -74,91 +74,118 @@ AL_Viper::AL_Viper()
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(JetMesh);
-	JetFirstEngine->SetRelativeScale3D(FVector(.1f));
-	JetFirstEngine->SetRelativeLocation(FVector(385 , -28 , 237));
+	JetFirstEngine->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
+	JetFirstEngine->SetRelativeLocation(FVector(385 , -28 , 239));
+	JetFirstEngine->SetBoxExtent(FVector(3 , 3 , 5));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
 	JetFirstEngine->SetHiddenInGame(false); // For Test
 
 	JetMic = CreateDefaultSubobject<UBoxComponent>(TEXT("JetMic"));
 	JetMic->SetupAttachment(JetMesh);
-	JetMic->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetMic->SetRelativeLocation(FVector(410 , -15 , 280));
+	JetMic->SetRelativeScale3D(FVector(4));
+	JetMic->SetRelativeLocation(FVector(373.5 , -36.1 , 237.6));
+	JetMic->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetMic->SetGenerateOverlapEvents(true);
 	JetMic->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
 	JetMic->SetHiddenInGame(false); // For Test
 
 	JetEngineGen = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen"));
 	JetEngineGen->SetupAttachment(JetMesh);
-	JetEngineGen->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineGen->SetRelativeLocation(FVector(410 , -7 , 280));
+	JetEngineGen->SetRelativeScale3D(FVector(4));
+	JetEngineGen->SetRelativeLocation(FVector(395 , 25 , 237));
+	JetEngineGen->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen->SetGenerateOverlapEvents(true);
 	JetEngineGen->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen1Clicked);
 	JetEngineGen->SetHiddenInGame(false); // For Test
 
 	JetEngineGen2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen2"));
 	JetEngineGen2->SetupAttachment(JetMesh);
-	JetEngineGen2->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineGen2->SetRelativeLocation(FVector(410 , 0 , 280));
+	JetEngineGen2->SetRelativeScale3D(FVector(4));
+	JetEngineGen2->SetRelativeLocation(FVector(395 , 26.2 , 237));
+	JetEngineGen2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen2->SetGenerateOverlapEvents(true);
 	JetEngineGen2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen2Clicked);
 	JetEngineGen2->SetHiddenInGame(false); // For Test
 
 	JetEngineControl = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl"));
 	JetEngineControl->SetupAttachment(JetMesh);
-	JetEngineControl->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineControl->SetRelativeLocation(FVector(410 , 7 , 280));
+	JetEngineControl->SetRelativeScale3D(FVector(4));
+	JetEngineControl->SetRelativeLocation(FVector(395 , 29.4 , 237));
+	JetEngineControl->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl->SetGenerateOverlapEvents(true);
 	JetEngineControl->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControlClicked);
 	JetEngineControl->SetHiddenInGame(false); // For Test
 
 	JetEngineControl2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl2"));
 	JetEngineControl2->SetupAttachment(JetMesh);
-	JetEngineControl2->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineControl2->SetRelativeLocation(FVector(410 , 15 , 280));
+	JetEngineControl2->SetRelativeLocation(FVector(395 , 30.7 , 237));
+	JetEngineControl2->SetRelativeScale3D(FVector(4));
+	JetEngineControl2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl2->SetGenerateOverlapEvents(true);
 	JetEngineControl2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControl2Clicked);
 	JetEngineControl2->SetHiddenInGame(false); // For Test
 
 	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
 	JetFuelStarter->SetupAttachment(JetMesh);
-	JetFuelStarter->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetFuelStarter->SetRelativeLocation(FVector(410 , 25 , 280));
+	JetFuelStarter->SetRelativeLocation(FVector(395 , 28 , 237));
+	JetFuelStarter->SetRelativeScale3D(FVector(4));
+	JetFuelStarter->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetFuelStarter->SetGenerateOverlapEvents(true);
 	JetFuelStarter->OnClicked.AddDynamic(this , &AL_Viper::OnMyJetFuelStarterClicked);
 	JetFuelStarter->SetHiddenInGame(false); // For Test
 
 	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
 	JetEngineMaster->SetupAttachment(JetMesh);
-	JetEngineMaster->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineMaster->SetRelativeLocation(FVector(410 , 7 , 260));
+	JetEngineMaster->SetRelativeLocation(FVector(390 , 25 , 237));
+	JetEngineMaster->SetRelativeScale3D(FVector(4));
+	JetEngineMaster->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster->SetGenerateOverlapEvents(true);
 	JetEngineMaster->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster1Clicked);
 	JetEngineMaster->SetHiddenInGame(false); // For Test
 
 	JetEngineMaster2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster2"));
 	JetEngineMaster2->SetupAttachment(JetMesh);
-	JetEngineMaster2->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetEngineMaster2->SetRelativeLocation(FVector(410 , 15 , 260));
+	JetEngineMaster2->SetRelativeLocation(FVector(390 , 30 , 237));
+	JetEngineMaster2->SetRelativeScale3D(FVector(4));
+	JetEngineMaster2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster2->SetGenerateOverlapEvents(true);
 	JetEngineMaster2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster2Clicked);
 	JetEngineMaster2->SetHiddenInGame(false); // For Test
 
 	JetJFSHandle = CreateDefaultSubobject<UBoxComponent>(TEXT("JetJFSHandle"));
 	JetJFSHandle->SetupAttachment(JetMesh);
-	JetJFSHandle->SetRelativeScale3D(FVector(.1f , .1f , .2f));
-	JetJFSHandle->SetRelativeLocation(FVector(410 , 15 , 260));
+	JetJFSHandle->SetRelativeLocation(FVector(410 , 28 , 236.5));
+	JetJFSHandle->SetRelativeScale3D(FVector(1));
+	JetJFSHandle->SetBoxExtent(FVector(3 , 2 , 2));
 	JetJFSHandle->SetGenerateOverlapEvents(true);
 	JetJFSHandle->OnClicked.AddDynamic(this , &AL_Viper::OnMyJFSHandle1Clicked);
 	JetJFSHandle->SetHiddenInGame(false); // For Test
 
 	JetCanopy = CreateDefaultSubobject<UBoxComponent>(TEXT("JetCanopy"));
 	JetCanopy->SetupAttachment(JetMesh);
-	JetCanopy->SetRelativeScale3D(FVector(.05f , .2f , .05f));
+	JetCanopy->SetRelativeLocation(FVector(373 , 30 , 253));
+	JetCanopy->SetRelativeScale3D(FVector(1));
+	JetCanopy->SetBoxExtent(FVector(3 , 6 , 3));
 	JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 	JetCanopy->SetGenerateOverlapEvents(true);
 	JetCanopy->OnClicked.AddDynamic(this , &AL_Viper::OnMyCanopyClicked);
 	JetCanopy->SetHiddenInGame(false); // For Test
+
+	JetLeftPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetLeftPannel"));
+	JetLeftPannel->SetRelativeLocation(FVector(-298 , 7 , -16.85));
+	JetLeftPannel->SetRelativeScale3D(FVector(1.3 , 1 , 1));
+	JetLeftPannel->SetupAttachment(JetMesh);
+
+	JetRightPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetRightPannel"));
+	JetRightPannel->SetRelativeLocation(FVector(-684 , 7 , -16.7));
+	JetRightPannel->SetRelativeScale3D(FVector(2 , 1 , 1));
+	JetRightPannel->SetupAttachment(JetMesh);
+
+	JetJFSPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetJFSPannel"));
+	JetJFSPannel->SetRelativeLocation(FVector(-137 , -6 , -17));
+	JetJFSPannel->SetRelativeScale3D(FVector(1));
+	JetJFSPannel->SetupAttachment(JetMesh);
 
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
@@ -390,7 +417,7 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 	if (!bMIC)
 	{
 		bMIC = true;
-		DummyMICMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyMICMesh->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("MIC"))
 		{
 			StartScenario.pop();
@@ -411,7 +438,7 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	if (!bEngineGen1)
 	{
 		bEngineGen1 = true;
-		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
 		{
 			if (bEngineGen1 && bEngineGen2)
@@ -437,7 +464,7 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	if (!bEngineGen2)
 	{
 		bEngineGen2 = true;
-		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
 		{
 			if (bEngineGen1 && bEngineGen2)
@@ -463,7 +490,7 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 	if (!bEngineControl1)
 	{
 		bEngineControl1 = true;
-		DummyEngineControlMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineControlMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
 		{
 			if (bEngineControl1 && bEngineControl2)
@@ -489,7 +516,7 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 	if (!bEngineControl2)
 	{
 		bEngineControl2 = true;
-		DummyEngineControlMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineControlMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
 		{
 			if (bEngineControl1 && bEngineControl2)
@@ -515,7 +542,7 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 	if (!bJFS)
 	{
 		bJFS = true;
-		DummyJFSMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyJFSMesh->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Switch"))
 		{
 			StartScenario.pop();
@@ -536,7 +563,7 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 	if (!bEngineMaster1)
 	{
 		bEngineMaster1 = true;
-		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
 		{
 			if (bEngineMaster1 && bEngineMaster2)
@@ -562,7 +589,7 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	if (!bEngineMaster2)
 	{
 		bEngineMaster2 = true;
-		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
+		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
 		{
 			if (bEngineMaster1 && bEngineMaster2)
@@ -588,6 +615,7 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 	if (!bJFSHandle)
 	{
 		bJFSHandle = true;
+		// 당기도록 변경
 		DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
 		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Handle"))
 		{
@@ -1031,7 +1059,7 @@ void AL_Viper::Tick(float DeltaTime)
 					{
 						WaitingForStartUI->AddToViewport(0);
 						ReadyMemeberCnt++;
-						if(HasAuthority())
+						if (HasAuthority())
 						{
 							OnMyMemberReFresh();
 						}
@@ -1325,10 +1353,10 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 		else
 		{
-			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-			//FRotator(-30 , 0 , 0)
-			auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-			JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+			// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+			// //FRotator(-30 , 0 , 0)
+			// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+			// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
 		}
 	}
 #pragma endregion
@@ -1599,48 +1627,48 @@ void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 void AL_Viper::CreateDumyComp()
 {
 	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
+	DummyMICMesh->SetRelativeLocation(FVector(0 , 0 , -.9));
 	DummyMICMesh->SetupAttachment(JetMic);
-	DummyMICMesh->SetRelativeScale3D(FVector(.5f));
 
 	DummyEngineGenerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh1"));
 	DummyEngineGenerMesh1->SetupAttachment(JetEngineGen);
-	DummyEngineGenerMesh1->SetRelativeScale3D(FVector(.5f));
-
+	DummyEngineGenerMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
+	
 	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
 	DummyEngineGenerMesh2->SetupAttachment(JetEngineGen2);
-	DummyEngineGenerMesh2->SetRelativeScale3D(FVector(.5f));
+	DummyEngineGenerMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyEngineControlMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh1"));
 	DummyEngineControlMesh1->SetupAttachment(JetEngineControl);
-	DummyEngineControlMesh1->SetRelativeScale3D(FVector(.5f));
+	DummyEngineControlMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyEngineControlMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh2"));
 	DummyEngineControlMesh2->SetupAttachment(JetEngineControl2);
-	DummyEngineControlMesh2->SetRelativeScale3D(FVector(.5f));
+	DummyEngineControlMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyJFSMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSMesh"));
 	DummyJFSMesh->SetupAttachment(JetFuelStarter);
-	DummyJFSMesh->SetRelativeScale3D(FVector(.5f));
+	DummyJFSMesh->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyEngineMasterMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh1"));
 	DummyEngineMasterMesh1->SetupAttachment(JetEngineMaster);
-	DummyEngineMasterMesh1->SetRelativeScale3D(FVector(.5f));
+	DummyEngineMasterMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
 	DummyEngineMasterMesh2->SetupAttachment(JetEngineMaster2);
-	DummyEngineMasterMesh2->SetRelativeScale3D(FVector(.5f));
+	DummyEngineMasterMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
 
 	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
 	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
-	DummyJFSHandleMesh->SetRelativeScale3D(FVector(.5f));
+	DummyJFSHandleMesh->SetRelativeLocation(FVector(-550,-33,-253));
 
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
-	DummyThrottleMesh->SetRelativeScale3D(FVector(.5f));
+	DummyThrottleMesh->SetRelativeLocation(FVector(0 , 0 , -8));
 
 	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
 	DummyCanopyMesh->SetupAttachment(JetCanopy);
-	DummyCanopyMesh->SetRelativeScale3D(FVector(.5f));
+	DummyCanopyMesh->SetRelativeLocation(FVector(-521,-40,-268));
 }
 
 void AL_Viper::SetAccelGear()
@@ -1763,7 +1791,7 @@ void AL_Viper::OnMyMemberReFresh()
 
 void AL_Viper::ReadyAllMembers()
 {
-	if(WaitingForStartUI)
+	if (WaitingForStartUI)
 	{
 		WaitingForStartUI->RemoveFromParent();
 	}
