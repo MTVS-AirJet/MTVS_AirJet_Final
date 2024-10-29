@@ -113,3 +113,8 @@ void UJ_ObjectiveUI::StartObjUI()
     }
     // objBodyText->SetColorAndOpacity(defaultTextColor);
 }
+
+void UJ_ObjectiveUI::ActiveResultUI()
+{
+    
+}

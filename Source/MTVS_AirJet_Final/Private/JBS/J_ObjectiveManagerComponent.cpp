@@ -8,6 +8,8 @@
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
+#include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_ObjectiveUIComponent.h"
 #include "TimerManager.h"
 
 // Sets default values for this component's properties
@@ -91,6 +93,7 @@ void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
 	}
 
 	auto* obj = objectiveDataAry[mIdx].objectiveActor;
+	if(!obj) return;
 	// 활성화
 	obj->IS_OBJECTIVE_ACTIVE = true;
 }
@@ -159,6 +162,24 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("미션 종료 결산 화면으로"));
 
 	isMissionComplete = true;
+
+	// 여기부터 결산 단계
+	// 미션 완료 ui 대기
+	// @@ 대기시간 변수화 해야할듯
+	// FIXME 결산 ui 안뜨는거 해결 필요
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager()
+		.SetTimer(timerHandle, [this]() mutable
+	{
+		//타이머에서 할 거
+		auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+		for(AJ_MissionPlayerController* pc : allPC)
+		{
+			// 결산 UI 전환
+			pc->objUIComp->CRPC_SwitchResultUI();
+		}
+	}, 1.5f, false);
 }
 
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)

@@ -161,3 +161,8 @@ UJ_MissionCompleteUI *UJ_ObjectiveUIComponent::GetMissionCompleteUI()
 	
 	return objUI->missionCompleteUI;
 }
+
+void UJ_ObjectiveUIComponent::CRPC_SwitchResultUI()
+{
+	objUI->ActiveResultUI();
+}
