@@ -133,4 +133,10 @@ public:
 
 #pragma endregion
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void ReqMapInfo(FString MyRoomName); //mapName입력내용 기준으로 서버에 요청하는 함수
+
+	UFUNCTION(BlueprintCallable)
+	void ResMapInfo(const FMapInfoResponse& resData);
 };

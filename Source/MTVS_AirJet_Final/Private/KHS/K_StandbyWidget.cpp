@@ -216,3 +216,41 @@ void UK_StandbyWidget::InitializeMissionData()
     }
 
 }
+
+void UK_StandbyWidget::ReqMapInfo(FString MyRoomName)
+{
+    // 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+    auto* gi = UK_JsonParseLib::GetKGameInstance(GetWorld());
+
+    if (!gi->MapInfoResUseDel.IsBound())
+        gi->MapInfoResUseDel.BindUObject(this , &UK_StandbyWidget::ResMapInfo);
+    //->이 델리게이트 바인딩을 통해 GameInstance에서 콜백이 들어올떄 
+    //  이 델리게이트 변수가 BroadCast되면 이곳의 연결함수가 실행
+
+    FMapInfoRequest data;
+    data.mapName = MyRoomName;
+
+    // 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+    UK_GameInstance::MyServerRequest<FMapInfoRequest>(GetWorld() , EEventType::MAPINFO , data);
+}
+
+void UK_StandbyWidget::ResMapInfo(const FMapInfoResponse& resData)
+{
+    GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+                                     FString::Printf(
+                                         TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+
+    //인게임에서 사용할 미션데이터를 인스턴스에 저장
+    FMissionDataRes md;
+    md.producer = resData.producer;
+    md.latitude = resData.latitude;
+    md.longitude = resData.longitude;
+    md.mapName = resData.mapName;
+    md.mapImage = resData.mapImage;
+    md.startPoint.x = resData.startPointX;
+    md.startPoint.y = resData.startPointY;
+    md.mission = resData.missionData;
+
+    GameInstance->InitializeMission(md);
+    InitializeMissionData();
+}

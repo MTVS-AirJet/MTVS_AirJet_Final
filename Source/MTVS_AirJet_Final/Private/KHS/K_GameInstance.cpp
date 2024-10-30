@@ -43,7 +43,7 @@ void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 void UK_GameInstance::OnConnectedPlayerNames()
 {
 	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
-	if ( KGameState )
+	if (KGameState)
 	{
 		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
 	}
@@ -96,7 +96,7 @@ void UK_GameInstance::OnCreateSessionComplete(FName SessionName , bool Success)
 		return;
 	}
 	GEngine->AddOnScreenDebugMessage(0 , 2 , FColor::Green , TEXT("Hosting"));
-
+	bHost = true;
 	// 세션이 성공적으로 생성 시,
 	if (ServerWidget) // ServerWidget 제거
 		ServerWidget->RemoveUI();
@@ -291,9 +291,6 @@ void UK_GameInstance::Host(FString ServerName , const FString& MapDataStruct)
 	{
 		FString HostName = PlayerController->PlayerState->GetPlayerName();
 		MyName = HostName;
-		// ConnectedPlayerNames.Add(HostName); // 호스트 이름 추가
-		//
-		
 	}
 
 	// 만약, 세션 인터페이스가 유효하다면,
@@ -342,8 +339,20 @@ void UK_GameInstance::Join(uint32 Index)
 	{
 		ServerWidget->RemoveUI(); //서버 UI제거
 	}
-
-
+	auto s = SessionSearch->SearchResults[Index].Session.SessionSettings.Settings[SERVER_DATA_SETTINGS_KEY].Data;
+	FString Value;
+	s.GetValue(Value);
+	UE_LOG(LogTemp , Warning , TEXT("join value : %s") , *Value);
+	if (!Value.IsEmpty())
+	{
+		TArray<FString> Tokens;
+		Value.ParseIntoArray(Tokens, TEXT("|"));
+		if(Tokens.Num()>=7)
+		{
+			JoinRoomName=Tokens[3];
+		}
+	}
+	
 	//Session Interface 를 통해 JoinSession 실행
 	SessionInterface->JoinSession(0 , SESSION_NAME , SessionSearch->SearchResults[Index]);
 }
@@ -422,7 +431,8 @@ void UK_GameInstance::CreateStandbyWidget()
 void UK_GameInstance::InitializeMission(const FMissionDataRes& newMD)
 {
 	MissionData = newMD;
-	MissionData.ToString();
+	auto str = MissionData.ToString();
+	LOG_S(Warning , TEXT("%s") , *str);
 }
 
 // 3) Travel 관련 함수 ------------------------------------------------------------------------------------
@@ -658,7 +668,9 @@ void UK_GameInstance::MyResMapInfo(const FString& jsonData , bool isSuccess)
 	// 바인드된 함수 실행(BroadCast)
 	MapInfoResUseDel.ExecuteIfBound(resData);
 }
+
 #pragma endregion
 
 
 #pragma endregion
+

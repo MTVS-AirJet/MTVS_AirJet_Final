@@ -15,7 +15,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "JBS/J_MissionPlayerController.h"
-#include "KHS/K_CesiumTeleportBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LHJ/L_Flare.h"
@@ -24,7 +23,6 @@
 #include "LHJ/L_RoadTrigger.h"
 #include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
-#include "JBS/J_MissionGameState.h"
 #include "KHS/K_GameInstance.h"
 
 
@@ -287,8 +285,8 @@ void AL_Viper::PushQueue()
 	StartScenario.push("MIC");
 	StartScenario.push("EngineGen");
 	StartScenario.push("EngineControl");
-	StartScenario.push("JFS_Switch");
 	StartScenario.push("EngineMaster");
+	StartScenario.push("JFS_Switch");
 	StartScenario.push("JFS_Handle");
 	StartScenario.push("Throttle");
 	StartScenario.push("Canopy");
@@ -936,6 +934,8 @@ void AL_Viper::BeginPlay()
 			LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
 			if (HasAuthority())
 				GI->OnConnectedPlayerNames();
+
+			
 		}
 	}
 }
