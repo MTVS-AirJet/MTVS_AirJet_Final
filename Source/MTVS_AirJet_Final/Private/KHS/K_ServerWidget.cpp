@@ -45,7 +45,7 @@ void UK_ServerWidget::NativeConstruct()
 
 	// GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	if ( !GameInstance )
+	if (!GameInstance)
 	{
 		UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
 	}
@@ -125,7 +125,6 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 // 서버메뉴로 돌아가는 함수
 void UK_ServerWidget::OpenServerMenuFromReady()
 {
-	
 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
@@ -198,7 +197,7 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 			FText::FromString(FString::Printf(TEXT("%d/%d") , ServerData.curPlayers , ServerData.maxPlayers)));
 
 		//ServerListUI 인덱스 부여
-		ServerList->Setup(this, ServerData.sessionIdx);
+		ServerList->Setup(this , ServerData.sessionIdx);
 		//ServerList->Setup(this , i);
 		//i++;
 
@@ -332,7 +331,6 @@ void UK_ServerWidget::CreateRoom()
 	//	FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
 	//	SessionInterface->Host(ServerName , CreatedMapData);
 	//}
-
 }
 
 //mapName입력내용 기준으로 서버에 요청하는 함수
@@ -340,7 +338,9 @@ void UK_ServerWidget::ReqMapInfo()
 {
 	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
 	auto* gi = UK_JsonParseLib::GetKGameInstance(GetWorld());
-	gi->MapInfoResUseDel.BindUObject(this , &UK_ServerWidget::ResMapInfo);
+
+	if (!gi->MapInfoResUseDel.IsBound())
+		gi->MapInfoResUseDel.BindUObject(this , &UK_ServerWidget::ResMapInfo);
 	//->이 델리게이트 바인딩을 통해 GameInstance에서 콜백이 들어올떄 
 	//  이 델리게이트 변수가 BroadCast되면 이곳의 연결함수가 실행
 
@@ -357,7 +357,7 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
 	                                 FString::Printf(
 		                                 TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
-	
+
 	CreatedMapData = resData.ResponseToServerData();
 
 	// 정보를 받아온 것이 도착해야(ResMapInfo가 실행되야) Host가 시작되도록 함.
@@ -367,7 +367,7 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 		FString ServerName = HostMenu_txt_RoomName->GetText().ToString();
 		WidgetInterface->Host(ServerName , CreatedMapData);
 	}
-	
+
 	//인게임에서 사용할 미션데이터를 인스턴스에 저장
 	FMissionDataRes md;
 	md.producer = resData.producer;
@@ -381,7 +381,4 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 
 	GameInstance->InitializeMission(md);
 }
-
-
 #pragma endregion
-

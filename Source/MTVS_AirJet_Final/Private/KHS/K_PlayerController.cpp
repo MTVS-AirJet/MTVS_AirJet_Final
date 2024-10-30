@@ -13,16 +13,17 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "GameFramework/PlayerController.h"
+#include "KHS/K_ServerWidget.h"
 
 void AK_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// 인게임 Common UI 세팅
-	if ( CommonWidgetFactory )
+	if (CommonWidgetFactory)
 	{
-		CommonWidget = CreateWidget<UK_CommonWidget>(this, CommonWidgetFactory);
-		if ( CommonWidget )
+		CommonWidget = CreateWidget<UK_CommonWidget>(this , CommonWidgetFactory);
+		if (CommonWidget)
 		{
 			CommonWidget->SetInterface(Cast<IK_SessionInterface>(GetGameInstance()));
 			bIsCommonWidgetVisible = false; //평소엔 안보이게 처리
@@ -30,8 +31,9 @@ void AK_PlayerController::BeginPlay()
 	}
 
 	//IMC Common 맵핑
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if ( Subsystem )
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer());
+	if (Subsystem)
 	{
 		Subsystem->AddMappingContext(IMC_Common , 1); //Zorder를 1번으로 설정.
 	}
@@ -48,20 +50,20 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 	//로그찍기
 	LOG_S(Warning , TEXT("KPlayerController OnPossess!!!!!"));
 	LOG_S(Warning , TEXT("PlayerController %s possessed pawn %s") , *GetName() , *InPawn->GetName());
-	LOG_S(Warning , TEXT("Current Map Name : %s"), *CurrentMapName);
-	LOG_S(Warning , TEXT("Current Player Controller Count : %d"), GetWorld()->GetNumPlayerControllers());
+	LOG_S(Warning , TEXT("Current Map Name : %s") , *CurrentMapName);
+	LOG_S(Warning , TEXT("Current Player Controller Count : %d") , GetWorld()->GetNumPlayerControllers());
 	TArray<AActor*> outActor;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AL_Viper::StaticClass(), outActor);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld() , AL_Viper::StaticClass() , outActor);
 	LOG_S(Warning , TEXT("Current Viper Count : %d") , outActor.Num());
 
 
 	// 서버에서 Pawn 타입을 확인하고 적절한 UI 설정 함수를 호출
 	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if ( CurrentMapName == FString::Printf(TEXT("CesiumTest")) )
+	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	{
 		//CRPC로 UI세팅하고 IMC맵핑
 		CRPC_SetIMCnCreateStandbyUI();
-		LOG_S(Warning , TEXT("KPlayerController Call Server_NotifyPawnPossessed!!!!!"));
+		LOG_S(Warning , TEXT("KPlayerzController Call Server_NotifyPawnPossessed!!!!!"));
 	}
 }
 
@@ -71,28 +73,29 @@ void AK_PlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
 
-	if ( EnhancedInput )
+	if (EnhancedInput)
 	{
-		EnhancedInput->BindAction(IA_ToggleCommonWidget , ETriggerEvent::Started , this , &AK_PlayerController::ToggleCommonWidget);
-		EnhancedInput->BindAction(IA_ToggleMouseCursor, ETriggerEvent::Started , this, &AK_PlayerController::ToggleMouseCursor);
+		EnhancedInput->BindAction(IA_ToggleCommonWidget , ETriggerEvent::Started , this ,
+		                          &AK_PlayerController::ToggleCommonWidget);
+		EnhancedInput->BindAction(IA_ToggleMouseCursor , ETriggerEvent::Started , this ,
+		                          &AK_PlayerController::ToggleMouseCursor);
 	}
-
 }
 
 //Common Widget 토글 함수
 void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
 {
-	if(!IsLocalPlayerController() ) return;
-	
-	if( nullptr == CommonWidget )
+	if (!IsLocalPlayerController()) return;
+
+	if (nullptr == CommonWidget)
 	{
-		LOG_S(Warning, TEXT("CommonWidget is not Valid"));
+		LOG_S(Warning , TEXT("CommonWidget is not Valid"));
 		return;
 	}
 	//플래그에 따라 UI상태 제어
-	if ( bIsCommonWidgetVisible )
+	if (bIsCommonWidgetVisible)
 	{
-		if( CommonWidget->IsInViewport() )
+		if (CommonWidget->IsInViewport())
 			CommonWidget->RemoveFromParent();
 
 		FInputModeGameOnly InputGameOnly;
@@ -108,12 +111,13 @@ void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
 		bIsCommonWidgetVisible = true;
 	}
 }
+
 // 마우스커서 토글 함수
 void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 {
 	// GetWorld() 유효 확인
 	UWorld* World = GetWorld();
-	if ( !World )
+	if (!World)
 	{
 		UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
 		return; // World가 유효하지 않으면
@@ -121,15 +125,15 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 
 	// PlayerController 유효 확인
 	APlayerController* PlayerController = World->GetFirstPlayerController();
-	if ( !PlayerController )
+	if (!PlayerController)
 	{
 		UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
 		return; // PlayerController가 유효하지 않으면 
 	}
 
-	if ( PlayerController )
+	if (PlayerController)
 	{
-		if ( bIsMouseCursorShow )
+		if (bIsMouseCursorShow)
 		{
 			FInputModeGameOnly InputGameOnlyMode;
 			PlayerController->SetInputMode(InputGameOnlyMode);
@@ -149,17 +153,18 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 //클라이언트 UI생성 및 IMC맵핑 RPC함수
 void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 {
-	if ( IsLocalController() )
+	if (IsLocalController())
 	{
-		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-		if ( Subsystem )
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+			GetLocalPlayer());
+		if (Subsystem)
 		{
-
-			if ( nullptr == IMC_Viper )
+			if (nullptr == IMC_Viper)
 			{
 				UE_LOG(LogTemp , Log , TEXT("nullptr == IMC_Viper"));
 			}
-			else {
+			else
+			{
 				Subsystem->ClearAllMappings();
 				Subsystem->AddMappingContext(IMC_Viper , 0);
 				UE_LOG(LogTemp , Log , TEXT("EnhancedInputMappingContext Mapping Complete"));
@@ -170,33 +175,32 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 			UE_LOG(LogTemp , Error , TEXT("Subsystem == null"));
 		}
 
-
 		StandbyUI = CreateWidget<UK_StandbyWidget>(this , StandbyUIFactory);
 		CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-		if ( StandbyUI && CurrentMapName == FString::Printf(TEXT("CesiumTest")) )
+		if (StandbyUI && CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 		{
 			StandbyUI->SetUI();
-			StandbyUI->InitializeMissionData(); // 서버에서 설정한 데이터와 동기화
 
-
-			if ( UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()) )
+			if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
 			{
-				if ( StandbyUI )
+				if (StandbyUI)
 				{
-					StandbyUI->ClientUpdatePlayerList(GI->ConnectedPlayerNames);  // StandbyUI에서 PlayerList 동기화
+					StandbyUI->ClientUpdatePlayerList(GI->ConnectedPlayerNames); // StandbyUI에서 PlayerList 동기화
+					if (GI->ServerWidget && !GI->bHost)
+						StandbyUI->ReqMapInfo(GI->JoinRoomName);
 				}
 			}
+			//StandbyUI->InitializeMissionData(); // 서버에서 설정한 데이터와 동기화
 		}
 	}
 	else
-		LOG_S(Warning , TEXT("Is Not Local Controller"));
+	LOG_S(Warning , TEXT("Is Not Local Controller"));
 }
 
 //void AK_PlayerController::ClientRPC_UpdatePlayerList_Implementation(const TArray<FString>& playerNames)
 //{
 //	
 //}
-
 
 
 ////클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
@@ -213,5 +217,4 @@ void AK_PlayerController::TravelToLobbyLevel()
 {
 	// 로비 맵으로 클라이언트를 이동
 	ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
-
 }
