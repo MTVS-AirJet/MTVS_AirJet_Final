@@ -927,18 +927,17 @@ void AL_Viper::BeginPlay()
 		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if ( CurrentMapName == FString::Printf(TEXT("CesiumTest")) )
+	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	{
-		auto KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
-		if ( KGameState )
+		if (auto GI = CastChecked<UK_GameInstance>(GetGameInstance()))
 		{
-			auto GI = CastChecked<UK_GameInstance>(GetGameInstance());
-			KGameState->SetConnectedPlayerNames(GI->ConnectedPlayerNames);
+			LOG_S(Warning , TEXT("Before Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
+			GI->ConnectedPlayerNames.Add(GI->MyName);
+			LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
+			if (HasAuthority())
+				GI->OnConnectedPlayerNames();
 		}
 	}
-	
-
-	
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1611,7 +1610,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 	LockOnTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
 	FVector ForwardVector = JetMesh->GetForwardVector();
-	FVector DownVector = JetMesh->GetUpVector()*-1;
+	FVector DownVector = JetMesh->GetUpVector() * -1;
 
 	TArray<AActor*> Overlaps;
 	TArray<FHitResult> OutHit;

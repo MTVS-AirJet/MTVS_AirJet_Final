@@ -28,29 +28,9 @@ public:
 
    UFUNCTION()
    virtual void OnRep_StreamingID();
-
-   /*UPROPERTY(Replicated , BlueprintReadOnly , Replicated)
-   TArray<FString> ConnectedPlayerNames;*/ //(미사용)
-
+	
 public:
-	////RepNotify로 관리할 미션데이터
-	//UPROPERTY(ReplicatedUsing = OnRep_MissionData)
-	//FMissionDataRes MissionData;
-	//
-	////MissionData가 변경될때 클라이언트에 알리기 위한 RepNotify함수
-	//UFUNCTION()
-	//void OnRep_MissionData();
-
-	////서버에서 MissionData설정하는 함수
-	//void SetMissionData(const FMissionDataRes& NewMissionData);
-
-public:
-	//RepNotify로 관리할 미션데이터
-	UPROPERTY(ReplicatedUsing = OnRep_ConnectedPlayerNames)
 	TArray<FString> ConnectedPlayerNames;
-
-	UFUNCTION()
-	void OnRep_ConnectedPlayerNames();
 
 	void SetConnectedPlayerNames(const TArray<FString>& newNames);
 
