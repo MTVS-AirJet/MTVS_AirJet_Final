@@ -33,16 +33,16 @@ public:
    TArray<FString> ConnectedPlayerNames;*/ //(미사용)
 
 public:
-	//RepNotify로 관리할 미션데이터
-	UPROPERTY(ReplicatedUsing = OnRep_MissionData)
-	FMissionDataRes MissionData;
-	
-	//MissionData가 변경될때 클라이언트에 알리기 위한 RepNotify함수
-	UFUNCTION()
-	void OnRep_MissionData();
+	////RepNotify로 관리할 미션데이터
+	//UPROPERTY(ReplicatedUsing = OnRep_MissionData)
+	//FMissionDataRes MissionData;
+	//
+	////MissionData가 변경될때 클라이언트에 알리기 위한 RepNotify함수
+	//UFUNCTION()
+	//void OnRep_MissionData();
 
-	//서버에서 MissionData설정하는 함수
-	void SetMissionData(const FMissionDataRes& NewMissionData);
+	////서버에서 MissionData설정하는 함수
+	//void SetMissionData(const FMissionDataRes& NewMissionData);
 
 public:
 	//RepNotify로 관리할 미션데이터

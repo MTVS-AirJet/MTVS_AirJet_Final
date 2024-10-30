@@ -322,8 +322,6 @@ void UK_ServerWidget::QuitCreaterWeb()
 // (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
 void UK_ServerWidget::CreateRoom()
 {
-	//이후 ReadyMenu구성이 되면 그때 LobbyMenu로 넘어가는 것으로 하자.
-
 	//Editable Text에 적은 MapName기준으로 백엔드서버에 요청하고
 	//콜백함수에 Create Room관련 내용들을 설정(정보를 받아두고 세션을 열기 위함)
 	ReqMapInfo();
@@ -380,19 +378,9 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	md.startPoint.x = resData.startPointX;
 	md.startPoint.y = resData.startPointY;
 	md.mission = resData.missionData;
-	/*GameInstance->MissionData.producer = resData.producer;
-	GameInstance->MissionData.latitude = resData.latitude;
-	GameInstance->MissionData.longitude = resData.longitude;
-	GameInstance->MissionData.mapName = resData.mapName;
-	GameInstance->MissionData.mapImage = resData.mapImage;
-	GameInstance->MissionData.startPoint.x = resData.startPointX;
-	GameInstance->MissionData.startPoint.y = resData.startPointY;
-	GameInstance->MissionData.mission = resData.missionData;*/
 
 	GameInstance->InitializeMission(md);
 }
-
-
 
 
 #pragma endregion

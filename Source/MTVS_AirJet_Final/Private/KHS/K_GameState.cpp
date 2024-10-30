@@ -16,7 +16,7 @@ void AK_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AK_GameState , ArrStreamingUserID);
-	DOREPLIFETIME(AK_GameState , MissionData); // MissionData를 Replicated 설정
+	//DOREPLIFETIME(AK_GameState , MissionData); // MissionData를 Replicated 설정
 	DOREPLIFETIME(AK_GameState , ConnectedPlayerNames); // ConnectedPlayerNames를 Replicated 설정
 }
 
@@ -27,7 +27,7 @@ void AK_GameState::BeginPlay()
 	auto gi = CastChecked<UK_GameInstance>(GetGameInstance());
 	if ( gi )
 	{
-		SetMissionData(gi->MissionData);
+		//SetMissionData(gi->MissionData);
 		SetConnectedPlayerNames(gi->ConnectedPlayerNames);
 	}
 	
@@ -46,33 +46,34 @@ void AK_GameState::OnRep_StreamingID()
 	}
 
 }
-//MissionData가 변경될때 클라이언트에 알리기 위한 RepNotify함수
-void AK_GameState::OnRep_MissionData()
-{
-	// World에서 플레이어 컨트롤러를 가져와 StandbyWidget에 접근
-	for ( FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It )
-	{
-		AK_PlayerController* PlayerController = Cast<AK_PlayerController>(It->Get());
-		if ( PlayerController )
-		{
-			UK_StandbyWidget* StandbyWidget = Cast<UK_StandbyWidget>(PlayerController->StandbyUI);
-			if ( StandbyWidget )
-			{
-				// StandbyWidget의 InitializeMissionData 호출로 UI 업데이트
-				StandbyWidget->InitializeMissionData();
-			}
-		}
-	}
-}
+////MissionData가 변경될때 클라이언트에 알리기 위한 RepNotify함수
+//void AK_GameState::OnRep_MissionData()
+//{
+//	// World에서 플레이어 컨트롤러를 가져와 StandbyWidget에 접근
+//	for ( FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It )
+//	{
+//		AK_PlayerController* PlayerController = Cast<AK_PlayerController>(It->Get());
+//		if ( PlayerController )
+//		{
+//			UK_StandbyWidget* StandbyWidget = Cast<UK_StandbyWidget>(PlayerController->StandbyUI);
+//			if ( StandbyWidget )
+//			{
+//				// StandbyWidget의 InitializeMissionData 호출로 UI 업데이트
+//				StandbyWidget->InitializeMissionData();
+//			}
+//		}
+//	}
+//}
 
-//서버에서 MissionData설정하는 함수
-void AK_GameState::SetMissionData(const FMissionDataRes& NewMissionData)
-{
-
-	MissionData = NewMissionData;
-	OnRep_MissionData(); // 변경 후 즉시 RepNotify 호출
-	
-}
+////서버에서 MissionData설정하는 함수
+//void AK_GameState::SetMissionData(const FMissionDataRes& NewMissionData)
+//{
+//
+//	MissionData = NewMissionData;
+//	if( HasAuthority() )
+//		OnRep_MissionData(); // 변경 후 즉시 RepNotify 호출
+//	
+//}
 
 void AK_GameState::OnRep_ConnectedPlayerNames()
 {

@@ -181,11 +181,19 @@ void UK_StandbyWidget::OpenLobbyLevel()
 // GameInstance의 MissionData로 위젯 설정하는 함수
 void UK_StandbyWidget::InitializeMissionData()
 {
-    // GameState에서 MissionData를 가져와 UI에 반영
-    KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
-    if ( !KGameState ) return;
+    //// GameState에서 MissionData를 가져와 UI에 반영
+    //KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+    //if ( !KGameState ) return;
 
-    const auto& MissionData = KGameState->MissionData;
+    //const auto& MissionData = KGameState->MissionData;
+
+    //GameInstance 가져오기
+	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	 if ( !GameInstance ) {
+		 UE_LOG(LogTemp , Error , TEXT("GameInstance를 가져오지 못했습니다."));
+		 return;
+	 }
+     const auto& MissionData = GameInstance->MissionData;
 
     StandbyMenu_txt_Producer->SetText(FText::FromString(MissionData.producer));
     StandbyMenu_txt_MapName->SetText(FText::FromString(MissionData.mapName));
