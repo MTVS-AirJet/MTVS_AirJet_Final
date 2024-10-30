@@ -327,6 +327,8 @@ public:
     // 목표 액터
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AJ_BaseMissionObjective* objectiveActor = nullptr;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    ETacticalOrder objType = ETacticalOrder::NONE;
     // 목표 수행도 | 목표 완료시 갱신됨
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     float successPercent = 0.f;
@@ -514,6 +516,8 @@ public:
     static bool CheckValueRange(float value, float min, float max, bool inClusive = true);
     // 파일럿 역할 enum -> string 변환
     static FString PilotRoleToString(EPilotRole role);
+    // 전술명령 enum -> string 변환
+    static FString TacticalOrderToString(ETacticalOrder type);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 500000.f;

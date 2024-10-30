@@ -327,7 +327,7 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc)
                 this->objectiveManagerComp->ActiveNextObjective();
                 
             }, 1.5, false);
-        }, .5f, false);
+        }, 1.5f, false);
 
 
         

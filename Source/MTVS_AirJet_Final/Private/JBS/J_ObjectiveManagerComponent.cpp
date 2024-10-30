@@ -74,6 +74,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 		// 목표 액터 배열에 추가
 		// 순서대로 하기위해 pinNo 사용
 		objectiveDataAry[mData.pinNo].objectiveActor = objectiveActor;
+		objectiveDataAry[mData.pinNo].objType = objectiveActor->orderType;
 		// objectiveAry.Add(objectiveActor);
 	}
 
@@ -136,6 +137,8 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 
 void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
 {
+	if(!GetOwner()->HasAuthority()) return;
+	
 	if(value < 0 || value > objectiveDataAry.Num())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("idx value 문제"));
@@ -165,7 +168,6 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 
 	// 여기부터 결산 단계
 	// 미션 완료 ui 전환
-	// FIXME 결산 ui 안뜨는거 해결 필요
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager()
 		.SetTimer(timerHandle, [this]() mutable
@@ -176,7 +178,7 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 		for(AJ_MissionPlayerController* pc : allPC)
 		{
 			// 결산 UI 전환
-			pc->objUIComp->CRPC_SwitchResultUI();
+			pc->objUIComp->CRPC_SwitchResultUI(objectiveDataAry);
 		}
 	}, objSwitchInterval, false);
 }
@@ -184,11 +186,13 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
 {
 	// 인덱스 찾기
-	FObjectiveData data = *objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
+	FObjectiveData& data = *objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
 	{
 		return objData.objectiveActor == objActor;
 	});
 
 	// 갱신
 	data.successPercent = successPercent;
+
+	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("도당체 : %.2f"), data.successPercent));
 }

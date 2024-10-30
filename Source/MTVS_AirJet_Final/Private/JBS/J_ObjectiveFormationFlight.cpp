@@ -7,6 +7,7 @@
 #include "Internationalization/Text.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
+#include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_ObjectiveUIComponent.h"
 #include "UObject/Class.h"
 #include <algorithm>
@@ -257,3 +258,18 @@ void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
     }
 }
 
+void AJ_ObjectiveFormationFlight::OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent,
+                                                             AActor *OtherActor, UPrimitiveComponent *OtherComp,
+                                                             int32 OtherBodyIndex, bool bFromSweep,
+                                                             const FHitResult &SweepResult)
+{
+    // 충돌한게 미션 폰이면 목표 성공 처리
+    if(OtherActor->IsA<AJ_BaseMissionPawn>())
+    {
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("충돌한 플레이어 : %s"), *OtherActor->GetName()));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이동 목표 성공"));
+        // 수행도 1
+        // SUCCESS_PERCENT = 1.f;
+        this->ObjectiveEnd(true);
+    }   
+}

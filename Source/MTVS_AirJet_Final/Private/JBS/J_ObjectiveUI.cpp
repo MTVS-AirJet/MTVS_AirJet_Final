@@ -5,15 +5,18 @@
 #include "Components/SlateWrapperTypes.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Components/WidgetSwitcher.h"
 #include "Engine/Engine.h"
 #include "JBS/J_ObjectiveSubElementUI.h"
 #include "Styling/SlateColor.h"
+#include "JBS/J_MissionCompleteUI.h"
 
 void UJ_ObjectiveUI::SetObjHeaderText(const FString& value)
 {
     // 텍스트 설정
     objHeaderText->SetText(FText::FromString(value));
 
+    
 }
 
 void UJ_ObjectiveUI::SetObjBodyText(TArray<FString> valueAry)
@@ -113,7 +116,20 @@ void UJ_ObjectiveUI::StartObjUI()
     // objBodyText->SetColorAndOpacity(defaultTextColor);
 }
 
-void UJ_ObjectiveUI::ActiveResultUI()
+void UJ_ObjectiveUI::ActiveResultUI(const TArray<FObjectiveData>& resultObjData)
 {
+    if(!MissionUI_Switcher)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("이게 어케 없음?"));
+        return;
+    }
+
+    MissionUI_Switcher->SetActiveWidget(missionCompleteUI);
     
+    // FString asd = FString::Printf(TEXT("결과 obj 개수 : %d"), resultObjData.Num());
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *asd));
+    // UE_LOG(LogTemp, Warning, TEXT("%s"), *asd);
+
+    missionCompleteUI->SetResultListValue(resultObjData);
 }
+
