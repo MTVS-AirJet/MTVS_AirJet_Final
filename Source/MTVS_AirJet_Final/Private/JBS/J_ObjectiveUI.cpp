@@ -56,10 +56,9 @@ void UJ_ObjectiveUI::SetObjUI(FObjUIData data)
 
 void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
 {
-    // @@ 완료 UMG
+    // @@ 서브 완료 UMG
     
-    // 성공 유무에 따라 텍스트 색상 변경
-    // @@
+    // @@ 성공 유무에 따라 텍스트 색상 변경
     auto subUIs = objBodyElementVBox->GetAllChildren();
     TArray<UJ_ObjectiveSubElementUI*> subEleUIs;
     Algo::Transform(subUIs, subEleUIs, [](UWidget* temp){
@@ -88,7 +87,7 @@ void UJ_ObjectiveUI::EndObjUI(bool isSuccess)
 
     // @@ 취소선 처리?
 
-    // @@ 완료 UMG
+    // 완료 UMG
     PlayObjEndAnim();
     // umg 종료후 비활성화
 }

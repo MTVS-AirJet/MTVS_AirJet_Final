@@ -48,12 +48,12 @@ void AJ_ObjectiveFormationFlight::Tick(float deltaTime)
     // 편대 조건 체크
     IS_FORMATION = CheckFormation();
     // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::White, FString::Printf(TEXT("체크리스트 값 : %d"), checklistValue));
-    FString check1 = checklistValue & 1 ? TEXT("고도 맞음") : TEXT("고도 아냐");
-    FString check2 = checklistValue & 2 ? TEXT("진형 맞아") : TEXT("진형 아냐");
+    // FString check1 = checklistValue & 1 ? TEXT("고도 맞음") : TEXT("고도 아냐");
+    // FString check2 = checklistValue & 2 ? TEXT("진형 맞아") : TEXT("진형 아냐");
     
-    FString checkStr = FString::Printf(TEXT("체크리스트 값 : %s, %s\n수행도 값 : %.2f\n현재 편대 비행 중 : %s"), *check1, *check2, SUCCESS_PERCENT, IS_FORMATION ? TEXT("맞아") : TEXT("아냐"));
+    // FString checkStr = FString::Printf(TEXT("체크리스트 값 : %s, %s\n수행도 값 : %.2f\n현재 편대 비행 중 : %s"), *check1, *check2, SUCCESS_PERCENT, IS_FORMATION ? TEXT("맞아") : TEXT("아냐"));
 
-    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::White, FString::Printf(TEXT("%s"), *checkStr));
+    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::White, FString::Printf(TEXT("%s"), *checkStr));
 
 }
 
@@ -95,7 +95,7 @@ bool AJ_ObjectiveFormationFlight::CheckHeight()
     for(auto* pawn : allPawns)
     {
         // 고도 확인
-        // @@ 이거 비교값을 보정시키고 싶음
+        // 이거 비교값을 보정시키고 싶음
         float pawnHeight = pawn->GetActorLocation().Z;
         isPass = UJ_Utility::CheckValueRange(pawnHeight, checkHeight - checkHeightAdj, checkHeight + checkHeightAdj);
     }
@@ -133,14 +133,14 @@ bool AJ_ObjectiveFormationFlight::CheckAlign()
                 {
                     // 앞에 뭔가 있으면 false
                     subPass = !CheckForward(pawn, otherPawn);
-                    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("전방 존재 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
+                    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("전방 존재 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
                 }
                     break;
                 // 외적
                 case EPilotRole::LEFT_WINGER:
                 {
                     subPass = CheckLeftRight(pawn, otherPawn);
-                    GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("왼쪽 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
+                    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("왼쪽 확인 %s"), subPass ? TEXT("TRUE"): TEXT("false")));
                 }
                     break;
                 case EPilotRole::RIGHT_WINGER:

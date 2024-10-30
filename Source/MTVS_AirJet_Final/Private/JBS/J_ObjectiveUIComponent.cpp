@@ -49,7 +49,7 @@ void UJ_ObjectiveUIComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UJ_ObjectiveUIComponent::InitObjUI()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 UI 생성"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 UI 생성"));
 	// ui 생성
 	objUI = CreateWidget<UJ_ObjectiveUI>(this->GetOwner<AJ_MissionPlayerController>(), objUIPrefab);
 	check(objUI);
