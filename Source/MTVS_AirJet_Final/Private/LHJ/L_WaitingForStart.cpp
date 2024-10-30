@@ -3,6 +3,7 @@
 
 #include "LHJ/L_WaitingForStart.h"
 
+#include "MTVS_AirJet_Final.h"
 #include "Components/TextBlock.h"
 #include "KHS/K_GameInstance.h"
 #include "LHJ/L_Viper.h"
@@ -13,6 +14,7 @@ void UL_WaitingForStart::NativeConstruct()
 
 	gm = Cast<UK_GameInstance>(GetWorld()->GetGameInstance());
 	MaxCnt = gm->ConnectedPlayerNames.Num();
+	LOG_S(Warning, TEXT("Current Player Count : %d"), MaxCnt);
 	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
 	TxtReadyCnt->SetText(FText::FromString(txt));
 }
