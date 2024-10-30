@@ -164,9 +164,9 @@ void AJ_MissionPlayerController::SRPC_AddFlightArySelf_Implementation()
 void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
 {
     // 로딩 ui 생성
-    loadingUI = CreateWidget<UK_LoadingWidget>(GetWorld(), loadingUIPrefab);
+    missionReadyUI = CreateWidget<UK_LoadingWidget>(GetWorld(), loadingUIPrefab);
     // 뷰포트에 추가
-    loadingUI->AddToViewport();
+    missionReadyUI->AddToViewport();
 }
 
 void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
@@ -180,10 +180,10 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
         .SetTimer(timerHandle, [this]() mutable
     {
         //타이머에서 할 거
-        if(loadingUI)
+        if(missionReadyUI)
         {
-            loadingUI->RemoveFromParent();
-            loadingUI = nullptr;
+            missionReadyUI->RemoveFromParent();
+            missionReadyUI = nullptr;
         }
     }, 1.f, false);
     // while(loadingUI)

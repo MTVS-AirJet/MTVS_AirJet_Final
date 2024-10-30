@@ -31,10 +31,12 @@ public:
     void RemoveStreamUserId(const FString &userId);
 
     // 현재 레벨 모든 pc 가져오기
+    UFUNCTION(BlueprintCallable)
     virtual TArray<class AJ_MissionPlayerController *> GetAllPlayerController();
 
     // @@ 아마 나중에 캐스팅 필요할지도
     // 현재 레벨 모든 플레이어 폰 가져오기
+    UFUNCTION(BlueprintCallable)
     virtual TArray<class APawn *> GetAllPlayerPawn();
 
     void RemoveAllLoadingUI();

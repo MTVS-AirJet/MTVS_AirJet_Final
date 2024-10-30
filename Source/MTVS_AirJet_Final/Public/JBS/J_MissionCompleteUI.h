@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "JBS/J_Utility.h"
 #include "J_MissionCompleteUI.generated.h"
 
 /**
@@ -35,4 +36,6 @@ protected:
 
 public:
 	// 결과 값 받기
+	// 결과 리스트 UI에 값 설정
+    void SetResultListValue(const TArray<FObjectiveData> &resultObjData);
 };

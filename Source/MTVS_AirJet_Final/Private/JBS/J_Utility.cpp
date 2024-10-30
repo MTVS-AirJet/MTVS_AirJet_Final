@@ -113,6 +113,30 @@ FString UJ_Utility::PilotRoleToString(EPilotRole role)
     return result;
 }
 
+FString UJ_Utility::TacticalOrderToString(ETacticalOrder type)
+{
+    FString result;
+
+    switch(type)
+    {
+
+    case ETacticalOrder::NONE:
+        result = TEXT("");
+        break;
+    case ETacticalOrder::MOVE_THIS_POINT:
+        result = TEXT("");
+        break;
+    case ETacticalOrder::FORMATION_FLIGHT:
+        result = TEXT("편대 비행 유지하기");
+        break;
+    case ETacticalOrder::NEUTRALIZE_TARGET:
+        result = TEXT("지상 목표 제거하기");
+        break;
+    }
+
+    return result;
+}
+
 
 
 // === 구조체 함수 구현

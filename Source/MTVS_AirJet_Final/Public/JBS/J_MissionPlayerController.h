@@ -27,8 +27,8 @@ protected:
 	bool enableDebugInput = false;
 
 	// 로딩 ui
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|UI")
-	class UK_LoadingWidget* loadingUI;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
+	class UK_LoadingWidget* missionReadyUI = nullptr;
 	// 로딩 ui 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TSubclassOf<class UK_LoadingWidget> loadingUIPrefab;
