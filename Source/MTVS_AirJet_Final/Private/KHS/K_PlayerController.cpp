@@ -4,16 +4,40 @@
 #include "KHS/K_PlayerController.h"
 #include "KHS/K_StandbyWidget.h"
 #include "KHS/K_GameInstance.h"
+#include "KHS/K_CommonWidget.h"
+#include "KHS/K_WidgetBase.h"
 #include "LHJ/L_Viper.h"
 #include "Kismet/GameplayStatics.h"
 #include <MTVS_AirJet_Final.h>
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
+#include "GameFramework/PlayerController.h"
 
 void AK_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 인게임 Common UI 세팅
+	if ( CommonWidgetFactory )
+	{
+		CommonWidget = CreateWidget<UK_CommonWidget>(this, CommonWidgetFactory);
+		if ( CommonWidget )
+		{
+			CommonWidget->SetInterface(Cast<IK_SessionInterface>(GetGameInstance()));
+			bIsCommonWidgetVisible = false; //평소엔 안보이게 처리
+		}
+	}
 
+	//IMC Common 맵핑
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if ( Subsystem )
+	{
+		Subsystem->AddMappingContext(IMC_Common , 1); //Zorder를 1번으로 설정.
+	}
+
+	//마우스커서는 평소엔 안보이게 처리
+	bIsMouseCursorShow = false;
 }
 
 void AK_PlayerController::OnPossess(APawn* InPawn)
@@ -38,6 +62,87 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 		//CRPC로 UI세팅하고 IMC맵핑
 		CRPC_SetIMCnCreateStandbyUI();
 		LOG_S(Warning , TEXT("KPlayerController Call Server_NotifyPawnPossessed!!!!!"));
+	}
+}
+
+void AK_PlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
+
+	if ( EnhancedInput )
+	{
+		EnhancedInput->BindAction(IA_ToggleCommonWidget , ETriggerEvent::Started , this , &AK_PlayerController::ToggleCommonWidget);
+		EnhancedInput->BindAction(IA_ToggleMouseCursor, ETriggerEvent::Started , this, &AK_PlayerController::ToggleMouseCursor);
+	}
+
+}
+
+//Common Widget 토글 함수
+void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
+{
+	if(!IsLocalPlayerController() ) return;
+	
+	if( nullptr == CommonWidget )
+	{
+		LOG_S(Warning, TEXT("CommonWidget is not Valid"));
+		return;
+	}
+	//플래그에 따라 UI상태 제어
+	if ( bIsCommonWidgetVisible )
+	{
+		if( CommonWidget->IsInViewport() )
+			CommonWidget->RemoveFromParent();
+
+		FInputModeGameOnly InputGameOnly;
+		SetInputMode(InputGameOnly);
+		bIsCommonWidgetVisible = false;
+	}
+	else
+	{
+		CommonWidget->AddToViewport(1);
+
+		FInputModeGameAndUI InputGameAndUI;
+		SetInputMode(InputGameAndUI);
+		bIsCommonWidgetVisible = true;
+	}
+}
+// 마우스커서 토글 함수
+void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
+{
+	// GetWorld() 유효 확인
+	UWorld* World = GetWorld();
+	if ( !World )
+	{
+		UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
+		return; // World가 유효하지 않으면
+	}
+
+	// PlayerController 유효 확인
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	if ( !PlayerController )
+	{
+		UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
+		return; // PlayerController가 유효하지 않으면 
+	}
+
+	if ( PlayerController )
+	{
+		if ( bIsMouseCursorShow )
+		{
+			FInputModeGameOnly InputGameOnlyMode;
+			PlayerController->SetInputMode(InputGameOnlyMode);
+			PlayerController->bShowMouseCursor = false; // 마우스 커서를 숨김
+			bIsMouseCursorShow = false;
+		}
+		else
+		{
+			FInputModeGameAndUI InputGameUIMode;
+			PlayerController->SetInputMode(InputGameUIMode);
+			PlayerController->bShowMouseCursor = true; // 마우스 커서를 보이게
+			bIsMouseCursorShow = true;
+		}
 	}
 }
 
@@ -91,6 +196,8 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 //{
 //	
 //}
+
+
 
 ////클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
 //void AK_PlayerController::ServerRPC_RequestPlayerListUpdate_Implementation()
