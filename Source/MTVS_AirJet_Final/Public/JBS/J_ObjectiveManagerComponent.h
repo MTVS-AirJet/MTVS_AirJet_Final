@@ -71,7 +71,11 @@ protected:
 	// 목표 액터 프리팹 맵
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<ETacticalOrder, TSubclassOf<class AJ_BaseMissionObjective>> objectiveActorPrefabMap;
+
 public:
+	// @@ 목표 전환 대기 시간 | 잘 처리 할 방법 궁리 필요
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float objSwitchInterval = 1.5f;
 
 protected:
 	// 미션 클리어

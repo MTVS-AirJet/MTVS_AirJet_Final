@@ -77,7 +77,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 		// objectiveAry.Add(objectiveActor);
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("목표 액터 추가 완료 개수 : %d"), objectiveDataAry.Num()));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("목표 액터 추가 완료 개수 : %d"), objectiveDataAry.Num()));
 
 	// XXX 바로 0번 미션 활성화 할지 고민 | 텔포 후 시작으로 변경
 	// ActiveNextObjective();
@@ -114,7 +114,7 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 	// 여기서 목표 다했으면 결산으로 넘어가짐 setcuractive~~
 	if(isMissionComplete) return;
 
-	// @@ 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
+	// 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
 	if(CUR_ACTIVE_MISSION_IDX > 0)
 	{
 		FTimerHandle timerHandle;
@@ -122,11 +122,11 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 			.SetTimer(timerHandle, [this]() mutable
 		{
 			//타이머에서 할 거
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
+			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
 			// 해당 목표 활성화
 			ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
 			
-		}, 1.5f, false);
+		}, objSwitchInterval, false);
 	}
 	else {
 		// 해당 목표 활성화
@@ -164,8 +164,7 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	isMissionComplete = true;
 
 	// 여기부터 결산 단계
-	// 미션 완료 ui 대기
-	// @@ 대기시간 변수화 해야할듯
+	// 미션 완료 ui 전환
 	// FIXME 결산 ui 안뜨는거 해결 필요
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager()
@@ -179,7 +178,7 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 			// 결산 UI 전환
 			pc->objUIComp->CRPC_SwitchResultUI();
 		}
-	}, 1.5f, false);
+	}, objSwitchInterval, false);
 }
 
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)

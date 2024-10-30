@@ -87,7 +87,7 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
         // return;
     }
 
-    // @@ 알고있어야 하려나?
+    // @@ gt 캐시 해야 하려나?
     // @@ 여러개 소환하려면 분산시켜야 할 듯
     for(int i = 0; i < spawnTargetAmt; i++)
     {
@@ -105,7 +105,7 @@ void AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed()
     // 수행도 갱신
     SUCCESS_PERCENT = static_cast<float>(destroyedTargetAmt) / spawnTargetAmt;
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("현재 파괴된 수 : %d, 남은 수 : %d"), destroyedTargetAmt, (spawnTargetAmt - destroyedTargetAmt)));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("현재 파괴된 수 : %d, 남은 수 : %d"), destroyedTargetAmt, (spawnTargetAmt - destroyedTargetAmt)));
 
     if(destroyedTargetAmt == spawnTargetAmt)
     {

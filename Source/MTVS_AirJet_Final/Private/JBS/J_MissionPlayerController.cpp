@@ -18,6 +18,7 @@
 #include <JBS/J_MissionGamemode.h>
 #include "KHS/K_StreamingUI.h"
 #include "Net/UnrealNetwork.h"
+#include "TimerManager.h"
 #include "UObject/Class.h"
 #include "UObject/Linker.h"
 
@@ -97,7 +98,7 @@ void AJ_MissionPlayerController::SRPC_SpawnMyPlayer_Implementation(TSubclassOf<c
 {
     // 자기 역할에 맞는 스폰 위치 가져오기
     auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
-    FTransform spawnTR = gm->GetPlayerSpawnTransfrom(playerRole);
+    FTransform spawnTR = gm->GetPlayerSpawnTransfrom(playerRole, this);
     // 항상 생성
     FActorSpawnParameters SpawnParams;
     // Always spawn, regardless of whether there are other actors at that location
@@ -170,14 +171,24 @@ void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
 
 void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
 {
-    UE_LOG(LogTemp, Warning, TEXT("asd제거할께 : %s, 로컬 유무 : %s, id : %d")
-        , loadingUI ? TEXT("있어") : TEXT("없어")
-        , IsLocalController() ? TEXT("예스") : TEXT("노")
-        , GetLocalPlayer()->GetControllerId());
-    if(loadingUI)
+    // // UE_LOG(LogTemp, Warning, TEXT("asd제거할께 : %s, 로컬 유무 : %s, id : %d")
+    //     , loadingUI ? TEXT("있어") : TEXT("없어")
+    //     , IsLocalController() ? TEXT("예스") : TEXT("노")
+    //     , GetLocalPlayer()->GetControllerId());
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
     {
-        loadingUI->RemoveFromParent();
-        loadingUI = nullptr;
+        //타이머에서 할 거
+        if(loadingUI)
+        {
+            loadingUI->RemoveFromParent();
+            loadingUI = nullptr;
+        }
+    }, 1.f, false);
+    // while(loadingUI)
+    {
+        
     }
 }
 

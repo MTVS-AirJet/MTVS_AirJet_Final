@@ -175,11 +175,6 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 	{
 		objectiveDeactiveDel.Broadcast();
 	}
-
-	
-	//@@
-	// iconWorldUIComp->SetHiddenInGame(false);
-
 }
 
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)

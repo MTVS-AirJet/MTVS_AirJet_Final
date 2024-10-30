@@ -66,6 +66,14 @@ protected:
     // 제거좀 하자
     FRemoveLoadingUIDel removeLUIDel;
 
+    // @@ 임시 스폰 횟수 기록
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int tempSpawnCnt = 0;
+
+    // 임시 스폰 간격 거리
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float spawnInterval = 500.f;
+
 #pragma region 세슘 관련 액터
     // 활주로 엔드 포인트 및 위경도 위치 이동 담당
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
@@ -114,7 +122,11 @@ protected:
     UFUNCTION(BlueprintCallable)
     virtual void StartMission();
 
+    // XXX 미사용
     void LoadMissionMap();
+
+    // 호스트 GI에서 미션 데이터 로드
+    FMissionDataRes LoadMissionData();
 
     // 해당하는 역할의 스폰포인트 가져오기
     class AJ_MissionSpawnPointActor* GetSpawnPoint(EPlayerRole role);
@@ -144,6 +156,8 @@ protected:
     UFUNCTION(Server, Reliable)
     void SRPC_RemoveLoadingUIByPC(class AJ_MissionPlayerController *missionPC);
 
+    
+
 public:
     virtual void Tick(float DeltaSeconds) override;
 
@@ -151,8 +165,9 @@ public:
     virtual void PostLogin(APlayerController *newPlayer) override;
 
     // 해당 역할의 플레이어 스폰 포인트 트랜스폼 가져오기
-    FTransform GetPlayerSpawnTransfrom(EPlayerRole role);
+    FTransform GetPlayerSpawnTransfrom(EPlayerRole role, AJ_MissionPlayerController* pc);
 
     // 이륙한 pc 배열 추가
+    UFUNCTION(BlueprintCallable)
     bool AddFlightedPC(class AJ_MissionPlayerController *pc);
 };

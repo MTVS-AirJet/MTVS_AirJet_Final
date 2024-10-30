@@ -57,7 +57,7 @@ void AJ_PilotViewTablet::StartViewScreenShare()
 		//해당 액터로 뭔가 하기
 		// 시청 시작
 		tempSA->ChangeLookSharingScreen();
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("3. 태블릿 : 시청 시작"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Purple, TEXT("3. 태블릿 : 시청 시작"));
 	}
 }
 
