@@ -16,8 +16,11 @@ class MTVS_AIRJET_FINAL_API UL_WaitingForStart : public UUserWidget
 
 private:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	UPROPERTY()
-	class UK_GameInstance* gm;
+	class AK_GameState* gs;
+	UPROPERTY()
+	class UK_GameInstance* gi;
 	int32 MaxCnt = 0;
 
 public:

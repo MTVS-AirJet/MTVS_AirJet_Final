@@ -511,14 +511,18 @@ private:
 	bool bVoice;
 	void StartVoiceChat();
 	void StopVoiceChat();
-
+public:
 	UPROPERTY(Category="UI" , EditDefaultsOnly)
 	class UL_WaitingForStart* WaitingForStartUI;
 
-	UPROPERTY(ReplicatedUsing=OnMyMemberReFresh)
 	int32 ReadyMemeberCnt = 0;
 	UFUNCTION()
 	void OnMyMemberReFresh();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetCurrentReadyMem();
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPC_SetCurrentReadyMem(int32 cnt);
 public:
 	void ReadyAllMembers();
 };

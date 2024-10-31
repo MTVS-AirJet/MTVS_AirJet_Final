@@ -31,7 +31,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	class AJ_MissionGamemode* ownerGM;
 
-	// 미션 목표 리스트
+	// 미션 목표 수행도 리스트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	TArray<FObjectiveData> objectiveDataAry;
 

@@ -4,6 +4,7 @@
 #include "LHJ/L_Missile.h"
 
 #include "MTVS_AirJet_Final.h"
+#include "Math/MathFwd.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
@@ -140,7 +141,9 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
 		mai->GetDamage();
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, GetActorLocation());
+		// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, GetActorLocation(), );
+		FVector VFXSpawnLoc = HitActor->GetActorLocation() + FVector::UpVector * 10000.f;
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, VFXSpawnLoc);
 	}
 	this->Destroy();
 }

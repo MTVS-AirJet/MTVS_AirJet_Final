@@ -96,9 +96,11 @@ void UJ_ObjectiveUIComponent::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder o
 			break;
         case ETacticalOrder::FORMATION_FLIGHT:
 		{
+			FString checkHeightStr = FString::FormatAsNumber(data.checkHeight * 3.281 / 100);
+			FString curHeightStr = FString::FormatAsNumber(data.curHeight * 3.281 / 100);
 			uiData.headerText = TEXT("편대 비행");
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("편대 비행 중 : %s"), data.checkFormation ? TEXT("TRUE") : TEXT("FALSE")));
-			uiData.bodyTextAry.Add(FString::Printf(TEXT("목표 고도 %.0f : \n현재 %.0f"), data.checkHeight, data.curHeight));
+			uiData.bodyTextAry.Add(FString::Printf(TEXT("목표 고도 %s ft: \n현재 %s ft"), *checkHeightStr, *curHeightStr));
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("올바른 위치 : %s"), data.isCorrectPosition ? TEXT("TRUE") : TEXT("FALSE")));
 			uiData.bodyTextAry.Add(FString::Printf(TEXT("당신의 역할 : %s")
 				, *UJ_Utility::PilotRoleToString(data.pilotRole)));
@@ -162,7 +164,7 @@ UJ_MissionCompleteUI *UJ_ObjectiveUIComponent::GetMissionCompleteUI()
 	return objUI->missionCompleteUI;
 }
 
-void UJ_ObjectiveUIComponent::CRPC_SwitchResultUI()
+void UJ_ObjectiveUIComponent::CRPC_SwitchResultUI_Implementation(const TArray<FObjectiveData>& resultObjData)
 {
-	objUI->ActiveResultUI();
+	objUI->ActiveResultUI(resultObjData);
 }

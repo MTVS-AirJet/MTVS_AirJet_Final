@@ -43,7 +43,7 @@ protected:
 
 	// 성공 판정 충돌
 	UFUNCTION()
-	void OnCheckCapsuleBeginOverlap(
+	virtual void OnCheckCapsuleBeginOverlap(
 		UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
 		UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult &SweepResult);

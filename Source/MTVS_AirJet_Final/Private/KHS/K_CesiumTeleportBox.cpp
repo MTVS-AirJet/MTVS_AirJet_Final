@@ -151,7 +151,7 @@ void AK_CesiumTeleportBox::NotifyFlight(APawn* flightPawn)
 {
     // 해당 폰의 pc 가져오기
     auto* pc = flightPawn->GetController<AJ_MissionPlayerController>();
-    check(pc);
+    if(!pc) return;
     
     pc->SRPC_AddFlightArySelf();
 }

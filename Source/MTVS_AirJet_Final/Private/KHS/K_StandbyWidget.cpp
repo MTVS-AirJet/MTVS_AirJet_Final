@@ -25,6 +25,7 @@ void UK_StandbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+    //LOG_S(Warning, TEXT("My Owner : %s"), *GetOwningPlayerPawn()->GetName());
 	// GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if ( GameInstance )
@@ -75,13 +76,6 @@ void UK_StandbyWidget::RemoveUI()
 // PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
 void UK_StandbyWidget::SetPlayerList()
 {
-    // GameInstance 가져오기
-    /*GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-    if ( !GameInstance ) {
-        UE_LOG(LogTemp , Error , TEXT("GameInstance를 가져오지 못했습니다."));
-        return;
-    }*/
-
     //GameState가져오기
     KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
     if ( !KGameState )
@@ -181,12 +175,6 @@ void UK_StandbyWidget::OpenLobbyLevel()
 // GameInstance의 MissionData로 위젯 설정하는 함수
 void UK_StandbyWidget::InitializeMissionData()
 {
-    //// GameState에서 MissionData를 가져와 UI에 반영
-    //KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
-    //if ( !KGameState ) return;
-
-    //const auto& MissionData = KGameState->MissionData;
-
     //GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	 if ( !GameInstance ) {
@@ -227,4 +215,42 @@ void UK_StandbyWidget::InitializeMissionData()
         UE_LOG(LogTemp , Warning , TEXT("Failed to decode mission data image"));
     }
 
+}
+
+void UK_StandbyWidget::ReqMapInfo(FString MyRoomName)
+{
+    // 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+    auto* gi = UK_JsonParseLib::GetKGameInstance(GetWorld());
+
+    if (!gi->MapInfoResUseDel.IsBound())
+        gi->MapInfoResUseDel.BindUObject(this , &UK_StandbyWidget::ResMapInfo);
+    //->이 델리게이트 바인딩을 통해 GameInstance에서 콜백이 들어올떄 
+    //  이 델리게이트 변수가 BroadCast되면 이곳의 연결함수가 실행
+
+    FMapInfoRequest data;
+    data.mapName = MyRoomName;
+
+    // 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+    UK_GameInstance::MyServerRequest<FMapInfoRequest>(GetWorld() , EEventType::MAPINFO , data);
+}
+
+void UK_StandbyWidget::ResMapInfo(const FMapInfoResponse& resData)
+{
+    GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+                                     FString::Printf(
+                                         TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+
+    //인게임에서 사용할 미션데이터를 인스턴스에 저장
+    FMissionDataRes md;
+    md.producer = resData.producer;
+    md.latitude = resData.latitude;
+    md.longitude = resData.longitude;
+    md.mapName = resData.mapName;
+    md.mapImage = resData.mapImage;
+    md.startPoint.x = resData.startPointX;
+    md.startPoint.y = resData.startPointY;
+    md.mission = resData.missionData;
+
+    GameInstance->InitializeMission(md);
+    InitializeMissionData();
 }
