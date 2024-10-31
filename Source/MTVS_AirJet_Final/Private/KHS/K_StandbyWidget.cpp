@@ -74,7 +74,7 @@ void UK_StandbyWidget::RemoveUI()
 }
 
 // PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
-void UK_StandbyWidget::SetPlayerList()
+void UK_StandbyWidget::SetPlayerList(const TArray<FString>& PlayerNames)
 {
     //GameState가져오기
     KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
@@ -87,8 +87,8 @@ void UK_StandbyWidget::SetPlayerList()
     StandbyMenu_PlayerList->ClearChildren();
 
     // 각 플레이어의 이름과 인덱스를 사용해 K_PlayerList 항목 추가
-    for ( int32 Index = 0; Index < KGameState->ConnectedPlayerNames.Num(); ++Index ) {
-        FString PlayerName = KGameState->ConnectedPlayerNames[Index];
+    for ( int32 Index = 0; Index <PlayerNames.Num(); ++Index ) {
+        FString PlayerName = PlayerNames[Index];
 
         // K_PlayerList 인스턴스 생성
         PlayerList = CreateWidget<UK_PlayerList>(this , PlayerListFactory);
@@ -108,7 +108,7 @@ void UK_StandbyWidget::SetPlayerList()
 void UK_StandbyWidget::PlayerListUpdateChildren()
 {
     PlayerController = Cast<AK_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld() , 0));
-    if ( PlayerController->HasAuthority() )  // 서버에서만 PlayerList 업데이트 요청
+    if ( !PlayerController->HasAuthority() )  // 서버에서만 PlayerList 업데이트 요청
     {
         ServerRequestPlayerListUpdate();
     }
@@ -116,14 +116,19 @@ void UK_StandbyWidget::PlayerListUpdateChildren()
 // 서버에서 PlayerList 업데이트 요청
 void UK_StandbyWidget::ServerRequestPlayerListUpdate_Implementation()
 {
-    if ( GameInstance )
+    auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
+    if(gs)
     {
-        GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-        if ( !GameInstance ) return;
-
-        // `ConnectedPlayerNames` 배열을 클라이언트에 전달
-        ClientUpdatePlayerList(GameInstance->ConnectedPlayerNames);
+        ClientUpdatePlayerList(gs->ConnectedPlayerNames);
     }
+    // if ( GameInstance )
+    // {
+    //     GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+    //     if ( !GameInstance ) return;
+    //
+    //     // `ConnectedPlayerNames` 배열을 클라이언트에 전달
+    //     ClientUpdatePlayerList(GameInstance->ConnectedPlayerNames);
+    // }
 }
 // 서버에서 PlayerList 업데이트 요청
 bool UK_StandbyWidget::ServerRequestPlayerListUpdate_Validate()

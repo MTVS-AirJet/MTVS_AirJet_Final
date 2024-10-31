@@ -13,6 +13,7 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "GameFramework/PlayerController.h"
+#include "KHS/K_GameState.h"
 #include "KHS/K_ServerWidget.h"
 
 void AK_PlayerController::BeginPlay()
@@ -40,6 +41,21 @@ void AK_PlayerController::BeginPlay()
 
 	//마우스커서는 평소엔 안보이게 처리
 	bIsMouseCursorShow = false;
+
+	if (IsLocalController())
+	{
+		auto* gi = Cast<UK_GameInstance>(GetGameInstance());
+		FString userId = gi->GetUserId();
+		AddPlayerName(userId);
+
+		UK_StandbyWidget* LocalStandbyWidget = Cast<UK_StandbyWidget>(StandbyUI);
+		if (LocalStandbyWidget)
+		{
+			auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
+			if (gs)
+				LocalStandbyWidget->SetPlayerList(gs->ConnectedPlayerNames);
+		}
+	}
 }
 
 void AK_PlayerController::OnPossess(APawn* InPawn)
@@ -181,11 +197,19 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 		{
 			StandbyUI->SetUI();
 
+			if (auto gs = Cast<AK_GameState>(GetWorld()->GetGameState()))
+			{
+				if (StandbyUI)
+				{
+					StandbyUI->ClientUpdatePlayerList(gs->ConnectedPlayerNames); // StandbyUI에서 PlayerList 동기화
+				}
+			}
+
 			if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
 			{
 				if (StandbyUI)
 				{
-					StandbyUI->ClientUpdatePlayerList(GI->ConnectedPlayerNames); // StandbyUI에서 PlayerList 동기화
+					//StandbyUI->ClientUpdatePlayerList(GI->ConnectedPlayerNames); // StandbyUI에서 PlayerList 동기화
 					if (GI->ServerWidget && !GI->bHost)
 						StandbyUI->ReqMapInfo(GI->JoinRoomName);
 				}
@@ -217,4 +241,14 @@ void AK_PlayerController::TravelToLobbyLevel()
 {
 	// 로비 맵으로 클라이언트를 이동
 	ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
+}
+
+void AK_PlayerController::AddPlayerName_Implementation(const FString& PlayerName)
+{
+	if (auto* gs = Cast<AK_GameState>(GetWorld()->GetGameState()))
+	{
+		gs->ConnectedPlayerNames.Add(PlayerName);
+		LOG_S(Warning , TEXT("=============================================="))
+		LOG_S(Warning , TEXT("Player Count : %d") , gs->ConnectedPlayerNames.Num());
+	}
 }

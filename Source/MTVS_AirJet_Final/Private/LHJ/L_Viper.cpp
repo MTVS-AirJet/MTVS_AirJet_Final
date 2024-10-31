@@ -924,28 +924,16 @@ void AL_Viper::BeginPlay()
 	if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 		JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 
-	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
-	{
-		if (auto GI = CastChecked<UK_GameInstance>(GetGameInstance()))
-		{
-			LOG_S(Warning , TEXT("Before Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
-			GI->ConnectedPlayerNames.Add(GI->MyName);
-			LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
-			if (HasAuthority())
-				GI->OnConnectedPlayerNames();
-		}
-	}
-	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
+	// FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	// if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	// {
-	// 	if (PC->WaitingForStartFac)
+	// 	if (auto GI = CastChecked<UK_GameInstance>(GetGameInstance()))
 	// 	{
-	// 		WaitingForStartUI = CreateWidget<UL_WaitingForStart>(GetWorld() , PC->WaitingForStartFac);
-	// 		if (WaitingForStartUI)
-	// 		{
-	// 			WaitingForStartUI->AddToViewport(0);
-	// 			WaitingForStartUI->SetVisibility(ESlateVisibility::Hidden);
-	// 		}
+	// 		LOG_S(Warning , TEXT("Before Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
+	// 		GI->ConnectedPlayerNames.Add(GI->MyName);
+	// 		LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
+	// 		if (HasAuthority())
+	// 			GI->OnConnectedPlayerNames();
 	// 	}
 	// }
 }

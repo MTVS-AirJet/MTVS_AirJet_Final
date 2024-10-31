@@ -110,7 +110,7 @@ public:
 
 	// Ready Menu ===================================================
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerList(); // PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
+	void SetPlayerList(const TArray<FString>& PlayerNames); // PlayerList ScrollBox에 플레이어 정보를 Set하는 함수
 
 	UFUNCTION(BlueprintCallable)
 	void PlayerListUpdateChildren(); // PlayerList 2초마다 업데이트

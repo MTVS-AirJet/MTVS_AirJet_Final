@@ -79,6 +79,8 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void TravelToLobbyLevel();
 
-
+	// 플레이어 이름 추가 함수
+	UFUNCTION(Server , Reliable)
+	void AddPlayerName(const FString& PlayerName);
 
 };

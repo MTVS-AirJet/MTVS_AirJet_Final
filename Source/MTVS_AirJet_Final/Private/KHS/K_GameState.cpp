@@ -21,13 +21,6 @@ void AK_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void AK_GameState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	auto gi = CastChecked<UK_GameInstance>(GetGameInstance());
-	if (gi)
-	{
-		//SetMissionData(gi->MissionData);
-		SetConnectedPlayerNames(gi->ConnectedPlayerNames);
-	}
 }
 
 //캐릭터의 StreamingUI에 보유중인 UserID 배열 델리게이트를 전달
@@ -43,10 +36,8 @@ void AK_GameState::OnRep_StreamingID()
 	}
 }
 
-void AK_GameState::SetConnectedPlayerNames(const TArray<FString>& newNames)
-{
-	ConnectedPlayerNames = newNames;
-	
+void AK_GameState::SetConnectedPlayerNames()
+{	
 	LOG_S(Warning , TEXT("Player Count : %d") , ConnectedPlayerNames.Num());
 	AK_PlayerController* LocalPlayerController = Cast<AK_PlayerController>(GetWorld()->GetFirstPlayerController());
 	if (LocalPlayerController)
@@ -54,7 +45,7 @@ void AK_GameState::SetConnectedPlayerNames(const TArray<FString>& newNames)
 		UK_StandbyWidget* LocalStandbyWidget = Cast<UK_StandbyWidget>(LocalPlayerController->StandbyUI);
 		if (LocalStandbyWidget)
 		{
-			LocalStandbyWidget->SetPlayerList();
+			LocalStandbyWidget->SetPlayerList(ConnectedPlayerNames);
 		}
 	}
 }

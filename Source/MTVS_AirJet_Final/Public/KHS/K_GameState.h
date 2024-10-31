@@ -30,8 +30,10 @@ public:
    virtual void OnRep_StreamingID();
 	
 public:
+	UPROPERTY(ReplicatedUsing=SetConnectedPlayerNames)
 	TArray<FString> ConnectedPlayerNames;
 
-	void SetConnectedPlayerNames(const TArray<FString>& newNames);
+	UFUNCTION()
+	void SetConnectedPlayerNames();
 
 };
