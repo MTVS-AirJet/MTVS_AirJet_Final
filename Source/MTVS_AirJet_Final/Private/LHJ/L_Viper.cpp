@@ -956,6 +956,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 	//PrintNetLog();
 
+	// 제트엔진 이펙트
 	if (bJetTailVFXOn)
 	{
 		if (JetTailVFXLeft && JetTailVFXLeft->GetAsset())
@@ -971,6 +972,7 @@ void AL_Viper::Tick(float DeltaTime)
 		bJetTailVFXOn = false;
 	}
 
+#pragma region Canopy Open & Close
 	if (iCanopyNum == 2)
 	{
 		// 캐노피를 닫는다.
@@ -981,7 +983,9 @@ void AL_Viper::Tick(float DeltaTime)
 		// 캐노피를 연다.
 		ServerRPC_Canopy(true);
 	}
+#pragma endregion
 
+#pragma region 마지막 트리거 박스를 통과하면 IMC_Fun을 연결
 	if (IsFlyStart)
 	{
 		auto pc = Cast<APlayerController>(Controller);
@@ -998,12 +1002,14 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 		IsFlyStart = false;
 	}
+#pragma endregion
 
 	// 시동 절차 단계
 	if (!IsStart)
 	{
 		if (StartScenario.size() > 0)
 		{
+#pragma region 시동절차
 			FString ScenarioFront = StartScenario.front();
 			UStaticMeshComponent* ScenarioComponent = nullptr;
 			if (ScenarioFront.Equals("MIC"))
@@ -1049,21 +1055,41 @@ void AL_Viper::Tick(float DeltaTime)
 			}
 			else if (ScenarioFront.Equals("Canopy"))
 			{
-				DummyCanopyMesh->SetRenderCustomDepth(true);
-				DummyCanopyMesh->CustomDepthStencilValue = 1;
+				// DummyCanopyMesh->SetRenderCustomDepth(true);
+				// DummyCanopyMesh->CustomDepthStencilValue = 1;
+				
+				if(CanopyPitch > 0.f)
+				{
+					if(iCanopyNum==2)
+					{
+						DummyCanopyMesh->SetRenderCustomDepth(false);
+					}
+					else
+					{
+						DummyCanopyMesh->SetRenderCustomDepth(true);
+						DummyCanopyMesh->CustomDepthStencilValue = 1;
+					}
+				}				
+				
 				if (CanopyPitch == 0.f)
 				{
-					StartScenario.pop();
-					DummyCanopyMesh->SetRenderCustomDepth(false);
-					DummyCanopyMesh->CustomDepthStencilValue = 0;
+					DummyCanopyMesh->SetRenderCustomDepth(true);
+					DummyCanopyMesh->CustomDepthStencilValue = 1;
 
-					if (JetAudio && JetAudio->GetSound())
+					if(iCanopyNum==3)
 					{
-						JetAudio->SetIntParameter("JetSoundIdx" , 1);
-						JetAudio->Play(0.f);
+						DummyCanopyMesh->SetRenderCustomDepth(false);
+						DummyCanopyMesh->CustomDepthStencilValue = 0;
+						StartScenario.pop();
+						if (JetAudio && JetAudio->GetSound())
+						{
+							JetAudio->SetIntParameter("JetSoundIdx" , 1);
+							JetAudio->Play(0.f);
+						}
 					}
 				}
 			}
+#pragma endregion
 		}
 		else
 		{
