@@ -309,4 +309,9 @@ public:
 	FString MyName;
 	FString JoinRoomName;
 	bool bHost;
+public:
+	UPROPERTY(ReplicatedUsing=OnMyMemberReFresh)
+	int32 ReadyMemeberCnt = 0;
+	UFUNCTION()
+	void OnMyMemberReFresh();
 };

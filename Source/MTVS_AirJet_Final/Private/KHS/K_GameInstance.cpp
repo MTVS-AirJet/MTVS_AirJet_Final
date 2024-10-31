@@ -26,6 +26,8 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "KHS/K_GameState.h"
+#include "LHJ/L_Viper.h"
+#include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -346,13 +348,13 @@ void UK_GameInstance::Join(uint32 Index)
 	if (!Value.IsEmpty())
 	{
 		TArray<FString> Tokens;
-		Value.ParseIntoArray(Tokens, TEXT("|"));
-		if(Tokens.Num()>=7)
+		Value.ParseIntoArray(Tokens , TEXT("|"));
+		if (Tokens.Num() >= 7)
 		{
-			JoinRoomName=Tokens[3];
+			JoinRoomName = Tokens[3];
 		}
 	}
-	
+
 	//Session Interface 를 통해 JoinSession 실행
 	SessionInterface->JoinSession(0 , SESSION_NAME , SessionSearch->SearchResults[Index]);
 }
@@ -668,9 +670,20 @@ void UK_GameInstance::MyResMapInfo(const FString& jsonData , bool isSuccess)
 	// 바인드된 함수 실행(BroadCast)
 	MapInfoResUseDel.ExecuteIfBound(resData);
 }
-
 #pragma endregion
 
 
 #pragma endregion
 
+void UK_GameInstance::OnMyMemberReFresh()
+{
+	AL_Viper* viper = Cast<AL_Viper>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (viper && viper->WaitingForStartUI)
+	{
+		if (viper->WaitingForStartUI)
+		{
+			LOG_S(Warning , TEXT("instance current mem cnt : %d") , ReadyMemeberCnt);
+			viper->WaitingForStartUI->SetMem(ReadyMemeberCnt);
+		}
+	}
+}

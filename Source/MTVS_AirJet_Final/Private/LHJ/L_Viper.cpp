@@ -318,7 +318,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
-	DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
+	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
 }
 
 #pragma region Input
@@ -934,10 +934,20 @@ void AL_Viper::BeginPlay()
 			LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
 			if (HasAuthority())
 				GI->OnConnectedPlayerNames();
-
-			
 		}
 	}
+	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
+	// {
+	// 	if (PC->WaitingForStartFac)
+	// 	{
+	// 		WaitingForStartUI = CreateWidget<UL_WaitingForStart>(GetWorld() , PC->WaitingForStartFac);
+	// 		if (WaitingForStartUI)
+	// 		{
+	// 			WaitingForStartUI->AddToViewport(0);
+	// 			WaitingForStartUI->SetVisibility(ESlateVisibility::Hidden);
+	// 		}
+	// 	}
+	// }
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1060,32 +1070,34 @@ void AL_Viper::Tick(float DeltaTime)
 			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
-
-			if (auto pc = Cast<AJ_MissionPlayerController>(GetOwner()))
-			{
-				UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<
-					UEnhancedInputLocalPlayerSubsystem>(
-					pc->GetLocalPlayer());
-				if (subsys)
-				{
-					FModifyContextOptions options;
-					subsys->RemoveMappingContext(IMC_Viper , options);
-				}
-
-				if (pc->WaitingForStartFac)
-				{
-					WaitingForStartUI = CreateWidget<UL_WaitingForStart>(GetWorld() , pc->WaitingForStartFac);
-					if (WaitingForStartUI)
-					{
-						WaitingForStartUI->AddToViewport(0);
-						ReadyMemeberCnt++;
-						if (HasAuthority())
-						{
-							OnMyMemberReFresh();
-						}
-					}
-				}
-			}
+			IsEngineOn = true;
+			// if (auto pc = Cast<AJ_MissionPlayerController>(GetOwner()))
+			// {
+			// 	UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<
+			// 		UEnhancedInputLocalPlayerSubsystem>(
+			// 		pc->GetLocalPlayer());
+			// 	if (subsys)
+			// 	{
+			// 		FModifyContextOptions options;
+			// 		subsys->RemoveMappingContext(IMC_Viper , options);
+			// 	}
+			//
+			// 	if (WaitingForStartUI)
+			// 	{
+			// 		WaitingForStartUI->SetVisibility(ESlateVisibility::Visible);
+			// 		if(HasAuthority())
+			// 		{
+			// 			MultiRPC_SetCurrentReadyMem(ReadyMemeberCnt);
+			// 		}
+			// 		else
+			// 		{
+			// 			ServerRPC_SetCurrentReadyMem();
+			// 		}
+			// 		// auto gi = Cast<UK_GameInstance>(GetGameInstance());
+			// 		// gi->ReadyMemeberCnt++;
+			// 		// gi->OnMyMemberReFresh();
+			// 	}
+			// }
 		}
 	}
 	// 운행 단계
@@ -1804,10 +1816,19 @@ void AL_Viper::StopVoiceChat()
 
 void AL_Viper::OnMyMemberReFresh()
 {
-	if (WaitingForStartUI)
-	{
-		WaitingForStartUI->SetMem(ReadyMemeberCnt);
-	}
+	
+}
+
+void AL_Viper::ServerRPC_SetCurrentReadyMem_Implementation()
+{
+	ReadyMemeberCnt++;
+	MultiRPC_SetCurrentReadyMem(ReadyMemeberCnt);
+}
+
+void AL_Viper::MultiRPC_SetCurrentReadyMem_Implementation(int32 cnt)
+{
+	ReadyMemeberCnt++;
+	WaitingForStartUI->SetMem(ReadyMemeberCnt);
 }
 
 void AL_Viper::ReadyAllMembers()
