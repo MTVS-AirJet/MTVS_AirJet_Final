@@ -34,5 +34,4 @@ public:
 
 	void SetConnectedPlayerNames(const TArray<FString>& newNames);
 
-
 };
