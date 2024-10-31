@@ -520,7 +520,7 @@ public:
     static FString TacticalOrderToString(ETacticalOrder type);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
-    constexpr static const float defaultMissionMapSize = 500000.f;
+    constexpr static const float defaultMissionMapSize = 1500000.f;
     // 기본 목표 지점 고도
     constexpr static const float defaultMissionObjectHeight = 400000.f;
 };
