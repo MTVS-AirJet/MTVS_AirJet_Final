@@ -307,6 +307,11 @@ public:
 
 #pragma endregion
 
+
+
+#pragma region 데이터 동기화 처리 (정리전)
+
+
 public:
 	FString MyName;
 	FString JoinRoomName;
@@ -316,4 +321,10 @@ public:
 	int32 ReadyMemeberCnt = 0;
 	UFUNCTION()
 	void OnMyMemberReFresh();
+
+
+
+
+#pragma endregion
+
 };

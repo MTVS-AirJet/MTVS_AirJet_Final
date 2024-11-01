@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ImageUtils.h"
 #include <MTVS_AirJet_Final.h>
+#include "KHS/K_CesiumTeleportBox.h"
 
 UK_StandbyWidget::UK_StandbyWidget(const FObjectInitializer& ObjectInitialize)
 {
@@ -218,6 +219,14 @@ void UK_StandbyWidget::InitializeMissionData()
     {
         UE_LOG(LogTemp , Warning , TEXT("Failed to decode mission data image"));
     }
+
+    //(추가) 위경도 변화예정값 담기(Cesium GeoReference)
+    AK_CesiumTeleportBox* TelBox = Cast<AK_CesiumTeleportBox>(UGameplayStatics::GetActorOfClass(GetWorld(),AK_CesiumTeleportBox::StaticClass()));
+    if ( TelBox )
+    {
+        TelBox->SetDestinationLogitudeLatitude(MissionData.longitude, MissionData.latitude);
+    }
+
 
 }
 
