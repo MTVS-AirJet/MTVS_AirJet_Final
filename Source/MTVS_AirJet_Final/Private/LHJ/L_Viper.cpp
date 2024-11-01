@@ -318,6 +318,9 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CurrentWeapon);
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
+	DOREPLIFETIME(AL_Viper , FrontWheel);
+	DOREPLIFETIME(AL_Viper , RearLWheel);
+	DOREPLIFETIME(AL_Viper , RearRWheel);
 	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
 }
 
@@ -995,12 +998,17 @@ void AL_Viper::Tick(float DeltaTime)
 				pc->GetLocalPlayer());
 			if (subsys)
 			{
-				subsys->AddMappingContext(IMC_Fun , 0);
+				if (!subsys->HasMappingContext(IMC_Fun))
+					subsys->AddMappingContext(IMC_Fun , 0);
 			}
 
 			pc->bEnableClickEvents = true;
 		}
-		IsFlyStart = false;
+
+		if (FrontWheel < 1.f)
+			ServerRPC_Wheel();
+		else
+			IsFlyStart = false;
 	}
 #pragma endregion
 
@@ -1057,10 +1065,10 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				// DummyCanopyMesh->SetRenderCustomDepth(true);
 				// DummyCanopyMesh->CustomDepthStencilValue = 1;
-				
-				if(CanopyPitch > 0.f)
+
+				if (CanopyPitch > 0.f)
 				{
-					if(iCanopyNum==2)
+					if (iCanopyNum == 2)
 					{
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 					}
@@ -1069,14 +1077,14 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(true);
 						DummyCanopyMesh->CustomDepthStencilValue = 1;
 					}
-				}				
-				
+				}
+
 				if (CanopyPitch == 0.f)
 				{
 					DummyCanopyMesh->SetRenderCustomDepth(true);
 					DummyCanopyMesh->CustomDepthStencilValue = 1;
 
-					if(iCanopyNum==3)
+					if (iCanopyNum == 3)
 					{
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
@@ -1830,6 +1838,19 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 	}
 }
 
+void AL_Viper::ServerRPC_Wheel_Implementation()
+{
+	float DeltaTime = GetWorld()->DeltaTimeSeconds;
+	float nowValue = FMath::Lerp(FrontWheel , 1 , DeltaTime);
+
+	if (nowValue >= 0.9)
+		nowValue = 1;
+
+	FrontWheel = nowValue;
+	RearLWheel = nowValue;
+	RearRWheel = nowValue;
+}
+
 void AL_Viper::StartVoiceChat()
 {
 	GetController<AJ_MissionPlayerController>()->StartTalking();
@@ -1842,7 +1863,6 @@ void AL_Viper::StopVoiceChat()
 
 void AL_Viper::OnMyMemberReFresh()
 {
-	
 }
 
 void AL_Viper::ServerRPC_SetCurrentReadyMem_Implementation()

@@ -24,4 +24,10 @@ private:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Pitch;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float FrontWheel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float RearLWheel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float RearRWheel;
 };

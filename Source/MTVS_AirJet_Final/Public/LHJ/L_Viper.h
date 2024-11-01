@@ -488,10 +488,20 @@ private:
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
-
+	//=====================================
+	// 바퀴
+	UFUNCTION(Server , Reliable)
+	void ServerRPC_Wheel();
+	
 public:
-	UPROPERTY(EditAnywhere , Category="Canopy" , Replicated)
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
 	float CanopyPitch = 80.f;
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
+	float FrontWheel = 0.f;
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
+	float RearLWheel = 0.f;
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
+	float RearRWheel = 0.f;
 
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
