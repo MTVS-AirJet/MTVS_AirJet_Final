@@ -961,43 +961,43 @@ void AL_Viper::BeginPlay()
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
-	}
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle , [this]()
-	{
-		LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
-		bReadyTimeEndFlag = true;
-		if (!IsStart)
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle , [this]()
 		{
-			FKey lMouse = EKeys::LeftMouseButton;
-			if (JetMic && !bMIC)
-				OnMyMicClicked(JetMic , lMouse);
-			if (JetEngineGen && !bEngineGen1)
-				OnMyEngineGen1Clicked(JetEngineGen , lMouse);
-			if (JetEngineGen2 && !bEngineGen2)
-				OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
-			if (JetEngineControl && !bEngineControl1)
-				OnMyEngineControlClicked(JetEngineControl , lMouse);
-			if (JetEngineControl2 && !bEngineControl2)
-				OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
-			if (JetEngineMaster && !bEngineMaster1)
-				OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
-			if (JetEngineMaster2 && !bEngineMaster2)
-				OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
-			if (JetFuelStarter && !bJFS)
-				OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
-			if (JetJFSHandle && !bJFSHandle)
-				OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
-			if (JetFirstEngine && !bFirstEngine)
-				OnMyFirstEngineClicked(JetFirstEngine , lMouse);
-			if (JetCanopy && iCanopyNum != 2)
+			LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
+			bReadyTimeEndFlag = true;
+			if (!IsStart)
 			{
-				JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-				iCanopyNum = 2;
+				FKey lMouse = EKeys::LeftMouseButton;
+				if (JetMic && !bMIC)
+					OnMyMicClicked(JetMic , lMouse);
+				if (JetEngineGen && !bEngineGen1)
+					OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+				if (JetEngineGen2 && !bEngineGen2)
+					OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+				if (JetEngineControl && !bEngineControl1)
+					OnMyEngineControlClicked(JetEngineControl , lMouse);
+				if (JetEngineControl2 && !bEngineControl2)
+					OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+				if (JetEngineMaster && !bEngineMaster1)
+					OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+				if (JetEngineMaster2 && !bEngineMaster2)
+					OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+				if (JetFuelStarter && !bJFS)
+					OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+				if (JetJFSHandle && !bJFSHandle)
+					OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+				if (JetFirstEngine && !bFirstEngine)
+					OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+				if (JetCanopy && iCanopyNum != 2)
+				{
+					JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+					iCanopyNum = 2;
+				}
 			}
-		}
-	} , TimeToReady , false);
+		} , TimeToReady , false);
+	}
 
 	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
 	// {
