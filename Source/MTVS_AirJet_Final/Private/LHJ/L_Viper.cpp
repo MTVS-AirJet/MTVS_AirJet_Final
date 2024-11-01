@@ -263,7 +263,7 @@ AL_Viper::AL_Viper()
 	FlareMoveLoc2 = CreateDefaultSubobject<USceneComponent>(TEXT("FlareMoveLoc2"));
 	FlareMoveLoc2->SetupAttachment(RootComponent);
 	FlareMoveLoc2->SetRelativeLocation(FVector(500 , 0 , -600));
-	
+
 	FlareMoveLoc3 = CreateDefaultSubobject<USceneComponent>(TEXT("FlareMoveLoc3"));
 	FlareMoveLoc3->SetupAttachment(RootComponent);
 	FlareMoveLoc3->SetRelativeLocation(FVector(400 , 0 , -600));
@@ -951,6 +951,43 @@ void AL_Viper::BeginPlay()
 				GI->OnConnectedPlayerNames();
 		}
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle , [this]()
+	{
+		LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
+		bReadyTimeEndFlag = true;
+		if (!IsStart)
+		{
+			FKey lMouse = EKeys::LeftMouseButton;
+			if (JetMic && !bMIC)
+				OnMyMicClicked(JetMic , lMouse);
+			if (JetEngineGen && !bEngineGen1)
+				OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+			if (JetEngineGen2 && !bEngineGen2)
+				OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+			if (JetEngineControl && !bEngineControl1)
+				OnMyEngineControlClicked(JetEngineControl , lMouse);
+			if (JetEngineControl2 && !bEngineControl2)
+				OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+			if (JetEngineMaster && !bEngineMaster1)
+				OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+			if (JetEngineMaster2 && !bEngineMaster2)
+				OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+			if (JetFuelStarter && !bJFS)
+				OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+			if (JetJFSHandle && !bJFSHandle)
+				OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+			if (JetFirstEngine && !bFirstEngine)
+				OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+			if (JetCanopy && iCanopyNum != 2)
+			{
+				JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+				iCanopyNum = 2;
+			}
+		}
+	} , TimeToReady , false);
+
 	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
 	// {
 	// 	if (PC->WaitingForStartFac)
@@ -1095,6 +1132,15 @@ void AL_Viper::Tick(float DeltaTime)
 				{
 					DummyCanopyMesh->SetRenderCustomDepth(true);
 					DummyCanopyMesh->CustomDepthStencilValue = 1;
+					if (bReadyTimeEndFlag)
+					{
+						if (JetCanopy)
+						{
+							FKey lMouse = EKeys::LeftMouseButton;
+							bReadyTimeEndFlag = false;
+							OnMyCanopyClicked(JetCanopy , lMouse);
+						}
+					}
 
 					if (iCanopyNum == 3)
 					{
@@ -1628,7 +1674,8 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 			// 던질 각도
 			FRotator SpawnRotation = JetMesh->GetComponentRotation();
 			// FlareFactory 이용해서 수류탄 스폰
-			AL_Flare* Flare1 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation, SpawnParams);
+			AL_Flare* Flare1 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation ,
+			                                                    SpawnParams);
 
 			if (Flare1)
 			{
@@ -1641,7 +1688,8 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 			// 던질 각도
 			//SpawnRotation = FRotator::ZeroRotator;
 			// FlareFactory 이용해서 수류탄 스폰
-			AL_Flare* Flare2 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation, SpawnParams);
+			AL_Flare* Flare2 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation ,
+			                                                    SpawnParams);
 
 			if (Flare2)
 			{

@@ -57,8 +57,6 @@ private: // Component
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetMic;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
-	class UBoxComponent* JetEngineMaster1;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineGen;
 	UPROPERTY(EditdefaultsOnly , Category="Components")
 	class UBoxComponent* JetEngineGen2;
@@ -372,6 +370,7 @@ public:
 	class USceneComponent* FlareMoveLoc2;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
 	class USceneComponent* FlareMoveLoc3;
+
 private:
 	UFUNCTION()
 	void ChangeBooster();
@@ -495,7 +494,7 @@ private:
 	// 바퀴
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Wheel();
-	
+
 public:
 	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
 	float CanopyPitch = 80.f;
@@ -524,6 +523,7 @@ private:
 	bool bVoice;
 	void StartVoiceChat();
 	void StopVoiceChat();
+
 public:
 	UPROPERTY(Category="UI" , EditDefaultsOnly)
 	class UL_WaitingForStart* WaitingForStartUI;
@@ -532,10 +532,16 @@ public:
 	UFUNCTION()
 	void OnMyMemberReFresh();
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server , Reliable)
 	void ServerRPC_SetCurrentReadyMem();
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast , Reliable)
 	void MultiRPC_SetCurrentReadyMem(int32 cnt);
+
 public:
 	void ReadyAllMembers();
+
+private:
+	bool bReadyTimeEndFlag;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Engine")
+	float TimeToReady = 30.f;
 };
