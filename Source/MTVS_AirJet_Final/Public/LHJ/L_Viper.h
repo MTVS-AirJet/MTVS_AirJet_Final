@@ -544,4 +544,19 @@ private:
 	bool bReadyTimeEndFlag;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Engine")
 	float TimeToReady = 30.f;
+
+#pragma region KHS Works
+
+	//KHS 작업부분
+public : 
+	// 플레이어리스트 업데이트 서버 요청
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_SetConnectedPlayerNames(const FString& newName);
+	// 플레이어리스트 Multicast 업데이트
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_SetConnectedPlayerNames(const TArray<FString>& newNames);
+
+
+#pragma endregion
+
 };

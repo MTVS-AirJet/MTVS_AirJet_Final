@@ -24,6 +24,9 @@
 #include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
 #include "KHS/K_GameInstance.h"
+#include "KHS/K_GameState.h"
+#include "KHS/K_StandbyWidget.h"
+#include "GameFramework/PlayerState.h"
 
 
 #pragma region Construct
@@ -942,13 +945,21 @@ void AL_Viper::BeginPlay()
 	FString CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	{
-		if (auto GI = CastChecked<UK_GameInstance>(GetGameInstance()))
+		auto KGameInstace = CastChecked<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		if ( !KGameInstace )
 		{
-			LOG_S(Warning , TEXT("Before Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
-			GI->ConnectedPlayerNames.Add(GI->MyName);
-			LOG_S(Warning , TEXT("After Connect Player Count : %d") , GI->ConnectedPlayerNames.Num());
-			if (HasAuthority())
-				GI->OnConnectedPlayerNames();
+			LOG_S(Warning , TEXT("GameInstance doesn't exist"));
+		}
+		//GI에서 자신의 로그인 ID를 받아오고
+		FString MyUserID = KGameInstace->GetUserId();
+
+		auto kpc = Cast<AK_PlayerController>(GetOwner());
+		//클라이언트일때
+		if ( kpc && kpc->IsLocalController() )
+		{
+			LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
+			//ServerRPC함수를 호출
+			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
 	}
 
@@ -1954,3 +1965,71 @@ void AL_Viper::ReadyAllMembers()
 		pc->bEnableClickEvents = true;
 	}
 }
+
+#pragma region KHS Works
+void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& newName)
+{
+	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if ( !KGameState )
+	{
+		LOG_S(Warning , TEXT("GameState doesn't exist"));
+	}
+	LOG_S(Warning , TEXT("MyUserID : %s") , *newName);
+
+	//GameState의 ConnectedPlayerNames 배열에 자신의 ID Set(Replicated)
+	KGameState->SetConnectedPlayerNames(newName);
+
+	//GameState에 업데이트된 배열 가져옴
+	TArray<FString> temp = KGameState->GetConnectedPlayernames();
+
+	//로그출력
+	for ( auto s : temp )
+	{
+		LOG_S(Warning , TEXT("The Name in PlayerList : %s") , *s);
+	}
+
+	//월드에 존재하는 PlayterController배열
+	TArray<AK_PlayerController*> allPC;
+	//배열에 GameState에 있는 PlayerArray에 접근해서 모든 PC담기
+	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS) {
+		check(PS);
+		auto* tempPC = CastChecked<AK_PlayerController>(PS->GetPlayerController());
+		check(tempPC);
+		return tempPC;
+	});
+
+	//PC배열을 검사해서 모든 pc에서 CRPC함수 실행
+	for ( auto localpc : allPC )
+	{
+		auto me = Cast<AL_Viper>(localpc->GetPawn());
+		check(me);
+		//CRPC로 업데이트된 배열을 클라이언트들의 GameState에 업데이트
+		me->ClientRPC_SetConnectedPlayerNames(temp);
+	}
+
+}
+
+void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FString>& newNames)
+{
+	//UI를 가져와서 현재의 GameState값 기준으로 SetPlayerList하도록 하기
+	AK_PlayerController* LocalPlayerController = Cast<AK_PlayerController>(GetWorld()->GetFirstPlayerController());
+	AK_PlayerController* MyPlayerController = Cast<AK_PlayerController>(GetOwner());
+
+	//Fisrt PC가 내 Owner와 동일하다면
+	if ( LocalPlayerController == MyPlayerController )
+	{
+		UK_StandbyWidget* LocalStandbyWidget = Cast<UK_StandbyWidget>(LocalPlayerController->StandbyUI);
+		if ( LocalStandbyWidget )
+		{
+			//타이머로 클라이언트가 입장후 Replicated가 완료되는 시간 기다리기
+			FTimerHandle tempHandle;
+			GetWorld()->GetTimerManager().SetTimer(tempHandle , [this , LocalStandbyWidget]() {
+
+				LocalStandbyWidget->SetPlayerList();
+			} , 1.0f , false);
+
+		}
+	}
+
+}
+#pragma endregion

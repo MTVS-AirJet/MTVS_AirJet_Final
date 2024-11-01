@@ -39,17 +39,17 @@ const static FName SERVER_DATA_SETTINGS_KEY = TEXT("ServerData");
 
 void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps)
 {
-	DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
+	//DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
 }
 
-void UK_GameInstance::OnConnectedPlayerNames()
-{
-	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
-	if (KGameState)
-	{
-		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
-	}
-}
+//void UK_GameInstance::OnConnectedPlayerNames()
+//{
+//	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
+//	if (KGameState)
+//	{
+//		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
+//	}
+//}
 
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {

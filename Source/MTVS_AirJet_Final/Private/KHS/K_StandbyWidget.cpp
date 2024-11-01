@@ -42,7 +42,7 @@ void UK_StandbyWidget::NativeConstruct()
     //}
 
     // 1초마다 PlayerListUpdateChildren 호출
-    GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateTimer , this , &UK_StandbyWidget::PlayerListUpdateChildren , 1.0f , true);
+    //GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateTimer , this , &UK_StandbyWidget::PlayerListUpdateChildren , 1.0f , true);
 
 }
 
@@ -86,13 +86,17 @@ void UK_StandbyWidget::SetPlayerList()
     // 기존 PlayerList 초기화
     StandbyMenu_PlayerList->ClearChildren();
 
+
     // 각 플레이어의 이름과 인덱스를 사용해 K_PlayerList 항목 추가
     for ( int32 Index = 0; Index < KGameState->ConnectedPlayerNames.Num(); ++Index ) {
         FString PlayerName = KGameState->ConnectedPlayerNames[Index];
 
+        LOG_S(Warning, TEXT("Set PlayerName(%s) in PlayerList"), *PlayerName);
+
         // K_PlayerList 인스턴스 생성
         PlayerList = CreateWidget<UK_PlayerList>(this , PlayerListFactory);
-        if ( PlayerList ) {
+        if ( PlayerList ) 
+        {
             // 플레이어 이름과 인덱스 설정
             PlayerList->PlayerNickName->SetText(FText::FromString(PlayerName));  // 플레이어 이름 텍스트 설정
             PlayerList->PlayerNum->SetText(FText::AsNumber(Index));  // 인덱스를 텍스트로 설정
