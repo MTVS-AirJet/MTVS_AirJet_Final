@@ -255,6 +255,18 @@ AL_Viper::AL_Viper()
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
 	MissileMoveLoc->SetupAttachment(RootComponent);
 	MissileMoveLoc->SetRelativeLocation(FVector(0 , 0 , -200));
+
+	FlareMoveLoc1 = CreateDefaultSubobject<USceneComponent>(TEXT("FlareMoveLoc1"));
+	FlareMoveLoc1->SetupAttachment(RootComponent);
+	FlareMoveLoc1->SetRelativeLocation(FVector(600 , 0 , -200));
+
+	FlareMoveLoc2 = CreateDefaultSubobject<USceneComponent>(TEXT("FlareMoveLoc2"));
+	FlareMoveLoc2->SetupAttachment(RootComponent);
+	FlareMoveLoc2->SetRelativeLocation(FVector(500 , 0 , -600));
+	
+	FlareMoveLoc3 = CreateDefaultSubobject<USceneComponent>(TEXT("FlareMoveLoc3"));
+	FlareMoveLoc3->SetupAttachment(RootComponent);
+	FlareMoveLoc3->SetRelativeLocation(FVector(400 , 0 , -600));
 	//============================================
 	JetFlareArrow1 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow1"));
 	JetFlareArrow1->SetupAttachment(JetMesh);
@@ -1601,11 +1613,6 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 	{
 		LOG_S(Warning , TEXT("타겟이 없습니다!!"));
 	}
-	//MulticastRPCMissile(newOwner);
-}
-
-void AL_Viper::MulticastRPCMissile_Implementation(AActor* newOwner)
-{
 }
 
 void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
@@ -1614,16 +1621,18 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 	{
 		if (FlareCurCnt > 0)
 		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = newOwner;
 			// 던질 위치 계산(캐릭터 위치에서 위로 조정)
 			FVector SpawnLocation = JetFlareArrow1->GetComponentLocation();
 			// 던질 각도
 			FRotator SpawnRotation = JetMesh->GetComponentRotation();
 			// FlareFactory 이용해서 수류탄 스폰
-			AL_Flare* Flare1 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
+			AL_Flare* Flare1 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation, SpawnParams);
 
 			if (Flare1)
 			{
-				Flare1->SetOwner(newOwner);
+				// Flare1->SetOwner(newOwner);
 				FlareCurCnt--;
 			}
 
@@ -1632,11 +1641,11 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 			// 던질 각도
 			//SpawnRotation = FRotator::ZeroRotator;
 			// FlareFactory 이용해서 수류탄 스폰
-			AL_Flare* Flare2 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation);
+			AL_Flare* Flare2 = GetWorld()->SpawnActor<AL_Flare>(FlareFactory , SpawnLocation , SpawnRotation, SpawnParams);
 
 			if (Flare2)
 			{
-				Flare2->SetOwner(newOwner);
+				// Flare2->SetOwner(newOwner);
 				FlareCurCnt--;
 			}
 		}

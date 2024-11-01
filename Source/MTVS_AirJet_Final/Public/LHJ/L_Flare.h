@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "L_Flare.generated.h"
 
@@ -45,6 +46,22 @@ private:
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare();
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Flare")
+	class UCurveFloat* FlareCurve;
+	UPROPERTY()
+	FTimeline FlareTimeline;
+	UFUNCTION()
+	void FlareUpdate(float Alpha);
+	UFUNCTION()
+	void FlareFinished();
+
+	FVector BezierFlare(FVector P1 , FVector P2 , FVector P3 , FVector P4 , float Alpha);
+
+	TArray<FVector> MoveLoc;
+	
+	bool bPursuit;
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Effect")

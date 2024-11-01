@@ -358,15 +358,20 @@ private:
 	TSubclassOf<class AL_Flare> FlareFactory;
 
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack")
 	int32 RangeCnt = 14;
 
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
 	AActor* LockOnTarget = nullptr;
-	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
 	class USceneComponent* MissileMoveLoc;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc3;
 private:
 	UFUNCTION()
 	void ChangeBooster();
@@ -389,8 +394,6 @@ private:
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCMissile(AActor* newOwner);
-	UFUNCTION(NetMulticast , Reliable)
-	void MulticastRPCMissile(AActor* newOwner);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare(AActor* newOwner);

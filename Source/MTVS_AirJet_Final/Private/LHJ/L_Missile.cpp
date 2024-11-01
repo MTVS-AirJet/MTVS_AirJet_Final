@@ -7,7 +7,6 @@
 #include "Math/MathFwd.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "NiagaraSystem.h"
 #include "Components/BoxComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "LHJ/L_Viper.h"
