@@ -190,6 +190,8 @@ private: // Input
 	class UInputAction* IA_ViperRotateViewTrigger;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperVoice;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperDevelop;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -251,6 +253,8 @@ private: // Input
 	void F_ViperRotateTriggerCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperVoiceStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperDevelopStarted(const struct FInputActionValue& value);
 
 private:
 	bool bFirstEngine;
