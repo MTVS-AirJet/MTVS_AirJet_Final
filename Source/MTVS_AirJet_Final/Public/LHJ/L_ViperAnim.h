@@ -27,7 +27,5 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float FrontWheel;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float RearLWheel;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float RearRWheel;
+	float RearWheel;
 };

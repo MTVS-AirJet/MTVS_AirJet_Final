@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "MTVS_AirJet_Final.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
@@ -334,8 +335,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
-	DOREPLIFETIME(AL_Viper , RearLWheel);
-	DOREPLIFETIME(AL_Viper , RearRWheel);
+	DOREPLIFETIME(AL_Viper , RearWheel);
 	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
 }
 
@@ -420,11 +420,8 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 			StartScenario.pop();
 			DummyThrottleMesh->SetRenderCustomDepth(false);
 			DummyThrottleMesh->CustomDepthStencilValue = 0;
-			if (JetAudio && JetAudio->GetSound())
-			{
-				JetAudio->SetIntParameter("JetSoundIdx" , 0);
-				JetAudio->Play(0.f);
-			}
+			CRPC_AudioControl(true, 0);
+			
 		}
 	}
 }
@@ -432,6 +429,7 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("MIC 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bMIC)
 	{
 		bMIC = true;
@@ -453,6 +451,7 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("EngineGen 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineGen1)
 	{
 		bEngineGen1 = true;
@@ -479,6 +478,7 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("EngineGen2 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineGen2)
 	{
 		bEngineGen2 = true;
@@ -505,6 +505,7 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("EngineControl 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineControl1)
 	{
 		bEngineControl1 = true;
@@ -531,6 +532,7 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("EngineControl2 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineControl2)
 	{
 		bEngineControl2 = true;
@@ -557,6 +559,7 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("JFS 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bJFS)
 	{
 		bJFS = true;
@@ -578,6 +581,7 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("Engine Master1 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineMaster1)
 	{
 		bEngineMaster1 = true;
@@ -604,6 +608,7 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
 	//LOG_SCREEN("Engine Master2 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineMaster2)
 	{
 		bEngineMaster2 = true;
@@ -630,6 +635,7 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	//LOG_SCREEN("JFS 핸들 클릭");
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bJFSHandle)
 	{
 		bJFSHandle = true;
@@ -656,6 +662,7 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 
 void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
@@ -921,9 +928,8 @@ FRotator AL_Viper::CombineRotate(FVector NewVector)
 void AL_Viper::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (JetAudio && JetAudio->GetSound())
-		JetAudio->Stop();
+	
+	CRPC_AudioControl(false);	
 
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -946,7 +952,7 @@ void AL_Viper::BeginPlay()
 	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	{
 		auto KGameInstace = CastChecked<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-		if ( !KGameInstace )
+		if (!KGameInstace)
 		{
 			LOG_S(Warning , TEXT("GameInstance doesn't exist"));
 		}
@@ -955,7 +961,7 @@ void AL_Viper::BeginPlay()
 
 		auto kpc = Cast<AK_PlayerController>(GetOwner());
 		//클라이언트일때
-		if ( kpc && kpc->IsLocalController() )
+		if (kpc && kpc->IsLocalController())
 		{
 			LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
 			//ServerRPC함수를 호출
@@ -1017,7 +1023,7 @@ void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//PrintNetLog();
+	PrintNetLog();
 
 	// 제트엔진 이펙트
 	if (bJetTailVFXOn)
@@ -1027,11 +1033,7 @@ void AL_Viper::Tick(float DeltaTime)
 		if (JetTailVFXRight && JetTailVFXRight->GetAsset())
 			JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 1.f);
 
-		if (JetAudio && JetAudio->GetSound())
-		{
-			JetAudio->SetIntParameter("JetSoundIdx" , 2);
-			JetAudio->Play(0.f);
-		}
+		CRPC_AudioControl(true , 2);
 		bJetTailVFXOn = false;
 	}
 
@@ -1158,11 +1160,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
-						if (JetAudio && JetAudio->GetSound())
-						{
-							JetAudio->SetIntParameter("JetSoundIdx" , 1);
-							JetAudio->Play(0.f);
-						}
+						CRPC_AudioControl(true , 1);
 					}
 				}
 			}
@@ -1576,7 +1574,8 @@ void AL_Viper::PrintNetLog()
 	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
 
 	FString logStr = FString::Printf(
-		TEXT("Connection : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr , *ownerName ,
+		TEXT("Connection : %s\nPawn Name : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr ,
+		*GetName() , *ownerName ,
 		*LOCALROLE , *REMOTEROLE);
 	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
 	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
@@ -1721,7 +1720,8 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 
 void AL_Viper::ServerRPCLockOn_Implementation()
 {
-	LockOnTarget = nullptr;
+	//LockOnTarget = nullptr;
+	AActor* searchTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
 	FVector ForwardVector = JetMesh->GetForwardVector();
 	FVector DownVector = JetMesh->GetUpVector() * -1;
@@ -1739,7 +1739,9 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 			{
 				if (auto mai = Cast<IJ_MissionActorInterface>(hit.GetActor()))
 				{
-					MulticastRPCLockOn(hit.GetActor());
+					if(!LockOnTarget)
+						ClientRPCLockOnSound(this);
+					searchTarget = hit.GetActor();
 				}
 				// if (hit.GetActor()->ActorHasTag("target"))
 				// {
@@ -1749,6 +1751,8 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 		}
 	}
 
+	MulticastRPCLockOn(searchTarget);
+
 	Diametr = 30.f;
 }
 
@@ -1757,6 +1761,17 @@ void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 	LockOnTarget = target;
 	// LOG_S(Warning , TEXT("Viper Name : %s, LockOnTarget Name : %s") , *GetName() ,
 	// 					  *LockOnTarget->GetName());
+}
+
+void AL_Viper::ClientRPCLockOnSound_Implementation(AL_Viper* CurrentViper)
+{
+	CurrentViper->PlayLockOnSound();
+}
+
+void AL_Viper::PlayLockOnSound()
+{
+	if (LockOnSound)
+		UGameplayStatics::PlaySound2D(this , LockOnSound);
 }
 
 void AL_Viper::CreateDumyComp()
@@ -1867,6 +1882,8 @@ void AL_Viper::PerformLineTrace()
 
 void AL_Viper::BackMoveCanopyHandle()
 {
+	CRPC_PlaySwitchSound(JetCanopy->GetComponentLocation());
+	
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
@@ -1915,8 +1932,7 @@ void AL_Viper::ServerRPC_Wheel_Implementation()
 		nowValue = 1;
 
 	FrontWheel = nowValue;
-	RearLWheel = nowValue;
-	RearRWheel = nowValue;
+	RearWheel = nowValue;
 }
 
 void AL_Viper::StartVoiceChat()
@@ -1970,7 +1986,7 @@ void AL_Viper::ReadyAllMembers()
 void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& newName)
 {
 	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
-	if ( !KGameState )
+	if (!KGameState)
 	{
 		LOG_S(Warning , TEXT("GameState doesn't exist"));
 	}
@@ -1983,7 +1999,7 @@ void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& n
 	TArray<FString> temp = KGameState->GetConnectedPlayernames();
 
 	//로그출력
-	for ( auto s : temp )
+	for (auto s : temp)
 	{
 		LOG_S(Warning , TEXT("The Name in PlayerList : %s") , *s);
 	}
@@ -1991,7 +2007,8 @@ void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& n
 	//월드에 존재하는 PlayterController배열
 	TArray<AK_PlayerController*> allPC;
 	//배열에 GameState에 있는 PlayerArray에 접근해서 모든 PC담기
-	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS) {
+	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS)
+	{
 		check(PS);
 		auto* tempPC = CastChecked<AK_PlayerController>(PS->GetPlayerController());
 		check(tempPC);
@@ -1999,14 +2016,13 @@ void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& n
 	});
 
 	//PC배열을 검사해서 모든 pc에서 CRPC함수 실행
-	for ( auto localpc : allPC )
+	for (auto localpc : allPC)
 	{
 		auto me = Cast<AL_Viper>(localpc->GetPawn());
 		check(me);
 		//CRPC로 업데이트된 배열을 클라이언트들의 GameState에 업데이트
 		me->ClientRPC_SetConnectedPlayerNames(temp);
 	}
-
 }
 
 void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FString>& newNames)
@@ -2016,20 +2032,76 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 	AK_PlayerController* MyPlayerController = Cast<AK_PlayerController>(GetOwner());
 
 	//Fisrt PC가 내 Owner와 동일하다면
-	if ( LocalPlayerController == MyPlayerController )
+	if (LocalPlayerController == MyPlayerController)
 	{
 		UK_StandbyWidget* LocalStandbyWidget = Cast<UK_StandbyWidget>(LocalPlayerController->StandbyUI);
-		if ( LocalStandbyWidget )
+		if (LocalStandbyWidget)
 		{
 			//타이머로 클라이언트가 입장후 Replicated가 완료되는 시간 기다리기
 			FTimerHandle tempHandle;
-			GetWorld()->GetTimerManager().SetTimer(tempHandle , [this , LocalStandbyWidget]() {
-
+			GetWorld()->GetTimerManager().SetTimer(tempHandle , [this , LocalStandbyWidget]()
+			{
 				LocalStandbyWidget->SetPlayerList();
 			} , 1.0f , false);
-
 		}
 	}
-
 }
 #pragma endregion
+
+void AL_Viper::CRPC_AudioControl_Implementation(bool bStart, int32 idx)
+{
+	if(bStart)
+	{
+		if (JetAudio && JetAudio->GetSound())
+		{
+			JetAudio->SetIntParameter("JetSoundIdx" , idx);
+			JetAudio->Play(0.f);
+		}
+	}
+	else
+	{
+		if (JetAudio && JetAudio->GetSound())
+			JetAudio->Stop();
+	}
+}
+
+void AL_Viper::Call_CRPC_MissileImpact(FVector ImpactLoc)
+{
+	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if (!KGameState)
+	{
+		LOG_S(Warning , TEXT("GameState doesn't exist"));
+	}
+
+	//월드에 존재하는 PlayterController배열
+	TArray<AK_PlayerController*> allPC;
+	//배열에 GameState에 있는 PlayerArray에 접근해서 모든 PC담기
+	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS)
+	{
+		check(PS);
+		auto* tempPC = CastChecked<AK_PlayerController>(PS->GetPlayerController());
+		check(tempPC);
+		return tempPC;
+	});
+
+	for (auto localpc : allPC)
+	{
+		auto me = Cast<AL_Viper>(localpc->GetPawn());
+		check(me);
+		//CRPC로 업데이트된 배열을 클라이언트들의 GameState에 업데이트
+		me->CRPC_MissileImpact(ImpactLoc);
+	}
+}
+
+void AL_Viper::CRPC_MissileImpact_Implementation(FVector ImpactLoc)
+{
+	FVector VFXSpawnLoc = ImpactLoc + FVector::UpVector * 10000.f;
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld() , DistroyVFX , VFXSpawnLoc);
+	UGameplayStatics::PlaySoundAtLocation(this , ImpactSound , GetActorLocation());
+}
+
+void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
+{
+	if(SwitchSound)
+		UGameplayStatics::PlaySoundAtLocation(this , SwitchSound , SoundLoc);
+}

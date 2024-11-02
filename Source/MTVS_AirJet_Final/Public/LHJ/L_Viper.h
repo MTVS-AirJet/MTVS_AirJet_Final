@@ -107,9 +107,16 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class UAudioComponent* JetAudio;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* SwitchSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* LockOnSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* ImpactSound;
+	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
+	class UNiagaraSystem* DistroyVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow1;
@@ -390,6 +397,10 @@ private:
 	void ServerRPCLockOn();
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCLockOn(AActor* target);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCLockOnSound(AL_Viper* CurrentViper);
+
+	void PlayLockOnSound();
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCMissile(AActor* newOwner);
@@ -501,9 +512,7 @@ public:
 	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
 	float FrontWheel = 0.f;
 	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
-	float RearLWheel = 0.f;
-	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
-	float RearRWheel = 0.f;
+	float RearWheel = 0.f;
 
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
@@ -559,4 +568,13 @@ public :
 
 #pragma endregion
 
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_MissileImpact(FVector ImpactLoc);
+	UFUNCTION(Client, Reliable)
+	void CRPC_AudioControl(bool bStart, int32 idx=0);
+	UFUNCTION(Client, Reliable)
+	void CRPC_PlaySwitchSound(FVector SoundLoc);
+public:
+	void Call_CRPC_MissileImpact(FVector ImpactLoc);
 };

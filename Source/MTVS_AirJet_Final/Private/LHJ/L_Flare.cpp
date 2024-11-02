@@ -4,6 +4,7 @@
 #include "LHJ/L_Flare.h"
 
 #include "NiagaraComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
 #include "LHJ/L_Viper.h"
@@ -22,6 +23,9 @@ AL_Flare::AL_Flare()
 	FlareMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FlareMesh"));
 	FlareMesh->SetupAttachment(RootComponent);
 
+	AudioComponent=CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(RootComponent);
+	
 	FlareEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("FlareEffect"));
 	FlareEffect->SetupAttachment(RootComponent);
 
@@ -72,6 +76,9 @@ void AL_Flare::BeginPlay()
 	FlareEffect->SetFloatParameter(FName("SpawnRadius") , SpawnRadius);
 	FlareEffect->SetFloatParameter(FName("SpawnRate") , SpawnRate);
 	FlareEffect->SetColorParameter(FName("Color") , LColor);
+	
+	if(AudioComponent&&AudioComponent->GetSound())
+		AudioComponent->Play();
 }
 
 // Called every frame
@@ -97,7 +104,7 @@ void AL_Flare::OnFlareBeginOverlap(UPrimitiveComponent* OverlappedComponent , AA
                                    UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
                                    const FHitResult& SweepResult)
 {
-	ServerRPCFlare();
+	
 }
 
 void AL_Flare::FlareUpdate(float Alpha)
@@ -125,8 +132,4 @@ FVector AL_Flare::BezierFlare(FVector P1, FVector P2, FVector P3, FVector P4, fl
 	FVector L6 = L4 + Alpha * (L5 - L4); //L4, L5
 
 	return L6;
-}
-
-void AL_Flare::ServerRPCFlare_Implementation()
-{
 }
