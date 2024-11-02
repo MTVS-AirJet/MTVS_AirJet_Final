@@ -397,6 +397,10 @@ private:
 	void ServerRPCLockOn();
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCLockOn(AActor* target);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCLockOnSound(AL_Viper* CurrentViper);
+
+	void PlayLockOnSound();
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCMissile(AActor* newOwner);
@@ -567,6 +571,10 @@ public :
 private:
 	UFUNCTION(Client, Reliable)
 	void CRPC_MissileImpact(FVector ImpactLoc);
+	UFUNCTION(Client, Reliable)
+	void CRPC_AudioControl(bool bStart, int32 idx=0);
+	UFUNCTION(Client, Reliable)
+	void CRPC_PlaySwitchSound(FVector SoundLoc);
 public:
 	void Call_CRPC_MissileImpact(FVector ImpactLoc);
 };
