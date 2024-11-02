@@ -19,6 +19,5 @@ void UL_ViperAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	Pitch = Viper->CanopyPitch;
 	FrontWheel = Viper->FrontWheel;
-	RearLWheel = Viper->RearLWheel;
-	RearRWheel = Viper->RearRWheel;
+	RearWheel = Viper->RearWheel;
 }

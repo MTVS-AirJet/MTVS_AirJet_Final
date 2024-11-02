@@ -334,8 +334,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , FlareCurCnt);
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
-	DOREPLIFETIME(AL_Viper , RearLWheel);
-	DOREPLIFETIME(AL_Viper , RearRWheel);
+	DOREPLIFETIME(AL_Viper , RearWheel);
 	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
 }
 
@@ -1915,8 +1914,7 @@ void AL_Viper::ServerRPC_Wheel_Implementation()
 		nowValue = 1;
 
 	FrontWheel = nowValue;
-	RearLWheel = nowValue;
-	RearRWheel = nowValue;
+	RearWheel = nowValue;
 }
 
 void AL_Viper::StartVoiceChat()

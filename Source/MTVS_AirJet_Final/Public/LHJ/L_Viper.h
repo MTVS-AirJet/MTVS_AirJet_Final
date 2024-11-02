@@ -501,9 +501,7 @@ public:
 	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
 	float FrontWheel = 0.f;
 	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
-	float RearLWheel = 0.f;
-	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
-	float RearRWheel = 0.f;
+	float RearWheel = 0.f;
 
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
