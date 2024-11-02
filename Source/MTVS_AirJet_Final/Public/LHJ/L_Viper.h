@@ -107,9 +107,16 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class UAudioComponent* JetAudio;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* SwitchSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* LockOnSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* ImpactSound;
+	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
+	class UNiagaraSystem* DistroyVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow1;
@@ -557,4 +564,9 @@ public :
 
 #pragma endregion
 
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_MissileImpact(FVector ImpactLoc);
+public:
+	void Call_CRPC_MissileImpact(FVector ImpactLoc);
 };

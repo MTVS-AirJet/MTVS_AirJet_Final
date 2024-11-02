@@ -7,8 +7,10 @@
 #include "Math/MathFwd.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "JBS/J_MissionActorInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "LHJ/L_Viper.h"
 
 // Sets default values
@@ -24,6 +26,9 @@ AL_Missile::AL_Missile()
 
 	MissileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MissileMesh"));
 	MissileMesh->SetupAttachment(RootComponent);
+
+	AudioComponent=CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	EngineVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EngineVFX"));
 	EngineVFX->SetupAttachment(RootComponent);
@@ -67,6 +72,12 @@ void AL_Missile::BeginPlay()
 
 			MissileTimeline.Play();
 		}
+	}
+	
+	if (AudioComponent && AudioComponent->GetSound())
+	{
+		AudioComponent->SetIntParameter("MissileIdx" , 0);
+		AudioComponent->Play(0.f);
 	}
 }
 
@@ -140,13 +151,8 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
 		mai->GetDamage();
-		// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, GetActorLocation(), );
-		FVector VFXSpawnLoc = HitActor->GetActorLocation() + FVector::UpVector * 10000.f;
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, VFXSpawnLoc);
+		if (auto viper = Cast<AL_Viper>(GetOwner()))
+			viper->Call_CRPC_MissileImpact(HitActor->GetActorLocation());
 	}
 	this->Destroy();
-}
-
-void AL_Missile::MulticastRPCDamage_Implementation(AActor* HitActor)
-{
 }

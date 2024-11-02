@@ -4,6 +4,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "MTVS_AirJet_Final.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
@@ -2031,3 +2032,37 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 
 }
 #pragma endregion
+
+void AL_Viper::Call_CRPC_MissileImpact(FVector ImpactLoc)
+{
+	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if ( !KGameState )
+	{
+		LOG_S(Warning , TEXT("GameState doesn't exist"));
+	}
+	
+	//월드에 존재하는 PlayterController배열
+	TArray<AK_PlayerController*> allPC;
+	//배열에 GameState에 있는 PlayerArray에 접근해서 모든 PC담기
+	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS) {
+		check(PS);
+		auto* tempPC = CastChecked<AK_PlayerController>(PS->GetPlayerController());
+		check(tempPC);
+		return tempPC;
+	});
+
+	for ( auto localpc : allPC )
+	{
+		auto me = Cast<AL_Viper>(localpc->GetPawn());
+		check(me);
+		//CRPC로 업데이트된 배열을 클라이언트들의 GameState에 업데이트
+		me->CRPC_MissileImpact(ImpactLoc);
+	}
+}
+
+void AL_Viper::CRPC_MissileImpact_Implementation(FVector ImpactLoc)
+{
+	FVector VFXSpawnLoc = ImpactLoc + FVector::UpVector * 10000.f;
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DistroyVFX, VFXSpawnLoc);
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+}
