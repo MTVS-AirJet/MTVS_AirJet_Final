@@ -415,14 +415,6 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 		                                            JetFirstEngine->GetRelativeLocation().Z));
 		AccelGear = 1;
 		bFirstEngine = true;
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("Throttle"))
-		{
-			StartScenario.pop();
-			DummyThrottleMesh->SetRenderCustomDepth(false);
-			DummyThrottleMesh->CustomDepthStencilValue = 0;
-			CRPC_AudioControl(true, 0);
-			
-		}
 	}
 }
 
@@ -434,12 +426,6 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 	{
 		bMIC = true;
 		DummyMICMesh->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("MIC"))
-		{
-			StartScenario.pop();
-			DummyMICMesh->SetRenderCustomDepth(false);
-			DummyMICMesh->CustomDepthStencilValue = 0;
-		}
 	}
 	else
 	{
@@ -456,17 +442,6 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	{
 		bEngineGen1 = true;
 		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
-		{
-			if (bEngineGen1 && bEngineGen2)
-			{
-				StartScenario.pop();
-				DummyEngineGenerMesh1->SetRenderCustomDepth(false);
-				DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
-				DummyEngineGenerMesh2->SetRenderCustomDepth(false);
-				DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -483,17 +458,6 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	{
 		bEngineGen2 = true;
 		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineGen"))
-		{
-			if (bEngineGen1 && bEngineGen2)
-			{
-				StartScenario.pop();
-				DummyEngineGenerMesh1->SetRenderCustomDepth(false);
-				DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
-				DummyEngineGenerMesh2->SetRenderCustomDepth(false);
-				DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -510,17 +474,6 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineControl1 = true;
 		DummyEngineControlMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
-		{
-			if (bEngineControl1 && bEngineControl2)
-			{
-				StartScenario.pop();
-				DummyEngineControlMesh1->SetRenderCustomDepth(false);
-				DummyEngineControlMesh1->CustomDepthStencilValue = 0;
-				DummyEngineControlMesh2->SetRenderCustomDepth(false);
-				DummyEngineControlMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -537,17 +490,6 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 	{
 		bEngineControl2 = true;
 		DummyEngineControlMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineControl"))
-		{
-			if (bEngineControl1 && bEngineControl2)
-			{
-				StartScenario.pop();
-				DummyEngineControlMesh1->SetRenderCustomDepth(false);
-				DummyEngineControlMesh1->CustomDepthStencilValue = 0;
-				DummyEngineControlMesh2->SetRenderCustomDepth(false);
-				DummyEngineControlMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -564,12 +506,6 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 	{
 		bJFS = true;
 		DummyJFSMesh->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Switch"))
-		{
-			StartScenario.pop();
-			DummyJFSMesh->SetRenderCustomDepth(false);
-			DummyJFSMesh->CustomDepthStencilValue = 0;
-		}
 	}
 	else
 	{
@@ -586,17 +522,6 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineMaster1 = true;
 		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
-		{
-			if (bEngineMaster1 && bEngineMaster2)
-			{
-				StartScenario.pop();
-				DummyEngineMasterMesh1->SetRenderCustomDepth(false);
-				DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
-				DummyEngineMasterMesh2->SetRenderCustomDepth(false);
-				DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -613,17 +538,6 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	{
 		bEngineMaster2 = true;
 		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(-30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("EngineMaster"))
-		{
-			if (bEngineMaster1 && bEngineMaster2)
-			{
-				StartScenario.pop();
-				DummyEngineMasterMesh1->SetRenderCustomDepth(false);
-				DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
-				DummyEngineMasterMesh2->SetRenderCustomDepth(false);
-				DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
-			}
-		}
 	}
 	else
 	{
@@ -645,18 +559,10 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 		{
 			DummyJFSHandleMesh->AddRelativeLocation(FVector(1 , 0 , 0));
 		} , 1.f , false);
-		//DummyJFSHandleMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
-		if (StartScenario.size() > 0 && StartScenario.front().Equals("JFS_Handle"))
-		{
-			StartScenario.pop();
-			DummyJFSHandleMesh->SetRenderCustomDepth(false);
-			DummyJFSHandleMesh->CustomDepthStencilValue = 0;
-		}
 	}
 	else
 	{
 		bJFSHandle = false;
-		//DummyJFSHandleMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
 	}
 }
 
@@ -928,8 +834,8 @@ FRotator AL_Viper::CombineRotate(FVector NewVector)
 void AL_Viper::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	CRPC_AudioControl(false);	
+
+	CRPC_AudioControl(false);
 
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -1084,44 +990,117 @@ void AL_Viper::Tick(float DeltaTime)
 			UStaticMeshComponent* ScenarioComponent = nullptr;
 			if (ScenarioFront.Equals("MIC"))
 			{
-				DummyMICMesh->SetRenderCustomDepth(true);
-				DummyMICMesh->CustomDepthStencilValue = 1;
+				if (DummyMICMesh)
+				{
+					DummyMICMesh->SetRenderCustomDepth(true);
+					DummyMICMesh->CustomDepthStencilValue = 1;
+					if (bMIC)
+					{
+						StartScenario.pop();
+						DummyMICMesh->SetRenderCustomDepth(false);
+						DummyMICMesh->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("EngineGen"))
 			{
-				DummyEngineGenerMesh1->SetRenderCustomDepth(true);
-				DummyEngineGenerMesh1->CustomDepthStencilValue = 1;
-				DummyEngineGenerMesh2->SetRenderCustomDepth(true);
-				DummyEngineGenerMesh2->CustomDepthStencilValue = 1;
+				if (DummyEngineGenerMesh1 && DummyEngineGenerMesh2)
+				{
+					DummyEngineGenerMesh1->SetRenderCustomDepth(true);
+					DummyEngineGenerMesh1->CustomDepthStencilValue = 1;
+					DummyEngineGenerMesh2->SetRenderCustomDepth(true);
+					DummyEngineGenerMesh2->CustomDepthStencilValue = 1;
+
+					if (bEngineGen1 && bEngineGen2)
+					{
+						StartScenario.pop();
+						DummyEngineGenerMesh1->SetRenderCustomDepth(false);
+						DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
+						DummyEngineGenerMesh2->SetRenderCustomDepth(false);
+						DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("EngineControl"))
 			{
-				DummyEngineControlMesh1->SetRenderCustomDepth(true);
-				DummyEngineControlMesh1->CustomDepthStencilValue = 1;
-				DummyEngineControlMesh2->SetRenderCustomDepth(true);
-				DummyEngineControlMesh2->CustomDepthStencilValue = 1;
+				if (DummyEngineControlMesh1 && DummyEngineControlMesh2)
+				{
+					DummyEngineControlMesh1->SetRenderCustomDepth(true);
+					DummyEngineControlMesh1->CustomDepthStencilValue = 1;
+					DummyEngineControlMesh2->SetRenderCustomDepth(true);
+					DummyEngineControlMesh2->CustomDepthStencilValue = 1;
+
+					if (bEngineControl1 && bEngineControl2)
+					{
+						StartScenario.pop();
+						DummyEngineControlMesh1->SetRenderCustomDepth(false);
+						DummyEngineControlMesh1->CustomDepthStencilValue = 0;
+						DummyEngineControlMesh2->SetRenderCustomDepth(false);
+						DummyEngineControlMesh2->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("JFS_Switch"))
 			{
-				DummyJFSMesh->SetRenderCustomDepth(true);
-				DummyJFSMesh->CustomDepthStencilValue = 1;
+				if (DummyJFSMesh)
+				{
+					DummyJFSMesh->SetRenderCustomDepth(true);
+					DummyJFSMesh->CustomDepthStencilValue = 1;
+					
+					if (bJFS)
+					{
+						StartScenario.pop();
+						DummyJFSMesh->SetRenderCustomDepth(false);
+						DummyJFSMesh->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("EngineMaster"))
 			{
-				DummyEngineMasterMesh1->SetRenderCustomDepth(true);
-				DummyEngineMasterMesh1->CustomDepthStencilValue = 1;
-				DummyEngineMasterMesh2->SetRenderCustomDepth(true);
-				DummyEngineMasterMesh2->CustomDepthStencilValue = 1;
+				if (DummyEngineControlMesh1 && DummyEngineControlMesh2)
+				{
+					DummyEngineMasterMesh1->SetRenderCustomDepth(true);
+					DummyEngineMasterMesh1->CustomDepthStencilValue = 1;
+					DummyEngineMasterMesh2->SetRenderCustomDepth(true);
+					DummyEngineMasterMesh2->CustomDepthStencilValue = 1;
+					
+					if (bEngineMaster1 && bEngineMaster2)
+					{
+						StartScenario.pop();
+						DummyEngineMasterMesh1->SetRenderCustomDepth(false);
+						DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
+						DummyEngineMasterMesh2->SetRenderCustomDepth(false);
+						DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("JFS_Handle"))
 			{
-				DummyJFSHandleMesh->SetRenderCustomDepth(true);
-				DummyJFSHandleMesh->CustomDepthStencilValue = 1;
+				if(DummyJFSHandleMesh)
+				{
+					DummyJFSHandleMesh->SetRenderCustomDepth(true);
+					DummyJFSHandleMesh->CustomDepthStencilValue = 1;
+
+					if(bJFSHandle)
+					{
+						StartScenario.pop();
+						DummyJFSHandleMesh->SetRenderCustomDepth(false);
+						DummyJFSHandleMesh->CustomDepthStencilValue = 0;
+					}
+				}
 			}
 			else if (ScenarioFront.Equals("Throttle"))
 			{
 				DummyThrottleMesh->SetRenderCustomDepth(true);
 				DummyThrottleMesh->CustomDepthStencilValue = 1;
+
+				if(bFirstEngine)
+				{
+					StartScenario.pop();
+					DummyThrottleMesh->SetRenderCustomDepth(false);
+					DummyThrottleMesh->CustomDepthStencilValue = 0;
+					CRPC_AudioControl(true , 0);
+				}
 			}
 			else if (ScenarioFront.Equals("Canopy"))
 			{
@@ -1739,7 +1718,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 			{
 				if (auto mai = Cast<IJ_MissionActorInterface>(hit.GetActor()))
 				{
-					if(!LockOnTarget)
+					if (!LockOnTarget)
 						ClientRPCLockOnSound(this);
 					searchTarget = hit.GetActor();
 				}
@@ -1883,7 +1862,7 @@ void AL_Viper::PerformLineTrace()
 void AL_Viper::BackMoveCanopyHandle()
 {
 	CRPC_PlaySwitchSound(JetCanopy->GetComponentLocation());
-	
+
 	auto currLoc = JetCanopy->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
@@ -2048,9 +2027,9 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 }
 #pragma endregion
 
-void AL_Viper::CRPC_AudioControl_Implementation(bool bStart, int32 idx)
+void AL_Viper::CRPC_AudioControl_Implementation(bool bStart , int32 idx)
 {
-	if(bStart)
+	if (bStart)
 	{
 		if (JetAudio && JetAudio->GetSound())
 		{
@@ -2102,6 +2081,6 @@ void AL_Viper::CRPC_MissileImpact_Implementation(FVector ImpactLoc)
 
 void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
 {
-	if(SwitchSound)
+	if (SwitchSound)
 		UGameplayStatics::PlaySoundAtLocation(this , SwitchSound , SoundLoc);
 }
