@@ -402,6 +402,9 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperVoice , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperVoiceStarted);
+
+		input->BindAction(IA_ViperDevelop , ETriggerEvent::Started , this ,
+		                  &AL_Viper::F_ViperDevelopStarted);
 	}
 }
 
@@ -821,6 +824,46 @@ void AL_Viper::F_ViperVoiceStarted(const struct FInputActionValue& value)
 		StartVoiceChat();
 	else
 		StopVoiceChat();
+}
+
+void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
+{
+#pragma region 시동절차 자동 수행
+	bReadyTimeEndFlag = true;
+	if (!IsStart)
+	{
+		FKey lMouse = EKeys::LeftMouseButton;
+		if (JetMic && !bMIC)
+			OnMyMicClicked(JetMic , lMouse);
+		if (JetEngineGen && !bEngineGen1)
+			OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+		if (JetEngineGen2 && !bEngineGen2)
+			OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+		if (JetEngineControl && !bEngineControl1)
+			OnMyEngineControlClicked(JetEngineControl , lMouse);
+		if (JetEngineControl2 && !bEngineControl2)
+			OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+		if (JetEngineMaster && !bEngineMaster1)
+			OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+		if (JetEngineMaster2 && !bEngineMaster2)
+			OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+		if (JetFuelStarter && !bJFS)
+			OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+		if (JetJFSHandle && !bJFSHandle)
+			OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+		if (JetFirstEngine && !bFirstEngine)
+			OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+		if (JetCanopy && iCanopyNum != 2)
+		{
+			JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+			iCanopyNum = 2;
+		}
+	}
+#pragma endregion
+	IsStart = true;
+	IsEngineOn = true;
+	intTriggerNum = 2;
+	IsFlyStart = true;
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
