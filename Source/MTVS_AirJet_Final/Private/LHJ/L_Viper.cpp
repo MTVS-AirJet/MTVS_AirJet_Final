@@ -1001,16 +1001,19 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region 사운드 감쇠
-	if(CanopyPitch==0)
+	if(JetAudio)
 	{
-		if(!JetAudio->bAllowSpatialization)
-			JetAudio->bAllowSpatialization=true;
-	}
-	else
-	{
-		if(JetAudio->bAllowSpatialization)
-			JetAudio->bAllowSpatialization=false;
-	}
+		if(CanopyPitch==0)
+        	{
+        		if(!JetAudio->bAllowSpatialization)
+        			JetAudio->bAllowSpatialization=true;
+        	}
+        	else
+        	{
+        		if(JetAudio->bAllowSpatialization)
+        			JetAudio->bAllowSpatialization=false;
+        	}
+	}	
 #pragma endregion
 
 #pragma region 마지막 트리거 박스를 통과하면 IMC_Fun을 연결
