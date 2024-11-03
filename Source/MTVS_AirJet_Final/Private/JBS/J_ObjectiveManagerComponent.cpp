@@ -9,7 +9,7 @@
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
 #include "JBS/J_MissionPlayerController.h"
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "TimerManager.h"
 
 // Sets default values for this component's properties

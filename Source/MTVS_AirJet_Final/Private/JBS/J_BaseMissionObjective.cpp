@@ -147,11 +147,9 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 	// 미션 비활성화
 	IS_OBJECTIVE_ACTIVE = false;
 
+	// 목표 완료 딜리게이트 실행
 	if(objectiveEndDel.IsBound())
-	{
-		// 목표 완료 딜리게이트 실행
 		objectiveEndDel.Broadcast();
-	}
 
 	// 성공 여부에 따라 함수 실행
 	isSuccess ? ObjectiveSuccess() : ObjectiveFail();

@@ -1,18 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
+#include "Containers/UnrealString.h"
 #include "Engine/Engine.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUI.h"
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/Class.h"
+#include "JBS/J_ObjectiveTextUI.h"
 
 // Sets default values for this component's properties
-UJ_ObjectiveUIComponent::UJ_ObjectiveUIComponent()
+UJ_ObjectiveUIComp::UJ_ObjectiveUIComp()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -23,7 +25,7 @@ UJ_ObjectiveUIComponent::UJ_ObjectiveUIComponent()
 
 
 // Called when the game starts
-void UJ_ObjectiveUIComponent::BeginPlay()
+void UJ_ObjectiveUIComp::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -40,26 +42,29 @@ void UJ_ObjectiveUIComponent::BeginPlay()
 
 
 // Called every frame
-void UJ_ObjectiveUIComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UJ_ObjectiveUIComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
 }
 
-void UJ_ObjectiveUIComponent::InitObjUI()
+void UJ_ObjectiveUIComp::InitObjUI()
 {
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 UI 생성"));
 	// ui 생성
 	objUI = CreateWidget<UJ_ObjectiveUI>(this->GetOwner<AJ_MissionPlayerController>(), objUIPrefab);
 	check(objUI);
+	// @@ 애니메이션 바인드
+	objUI->startAnimDel.AddUObject(this, &UJ_ObjectiveUIComp::PlayObjUIStartAnim);
+
 	// 비활성화
 	objUI->SetVisibility(ESlateVisibility::Hidden);
 	// 뷰포트에 붙이기
 	objUI->AddToViewport();
 }
 
-void UJ_ObjectiveUIComponent::CRPC_StartFFObjUI_Implementation(ETacticalOrder orderType, FFormationFlightUIData data)
+void UJ_ObjectiveUIComp::CRPC_StartFFObjUI_Implementation(ETacticalOrder orderType, FFormationFlightUIData data)
 {
 	// 비활성 상태시 활성화
 	if(objUI->GetVisibility() == ESlateVisibility::Hidden)
@@ -73,7 +78,7 @@ void UJ_ObjectiveUIComponent::CRPC_StartFFObjUI_Implementation(ETacticalOrder or
 	CRPC_UpdateFFObjUI(orderType, data);
 }
 
-void UJ_ObjectiveUIComponent::CRPC_StartObjUI_Implementation(ETacticalOrder orderType, FNeutralizeTargetUIData data)
+void UJ_ObjectiveUIComp::CRPC_StartObjUI_Implementation(ETacticalOrder orderType, FNeutralizeTargetUIData data)
 {
 	// 비활성 상태시 활성화
 	if(objUI->GetVisibility() == ESlateVisibility::Hidden)
@@ -85,10 +90,10 @@ void UJ_ObjectiveUIComponent::CRPC_StartObjUI_Implementation(ETacticalOrder orde
 	CRPC_UpdateObjUI(orderType, data);
 }
 
-void UJ_ObjectiveUIComponent::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder orderType, FFormationFlightUIData data)
+void UJ_ObjectiveUIComp::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder orderType, FFormationFlightUIData data)
 {
 	//@@ 나중엔 오더 타입에 따라 다른 데이터 구조체 처리
-	FObjUIData uiData;
+	FTextUIData uiData;
 
 	switch (orderType) {
         case ETacticalOrder::NONE:
@@ -122,10 +127,10 @@ void UJ_ObjectiveUIComponent::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder o
 	objUI->SetObjUI(uiData);
 }
 
-void UJ_ObjectiveUIComponent::CRPC_UpdateObjUI_Implementation(ETacticalOrder orderType, FNeutralizeTargetUIData data)
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(ETacticalOrder orderType, FNeutralizeTargetUIData data)
 {
 	//@@ 나중엔 오더 타입에 따라 다른 데이터 구조체 처리
-	FObjUIData uiData;
+	FTextUIData uiData;
 
 	switch (orderType) {
         case ETacticalOrder::NONE:
@@ -147,24 +152,32 @@ void UJ_ObjectiveUIComponent::CRPC_UpdateObjUI_Implementation(ETacticalOrder ord
 	objUI->SetObjUI(uiData);
 }
 
-void UJ_ObjectiveUIComponent::CRPC_EndSubObjUI_Implementation(int idx, bool isSuccess)
+void UJ_ObjectiveUIComp::CRPC_EndSubObjUI_Implementation(int idx, bool isSuccess)
 {
 	objUI->EndSubObjUI(idx, isSuccess);
 }
 
-void UJ_ObjectiveUIComponent::CRPC_EndObjUI_Implementation(bool isSuccess)
+void UJ_ObjectiveUIComp::CRPC_EndObjUI_Implementation(bool isSuccess)
 {
 	objUI->EndObjUI(isSuccess);
 }
 
-UJ_MissionCompleteUI *UJ_ObjectiveUIComponent::GetMissionCompleteUI()
+UJ_MissionCompleteUI *UJ_ObjectiveUIComp::GetMissionCompleteUI()
 {
 	check(objUI);
 	
 	return objUI->missionCompleteUI;
 }
 
-void UJ_ObjectiveUIComponent::CRPC_SwitchResultUI_Implementation(const TArray<FObjectiveData>& resultObjData)
+void UJ_ObjectiveUIComp::CRPC_SwitchResultUI_Implementation(const TArray<FObjectiveData>& resultObjData)
 {
 	objUI->ActiveResultUI(resultObjData);
+}
+void UJ_ObjectiveUIComp::UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY)
+{
+	// FString str = FString::Printf(TEXT("cX : %.2f , bpb : %.2f, sesy : %.2f"), canvasX, bgPaddingBottom, subEleScaleY);
+	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("%s"), *str));
+
+	// ui 요소에 적용
+	objUI->GetObjTextUI()->UpdateObjUIAnimValue(canvasX, bgPaddingBottom, subEleScaleY);
 }

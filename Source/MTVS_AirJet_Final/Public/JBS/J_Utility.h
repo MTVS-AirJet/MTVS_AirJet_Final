@@ -396,7 +396,7 @@ enum class EFormationChecklist : uint8
 
 // 목표 UI 표시용 
 USTRUCT(BlueprintType)
-struct FObjUIData
+struct FTextUIData
 {
     GENERATED_BODY()
 public:

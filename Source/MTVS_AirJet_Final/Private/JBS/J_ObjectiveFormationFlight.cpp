@@ -8,7 +8,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "UObject/Class.h"
 #include <algorithm>
 
@@ -243,7 +243,7 @@ void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
     // 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    // pc에게 새 전술명령 UI 시작 srpc
+    // pc에게 새 전술명령 UI 시작 crpc
     for(auto* pc : allPC)
     {
         FFormationFlightUIData data;

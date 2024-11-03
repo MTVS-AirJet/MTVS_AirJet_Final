@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "JBS/J_Utility.h"
-#include "J_ObjectiveUIComponent.generated.h"
+#include "J_ObjectiveUIComp.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MTVS_AIRJET_FINAL_API UJ_ObjectiveUIComponent : public UActorComponent
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class MTVS_AIRJET_FINAL_API UJ_ObjectiveUIComp : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UJ_ObjectiveUIComponent();
+	UJ_ObjectiveUIComp();
 
 protected:
 	// Called when the game starts
@@ -74,4 +74,12 @@ public:
         // 결산 UI 가져오기 | 바로 접근용
 	UFUNCTION(BlueprintCallable)
 	class UJ_MissionCompleteUI *GetMissionCompleteUI();
+
+	// 목표 UI 애니메이션 시작
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayObjUIStartAnim();
+
+	// 목표 UI 애니메이션 값 업데이트
+	UFUNCTION(BlueprintCallable)
+	void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
 };

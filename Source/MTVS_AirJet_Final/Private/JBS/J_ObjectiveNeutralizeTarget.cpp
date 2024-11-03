@@ -11,7 +11,7 @@
 #include "Math/MathFwd.h"
 #include <cfloat>
 #include "JBS/J_MissionPlayerController.h"
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "TimerManager.h"
 
 void AJ_ObjectiveNeutralizeTarget::BeginPlay()
