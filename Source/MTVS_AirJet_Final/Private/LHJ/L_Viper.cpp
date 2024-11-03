@@ -1431,6 +1431,11 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
 			}
+
+			// 카메라 쉐이크
+			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
+			if (intTriggerNum < 2 && ValueOfMoveForce > 0)
+				CRPC_CameraShake();
 		}
 		JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
@@ -1799,7 +1804,7 @@ void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AAct
 	{
 		if (TargetUIActorFac)
 		{
-			if(!TargetActor)
+			if (!TargetActor)
 			{
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Owner = this;
@@ -1809,8 +1814,8 @@ void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AAct
 				FRotator TargetRotation = (GetActorLocation() - TargetLocation).Rotation();
 
 				TargetActor = GetWorld()->SpawnActor<AL_Target>(TargetUIActorFac , TargetLocation , TargetRotation ,
-																SpawnParams);
-			}			
+				                                                SpawnParams);
+			}
 		}
 	}
 	else
@@ -1818,7 +1823,7 @@ void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AAct
 		if (TargetActor)
 		{
 			TargetActor->Destroy();
-			TargetActor=nullptr;
+			TargetActor = nullptr;
 			//TargetActor->F_Destroy();
 		}
 	}
@@ -2160,4 +2165,10 @@ void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
 {
 	if (SwitchSound)
 		UGameplayStatics::PlaySoundAtLocation(this , SwitchSound , SoundLoc);
+}
+
+void AL_Viper::CRPC_CameraShake_Implementation()
+{
+	if (LoadCameraShake)
+		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
 }

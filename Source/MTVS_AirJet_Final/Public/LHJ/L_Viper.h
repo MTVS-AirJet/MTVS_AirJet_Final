@@ -587,4 +587,10 @@ private:
 	void CRPC_PlaySwitchSound(FVector SoundLoc);
 public:
 	void Call_CRPC_MissileImpact(FVector ImpactLoc);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Default|Camera")
+	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
+	UFUNCTION(Client, Reliable)
+	void CRPC_CameraShake();
 };
