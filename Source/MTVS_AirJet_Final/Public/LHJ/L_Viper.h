@@ -350,11 +350,15 @@ private:
 	float TurnFlightAB = 6500.f;
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
 	float HeightOfSea = -480000; // Cesium 해수면 높이
-	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
 	TSubclassOf<class UUserWidget> HUD_UI;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
+	TSubclassOf<class AL_Target> TargetUIActorFac;
+	UPROPERTY()
+	class AL_Target* TargetActor;
+	
 private:
 	UFUNCTION()
 	void IsLockOn();
@@ -403,6 +407,8 @@ private:
 	void MulticastRPCLockOn(AActor* target);
 	UFUNCTION(Client,Reliable)
 	void ClientRPCLockOnSound(AL_Viper* CurrentViper);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCSetLockOnUI(AL_Viper* CurrentViper, AActor* target);
 
 	void PlayLockOnSound();
 

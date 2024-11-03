@@ -28,6 +28,7 @@
 #include "KHS/K_GameState.h"
 #include "KHS/K_StandbyWidget.h"
 #include "GameFramework/PlayerState.h"
+#include "LHJ/L_Target.h"
 
 
 #pragma region Construct
@@ -1089,7 +1090,7 @@ void AL_Viper::Tick(float DeltaTime)
 				{
 					DummyJFSMesh->SetRenderCustomDepth(true);
 					DummyJFSMesh->CustomDepthStencilValue = 1;
-					
+
 					if (bJFS)
 					{
 						StartScenario.pop();
@@ -1106,7 +1107,7 @@ void AL_Viper::Tick(float DeltaTime)
 					DummyEngineMasterMesh1->CustomDepthStencilValue = 1;
 					DummyEngineMasterMesh2->SetRenderCustomDepth(true);
 					DummyEngineMasterMesh2->CustomDepthStencilValue = 1;
-					
+
 					if (bEngineMaster1 && bEngineMaster2)
 					{
 						StartScenario.pop();
@@ -1119,12 +1120,12 @@ void AL_Viper::Tick(float DeltaTime)
 			}
 			else if (ScenarioFront.Equals("JFS_Handle"))
 			{
-				if(DummyJFSHandleMesh)
+				if (DummyJFSHandleMesh)
 				{
 					DummyJFSHandleMesh->SetRenderCustomDepth(true);
 					DummyJFSHandleMesh->CustomDepthStencilValue = 1;
 
-					if(bJFSHandle)
+					if (bJFSHandle)
 					{
 						StartScenario.pop();
 						DummyJFSHandleMesh->SetRenderCustomDepth(false);
@@ -1137,7 +1138,7 @@ void AL_Viper::Tick(float DeltaTime)
 				DummyThrottleMesh->SetRenderCustomDepth(true);
 				DummyThrottleMesh->CustomDepthStencilValue = 1;
 
-				if(bFirstEngine)
+				if (bFirstEngine)
 				{
 					StartScenario.pop();
 					DummyThrottleMesh->SetRenderCustomDepth(false);
@@ -1774,6 +1775,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 	}
 
 	MulticastRPCLockOn(searchTarget);
+	ClientRPCSetLockOnUI(this , searchTarget);
 
 	Diametr = 30.f;
 }
@@ -1781,6 +1783,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 {
 	LockOnTarget = target;
+
 	// LOG_S(Warning , TEXT("Viper Name : %s, LockOnTarget Name : %s") , *GetName() ,
 	// 					  *LockOnTarget->GetName());
 }
@@ -1788,6 +1791,37 @@ void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 void AL_Viper::ClientRPCLockOnSound_Implementation(AL_Viper* CurrentViper)
 {
 	CurrentViper->PlayLockOnSound();
+}
+
+void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AActor* target)
+{
+	if (target && TargetUIActorFac)
+	{
+		if (TargetUIActorFac)
+		{
+			if(!TargetActor)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = GetInstigator();
+
+				FVector TargetLocation = target->GetActorLocation() + FVector(0 , 0 , 100);
+				FRotator TargetRotation = (GetActorLocation() - TargetLocation).Rotation();
+
+				TargetActor = GetWorld()->SpawnActor<AL_Target>(TargetUIActorFac , TargetLocation , TargetRotation ,
+																SpawnParams);
+			}			
+		}
+	}
+	else
+	{
+		if (TargetActor)
+		{
+			TargetActor->Destroy();
+			TargetActor=nullptr;
+			//TargetActor->F_Destroy();
+		}
+	}
 }
 
 void AL_Viper::PlayLockOnSound()
