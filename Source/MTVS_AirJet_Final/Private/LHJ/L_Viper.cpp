@@ -1001,19 +1001,19 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region 사운드 감쇠
-	if(JetAudio)
+	if (JetAudio)
 	{
-		if(CanopyPitch==0)
-        	{
-        		if(!JetAudio->bAllowSpatialization)
-        			JetAudio->bAllowSpatialization=true;
-        	}
-        	else
-        	{
-        		if(JetAudio->bAllowSpatialization)
-        			JetAudio->bAllowSpatialization=false;
-        	}
-	}	
+		if (CanopyPitch == 0)
+		{
+			if (!JetAudio->bAllowSpatialization)
+				JetAudio->bAllowSpatialization = true;
+		}
+		else
+		{
+			if (JetAudio->bAllowSpatialization)
+				JetAudio->bAllowSpatialization = false;
+		}
+	}
 #pragma endregion
 
 #pragma region 마지막 트리거 박스를 통과하면 IMC_Fun을 연결
@@ -1476,9 +1476,10 @@ void AL_Viper::Tick(float DeltaTime)
 	{
 		ChangeBooster();
 
+		//<><><>
 #pragma region 고도계
-		float CurrHeight = GetActorLocation().Z + HeightOfSea; // 고도 높이
-		float CurrFeet = CurrHeight / 30.48; // cm to feet
+		float CurrHeight = GetActorLocation().Z; // + HeightOfSea; // 고도 높이
+		float CurrFeet = CurrHeight * 3.281 / 100; // cm to feet
 		if (CurrFeet < 0)
 			CurrFeet = 0;
 
@@ -1489,10 +1490,12 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region 속도계
-		int32 ValueOfMoveForceInNote = static_cast<int32>(ValueOfMoveForce / 1650.0);
+		// 100 = 1m, 1000000=1km, 1km = 0.539957 Note
+		float km = ValueOfMoveForce / 1000000.f;
+		int32 ValueOfMoveForceInNote = static_cast<int32>(km * 0.539957);
 		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
 		{
-			HUDui->UpdateHeightText(ValueOfMoveForceInNote);
+			HUDui->UpdateSpeedText(ValueOfMoveForceInNote);
 		}
 #pragma endregion
 

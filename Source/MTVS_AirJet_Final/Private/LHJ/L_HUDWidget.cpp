@@ -3,6 +3,7 @@
 
 #include "LHJ/L_HUDWidget.h"
 
+#include "MTVS_AirJet_Final.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -34,7 +35,8 @@ void UL_HUDWidget::UpdateHeightBar(float NewHeight)
 
 void UL_HUDWidget::UpdateHeightText(int32 NewHeight)
 {
-	txtHeight->SetText(FText::AsNumber(NewHeight));
+	FString h = FString::FormatAsNumber(NewHeight);
+	txtHeight->SetText(FText::FromString(h));
 }
 
 void UL_HUDWidget::UpdateSpeedText(float NewSpeed)
