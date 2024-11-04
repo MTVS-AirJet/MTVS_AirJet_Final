@@ -27,22 +27,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
     {
-      "state": "OPEN"
+      &quot;state&quot;: &quot;OPEN&quot;
     }
   ],
-  "lastFilter": {
-    "state": "OPEN"
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/MTVS-AirJet/MTVS_AirJet_Final.git",
-    "accountId": "976b60b0-d03c-489d-9980-5ec0ceb16c21"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MTVS-AirJet/MTVS_AirJet_Final.git&quot;,
+    &quot;accountId&quot;: &quot;976b60b0-d03c-489d-9980-5ec0ceb16c21&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -77,7 +77,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "C++ Project.MTVS_AirJet_Final.executor": "Debug",
-    "C++ 프로젝트.MTVS_AirJet_Final.executor": "Debug",
+    "C++ 프로젝트.MTVS_AirJet_Final.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "KHS__Alpha",
     "ignore.virus.scanning.warn.message": "true",
@@ -85,7 +85,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "settings.editor.selected.configurable": "settings.sync",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -103,6 +103,18 @@
         <option name="USE_EXTERNAL_CONSOLE" value="0" />
         <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
       </configuration_1>
+      <configuration_2>
+        <option name="CONFIGURATION" value="" />
+        <option name="PLATFORM" value="" />
+        <option name="PROJECT_FILE_PATH" value="" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXE_PATH" value="$(TargetPath)" />
+        <option name="PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="$(ProjectDir)" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="AUTO_DETECT" />
+      </configuration_2>
       <option name="DEFAULT_PROJECT_PATH" value="" />
       <option name="AUTO_SELECT_PRIORITY" value="0" />
       <method v="2">
@@ -216,6 +228,7 @@
       <workItem from="1730683450830" duration="623000" />
       <workItem from="1730684319705" duration="14000" />
       <workItem from="1730684343088" duration="9142000" />
+      <workItem from="1730734837820" duration="809000" />
     </task>
     <servers />
   </component>
