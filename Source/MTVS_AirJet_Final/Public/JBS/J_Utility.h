@@ -518,6 +518,8 @@ public:
     static FString PilotRoleToString(EPilotRole role);
     // 전술명령 enum -> string 변환
     static FString TacticalOrderToString(ETacticalOrder type);
+    // 레벨 로컬 플레이어 컨트롤러 가져오기
+    static bool GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1500000.f;
