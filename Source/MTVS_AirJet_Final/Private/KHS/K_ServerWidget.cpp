@@ -36,7 +36,7 @@ void UK_ServerWidget::NativeConstruct()
 	if (ShowServerMenuAnim)
 	{
 		// 메인 애니메이션 재생
-		PlayAnimation(ShowTransitionAnim);
+		//PlayAnimation(ShowTransitionAnim);
 		PlayAnimation(ShowServerMenuAnim);
 	}
 
@@ -77,18 +77,18 @@ bool UK_ServerWidget::Initialize()
 	{
 		HostMenu_btn_Create->OnClicked.AddDynamic(this , &UK_ServerWidget::CreateRoom);
 	}
-	if (HostMenu_btn_LoadMap) //웹에디터 정보 불러오기 버튼 바인딩
-	{
-		HostMenu_btn_LoadMap->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenCreaterWeb);
-	}
+	// if (HostMenu_btn_LoadMap) //웹에디터 정보 불러오기 버튼 바인딩
+	// {
+	// 	HostMenu_btn_LoadMap->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenCreaterWeb);
+	// }
 	if (HostMenu_btn_Cancel) //생성취소 버튼 바인딩
 	{
 		HostMenu_btn_Cancel->OnClicked.AddDynamic(this , &UK_ServerWidget::OpenServerMenuFromHost);
 	}
-	if (HostMenu_btn_WebQuit) //웹에디터 종료 버튼 바인딩
-	{
-		HostMenu_btn_WebQuit->OnClicked.AddDynamic(this , &UK_ServerWidget::QuitCreaterWeb);
-	}
+	// if (HostMenu_btn_WebQuit) //웹에디터 종료 버튼 바인딩
+	// {
+	// 	HostMenu_btn_WebQuit->OnClicked.AddDynamic(this , &UK_ServerWidget::QuitCreaterWeb);
+	// }
 
 
 	return true;
@@ -123,23 +123,23 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 }
 
 // 서버메뉴로 돌아가는 함수
-void UK_ServerWidget::OpenServerMenuFromReady()
-{
-	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
-	FTimerHandle TimerHandle_MenuSwitch;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
-	{
-		if (MenuSwitcher)
-		{
-			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
-			PlayAnimation(ShowServerMenuAnim);
-			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
-
-			if (WidgetInterface)
-				WidgetInterface->RefreshServerList();
-		}
-	} , 1.0f , false);
-}
+// void UK_ServerWidget::OpenServerMenuFromReady()
+// {
+// 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
+// 	FTimerHandle TimerHandle_MenuSwitch;
+// 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
+// 	{
+// 		if (MenuSwitcher)
+// 		{
+// 			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
+// 			PlayAnimation(ShowServerMenuAnim);
+// 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+//
+// 			if (WidgetInterface)
+// 				WidgetInterface->RefreshServerList();
+// 		}
+// 	} , 1.0f , false);
+// }
 
 // Host 메뉴로 접속하는 함수
 void UK_ServerWidget::OpenHostMenuFromServer()
@@ -155,9 +155,11 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 		{
 			MenuSwitcher->SetActiveWidget(HostMenu); // HostMenu로 전환하여 활성화
 
-			//숨겨둬야하는 위젯들 설정
-			HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
-			HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
+			//시작하자마자 WebURL실행
+			OpenCreaterWeb();
+			//숨겨둬야하는 위젯들 설정(변경)
+			// HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
+			// HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
 
 			PlayAnimation(ShowHostMenuAnim);
 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
@@ -303,20 +305,20 @@ void UK_ServerWidget::OpenCreaterWeb()
 	if (HostMenu_web_Popup)
 	{
 		HostMenu_web_Popup->LoadURL(URL);
-		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Visible);
-		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Visible);
+		//HostMenu_web_Popup->SetVisibility(ESlateVisibility::Visible);
+		//HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
 // 웹브라우저 위젯 종료 함수
-void UK_ServerWidget::QuitCreaterWeb()
-{
-	if (HostMenu_web_Popup)
-	{
-		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
-		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
+// void UK_ServerWidget::QuitCreaterWeb()
+// {
+// 	if (HostMenu_web_Popup)
+// 	{
+// 		HostMenu_web_Popup->SetVisibility(ESlateVisibility::Hidden);
+// 		HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
+// 	}
+// }
 
 // (현재) Interface에서 Host 함수를 호출하는 함수 (Origin) ReadyMenu로 정보를 가진채 넘어가기.
 void UK_ServerWidget::CreateRoom()
