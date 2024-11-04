@@ -13,9 +13,8 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ServerUI.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ServerUI.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_ServerWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_ServerWidget.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_ServerWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_ServerWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultInput.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultInput.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MTVS_AirJet_Final.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/MTVS_AirJet_Final.uproject" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +44,10 @@
   }
 }]]></component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="cidr-memory-view://0" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://2" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/UObject/ScriptDelegates.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.gen.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.generated.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -213,7 +215,7 @@
       <workItem from="1730682483023" duration="771000" />
       <workItem from="1730683450830" duration="623000" />
       <workItem from="1730684319705" duration="14000" />
-      <workItem from="1730684343088" duration="8146000" />
+      <workItem from="1730684343088" duration="9142000" />
     </task>
     <servers />
   </component>
