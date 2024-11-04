@@ -10,6 +10,8 @@
 #include "Engine/Engine.h"
 #include "Engine/StaticMesh.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveIconUI.h"
 #include "JBS/J_Utility.h"
 #include "Materials/Material.h"
@@ -72,7 +74,7 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 	if (WidgetClassFinder.Succeeded())
 		iconWorldUIComp->SetWidgetClass(WidgetClassFinder.Class);
 
-	
+   
 }
 
 // Called when the game starts or when spawned
@@ -105,7 +107,9 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 로컬 폰 과의 거리 설정
-	auto* localPC = GetWorld()->GetFirstPlayerController();
+	AJ_MissionPlayerController* localPC;
+	if(!UJ_Utility::GetLocalPlayerController(GetWorld(), localPC)) return;
+	
 	if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
 	{
 		auto* localPawn = localPC->GetPawn();
@@ -187,6 +191,7 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 {
 	if(!HasAuthority()) return;
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
+
 	
 }
 

@@ -19,18 +19,15 @@ class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
 {
 	GENERATED_BODY()
 public:	
-	// Sets default values for this actor's properties
 	AJ_BaseMissionObjective();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	// 미션 액터 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class USceneComponent* rootComp;
 
@@ -40,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UArrowComponent* forWComp;
 
-	// world UI 아이콘 컴포넌트
+	// 아이콘 3d ui 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UJ_CustomWidgetComponent* iconWorldUIComp;
 	// 아이콘 UI
