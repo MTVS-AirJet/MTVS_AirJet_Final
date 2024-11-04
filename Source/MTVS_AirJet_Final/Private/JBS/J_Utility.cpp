@@ -7,9 +7,11 @@
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
+#include "UObject/Object.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
 #include <JBS/J_MissionGamemode.h>
+#include "JBS/J_MissionPlayerController.h"
 #include <Engine/World.h>
 
 // 전역 함수
@@ -137,7 +139,10 @@ FString UJ_Utility::TacticalOrderToString(ETacticalOrder type)
     return result;
 }
 
-
+FString UJ_Utility::ToStringBool(bool value)
+{
+    return value ? TEXT("TRUE") : TEXT("FALSE");
+}
 
 // === 구조체 함수 구현
 
@@ -177,6 +182,15 @@ FTransform FJVector2D::GetTransform() const
     FTransform tr = FTransform(rot,vec,  FVector::OneVector);
 
     return tr;
+}
+
+bool UJ_Utility::GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC)
+{
+    // 로컬 플레이어 찾기
+    outPC = Cast<AJ_MissionPlayerController>(world->GetFirstPlayerController());
+
+    // 유효성 체크
+    return IsValid(outPC);
 }
 
 
