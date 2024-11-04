@@ -473,13 +473,13 @@ private:
 	class UStaticMeshComponent* DummyThrottleMesh;
 	bool bThrottleAccel;
 	bool bThrottleBreak;
-	FVector ThrottleOffLoc = FVector(385 , -28 , 239);
-	FVector ThrottleMilLoc = FVector(395 , -28 , 239);
-	FVector ThrottleMaxLoc = FVector(405 , -28 , 239);
+	FVector ThrottleOffLoc = FVector(515 , -35 , 255);
+	FVector ThrottleMilLoc = FVector(525 , -35 , 255);
+	FVector ThrottleMaxLoc = FVector(530 , -35 , 255);
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
-	float ThrottleMoveSpeed1 = .15f;
+	float ThrottleMoveSpeed1 = .1f;
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
-	float ThrottleMoveSpeed2 = .25f;
+	float ThrottleMoveSpeed2 = .15f;
 	void SetAccelGear();
 	//==================================
 	// 시동 절차

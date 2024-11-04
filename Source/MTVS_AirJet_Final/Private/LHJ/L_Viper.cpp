@@ -974,7 +974,7 @@ void AL_Viper::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// PrintNetLog();
-	
+
 	// 제트엔진 이펙트
 	if (bJetTailVFXOn)
 	{
@@ -1003,7 +1003,7 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region 사운드 감쇠
 	if (JetAudio)
 	{
-		if(JetCameraFPS->IsActive())
+		if (JetCameraFPS->IsActive())
 		{
 			if (CanopyPitch == 0)
 			{
@@ -1016,7 +1016,7 @@ void AL_Viper::Tick(float DeltaTime)
 					JetAudio->bAllowSpatialization = false;
 			}
 		}
-		else if(JetCamera->IsActive())
+		else if (JetCamera->IsActive())
 		{
 			if (JetAudio->bAllowSpatialization)
 				JetAudio->bAllowSpatialization = false;
@@ -1334,7 +1334,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 #pragma region Change Accel Value2
 		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
-		SetAccelGear();
+
 		if (bThrottleAccel)
 		{
 			if (intTriggerNum == 0)
@@ -1399,22 +1399,18 @@ void AL_Viper::Tick(float DeltaTime)
 
 		if (bThrottleBreak)
 		{
+			float newEngineX = 0.f;
 			if (engineLoc.X > ThrottleMilLoc.X)
-			{
-				auto newEngineX = engineLoc.X - ThrottleMoveSpeed2;
-				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-				if (ThrottleMaxLoc.X - newEngineX < 0.2)
-					JetFirstEngine->SetRelativeLocation(ThrottleMilLoc);
-				else
-					JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-			}
+				newEngineX = engineLoc.X - ThrottleMoveSpeed2;
 			else if (engineLoc.X > ThrottleOffLoc.X)
-			{
-				auto newEngineX = engineLoc.X - ThrottleMoveSpeed1;
-				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-				JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-			}
+				newEngineX = engineLoc.X - ThrottleMoveSpeed1;
+			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
+			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 		}
+
+		SetAccelGear();
+		LOG_S(Warning, TEXT("Current Gear X LOC : %f"), JetFirstEngine->GetRelativeLocation().X);
+		LOG_S(Warning, TEXT("Current Gear : %d"), AccelGear);
 #pragma endregion
 
 #pragma region Jet Move
@@ -1918,7 +1914,7 @@ void AL_Viper::SetAccelGear()
 	auto currValue = currAccelGear - ThrottleOffLoc.X;
 	auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 	auto per = currValue / SizeValue * 100;
-	if (per <= 0)
+	if (per <= 5)
 	{
 		// IsEngineOn = false;
 		AccelGear = 0;
