@@ -40,23 +40,20 @@ protected:
 	// 목표 UI 생성
     void InitObjUI();
 
+	// 편대 비행 UI 값 생성
+    void CreateUIData(const FFormationFlightUIData &data, TArray<FTextUIData>& outData, bool isInit = false);
+    void CreateUIData(const FNeutralizeTargetUIData &data, TArray<FTextUIData> &outData, bool isInit = false);
+
 public:
 	// 목표 UI 시작 및 갱신
-	// 편대 비행
 	UFUNCTION(Client, Reliable)
-    void CRPC_StartFFObjUI(ETacticalOrder orderType, FFormationFlightUIData data);
-	// 지상 타겟 무력화
-	UFUNCTION(Client, Reliable)
-    void CRPC_StartObjUI(ETacticalOrder orderType, FNeutralizeTargetUIData data);
+    void CRPC_StartObjUI(FTacticalOrderData orderData);
 
 
     // 목표 UI 갱신
-	// 편대 비행
-	UFUNCTION(Client, Reliable)
-    void CRPC_UpdateFFObjUI(ETacticalOrder orderType, FFormationFlightUIData data);
 	// 지상 타겟 무력화
 	UFUNCTION(Client, Reliable)
-    void CRPC_UpdateObjUI(ETacticalOrder orderType, FNeutralizeTargetUIData data);
+    void CRPC_UpdateObjUI(FTacticalOrderData orderData, bool isInit = false);
 
 
 
@@ -75,11 +72,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class UJ_MissionCompleteUI *GetMissionCompleteUI();
 
-	// 목표 UI 애니메이션 시작
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlayObjUIStartAnim();
+	// XXX // 목표 UI 애니메이션 시작
+	// UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	// void PlayObjUIStartAnim();
 
-	// 목표 UI 애니메이션 값 업데이트
-	UFUNCTION(BlueprintCallable)
-	void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
+	// XXX 목표 UI 애니메이션 값 업데이트
+	// UFUNCTION(BlueprintCallable)
+	// void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
 };

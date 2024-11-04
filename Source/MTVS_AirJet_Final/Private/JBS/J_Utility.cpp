@@ -139,7 +139,10 @@ FString UJ_Utility::TacticalOrderToString(ETacticalOrder type)
     return result;
 }
 
-
+FString UJ_Utility::ToStringBool(bool value)
+{
+    return value ? TEXT("TRUE") : TEXT("FALSE");
+}
 
 // === 구조체 함수 구현
 
@@ -189,3 +192,5 @@ bool UJ_Utility::GetLocalPlayerController(const UWorld *world, class AJ_MissionP
     // 유효성 체크
     return IsValid(outPC);
 }
+
+

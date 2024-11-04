@@ -134,7 +134,8 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
     Super::SRPC_StartNewObjUI();
 
     // 보낼 데이터 
-    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt);
+    FTacticalOrderData orderData(this->orderType, FFormationFlightUIData(), FNeutralizeTargetUIData(spawnTargetAmt, spawnTargetAmt));
+
     
     // 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -142,7 +143,7 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
     {
-        pc->objUIComp->CRPC_StartObjUI(this->orderType, data);
+        pc->objUIComp->CRPC_StartObjUI(orderData);
     }
 }
 
@@ -152,6 +153,7 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
 
     // 보낼 데이터 
     FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt - destroyedTargetAmt);
+    FTacticalOrderData orderData(this->orderType, FFormationFlightUIData(), data);
     
     // 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -159,7 +161,7 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
     {
-        pc->objUIComp->CRPC_UpdateObjUI(this->orderType, data);
+        pc->objUIComp->CRPC_UpdateObjUI(orderData);
     }
 }
 

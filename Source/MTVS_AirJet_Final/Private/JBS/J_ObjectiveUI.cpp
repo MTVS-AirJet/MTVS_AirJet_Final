@@ -8,6 +8,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/WidgetSwitcher.h"
 #include "Engine/Engine.h"
+#include "JBS/J_DetailUI.h"
 #include "JBS/J_ObjectiveSubElementUI.h"
 #include "JBS/J_ObjectiveTextUI.h"
 #include "Styling/SlateColor.h"
@@ -15,12 +16,39 @@
 
 
 
-void UJ_ObjectiveUI::SetObjUI(FTextUIData data)
+void UJ_ObjectiveUI::SetObjUI(FTextUIData data, bool isInit)
 {
-    // SetObjHeaderText(data.headerText);
-    // SetObjBodyText(data.bodyTextAry);
-    // 설정
-    objectiveTextUI->SetTextUI(data);
+    // ui 설정
+    objectiveTextUI->SetTextUI(data, isInit);
+}
+
+void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)
+{
+    // ui 설정
+    objectiveTextUI->SetTextUI(data[0], isInit);
+    // 상세 ui 설정
+    DETAIL_TEXT_UI->SetTextUI(data[1], isInit);
+}
+
+
+
+void UJ_ObjectiveUI::StartObjUI()
+{
+    // 시작 UMG 애니메이션 바인드 | settextui 이후 실행
+    objectiveTextUI->startAnimDel.BindUObject(this, &UJ_ObjectiveUI::PlayObjStartAnim);
+
+    // 글자 색 초기화
+    ResetTextColor();
+    
+}
+
+void UJ_ObjectiveUI::EndObjUI(bool isSuccess)
+{
+    // 완료 UMG
+    PlayObjEndAnim(this->GetObjTextUI());
+
+    // @@ 취소선 처리?
+    // umg 종료후 비활성화 | 지금은 하드코딩으로 맞추고 있음
 }
 
 void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
@@ -50,27 +78,22 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
     // @@ 취소선 처리?
 }
 
-void UJ_ObjectiveUI::EndObjUI(bool isSuccess)
+
+
+void UJ_ObjectiveUI::ActiveResultUI(const TArray<FObjectiveData>& resultObjData)
 {
-    // XXX 성공 유무에 따라 텍스트 색상 변경 | UMG 에서 처리
-    // objHeaderText->SetColorAndOpacity(isSuccess ? successTextColor : failTextColor);
+    MissionUI_Switcher->SetActiveWidget(missionCompleteUI);
+    
+    // FString asd = FString::Printf(TEXT("결과 obj 개수 : %d"), resultObjData.Num());
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *asd));
+    // UE_LOG(LogTemp, Warning, TEXT("%s"), *asd);
 
-    // @@ 취소선 처리?
-
-    // 완료 UMG
-    endAnimDel.Broadcast();
-    // PlayObjEndAnim();
-    // umg 종료후 비활성화 | 지금은 하드코딩으로 맞추고 있음
+    missionCompleteUI->SetResultListValue(resultObjData);
 }
 
-void UJ_ObjectiveUI::StartObjUI()
+void UJ_ObjectiveUI::ResetTextColor()
 {
-    // 시작 UMG
-    startAnimDel.Broadcast();
-    // PlayObjStartAnim();
-
-    // FIXME 글자 색 초기화
-    // objHeaderText->SetColorAndOpacity(defaultTextColor);
+// objHeaderText->SetColorAndOpacity(defaultTextColor);
 
     // FIXME
     // auto allSub = objBodyElementVBox->GetAllChildren();
@@ -86,18 +109,6 @@ void UJ_ObjectiveUI::StartObjUI()
     // }
     // objBodyText->SetColorAndOpacity(defaultTextColor);
 }
-
-void UJ_ObjectiveUI::ActiveResultUI(const TArray<FObjectiveData>& resultObjData)
-{
-    MissionUI_Switcher->SetActiveWidget(missionCompleteUI);
-    
-    // FString asd = FString::Printf(TEXT("결과 obj 개수 : %d"), resultObjData.Num());
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *asd));
-    // UE_LOG(LogTemp, Warning, TEXT("%s"), *asd);
-
-    missionCompleteUI->SetResultListValue(resultObjData);
-}
-
 
 
 

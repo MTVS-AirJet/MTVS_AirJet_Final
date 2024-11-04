@@ -9,6 +9,8 @@
 /**
  * 
  */
+DECLARE_DELEGATE_OneParam(FUIAnimDel, class UJ_ObjectiveTextUI*);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_ObjectiveTextUI : public UJ_BaseTextUI
 {
@@ -32,22 +34,32 @@ protected:
 	// 서브 조건 요소 UI 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TSubclassOf<class UJ_ObjectiveSubElementUI> objSubEleUIPrefab;
-
 public:
+	// 시작 애니메이션 딜리게이트
+	FUIAnimDel startAnimDel;
 
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
+    void SetBodyTextValue(class UWidget *textWidget, const FString &str) override;
 
 public:
 	// 명령 UI 설정
-    void SetTextUI(FTextUIData data) override;
+    void SetTextUI(FTextUIData data, bool isInit = false) override;
 
 	// 서브 조건 요소 설정
     UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str) override;
 
 	
 
-	// 전술명령 UI 요소 값 적용 | 애니메이션에 사용
-    void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
+	// XXX 전술명령 UI 요소 값 적용 | 애니메이션에 사용
+    // void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
+
+	// ui 애니메이션
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayStartAnim(const TArray<UWidget*>& allSub);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayEndAnim(const TArray<UWidget*>& allSub);
+	
 };
