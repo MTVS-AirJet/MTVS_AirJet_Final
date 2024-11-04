@@ -7,8 +7,6 @@
 #include "KHS/K_JsonParseLib.h"
 #include "K_ServerWidget.generated.h"
 
-
-
 USTRUCT()
 struct FServerData
 {
@@ -57,8 +55,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* MenuSwitcher; // 각 위젯으로 전환시킬 수 있는 Menu Switcher
 
-	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	class UWidgetAnimation* ShowTransitionAnim; 
+	//UPROPERTY(meta = (BindWidgetAnim), Transient)
+	//class UWidgetAnimation* ShowTransitionAnim; 
 
 	UPROPERTY(meta = (BindWidgetAnim) , Transient)
 	class UWidgetAnimation* ShowServerMenuAnim; 
@@ -72,11 +70,6 @@ public:
 	UPROPERTY(meta = (BindWidgetAnim) , Transient)
 	class UWidgetAnimation* HideHostMenuAnim;
 
-	//UPROPERTY(meta = (BindWidgetAnim) , Transient)
-	//class UWidgetAnimation* ShowReadyMenuAnim;
-	
-	//UPROPERTY(meta = (BindWidgetAnim) , Transient)
-	//class UWidgetAnimation* HideReadyMenuAnim;
 
 	// Server Menu ==================================================
 
@@ -114,14 +107,14 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* HostMenu_btn_Create; // 방 생성 버튼 
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* HostMenu_btn_LoadMap; // 맵 불러오기 버튼 
+	//UPROPERTY(meta = (BindWidget))
+	//class UButton* HostMenu_btn_LoadMap; // 맵 불러오기 버튼 
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* HostMenu_btn_Cancel; // 로비로 돌아가기 버튼
 	
-	UPROPERTY(meta = (BindWidget))
-	class UButton* HostMenu_btn_WebQuit; // 로비로 돌아가기 버튼
+	//UPROPERTY(meta = (BindWidget))
+	//class UButton* HostMenu_btn_WebQuit; // 로비로 돌아가기 버튼
 	
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* HostMenu_txt_RoomName; // 방이름 입력 텍스트
@@ -163,8 +156,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OpenServerMenuFromHost(); // Server메뉴로 돌아가는 함수
 
-	UFUNCTION(BlueprintCallable)
-	void OpenServerMenuFromReady(); // Server메뉴로 돌아가는 함수
+	// UFUNCTION(BlueprintCallable)
+	//void OpenServerMenuFromReady(); // Server메뉴로 돌아가는 함수
 
 	UFUNCTION(BlueprintCallable)
 	void OpenLobbyLevel(); // Lobby 맵으로 돌아가는 함수
@@ -196,8 +189,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OpenCreaterWeb(); // 크리에이터툴 웹서비스로 접속하는 함수
 
-	UFUNCTION(BlueprintCallable)
-	void QuitCreaterWeb(); // 웹브라우저 위젯 종료 함수
+	// UFUNCTION(BlueprintCallable)
+	// void QuitCreaterWeb(); // 웹브라우저 위젯 종료 함수
 
 	UFUNCTION(BlueprintCallable)
 	void ReqMapInfo(); //mapName입력내용 기준으로 서버에 요청하는 함수
