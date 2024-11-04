@@ -500,10 +500,10 @@ private:
 	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
 	void PerformLineTrace();
 	void BackMoveCanopyHandle();
-	FVector CanopyOpenLoc = FVector(368 , 30 , 253);
-	FVector CanopyNormalLoc = FVector(373 , 30 , 253);
-	FVector CanopyCloseLoc = FVector(378 , 30 , 253);
-	FVector CanopyHoldLoc = FVector(383 , 30 , 253);
+	FVector CanopyOpenLoc = FVector(492 , 37 , 274);
+	FVector CanopyNormalLoc = FVector(497, 37 , 274);
+	FVector CanopyCloseLoc = FVector(502 ,37, 274);
+	FVector CanopyHoldLoc = FVector(507 , 37, 274);
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")

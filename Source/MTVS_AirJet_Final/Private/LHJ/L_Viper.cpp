@@ -80,7 +80,7 @@ AL_Viper::AL_Viper()
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(JetMesh);
 	JetFirstEngine->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
-	JetFirstEngine->SetRelativeLocation(FVector(385 , -28 , 239));
+	JetFirstEngine->SetRelativeLocation(FVector(515 , -35 , 255));
 	JetFirstEngine->SetBoxExtent(FVector(3 , 3 , 5));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
@@ -89,7 +89,7 @@ AL_Viper::AL_Viper()
 	JetMic = CreateDefaultSubobject<UBoxComponent>(TEXT("JetMic"));
 	JetMic->SetupAttachment(JetMesh);
 	JetMic->SetRelativeScale3D(FVector(4));
-	JetMic->SetRelativeLocation(FVector(373.5 , -36.1 , 237.6));
+	JetMic->SetRelativeLocation(FVector(503.5 , -45 , 253));
 	JetMic->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetMic->SetGenerateOverlapEvents(true);
 	JetMic->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
@@ -98,7 +98,7 @@ AL_Viper::AL_Viper()
 	JetEngineGen = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen"));
 	JetEngineGen->SetupAttachment(JetMesh);
 	JetEngineGen->SetRelativeScale3D(FVector(4));
-	JetEngineGen->SetRelativeLocation(FVector(395 , 25 , 237));
+	JetEngineGen->SetRelativeLocation(FVector(524 , 33 , 253));
 	JetEngineGen->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen->SetGenerateOverlapEvents(true);
 	JetEngineGen->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen1Clicked);
@@ -107,7 +107,7 @@ AL_Viper::AL_Viper()
 	JetEngineGen2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen2"));
 	JetEngineGen2->SetupAttachment(JetMesh);
 	JetEngineGen2->SetRelativeScale3D(FVector(4));
-	JetEngineGen2->SetRelativeLocation(FVector(395 , 26.2 , 237));
+	JetEngineGen2->SetRelativeLocation(FVector(524 , 34 , 253));
 	JetEngineGen2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineGen2->SetGenerateOverlapEvents(true);
 	JetEngineGen2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen2Clicked);
@@ -116,7 +116,7 @@ AL_Viper::AL_Viper()
 	JetEngineControl = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl"));
 	JetEngineControl->SetupAttachment(JetMesh);
 	JetEngineControl->SetRelativeScale3D(FVector(4));
-	JetEngineControl->SetRelativeLocation(FVector(395 , 29.4 , 237));
+	JetEngineControl->SetRelativeLocation(FVector(524 , 37.5 , 253));
 	JetEngineControl->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl->SetGenerateOverlapEvents(true);
 	JetEngineControl->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControlClicked);
@@ -124,7 +124,7 @@ AL_Viper::AL_Viper()
 
 	JetEngineControl2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl2"));
 	JetEngineControl2->SetupAttachment(JetMesh);
-	JetEngineControl2->SetRelativeLocation(FVector(395 , 30.7 , 237));
+	JetEngineControl2->SetRelativeLocation(FVector(524 , 38.5 , 253));
 	JetEngineControl2->SetRelativeScale3D(FVector(4));
 	JetEngineControl2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineControl2->SetGenerateOverlapEvents(true);
@@ -133,7 +133,7 @@ AL_Viper::AL_Viper()
 
 	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
 	JetFuelStarter->SetupAttachment(JetMesh);
-	JetFuelStarter->SetRelativeLocation(FVector(395 , 28 , 237));
+	JetFuelStarter->SetRelativeLocation(FVector(524 , 36 , 253));
 	JetFuelStarter->SetRelativeScale3D(FVector(4));
 	JetFuelStarter->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetFuelStarter->SetGenerateOverlapEvents(true);
@@ -142,7 +142,7 @@ AL_Viper::AL_Viper()
 
 	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
 	JetEngineMaster->SetupAttachment(JetMesh);
-	JetEngineMaster->SetRelativeLocation(FVector(390 , 25 , 237));
+	JetEngineMaster->SetRelativeLocation(FVector(518 , 33.5 , 253));
 	JetEngineMaster->SetRelativeScale3D(FVector(4));
 	JetEngineMaster->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster->SetGenerateOverlapEvents(true);
@@ -151,7 +151,7 @@ AL_Viper::AL_Viper()
 
 	JetEngineMaster2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster2"));
 	JetEngineMaster2->SetupAttachment(JetMesh);
-	JetEngineMaster2->SetRelativeLocation(FVector(390 , 30 , 237));
+	JetEngineMaster2->SetRelativeLocation(FVector(518 , 38 , 253));
 	JetEngineMaster2->SetRelativeScale3D(FVector(4));
 	JetEngineMaster2->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetEngineMaster2->SetGenerateOverlapEvents(true);
@@ -160,7 +160,7 @@ AL_Viper::AL_Viper()
 
 	JetJFSHandle = CreateDefaultSubobject<UBoxComponent>(TEXT("JetJFSHandle"));
 	JetJFSHandle->SetupAttachment(JetMesh);
-	JetJFSHandle->SetRelativeLocation(FVector(410 , 28 , 236.5));
+	JetJFSHandle->SetRelativeLocation(FVector(550 , 34.5 , 258));
 	JetJFSHandle->SetRelativeScale3D(FVector(1));
 	JetJFSHandle->SetBoxExtent(FVector(3 , 2 , 2));
 	JetJFSHandle->SetGenerateOverlapEvents(true);
@@ -169,8 +169,8 @@ AL_Viper::AL_Viper()
 
 	JetCanopy = CreateDefaultSubobject<UBoxComponent>(TEXT("JetCanopy"));
 	JetCanopy->SetupAttachment(JetMesh);
-	JetCanopy->SetRelativeLocation(FVector(373 , 30 , 253));
-	JetCanopy->SetRelativeScale3D(FVector(1));
+	JetCanopy->SetRelativeLocation(FVector(497 , 37 , 274));
+	JetCanopy->SetRelativeScale3D(FVector(1.5));
 	JetCanopy->SetBoxExtent(FVector(3 , 6 , 3));
 	JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 	JetCanopy->SetGenerateOverlapEvents(true);
@@ -178,12 +178,12 @@ AL_Viper::AL_Viper()
 	//JetCanopy->SetHiddenInGame(false); // For Test
 
 	JetLeftPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetLeftPannel"));
-	JetLeftPannel->SetRelativeLocation(FVector(-298 , 7 , -16.85));
-	JetLeftPannel->SetRelativeScale3D(FVector(1.3 , 1 , 1));
+	JetLeftPannel->SetRelativeLocation(FVector(-271 , -2 , 0));
+	JetLeftPannel->SetRelativeScale3D(FVector(1.5 , 1 , 1));
 	JetLeftPannel->SetupAttachment(JetMesh);
 
 	JetRightPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetRightPannel"));
-	JetRightPannel->SetRelativeLocation(FVector(-684 , 7 , -16.7));
+	JetRightPannel->SetRelativeLocation(FVector(-555 , 1 , 0));
 	JetRightPannel->SetRelativeScale3D(FVector(2 , 1 , 1));
 	JetRightPannel->SetupAttachment(JetMesh);
 
@@ -195,14 +195,14 @@ AL_Viper::AL_Viper()
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
-	JetWidget->SetDrawSize(FVector2D(300 , 200));
+	JetWidget->SetDrawSize(FVector2D(200 , 150));
 
 	movement = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movement"));
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
 	// 조종석 뷰
-	JetSprintArmFPS->SetRelativeLocationAndRotation(FVector(350 , 0 , 310) , FRotator(-30 , 0 , 0));
+	JetSprintArmFPS->SetRelativeLocationAndRotation(FVector(500 , 0 , 330) , FRotator(0 , 0 , 0));
 	JetSprintArmFPS->TargetArmLength = 0.f;
 	JetSprintArmFPS->bEnableCameraRotationLag = true;
 	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
@@ -620,7 +620,7 @@ void AL_Viper::F_ViperLook(const FInputActionValue& value)
 			FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
 			float newFpsYaw = FPSrot.Yaw + v.X;
 			float newFpsPitch = FPSrot.Pitch + v.Y;
-			newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -150.f , 150.f);
+			newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -100.f , 100.f);
 			newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
 			JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
 		}
@@ -973,8 +973,8 @@ void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	PrintNetLog();
-
+	// PrintNetLog();
+	
 	// 제트엔진 이펙트
 	if (bJetTailVFXOn)
 	{
@@ -1003,12 +1003,20 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region 사운드 감쇠
 	if (JetAudio)
 	{
-		if (CanopyPitch == 0)
+		if(JetCameraFPS->IsActive())
 		{
-			if (!JetAudio->bAllowSpatialization)
-				JetAudio->bAllowSpatialization = true;
+			if (CanopyPitch == 0)
+			{
+				if (!JetAudio->bAllowSpatialization)
+					JetAudio->bAllowSpatialization = true;
+			}
+			else
+			{
+				if (JetAudio->bAllowSpatialization)
+					JetAudio->bAllowSpatialization = false;
+			}
 		}
-		else
+		else if(JetCamera->IsActive())
 		{
 			if (JetAudio->bAllowSpatialization)
 				JetAudio->bAllowSpatialization = false;
@@ -1778,9 +1786,9 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 	for (int i = 0; i < RangeCnt; i++)
 	{
 		Diametr *= 2.f;
-		Start += (ForwardVector * Diametr / 2) + (DownVector * Diametr / 2);
+		Start += (ForwardVector * Diametr / 4) + (DownVector * Diametr / 2);
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::None , OutHit , true))
+		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
 		{
 			for (auto hit : OutHit)
 			{
@@ -1894,6 +1902,7 @@ void AL_Viper::CreateDumyComp()
 
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
+	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
 	DummyThrottleMesh->SetRelativeLocation(FVector(0 , 0 , -8));
 
 	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
