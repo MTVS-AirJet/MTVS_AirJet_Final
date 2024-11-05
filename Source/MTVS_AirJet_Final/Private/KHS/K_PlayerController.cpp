@@ -9,6 +9,8 @@
 #include "LHJ/L_Viper.h"
 #include "Kismet/GameplayStatics.h"
 #include <MTVS_AirJet_Final.h>
+
+#include "DetailCategoryBuilder.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
@@ -26,6 +28,8 @@ void AK_PlayerController::BeginPlay()
 		if (CommonWidget)
 		{
 			CommonWidget->SetInterface(Cast<IK_SessionInterface>(GetGameInstance()));
+			CommonWidget->AddToViewport(1);
+			CommonWidget->SetVisibility(ESlateVisibility::Hidden);
 			bIsCommonWidgetVisible = false; //평소엔 안보이게 처리
 		}
 	}
@@ -35,7 +39,7 @@ void AK_PlayerController::BeginPlay()
 		GetLocalPlayer());
 	if (Subsystem)
 	{
-		Subsystem->AddMappingContext(IMC_Common , 1); //Zorder를 1번으로 설정.
+		Subsystem->AddMappingContext(IMC_Common , 0); //Zorder를 1번으로 설정.
 	}
 
 	//마우스커서는 평소엔 안보이게 처리
@@ -95,17 +99,17 @@ void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
 	//플래그에 따라 UI상태 제어
 	if (bIsCommonWidgetVisible)
 	{
-		if (CommonWidget->IsInViewport())
-			CommonWidget->RemoveFromParent();
-
+		// if (CommonWidget->IsInViewport())
+		// 	CommonWidget->RemoveFromParent();
+		CommonWidget->SetVisibility(ESlateVisibility::Hidden);
 		FInputModeGameOnly InputGameOnly;
 		SetInputMode(InputGameOnly);
 		bIsCommonWidgetVisible = false;
 	}
 	else
 	{
-		CommonWidget->AddToViewport(1);
-
+		//CommonWidget->AddToViewport(1);
+		CommonWidget->SetVisibility(ESlateVisibility::Visible);
 		FInputModeGameAndUI InputGameAndUI;
 		SetInputMode(InputGameAndUI);
 		bIsCommonWidgetVisible = true;
@@ -197,20 +201,6 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 	LOG_S(Warning , TEXT("Is Not Local Controller"));
 }
 
-//void AK_PlayerController::ClientRPC_UpdatePlayerList_Implementation(const TArray<FString>& playerNames)
-//{
-//	
-//}
-
-
-////클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
-//void AK_PlayerController::ServerRPC_RequestPlayerListUpdate_Implementation()
-//{
-//	if ( UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()) )
-//	{
-//		GI->SendPlayerListToClient(this);
-//	}
-//}
 
 
 void AK_PlayerController::TravelToLobbyLevel()

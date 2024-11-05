@@ -67,13 +67,6 @@ public:
     void ToggleMouseCursor(const struct FInputActionValue& value);
 
 
-   //클라이언트 PlayerList Update RPC함수
-   //UFUNCTION(Client, Reliable)
-   //void ClientRPC_UpdatePlayerList(const TArray<FString>& playerNames);
-
-   //클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
-   /*UFUNCTION(Server, Reliable)
-   void ServerRPC_RequestPlayerListUpdate();*/
 
     // 클라이언트를 로비 레벨로 트래블시키는 함수
     UFUNCTION(BlueprintCallable)
