@@ -83,6 +83,10 @@
 				"Android",
 				"VisionOS"
 			]
+		},
+		{
+			"Name": "RawInput",
+			"Enabled": true
 		}
 	]
 }
