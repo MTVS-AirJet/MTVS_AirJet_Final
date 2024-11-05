@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_Utility.h"
 #include "L_Viper.generated.h"
 
 UENUM()
@@ -593,4 +594,9 @@ private:
 	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
 	UFUNCTION(Client, Reliable)
 	void CRPC_CameraShake();
+
+#pragma region JBS 추가 부분
+public:
+	FSuccessProgress engineProgSuccessDel;
+#pragma endregion
 };

@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "JBS/J_Utility.h"
 #include "MTVS_AirJet_Final.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -918,41 +919,41 @@ void AL_Viper::BeginPlay()
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
 
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle , [this]()
-		{
-			LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
-			bReadyTimeEndFlag = true;
-			if (!IsStart)
-			{
-				FKey lMouse = EKeys::LeftMouseButton;
-				if (JetMic && !bMIC)
-					OnMyMicClicked(JetMic , lMouse);
-				if (JetEngineGen && !bEngineGen1)
-					OnMyEngineGen1Clicked(JetEngineGen , lMouse);
-				if (JetEngineGen2 && !bEngineGen2)
-					OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
-				if (JetEngineControl && !bEngineControl1)
-					OnMyEngineControlClicked(JetEngineControl , lMouse);
-				if (JetEngineControl2 && !bEngineControl2)
-					OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
-				if (JetEngineMaster && !bEngineMaster1)
-					OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
-				if (JetEngineMaster2 && !bEngineMaster2)
-					OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
-				if (JetFuelStarter && !bJFS)
-					OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
-				if (JetJFSHandle && !bJFSHandle)
-					OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
-				if (JetFirstEngine && !bFirstEngine)
-					OnMyFirstEngineClicked(JetFirstEngine , lMouse);
-				if (JetCanopy && iCanopyNum != 2)
-				{
-					JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-					iCanopyNum = 2;
-				}
-			}
-		} , TimeToReady , false);
+	// 	FTimerHandle TimerHandle;
+	// 	GetWorldTimerManager().SetTimer(TimerHandle , [this]()
+	// 	{
+	// 		LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
+	// 		bReadyTimeEndFlag = true;
+	// 		if (!IsStart)
+	// 		{
+	// 			FKey lMouse = EKeys::LeftMouseButton;
+	// 			if (JetMic && !bMIC)
+	// 				OnMyMicClicked(JetMic , lMouse);
+	// 			if (JetEngineGen && !bEngineGen1)
+	// 				OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+	// 			if (JetEngineGen2 && !bEngineGen2)
+	// 				OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+	// 			if (JetEngineControl && !bEngineControl1)
+	// 				OnMyEngineControlClicked(JetEngineControl , lMouse);
+	// 			if (JetEngineControl2 && !bEngineControl2)
+	// 				OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+	// 			if (JetEngineMaster && !bEngineMaster1)
+	// 				OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+	// 			if (JetEngineMaster2 && !bEngineMaster2)
+	// 				OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+	// 			if (JetFuelStarter && !bJFS)
+	// 				OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+	// 			if (JetJFSHandle && !bJFSHandle)
+	// 				OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+	// 			if (JetFirstEngine && !bFirstEngine)
+	// 				OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+	// 			if (JetCanopy && iCanopyNum != 2)
+	// 			{
+	// 				JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+	// 				iCanopyNum = 2;
+	// 			}
+	// 		}
+	// 	} , TimeToReady , false);
 	}
 
 	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
@@ -1065,6 +1066,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bMIC)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::MIC_SWITCH_ON);
 						DummyMICMesh->SetRenderCustomDepth(false);
 						DummyMICMesh->CustomDepthStencilValue = 0;
 					}
@@ -1082,6 +1084,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineGen1 && bEngineGen2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_GEN_SWITCH_ON);
 						DummyEngineGenerMesh1->SetRenderCustomDepth(false);
 						DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
 						DummyEngineGenerMesh2->SetRenderCustomDepth(false);
@@ -1101,6 +1104,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineControl1 && bEngineControl2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_CONTROL_SWITCH_ON);
 						DummyEngineControlMesh1->SetRenderCustomDepth(false);
 						DummyEngineControlMesh1->CustomDepthStencilValue = 0;
 						DummyEngineControlMesh2->SetRenderCustomDepth(false);
@@ -1118,6 +1122,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFS)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_STARTER_SWITCH_ON);
 						DummyJFSMesh->SetRenderCustomDepth(false);
 						DummyJFSMesh->CustomDepthStencilValue = 0;
 					}
@@ -1135,6 +1140,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineMaster1 && bEngineMaster2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_MASTER_SWITCH_ON);
 						DummyEngineMasterMesh1->SetRenderCustomDepth(false);
 						DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
 						DummyEngineMasterMesh2->SetRenderCustomDepth(false);
@@ -1152,6 +1158,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFSHandle)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_HANDLE_PULL);
 						DummyJFSHandleMesh->SetRenderCustomDepth(false);
 						DummyJFSHandleMesh->CustomDepthStencilValue = 0;
 					}
@@ -1165,6 +1172,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (bFirstEngine)
 				{
 					StartScenario.pop();
+					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_THROTTLE_IDLE);
 					DummyThrottleMesh->SetRenderCustomDepth(false);
 					DummyThrottleMesh->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 0);
@@ -1207,6 +1215,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
 						CRPC_AudioControl(true , 1);
 					}
 				}

@@ -11,6 +11,7 @@
 #include "JBS/J_ObjectiveUIComp.h"
 #include "KHS/K_LoadingWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "LHJ/L_Viper.h"
 #include "Math/MathFwd.h"
 #include <KHS/K_GameInstance.h>
 #include <JBS/J_Utility.h>
@@ -111,6 +112,10 @@ void AJ_MissionPlayerController::CRPC_SpawnMyPlayer_Implementation(APawn *newPaw
 void AJ_MissionPlayerController::OnPossess(APawn *newPawn)
 {
     Super::OnPossess(newPawn);
+
+    // 포제스 시 시동 절차 수행 딜리게이트 바인드
+    auto* pilot = Cast<AL_Viper>(newPawn);
+    pilot->engineProgSuccessDel.BindUObject(this, &AJ_MissionPlayerController::SendEngineProgressSuccess);
     
     if(this->IsLocalPlayerController())
     {
@@ -202,4 +207,10 @@ void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransfo
     // 전송
     auto* pawn = this->GetPawn();
     pawn->SetActorTransform(tpTR);
+}
+
+void AJ_MissionPlayerController::SendEngineProgressSuccess(EEngineProgress type)
+{
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2 mpc"));
+    sendEngineProgDel.ExecuteIfBound(this, type);
 }
