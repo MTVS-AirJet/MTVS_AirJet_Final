@@ -74,6 +74,8 @@ private: // Component
 	class UBoxComponent* JetJFSHandle;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* JetCanopy;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetBreakHold;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetLeftPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
@@ -146,6 +148,8 @@ private:
 	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -481,6 +485,10 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
 	float ThrottleMoveSpeed2 = .15f;
 	void SetAccelGear();
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyJFSBreakHold;
+	bool bBreakHold;
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
@@ -593,4 +601,10 @@ private:
 	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
 	UFUNCTION(Client, Reliable)
 	void CRPC_CameraShake();
+
+private:
+	void GenericAxis1(float Value);
+	void GenericAxis3(float Value);
+	void GenericAxis4(float Value);
+	void GenericAxis6(float Value);
 };
