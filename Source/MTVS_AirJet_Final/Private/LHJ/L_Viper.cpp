@@ -354,7 +354,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+#pragma region Enhanced Input
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 	{
@@ -416,6 +416,14 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ViperDevelop , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperDevelopStarted);
 	}
+#pragma endregion
+	
+#pragma region Axis Mapping
+	PlayerInputComponent->BindAxis("GA1", this, &AL_Viper::GenericAxis1);
+	PlayerInputComponent->BindAxis("GA3", this, &AL_Viper::GenericAxis3);
+	PlayerInputComponent->BindAxis("GA4", this, &AL_Viper::GenericAxis4);
+	PlayerInputComponent->BindAxis("GA6", this, &AL_Viper::GenericAxis6);
+#pragma endregion
 }
 
 void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
@@ -1534,6 +1542,7 @@ void AL_Viper::Tick(float DeltaTime)
 		// 100 = 1m, 1000000=1km, 1km = 0.539957 Note
 		float km = ValueOfMoveForce / 1000000.f;
 		int32 ValueOfMoveForceInNote = static_cast<int32>(km * 0.539957);
+		ValueOfMoveForceInNote *= 60;
 		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
 		{
 			HUDui->UpdateSpeedText(ValueOfMoveForceInNote);
@@ -2236,4 +2245,24 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 {
 	if (LoadCameraShake)
 		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
+}
+
+void AL_Viper::GenericAxis1(float Value)
+{
+	LOG_SCREEN("%f" , Value);
+}
+
+void AL_Viper::GenericAxis3(float Value)
+{
+	LOG_SCREEN("%f" , Value);
+}
+
+void AL_Viper::GenericAxis4(float Value)
+{
+	LOG_SCREEN("%f" , Value);
+}
+
+void AL_Viper::GenericAxis6(float Value)
+{
+	LOG_SCREEN("%f" , Value);
 }

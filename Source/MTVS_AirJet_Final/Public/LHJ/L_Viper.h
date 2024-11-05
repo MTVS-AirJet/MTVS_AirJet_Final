@@ -601,4 +601,10 @@ private:
 	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
 	UFUNCTION(Client, Reliable)
 	void CRPC_CameraShake();
+
+private:
+	void GenericAxis1(float Value);
+	void GenericAxis3(float Value);
+	void GenericAxis4(float Value);
+	void GenericAxis6(float Value);
 };
