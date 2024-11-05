@@ -158,7 +158,10 @@ void UK_StandbyWidget::ClientUpdatePlayerList_Implementation(const TArray<FStrin
 //게임시작 버튼 바인딩 함수
 void UK_StandbyWidget::StartMission()
 {
-    RemoveUI();
+    PlayerController = Cast<AK_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld() , 0));
+    if(PlayerController)
+        PlayerController->SRPC_StartGame();
+    //RemoveUI();
 }
 
 //로비레벨로 돌아가는 함수
