@@ -4,12 +4,11 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
-#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GenericPlatform/ICursor.h"
 #include "JBS/J_BaseMissionPawn.h"
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "KHS/K_LoadingWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
@@ -19,29 +18,22 @@
 #include "KHS/K_StreamingUI.h"
 #include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
-#include "UObject/Class.h"
-#include "UObject/Linker.h"
+#include "UObject/ConstructorHelpers.h"
+#include "UObject/UObjectGlobals.h"
 
 AJ_MissionPlayerController::AJ_MissionPlayerController()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryActorTick.bCanEverTick = true;
-    
-	// ...
-    objUIComp = CreateDefaultSubobject<UJ_ObjectiveUIComponent>(TEXT("objUIComp"));
 }
 
 void AJ_MissionPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    // solved 임시 spawnpos 가져오기
-    // TArray<AActor*> outActors;
-    // UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), FName(TEXT("SpawnPos")), outActors);
-    // spawnTR = outActors[0]->GetActorTransform();
-
-    
+    // objuiComp 가져오기
+    objUIComp = GetComponentByClass<UJ_ObjectiveUIComp>();
 }
 
 

@@ -36,7 +36,7 @@ protected:
 public:
 	// 목표 UI 관리 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
-	class UJ_ObjectiveUIComponent* objUIComp;
+	class UJ_ObjectiveUIComp* objUIComp;
 
 	// 파일럿 역할
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", Replicated)

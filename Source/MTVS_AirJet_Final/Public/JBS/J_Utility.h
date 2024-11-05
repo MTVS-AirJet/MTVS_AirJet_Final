@@ -396,7 +396,7 @@ enum class EFormationChecklist : uint8
 
 // 목표 UI 표시용 
 USTRUCT(BlueprintType)
-struct FObjUIData
+struct FTextUIData
 {
     GENERATED_BODY()
 public:
@@ -435,8 +435,8 @@ public:
     FFormationFlightUIData() {}
 
     FFormationFlightUIData(
-        float checkHeight, float curHeight, EPilotRole pilotRole, bool checkFormation, bool isCorrectPosition) :
-        checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), checkFormation(checkFormation), isCorrectPosition(isCorrectPosition) {}
+        bool checkFormation, float checkHeight, float curHeight, EPilotRole pilotRole,  bool isCorrectPosition) :
+        checkFormation(checkFormation), checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), isCorrectPosition(isCorrectPosition) {}
 };
 
 // 2. 목표 무력화
@@ -457,9 +457,35 @@ public:
     FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
 };
 
+// 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
+USTRUCT(BlueprintType)
+struct FTacticalOrderData
+{
+    GENERATED_BODY()
+public:
+    // 생성자
+    FTacticalOrderData() {}
+
+    FTacticalOrderData(
+        ETacticalOrder orderType, FFormationFlightUIData ffData = FFormationFlightUIData(), FNeutralizeTargetUIData ntData = FNeutralizeTargetUIData()) 
+        : orderType(orderType), ffData(ffData), ntData(ntData) {}
+
+    // 명령 종류
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    ETacticalOrder orderType;
+
+    // 편대비행
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FFormationFlightUIData ffData;
+    // 지대공 무력화
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FNeutralizeTargetUIData ntData;
+    // 이동
+};
+
 #pragma endregion
 
-// @@ 테스트 용
+// solved 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
 {
@@ -518,6 +544,10 @@ public:
     static FString PilotRoleToString(EPilotRole role);
     // 전술명령 enum -> string 변환
     static FString TacticalOrderToString(ETacticalOrder type);
+    // 레벨 로컬 플레이어 컨트롤러 가져오기
+    static bool GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC);
+    // bool 값 FString 으로 변환
+    static FString ToStringBool(bool value);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1500000.f;
