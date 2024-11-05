@@ -13,7 +13,9 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MTVS_AirJet_Final.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/MTVS_AirJet_Final.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_StandbyWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_StandbyWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_PlayerController.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,6 +222,7 @@
       <workItem from="1730766862291" duration="8111000" />
       <workItem from="1730784324543" duration="1324000" />
       <workItem from="1730785772627" duration="814000" />
+      <workItem from="1730786675586" duration="3690000" />
     </task>
     <servers />
   </component>
@@ -241,6 +244,32 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_StandbyWidget.cpp</url>
+          <line>162</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp</url>
+          <line>105</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp</url>
+          <line>111</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp</url>
+          <line>127</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
