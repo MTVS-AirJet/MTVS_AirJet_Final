@@ -20,13 +20,6 @@ void AJ_ObjectiveNeutralizeTarget::BeginPlay()
 
     // 활성화시 지상 목표 생성 바인드
     objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget);
-    // 활성화시 목표 UI 생성 바인드
-    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI);
-    // 수행도 갱신시 목표 UI 값 갱신 바인드
-    objSuccessUpdateDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI);
-    // 목표 완료시 목표 UI 완료 바인드
-    objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI);
-    objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI);
 }
 
 bool AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform(FTransform& outSpawnTR)
@@ -134,7 +127,7 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
     Super::SRPC_StartNewObjUI();
 
     // 보낼 데이터 
-    FTacticalOrderData orderData(this->orderType, FFormationFlightUIData(), FNeutralizeTargetUIData(spawnTargetAmt, spawnTargetAmt));
+    auto orderData = SetObjUIData();
 
     
     // 모든 pc 가져오기
@@ -152,8 +145,7 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
     Super::SRPC_UpdateObjUI();
 
     // 보낼 데이터 
-    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt - destroyedTargetAmt);
-    FTacticalOrderData orderData(this->orderType, FFormationFlightUIData(), data);
+    auto orderData = SetObjUIData();
     
     // 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -168,27 +160,16 @@ void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
 void AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI()
 {
     Super::SRPC_EndObjUI();
-
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-        pc->objUIComp->CRPC_EndObjUI();
-    }
 }
 
-void AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI()
+// void AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI()
+// {
+//     Super::SRPC_EndSubObjUI();
+// }
+
+FTacticalOrderData AJ_ObjectiveNeutralizeTarget::SetObjUIData(class AJ_MissionPlayerController *pc)
 {
-    Super::SRPC_EndSubObjUI();
+    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt - destroyedTargetAmt);
 
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-        pc->objUIComp->CRPC_EndSubObjUI();
-    }
+    return FTacticalOrderData(this->orderType, FFormationFlightUIData(), data);
 }

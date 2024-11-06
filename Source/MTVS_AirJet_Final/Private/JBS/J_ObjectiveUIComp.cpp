@@ -99,6 +99,14 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(FTacticalOrderData orde
 			CreateUIData(ntData, textUIData, isInit);
 		}
             break;
+		case ETacticalOrder::ENGINE_START:
+		{
+			auto& epData = orderData.epData;
+
+			CreateUIData(epData, textUIData, isInit);
+		}
+			break;
+
 	}
 	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::White, TEXT("doremi111"));
 
@@ -130,7 +138,7 @@ void UJ_ObjectiveUIComp::CRPC_SwitchResultUI_Implementation(const TArray<FObject
 {
 	objUI->ActiveResultUI(resultObjData);
 }
-
+// @@ 이 시점에서 텍스트 스타일 결정해야함
 void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray<FTextUIData>& outData, bool isInit)
 {
 	// 목표 ui 데이터
@@ -141,22 +149,23 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	// 목표 단
 	FString checkHeightStr = FString::FormatAsNumber(data.checkHeight * 3.281 / 100);
 	FString curHeightStr = FString::FormatAsNumber(data.curHeight * 3.281 / 100);
-	objUIData.headerText = TEXT("편대 비행");
+
+	objUIData.headerText = FRichString(TEXT("편대 비행"));
 	objUIData.bodyTextAry = {
-		FString::Printf(TEXT("편대 비행 중 : %s"), *UJ_Utility::ToStringBool(data.checkFormation))
-		,FString::Printf(TEXT("목표 고도 %s ft: \n현재 %s ft"), *checkHeightStr, *curHeightStr)
-		,FString::Printf(TEXT("올바른 위치 : %s"), *UJ_Utility::ToStringBool(data.isCorrectPosition))
-		,FString::Printf(TEXT("당신의 역할 : %s"), *UJ_Utility::PilotRoleToString(data.pilotRole))
+		FRichString(FString::Printf(TEXT("편대 비행 중 : %s"), *UJ_Utility::ToStringBool(data.checkFormation)))
+		,FRichString(FString::Printf(TEXT("목표 고도 %s ft: \n현재 %s ft"), *checkHeightStr, *curHeightStr))
+		,FRichString(FString::Printf(TEXT("올바른 위치 : %s"), *UJ_Utility::ToStringBool(data.isCorrectPosition)))
+		,FRichString(FString::Printf(TEXT("당신의 역할 : %s"), *UJ_Utility::PilotRoleToString(data.pilotRole)))
 	};
 
 	if(isInit)
 	{
 		// 상세 단
-		detailUIData.headerText = TEXT("임시 편대 상세 텍스트");
+		detailUIData.headerText = FRichString(TEXT("임시 편대 상세 텍스트"));
 		detailUIData.bodyTextAry = {
-			TEXT("임시 상세 1")
-			,TEXT("doremi 상세 2")
-			,TEXT("임시 상세 3")
+			FRichString(TEXT("임시 상세 1"))
+			,FRichString(TEXT("doremi 상세 2"))
+			,FRichString(TEXT("임시 상세 3"))
 		};
 	}
 
@@ -172,73 +181,63 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 	FTextUIData detailUIData;
 
 	// 목표 단
-	objUIData.headerText = TEXT("지상 목표 무력화");
-	objUIData.bodyTextAry.Add(FString::Printf(TEXT("남은 지상 목표 %d/%d"), data.curTargetAmt, data.allTargetAmt));
+	objUIData.headerText = FRichString(TEXT("지상 목표 무력화"));
+	objUIData.bodyTextAry.Add(FRichString(FString::Printf(TEXT("남은 지상 목표 %d/%d"), data.curTargetAmt, data.allTargetAmt)));
 
 	// 상세 단
 	if(isInit)
 	{
-		detailUIData.headerText = TEXT("임시 지대공 상세 텍스트");
+		detailUIData.headerText = FRichString(TEXT("임시 지대공 상세 텍스트"));
 		detailUIData.bodyTextAry = {
-			TEXT("임시 상세 1")
-			,TEXT("doremi 상세 2")
+			FRichString(TEXT("임시 상세 1"))
+			,FRichString(TEXT("doremi 상세 2"))
 		};
 	}
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
 
+void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FTextUIData> &outData, bool isInit )
+{
+	// 목표 ui 데이터
+	FTextUIData objUIData;
+	// 상세 ui 데이터
+	FTextUIData detailUIData;
 
-// XXX
-// void UJ_ObjectiveUIComp::UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY)
-// {
-// 	// FString str = FString::Printf(TEXT("cX : %.2f , bpb : %.2f, sesy : %.2f"), canvasX, bgPaddingBottom, subEleScaleY);
-// 	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("%s"), *str));
+	// 목표 단
+	objUIData.headerText = FRichString(TEXT("시동 절차"));
+	// 시동 절차 텍스트 설정
+	for(int i = static_cast<int>(EEngineProgress::MIC_SWITCH_ON); i <= static_cast<int>(EEngineProgress::RELEASE_SIDE_BREAK); i ++)
+	{
+		// 수행 절차
+		EEngineProgress type = static_cast<EEngineProgress>(i);
+		ETextStyle style = ETextStyle::DEFAULT;
+		// 수행된 절차 확인
+		if(type < data.curProgress)
+		{
+			// 성공 여부
+			bool isSuccess = data.CheckProgressSuccess(type);
+			// 텍스트 스타일
+			style = isSuccess ? ETextStyle::SUCCESS : ETextStyle::FAIL;
+		}
+		// 리치 텍스트 설정
+		FRichString str(data.ToStringProgressEnum(type), style);
+		// 본문에 추가
+		objUIData.bodyTextAry.Add(str);
 
-// 	// ui 요소에 적용
-// 	// objUI->GetObjTextUI()->UpdateObjUIAnimValue(canvasX, bgPaddingBottom, subEleScaleY);
-// }
+		// FIXME 설명을 objdetail 태그로 \n 해서 추가
+	}
 
+	// 상세 단
+	if(isInit)
+	{
+		detailUIData.headerText = FRichString(TEXT("임시 시동 절차 상세 텍스트"));
+		detailUIData.bodyTextAry = {
+			FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10)))
+			,FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10)))
+		};
+	}
 
-// XXX
-// void UJ_ObjectiveUIComp::CRPC_UpdateFFObjUI_Implementation(ETacticalOrder orderType, const TVariant<FFormationFlightUIData, FNeutralizeTargetUIData>& data, bool isInit)
-// {
-// 	FTextUIData uiData;
+	outData = TArray<FTextUIData> { objUIData , detailUIData};
+}
 
-// 	switch (orderType) {
-//         case ETacticalOrder::NONE:
-//         case ETacticalOrder::MOVE_THIS_POINT:
-// 			break;
-//         case ETacticalOrder::FORMATION_FLIGHT:
-// 		{
-// 			const FFormationFlightUIData& flightData = data.Get<FFormationFlightUIData>();
-
-// 			FString checkHeightStr = FString::FormatAsNumber(flightData.checkHeight * 3.281 / 100);
-// 			FString curHeightStr = FString::FormatAsNumber(flightData.curHeight * 3.281 / 100);
-// 			uiData.headerText = TEXT("편대 비행");
-// 			uiData.bodyTextAry.Add(FString::Printf(TEXT("편대 비행 중 : %s"), flightData.checkFormation ? TEXT("TRUE") : TEXT("FALSE")));
-// 			uiData.bodyTextAry.Add(FString::Printf(TEXT("목표 고도 %s ft: \n현재 %s ft"), *checkHeightStr, *curHeightStr));
-// 			uiData.bodyTextAry.Add(FString::Printf(TEXT("올바른 위치 : %s"), flightData.isCorrectPosition ? TEXT("TRUE") : TEXT("FALSE")));
-// 			uiData.bodyTextAry.Add(FString::Printf(TEXT("당신의 역할 : %s")
-// 				, *UJ_Utility::PilotRoleToString(flightData.pilotRole)));
-// 		}
-// 			break;
-// 	}
-
-// 	// ui에 값 전달
-// 	objUI->SetObjUI(uiData, isInit);
-// }
-
-// XXX
-// void UJ_ObjectiveUIComp::CRPC_StartFFObjUI_Implementation(ETacticalOrder orderType, FFormationFlightUIData data)
-// {
-// 	// 비활성 상태시 활성화
-// 	if(objUI->GetVisibility() == ESlateVisibility::Hidden)
-// 		objUI->SetVisibility(ESlateVisibility::Visible);
-
-// 	// 시작 처리
-// 	objUI->StartObjUI();
-
-// 	// 값 설정
-// 	CRPC_UpdateFFObjUI(orderType, dv, true);
-// }

@@ -420,6 +420,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 #pragma endregion
 
 #pragma region Controller
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton8Started);		
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Completed , this , &AL_Viper::F_ThrottleButton8Completed);		
 		input->BindAction(IA_ThrottleButton15 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton15Started);		
 		input->BindAction(IA_ThrottleButton34 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton34Started);		
 		input->BindAction(IA_ThrottleButton35 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton35Started);		
@@ -1268,6 +1270,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
 						// CRPC_AudioControl(true , 1);
 					}
 				}
@@ -1280,6 +1283,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (bBreakHold)
 				{
 					StartScenario.pop();
+					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::RELEASE_SIDE_BREAK);
 					DummyJFSBreakHold->SetRenderCustomDepth(false);
 					DummyJFSBreakHold->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 1);
@@ -2276,124 +2280,136 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
 }
 
+void AL_Viper::F_ThrottleButton8Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton8Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton8Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton8Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
 void AL_Viper::F_ThrottleButton15Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_ThrottleButton15Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_ThrottleButton15Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton34Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_ThrottleButton34Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_ThrottleButton34Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton35Started(const struct FInputActionValue& value)
 {
 auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_ThrottleButton35Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_ThrottleButton35Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton36Started(const struct FInputActionValue& value)
 {
 auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_ThrottleButton36Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_ThrottleButton36Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton37Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton37Started : %s") , b?*FString("true"):*FString("false"));
+    	// LOG_S(Warning , TEXT("F_ThrottleButton37Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton38Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton38Started : %s") , b?*FString("true"):*FString("false"));
+    	// LOG_S(Warning , TEXT("F_ThrottleButton38Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton39Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton39Started : %s") , b?*FString("true"):*FString("false"));
+    	// LOG_S(Warning , TEXT("F_ThrottleButton39Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton40Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_ThrottleButton40Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_ThrottleButton40Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton41Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton41Started : %s") , b?*FString("true"):*FString("false"));
+    	// LOG_S(Warning , TEXT("F_ThrottleButton41Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton42Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton42Started : %s") , b?*FString("true"):*FString("false"));
+    	// LOG_S(Warning , TEXT("F_ThrottleButton42Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton43Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
+    // LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 {
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+	// LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
 }
 
 void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+	// LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
 }
 
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton11Completed(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton13Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-	LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
+	// LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)

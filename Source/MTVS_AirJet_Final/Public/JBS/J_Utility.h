@@ -341,6 +341,47 @@ public:
     FObjectiveData(ETacticalOrder objType) : objType(objType) {}
 };
 
+// 텍스트 스타일 종류
+UENUM(BlueprintType)
+enum class ETextStyle : uint8
+{
+    DEFAULT
+    ,SUCCESS
+    ,FAIL
+    
+};
+
+// 리치 텍스트 데이터 구조체
+USTRUCT(BlueprintType)
+struct FRichString
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    FString value;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString formatStr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    ETextStyle styleType;
+
+    FRichString() : value(""), styleType(ETextStyle::DEFAULT) {}
+    FRichString(FString value) : value(value), styleType(ETextStyle::DEFAULT)
+    {
+        formatStr = FormatString(value, styleType);
+    }
+    FRichString(FString value, ETextStyle styleType)
+        : value(value), styleType(styleType)
+    {
+        formatStr = FormatString(value, styleType);
+    }
+
+    FString FormatString(const FString &str, ETextStyle type);
+    FString GetFormatString() const
+    {
+        return formatStr;
+    }
+};
+
 // 편대 역할
 UENUM(BlueprintType)
 enum class EPilotRole : uint8
@@ -386,10 +427,10 @@ struct FTextUIData
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString headerText;
+    FRichString headerText = FRichString();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FString> bodyTextAry;
+    TArray<FRichString> bodyTextAry;
 };
 
 
@@ -441,32 +482,6 @@ public:
     FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
 };
 
-// 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
-USTRUCT(BlueprintType)
-struct FTacticalOrderData
-{
-    GENERATED_BODY()
-public:
-    // 생성자
-    FTacticalOrderData() {}
-
-    FTacticalOrderData(
-        ETacticalOrder orderType, FFormationFlightUIData ffData = FFormationFlightUIData(), FNeutralizeTargetUIData ntData = FNeutralizeTargetUIData()) 
-        : orderType(orderType), ffData(ffData), ntData(ntData) {}
-
-    // 명령 종류
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    ETacticalOrder orderType;
-
-    // 편대비행
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FFormationFlightUIData ffData;
-    // 지대공 무력화
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FNeutralizeTargetUIData ntData;
-    // 이동
-};
-
 // 시동 절차 | 비트마스크 처리 하는거 포폴에 넣어도 될듯
 UENUM(BlueprintType)
 enum class EEngineProgress : uint8
@@ -481,6 +496,7 @@ enum class EEngineProgress : uint8
     ,ENGINE_THROTTLE_IDLE = 7
     ,CLOSE_CANOPY = 8
     ,STANDBY_OTHER_PLAYER = 9
+    ,RELEASE_SIDE_BREAK = 10
 };
 
 // 시동 절차 확인 용 개인 pc 데이터
@@ -507,7 +523,11 @@ public:
     // 수행 점수로 수행 비율 계산
     float CalcSuccessRate(int value);
     // enum 값을 비트마스크 용 정수로 변환
-    int ConvertProgressEnumToInt(EEngineProgress type);
+    int ConvertProgressEnumToInt(EEngineProgress type) const;
+    // enum 값을 string 으로 변환 | 목표 UI에서 사용
+    FString ToStringProgressEnum(EEngineProgress type) const;
+    // 해당 enum 성공 실패 여부 반환 | 비트마스크
+    bool CheckProgressSuccess(EEngineProgress type) const;
 };
 
 // 시동 절차 확인 용 전체 데이터
@@ -526,6 +546,42 @@ public:
 
 // 시동 절차 수행 알림 딜리게이트 선언
 DECLARE_DELEGATE_OneParam(FSuccessProgress, EEngineProgress);
+
+// 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
+USTRUCT(BlueprintType)
+struct FTacticalOrderData
+{
+    GENERATED_BODY()
+public:
+    // 생성자
+    FTacticalOrderData() {}
+
+    FTacticalOrderData(
+        ETacticalOrder orderType, FFormationFlightUIData ffData = FFormationFlightUIData(), FNeutralizeTargetUIData ntData = FNeutralizeTargetUIData()) 
+        : orderType(orderType), ffData(ffData), ntData(ntData) {}
+    
+    FTacticalOrderData(ETacticalOrder orderType, FEngineProgressData epData)
+        : orderType(orderType), epData(epData) {}
+
+    // 명령 종류
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    ETacticalOrder orderType;
+
+    // 편대비행
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FFormationFlightUIData ffData;
+    // 지대공 무력화
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FNeutralizeTargetUIData ntData;
+    // 이동
+
+    // 시동 절차
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FEngineProgressData epData;
+};
+
+
+
 
 
 #pragma endregion
