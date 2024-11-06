@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "JBS/J_Utility.h"
 #include "J_ObjectiveSubElementUI.generated.h"
 
 /**
@@ -15,8 +16,6 @@ class MTVS_AIRJET_FINAL_API UJ_ObjectiveSubElementUI : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	class UWidgetAnimation* tempasd;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
@@ -25,7 +24,7 @@ public:
 	class URichTextBlock* objSubText;
 
 protected:
-
+	
 
 public:
 	// ui 애니메이션
@@ -34,4 +33,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void PlayEndAnim();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlaySubEndAnim();
+
+	// 리치 텍스트 설정
+	void SetSubText(const FRichString& str);
 };

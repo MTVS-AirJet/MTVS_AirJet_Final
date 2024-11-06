@@ -117,15 +117,21 @@ protected:
 	// 목표 UI 시작 | 목표 활성화 시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_StartNewObjUI();
+
+	// 개인 목표 ui에 표시할 데이터 만들기 | 상속하면 재정의
+	UFUNCTION(BlueprintCallable)
+	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController* pc = nullptr);
+
 	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_UpdateObjUI();
 	// 목표 UI 완료 | 목표 완료시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_EndObjUI();
-	// 목표 서브 조건 UI 완료 
+	// 개인 목표 서브 조건 UI 완료 
 	UFUNCTION(Server, Reliable)
-	virtual void SRPC_EndSubObjUI();
+	virtual void SRPC_EndSubObjUI(class AJ_MissionPlayerController* pc, int idx = 0, bool isSuccess = true);
+	// @@ 모든 pc에서 서브 조건 완료 처리
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
 

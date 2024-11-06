@@ -46,14 +46,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void CountTargetDestroyed();
 
-	// 목표 UI 시작 | 목표 활성화 시 호출
+	// 목표 UI에 표시할 데이터 구성
+	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
+
+        // 목표 UI 시작 | 목표 활성화 시 호출
 	virtual void SRPC_StartNewObjUI() override;
 	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
 	virtual void SRPC_UpdateObjUI() override;
 	// 목표 UI 완료 | 목표 완료시 호출
 	virtual void SRPC_EndObjUI() override;
 	// 목표 서브 조건 UI 완료
-	virtual void SRPC_EndSubObjUI() override;
+	// virtual void SRPC_EndSubObjUI() override;
 
     public:
 	virtual void Tick(float deltaTime) override;

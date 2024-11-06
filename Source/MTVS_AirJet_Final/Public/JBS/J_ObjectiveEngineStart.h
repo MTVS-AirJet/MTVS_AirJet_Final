@@ -40,7 +40,7 @@ protected:
     void CheckProgress(class AJ_MissionPlayerController *pc, EEngineProgress type);
 
 	// 전체 시동 완료 체크
-    bool CheckAllRunEngine(const TArray<class AJ_MissionPlayerController *> pcs);
+    bool CheckAllRunEngine(const TArray<class AJ_MissionPlayerController *> pcs, EEngineProgress checkType);
 
     // 해당 pc 수행 절차 성공 처리
     void ActiveNextProgress(FEngineProgressData& data, bool isSuccess = true);
@@ -48,6 +48,9 @@ protected:
 	// 목표 성공시 수행도 계산
 	UFUNCTION(BlueprintCallable)
     void CalcSuccessPercent();
+
+	// 목표 ui에 표시할 데이터 설정
+    virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
 
 public:
     virtual void Tick(float deltaTime) override;

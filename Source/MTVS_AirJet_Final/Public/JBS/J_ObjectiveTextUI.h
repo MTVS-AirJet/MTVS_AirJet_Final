@@ -30,6 +30,17 @@ protected:
 	// 본문 서브 조건 ui vbox
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UVerticalBox* objBodyElementVBox;
+		public:
+	__declspec(property(get = GetBodyVBox, put = SetBodyVBox)) class UVerticalBox* OBJ_BODY_VBOX;
+	class UVerticalBox* GetBodyVBox()
+	{
+		return objBodyElementVBox;
+	}
+	void SetBodyVBox(class UVerticalBox* value)
+	{
+		objBodyElementVBox = value;
+	}
+		protected:
 
 	// 서브 조건 요소 UI 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
@@ -41,19 +52,14 @@ public:
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
-    void SetBodyTextValue(class UWidget *textWidget, const FString &str) override;
+    void SetBodyTextValue(class UWidget *textWidget, const FRichString &str) override;
 
 public:
 	// 명령 UI 설정
     void SetTextUI(FTextUIData data, bool isInit = false) override;
 
 	// 서브 조건 요소 설정
-    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str) override;
-
-	
-
-	// XXX 전술명령 UI 요소 값 적용 | 애니메이션에 사용
-    // void UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY);
+    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str) override;
 
 	// ui 애니메이션
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
