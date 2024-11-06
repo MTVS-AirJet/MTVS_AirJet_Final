@@ -359,6 +359,7 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 	{
+#pragma region Keyboard & Moused
 		input->BindAction(IA_ViperEngine , ETriggerEvent::Started , this , &AL_Viper::F_ViperEngine);
 
 		input->BindAction(IA_ViperLook , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLook);
@@ -416,15 +417,27 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperDevelop , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperDevelopStarted);
+#pragma endregion
+
+#pragma region Controller
+		input->BindAction(IA_ThrottleButton15 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton15Started);		
+		input->BindAction(IA_ThrottleButton34 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton34Started);		
+		input->BindAction(IA_ThrottleButton35 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton35Started);		
+		input->BindAction(IA_ThrottleButton36 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton36Started);		
+		input->BindAction(IA_ThrottleButton37 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton37Started);		
+		input->BindAction(IA_ThrottleButton38 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton38Started);		
+		input->BindAction(IA_ThrottleButton39 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton39Started);		
+		input->BindAction(IA_ThrottleButton40 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton40Started);		
+		input->BindAction(IA_ThrottleButton41 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton41Started);		
+		input->BindAction(IA_ThrottleButton42 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton42Started);		
+		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);		
+		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);		
+		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);		
+		input->BindAction(IA_GearAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_GearAxis2);		
+		input->BindAction(IA_GearAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_GearAxis3);		
+#pragma endregion
 	}
-#pragma endregion
-	
-#pragma region Axis Mapping
-	PlayerInputComponent->BindAxis("GA1", this, &AL_Viper::GenericAxis1);
-	PlayerInputComponent->BindAxis("GA3", this, &AL_Viper::GenericAxis3);
-	PlayerInputComponent->BindAxis("GA4", this, &AL_Viper::GenericAxis4);
-	PlayerInputComponent->BindAxis("GA6", this, &AL_Viper::GenericAxis6);
-#pragma endregion
+#pragma endregion	
 }
 
 void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
@@ -2255,22 +2268,94 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
 }
 
-void AL_Viper::GenericAxis1(float Value)
+void AL_Viper::F_ThrottleButton15Started(const struct FInputActionValue& value)
 {
-	LOG_SCREEN("%f" , Value);
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton15Started : %s") , b?*FString("true"):*FString("false"));
 }
 
-void AL_Viper::GenericAxis3(float Value)
+void AL_Viper::F_ThrottleButton34Started(const struct FInputActionValue& value)
 {
-	LOG_SCREEN("%f" , Value);
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton34Started : %s") , b?*FString("true"):*FString("false"));
 }
 
-void AL_Viper::GenericAxis4(float Value)
+void AL_Viper::F_ThrottleButton35Started(const struct FInputActionValue& value)
 {
-	LOG_SCREEN("%f" , Value);
+auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton35Started : %s") , b?*FString("true"):*FString("false"));
 }
 
-void AL_Viper::GenericAxis6(float Value)
+void AL_Viper::F_ThrottleButton36Started(const struct FInputActionValue& value)
 {
-	LOG_SCREEN("%f" , Value);
+auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton36Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton37Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton37Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton38Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton38Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton39Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton39Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton40Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton40Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton41Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton41Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton42Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton42Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton43Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+    	LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
+{
+	float data=value.Get<float>();
+	//LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+}
+
+void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
+{
+	float data=value.Get<float>();
+	//LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+}
+
+void AL_Viper::F_GearAxis2(const struct FInputActionValue& value)
+{
+	// Up(1), Down(-1)
+	float data=value.Get<float>();
+	//LOG_S(Warning , TEXT("F_GearAxis2 : %f") , data);
+}
+
+void AL_Viper::F_GearAxis3(const struct FInputActionValue& value)
+{
+	// Left(-1), Right(1)
+	float data=value.Get<float>();
+	//LOG_S(Warning , TEXT("F_GearAxis3 : %f") , data);
 }

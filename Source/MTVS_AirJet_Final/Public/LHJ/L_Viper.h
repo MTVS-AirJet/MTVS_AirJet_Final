@@ -604,10 +604,68 @@ private:
 	void CRPC_CameraShake();
 
 private:
-	void GenericAxis1(float Value);
-	void GenericAxis3(float Value);
-	void GenericAxis4(float Value);
-	void GenericAxis6(float Value);
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton15;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton34;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton35;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton36;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton37;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton38;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton39;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton40;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton41;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton42;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton43;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis4;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis6;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_GearAxis2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_GearAxis3;
+
+	UFUNCTION()
+	void F_ThrottleButton15Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton34Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton35Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton36Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton37Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton38Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton39Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton40Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton41Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton42Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton43Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis4(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis6(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_GearAxis2(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_GearAxis3(const struct FInputActionValue& value);
+	
 #pragma region JBS 추가 부분
 public:
 	FSuccessProgress engineProgSuccessDel;
