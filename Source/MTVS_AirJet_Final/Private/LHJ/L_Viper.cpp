@@ -433,8 +433,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);		
 		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);		
 		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);		
-		input->BindAction(IA_GearAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_GearAxis2);		
-		input->BindAction(IA_GearAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_GearAxis3);		
+		input->BindAction(IA_StickAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis2);		
+		input->BindAction(IA_StickAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis3);		
 #pragma endregion
 	}
 #pragma endregion	
@@ -2346,16 +2346,16 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 	//LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
 }
 
-void AL_Viper::F_GearAxis2(const struct FInputActionValue& value)
+void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_GearAxis2 : %f") , data);
+	//LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
-void AL_Viper::F_GearAxis3(const struct FInputActionValue& value)
+void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_GearAxis3 : %f") , data);
+	//LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }

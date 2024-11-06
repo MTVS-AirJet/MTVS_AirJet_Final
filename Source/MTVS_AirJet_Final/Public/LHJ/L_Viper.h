@@ -630,10 +630,10 @@ private:
 	class UInputAction* IA_ThrottleAxis4;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleAxis6;
-	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
-	class UInputAction* IA_GearAxis2;
-	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
-	class UInputAction* IA_GearAxis3;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis3;
 
 	UFUNCTION()
 	void F_ThrottleButton15Started(const struct FInputActionValue& value);
@@ -662,9 +662,9 @@ private:
 	UFUNCTION()
 	void F_ThrottleAxis6(const struct FInputActionValue& value);
 	UFUNCTION()
-	void F_GearAxis2(const struct FInputActionValue& value);
+	void F_StickAxis2(const struct FInputActionValue& value);
 	UFUNCTION()
-	void F_GearAxis3(const struct FInputActionValue& value);
+	void F_StickAxis3(const struct FInputActionValue& value);
 	
 #pragma region JBS 추가 부분
 public:
