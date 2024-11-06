@@ -98,13 +98,13 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
 
+protected:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArmFPS;
-protected:
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCameraFPS;
 private:
@@ -636,6 +636,14 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickButton2;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton5;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton11;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton13;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis2;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis3;
@@ -670,6 +678,18 @@ private:
 	void F_StickButton1Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_StickButton2Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton5Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis1(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_StickAxis2(const struct FInputActionValue& value);
 	UFUNCTION()
