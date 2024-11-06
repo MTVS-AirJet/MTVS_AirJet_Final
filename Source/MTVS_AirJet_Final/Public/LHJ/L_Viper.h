@@ -631,6 +631,8 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleAxis6;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis2;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis3;
@@ -661,6 +663,8 @@ private:
 	void F_ThrottleAxis4(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleAxis6(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton2Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_StickAxis2(const struct FInputActionValue& value);
 	UFUNCTION()

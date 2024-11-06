@@ -433,6 +433,7 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);		
 		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);		
 		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);		
+		input->BindAction(IA_StickButton2 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton2Started);		
 		input->BindAction(IA_StickAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis2);		
 		input->BindAction(IA_StickAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis3);		
 #pragma endregion
@@ -2331,7 +2332,7 @@ void AL_Viper::F_ThrottleButton42Started(const struct FInputActionValue& value)
 void AL_Viper::F_ThrottleButton43Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
-    	LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
+    LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
@@ -2344,6 +2345,12 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data=value.Get<float>();
 	//LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+}
+
+void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
