@@ -606,6 +606,8 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton8;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleButton15;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleButton34;
@@ -648,6 +650,10 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis3;
 
+	UFUNCTION()
+	void F_ThrottleButton8Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton8Completed(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleButton15Started(const struct FInputActionValue& value);
 	UFUNCTION()

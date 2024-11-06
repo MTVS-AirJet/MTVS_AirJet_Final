@@ -420,6 +420,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 #pragma endregion
 
 #pragma region Controller
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton8Started);		
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Completed , this , &AL_Viper::F_ThrottleButton8Completed);		
 		input->BindAction(IA_ThrottleButton15 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton15Started);		
 		input->BindAction(IA_ThrottleButton34 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton34Started);		
 		input->BindAction(IA_ThrottleButton35 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton35Started);		
@@ -2274,6 +2276,18 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 {
 	if (LoadCameraShake)
 		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
+}
+
+void AL_Viper::F_ThrottleButton8Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton8Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton8Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_ThrottleButton8Completed : %s") , b?*FString("true"):*FString("false"));
 }
 
 void AL_Viper::F_ThrottleButton15Started(const struct FInputActionValue& value)
