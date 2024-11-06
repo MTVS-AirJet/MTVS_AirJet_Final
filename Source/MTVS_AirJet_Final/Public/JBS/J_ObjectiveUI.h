@@ -49,16 +49,6 @@ protected:
 	}
 		protected:
 
-	// 기본 text color
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FSlateColor defaultTextColor;
-	// 완료 text color
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FSlateColor successTextColor;
-	// 실패 text color
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FSlateColor failTextColor;
-
 public:
 	// 결산 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
@@ -73,6 +63,9 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void PlayObjEndAnim(class UJ_ObjectiveTextUI* objTextUI);
 
+	// 서브 목표 완료 UMG
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlaySubObjEndAnim(class UJ_ObjectiveSubElementUI* subTextUI);
 
 public:
 	// 전술명령 텍스트 설정
@@ -85,7 +78,7 @@ public:
     // 전술명령 완료 처리
     void EndObjUI(bool isSuccess);
 	// 텍스트 색상 초기화
-    void ResetTextColor();
+    // void ResetTextColor();
 
     // 결산 UI 표시
     void ActiveResultUI(const TArray<FObjectiveData>& resultObjData);

@@ -33,9 +33,12 @@ void AJ_MissionGamemode::BeginPlay()
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this]() mutable
     {
-        //타이머에서 할 거
-        StartMissionLevel();
-    }, 1.5, false);
+        // 호스트 pc 가져와서 시작 함수 바인드
+        AJ_MissionPlayerController* outPC;
+        UJ_Utility::GetLocalPlayerController(GetWorld(), outPC);
+        
+        outPC->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
+    }, .1f, false);
 }
 
 // 사실상 beginplay
@@ -75,6 +78,12 @@ void AJ_MissionGamemode::StartMission()
         CacheCesiumActors();
     }, .1f, false);
     
+}
+
+void AJ_MissionGamemode::StartMissionLevel()
+{
+    // 시동 목표 시작
+    objectiveManagerComp->StartDefualtObj();
 }
 
 void AJ_MissionGamemode::Tick(float DeltaSeconds)
@@ -336,11 +345,7 @@ FMissionDataRes AJ_MissionGamemode::LoadMissionData()
     return gi->MissionData;
 }
 
-void AJ_MissionGamemode::StartMissionLevel()
-{
-    // 시동 목표 시작
-    objectiveManagerComp->StartDefualtObj();
-}
+
 
 void AJ_MissionGamemode::StartTacticalOrder()
 {

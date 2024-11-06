@@ -1247,6 +1247,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
 						// CRPC_AudioControl(true , 1);
 					}
 				}
@@ -1259,6 +1260,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (bBreakHold)
 				{
 					StartScenario.pop();
+					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::RELEASE_SIDE_BREAK);
 					DummyJFSBreakHold->SetRenderCustomDepth(false);
 					DummyJFSBreakHold->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 1);
@@ -2257,20 +2259,20 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 
 void AL_Viper::GenericAxis1(float Value)
 {
-	LOG_SCREEN("%f" , Value);
+	// LOG_SCREEN("%f" , Value);
 }
 
 void AL_Viper::GenericAxis3(float Value)
 {
-	LOG_SCREEN("%f" , Value);
+	// LOG_SCREEN("%f" , Value);
 }
 
 void AL_Viper::GenericAxis4(float Value)
 {
-	LOG_SCREEN("%f" , Value);
+	// LOG_SCREEN("%f" , Value);
 }
 
 void AL_Viper::GenericAxis6(float Value)
 {
-	LOG_SCREEN("%f" , Value);
+	// LOG_SCREEN("%f" , Value);
 }

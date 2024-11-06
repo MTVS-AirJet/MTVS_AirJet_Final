@@ -138,6 +138,7 @@ protected:
     class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole);
 
     // 0. 미션 레벨 시작 트리거 | 호스트가 시작 버튼 누르면 실행
+    UFUNCTION(BlueprintCallable)
     void StartMissionLevel();
 
     // 1. 미션 시작지점 액터 추가
