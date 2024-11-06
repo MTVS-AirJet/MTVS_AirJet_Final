@@ -433,6 +433,7 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);		
 		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);		
 		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);		
+		input->BindAction(IA_StickButton1 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton1Started);		
 		input->BindAction(IA_StickButton2 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton2Started);		
 		input->BindAction(IA_StickAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis2);		
 		input->BindAction(IA_StickAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis3);		
@@ -1476,8 +1477,8 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 
 		SetAccelGear();
-		LOG_S(Warning , TEXT("Current Gear X LOC : %f") , JetFirstEngine->GetRelativeLocation().X);
-		LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
+		// LOG_S(Warning , TEXT("Current Gear X LOC : %f") , JetFirstEngine->GetRelativeLocation().X);
+		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
 #pragma region Jet Move
@@ -2347,6 +2348,12 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 	//LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
 }
 
+void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
+}
+
 void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
@@ -2357,12 +2364,12 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data=value.Get<float>();
-	//LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
 }

@@ -104,9 +104,10 @@ private: // Component
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArmFPS;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+protected:
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCameraFPS;
-
+private:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
@@ -631,6 +632,8 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleAxis6;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickButton2;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
 	class UInputAction* IA_StickAxis2;
@@ -663,6 +666,8 @@ private:
 	void F_ThrottleAxis4(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleAxis6(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton1Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_StickButton2Started(const struct FInputActionValue& value);
 	UFUNCTION()
