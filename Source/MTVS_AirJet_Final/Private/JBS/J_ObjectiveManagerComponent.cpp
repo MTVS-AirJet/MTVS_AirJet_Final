@@ -3,6 +3,7 @@
 
 #include "JBS/J_ObjectiveManagerComponent.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineTypes.h"
 #include "Engine/World.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
@@ -10,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUIComp.h"
+#include "Math/MathFwd.h"
 #include "TimerManager.h"
 
 // Sets default values for this component's properties
@@ -42,6 +44,36 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	// ...
 }
 
+void UJ_ObjectiveManagerComponent::InitDefaultObj()
+{
+	// @@ 전술명령 목표와는 별개로 동작하면서 비슷한 로직으로 구성
+	
+	for(auto& dmData : defaultObjDataAry)
+	{
+		// 프리팹 가져오기
+		auto* objActor = SpawnObjActor(dmData.objType);
+
+		// 목표 액터 설정
+		dmData.objectiveActor = objActor;
+
+		// 목표 수행도 갱신함수 바인드
+		objActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
+	}
+}
+
+// 기본 목표 시작 | 시동
+void UJ_ObjectiveManagerComponent::StartDefualtObj()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("응애에요"));
+
+	auto* engineObj = defaultObjDataAry[0].objectiveActor;
+	check(engineObj);
+
+	// 활성화
+	engineObj->IS_OBJECTIVE_ACTIVE = true;
+	
+}
+
 void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObject> missions)
 {
 	// 목표 배열 초기화
@@ -50,27 +82,17 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 	// 데이터 가지고 미션 액터 하나씩 생성
 	for(auto mData : missions)
 	{
-		// 목표 종류에 따라 프리팹 가져오기
-		// 목표 종류
-		auto type = mData.GetOrderType();
-		// 프리팹
-		auto prefab = objectiveActorPrefabMap[type];
 		// 스폰 지점 계산
 		FTransform spawnTR = mData.GetTransform();
 
 		// 목표 액터 스폰
-		auto* objectiveActor = GetWorld()->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR);
-		// 주인 설정
-		// objectiveActor->SetOwner(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		auto* objectiveActor = SpawnObjActor(mData.GetOrderType(), spawnTR);
 
-		// 목표 액터 설정
-		objectiveActor->InitObjective(type, false);
 		// 목표 완료시 다음 목표 활성화 바인드
 		objectiveActor->objectiveEndDel.AddUObject(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
 		// 목표 수행도 갱신함수 바인드
 		objectiveActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
 	
-
 		// 목표 액터 배열에 추가
 		// 순서대로 하기위해 pinNo 사용
 		objectiveDataAry[mData.pinNo].objectiveActor = objectiveActor;
@@ -79,9 +101,27 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 	}
 
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("목표 액터 추가 완료 개수 : %d"), objectiveDataAry.Num()));
+}
 
-	// XXX 바로 0번 미션 활성화 할지 고민 | 텔포 후 시작으로 변경
-	// ActiveNextObjective();
+// 목표 액터 스폰 
+AJ_BaseMissionObjective*  UJ_ObjectiveManagerComponent::SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR)
+{
+	// 목표 종류에 따라 프리팹 가져오기
+	auto prefab = objectiveActorPrefabMap[type];
+
+	// 항상 스폰 처리
+	FActorSpawnParameters params;
+	params.bNoFail = true;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	// 목표 액터 스폰
+	auto* objectiveActor = GetWorld()->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR, params);
+
+	// 목표 액터 설정
+	objectiveActor->InitObjective(type, false);
+	
+
+	return objectiveActor;
 }
 
 void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
@@ -101,15 +141,6 @@ void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
 
 void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 {
-	// // 맨 처음 예외처리
-	// if(CUR_ACTIVE_MISSION_IDX >= 0)
-	// {
-	// 	// 목표 수행도 배열에 저장
-	// 	objectiveDataAry[CUR_ACTIVE_MISSION_IDX].successPercent = successPercent;
-
-	// 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d 번 미션 수행도 : %.2f")
-	// 	, CUR_ACTIVE_MISSION_IDX, successPercent));
-	// }
 	// 인덱스 증가
 	CUR_ACTIVE_MISSION_IDX++;
 	// 여기서 목표 다했으면 결산으로 넘어가짐 setcuractive~~
@@ -185,14 +216,24 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
 {
-	// 인덱스 찾기
-	FObjectiveData& data = *objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
+	// 사용 목표 찾기
+	FObjectiveData* data = defaultObjDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
 	{
 		return objData.objectiveActor == objActor;
 	});
 
+	if(!data)
+	{
+		data = objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
+		{
+			return objData.objectiveActor == objActor;
+		});
+	}
+	// 내가 기어코 구조체 포인터를 쓰는구나
+
 	// 갱신
-	data.successPercent = successPercent;
+	data->successPercent = successPercent;
 
 	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("도당체 : %.2f"), data.successPercent));
 }
+

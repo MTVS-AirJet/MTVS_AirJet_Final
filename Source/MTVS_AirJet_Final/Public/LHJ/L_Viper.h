@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_Utility.h"
 #include "L_Viper.generated.h"
 
 UENUM()
@@ -607,4 +608,8 @@ private:
 	void GenericAxis3(float Value);
 	void GenericAxis4(float Value);
 	void GenericAxis6(float Value);
+#pragma region JBS 추가 부분
+public:
+	FSuccessProgress engineProgSuccessDel;
+#pragma endregion
 };

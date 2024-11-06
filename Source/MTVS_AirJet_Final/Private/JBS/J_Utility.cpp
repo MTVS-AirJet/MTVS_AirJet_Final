@@ -7,6 +7,7 @@
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
+#include "Math/UnrealMathUtility.h"
 #include "UObject/Object.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
@@ -191,6 +192,81 @@ bool UJ_Utility::GetLocalPlayerController(const UWorld *world, class AJ_MissionP
 
     // 유효성 체크
     return IsValid(outPC);
+}
+
+// 엔진 수행 맵 초기화
+void FEngineProgressAllData::InitDataMap(const TArray<AJ_MissionPlayerController *> &pcAry)
+{
+    for(auto* pc : pcAry)
+    {
+        dataMap.Add(pc, FEngineProgressData());
+    }
+}
+
+int FEngineProgressData::ConvertProgressEnumToInt(EEngineProgress type)
+{
+    // uint8 범위 넘어가서 그대로 사용 불가 변환 해야함 | 2의 type -1 제곱
+    int pow = static_cast<int>(type) - 1;
+    int value = static_cast<int>(FMath::Pow(2.0, pow));
+
+    return value;
+}
+
+void FEngineProgressData::AddSuccessValue(EEngineProgress type)
+{
+    this->successValue += ConvertProgressEnumToInt(type);
+}
+
+void FEngineProgressData::SetNextProgress()
+{
+    switch(this->curProgress)
+    {
+    case EEngineProgress::None:
+        break;
+    case EEngineProgress::MIC_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_GEN_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_GEN_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_CONTROL_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
+        this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
+        break;
+    case EEngineProgress::JFS_STARTER_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_MASTER_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+        this->curProgress = EEngineProgress::JFS_HANDLE_PULL;
+        break;
+    case EEngineProgress::JFS_HANDLE_PULL:
+        this->curProgress = EEngineProgress::ENGINE_THROTTLE_IDLE;
+        break;
+    case EEngineProgress::ENGINE_THROTTLE_IDLE:
+        this->curProgress = EEngineProgress::CLOSE_CANOPY;
+        break;
+    case EEngineProgress::CLOSE_CANOPY:
+        this->curProgress = EEngineProgress::STANDBY_OTHER_PLAYER;
+        break;
+    }
+}
+
+float FEngineProgressData::CalcSuccessRate(int value)
+{
+    int cnt = 0;
+    int enumCnt = 0;
+
+    for(int i = static_cast<int>(EEngineProgress::MIC_SWITCH_ON); i <= static_cast<int>(EEngineProgress::STANDBY_OTHER_PLAYER); i++)
+    {
+        // @@ 어떤 거 틀렸는지 반환 할 수 있게 고도화 가능
+        // 수행 절차 하나하나 성공 확인
+        bool isSuccess = value & i;
+        if(isSuccess)
+            cnt++;
+
+        enumCnt++;
+    }
+    // 비율 반환
+    return (float) cnt / enumCnt;
 }
 
 
