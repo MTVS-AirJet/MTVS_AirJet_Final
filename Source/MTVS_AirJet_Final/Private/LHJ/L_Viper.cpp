@@ -435,6 +435,12 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);		
 		input->BindAction(IA_StickButton1 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton1Started);		
 		input->BindAction(IA_StickButton2 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton2Started);		
+		input->BindAction(IA_StickButton5 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton5Started);		
+		input->BindAction(IA_StickButton11 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton11Started);		
+		input->BindAction(IA_StickButton11 , ETriggerEvent::Completed , this , &AL_Viper::F_StickButton11Completed);		
+		input->BindAction(IA_StickButton13 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton13Started);		
+		input->BindAction(IA_StickButton13 , ETriggerEvent::Completed , this , &AL_Viper::F_StickButton13Completed);		
+		input->BindAction(IA_StickAxis1 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis1);		
 		input->BindAction(IA_StickAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis2);		
 		input->BindAction(IA_StickAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis3);		
 #pragma endregion
@@ -2358,6 +2364,42 @@ void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 {
 	auto b = value.Get<bool>();
 	LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton11Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton13Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
+{
+	float data=value.Get<float>();
+	//LOG_S(Warning , TEXT("F_StickAxis1 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
