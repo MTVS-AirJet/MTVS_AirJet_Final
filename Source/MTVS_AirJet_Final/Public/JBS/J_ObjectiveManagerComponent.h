@@ -31,7 +31,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	class AJ_MissionGamemode* ownerGM;
 
-	// 미션 목표 수행도 리스트
+	// 시동/이륙 데이터 리스트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+	TArray<FObjectiveData> defaultObjDataAry = {
+		FObjectiveData(ETacticalOrder::ENGINE_START)
+		,FObjectiveData(ETacticalOrder::TAKE_OFF)
+	};
+
+	// 미션 목표 데이터 리스트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	TArray<FObjectiveData> objectiveDataAry;
 
@@ -82,8 +89,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void MissionComplete();
 
-public:
-	// 미션 시작 시 목표 리스트 설정
+	// 목표 액터 생성 및 설정
+	class AJ_BaseMissionObjective* SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR = FTransform());
+
+    public:
+	// 레벨 시작 시 시동/이륙 목표 설정
+    void InitDefaultObj();
+    // 미션 시작 시 목표 리스트 설정
     void InitObjectiveList(TArray<struct FMissionObject> missions);
 
 	// 해당 목표 활성화
@@ -95,4 +107,7 @@ public:
 	// 목표 수행도 갱신
 	UFUNCTION(BlueprintCallable)
 	void UpdateObjectiveSuccess(class AJ_BaseMissionObjective* objActor, float successPercent);
+
+	// 기본 목표 시작
+	void StartDefualtObj();
 };

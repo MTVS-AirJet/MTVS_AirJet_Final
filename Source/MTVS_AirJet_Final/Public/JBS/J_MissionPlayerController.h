@@ -10,6 +10,8 @@
 /**
  * 
  */
+DECLARE_DELEGATE_TwoParams(FSendEngineProgressSuccessDel, AJ_MissionPlayerController*, EEngineProgress);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionPlayerController : public AK_PlayerController
 {
@@ -41,6 +43,9 @@ public:
 	// 파일럿 역할
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", Replicated)
 	EPilotRole pilotRole;
+
+	// 엔진 수행 성공 딜리게이트
+	FSendEngineProgressSuccessDel sendEngineProgDel;
 
 protected:
     virtual void BeginPlay() override;
@@ -85,7 +90,12 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_TeleportStartPoint(FTransform tpTR);
 
-        // LHJ 추가
+	// 시동 수행 알리기 | 서버단
+	UFUNCTION(BlueprintCallable)
+	void SendEngineProgressSuccess(EEngineProgress type);
+
+#pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")
 	TSubclassOf<class UUserWidget> WaitingForStartFac;
+#pragma endregion
 };
