@@ -2580,32 +2580,62 @@ void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetCamera && JetCamera->IsActive())
+	{
+		JetCamera->SetActive(false);
+		if (JetCameraFPS)
+		{
+			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
+			JetCameraFPS->SetActive(true);
+		}
+	}
+	else
+	{
+		if (JetCamera)
+		{
+			JetCamera->SetActive(true);
+			if (JetCameraFPS)
+			{
+				if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
+					JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
+				JetCameraFPS->SetActive(false);
+			}
+		}			
+	}		
 }
 
 void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
+	if (!IsZoomOut)
+		IsZoomIn = true;
 }
 
 void AL_Viper::F_StickButton11Completed(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
+	// 중복 키입력 방지용
+	IsZoomIn = false;
 }
 
 void AL_Viper::F_StickButton13Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
+	if (!IsZoomIn)
+		IsZoomOut = true;
 }
 
 void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
+	IsZoomOut = false;
 }
 
 void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
