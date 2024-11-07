@@ -723,6 +723,7 @@ private:
 	void F_StickAxis3(const struct FInputActionValue& value);
 
 	float switchLate=0.4f;
+	float DeviceThrottleCurrentValue = 0.f;
 #pragma region JBS 추가 부분
 public:
 	FSuccessProgress engineProgSuccessDel;

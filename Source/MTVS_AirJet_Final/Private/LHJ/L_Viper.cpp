@@ -2476,14 +2476,79 @@ void AL_Viper::F_ThrottleButton47Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 {
-	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+	float data = value.Get<float>();	// 갱신용 데이터
+	float newData = data;	// 이동용 데이터
+	LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+
+	if (DeviceThrottleCurrentValue > data)
+	{
+		// 스로틀 Down
+		if (intTriggerNum == 0)
+		{
+			if (newData > .25f)
+				return;
+		}
+		else if (intTriggerNum == 1)
+		{
+			if (newData > .8f)
+				return;
+		}
+
+		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+		auto moveValue = SizeValue * newData;
+		JetFirstEngine->
+			SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
+	}
+	else
+	{
+		// 스로틀 up
+		if (intTriggerNum == 0)
+		{
+			float per = .25f;
+			newData = UKismetMathLibrary::FClamp(newData , .0f , per);
+		}
+		else if (intTriggerNum == 1)
+		{
+			float per = .8f;
+			newData = UKismetMathLibrary::FClamp(newData , .0f , per);
+		}
+
+		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+		auto moveValue = SizeValue * newData;
+		JetFirstEngine->
+			SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
+	}
+	DeviceThrottleCurrentValue = data;
 }
 
 void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
-	LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+	// LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+	if (data > .8f)
+	{
+		// 잠금
+		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+		iCanopyNum = 3;
+	}
+	else if (data > .6f)
+	{
+		// 닫기
+		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		iCanopyNum = 2;
+	}
+	else if (data > .3f)
+	{
+		// 중립
+		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		iCanopyNum = 1;
+	}
+	else
+	{
+		// 열기
+		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+		iCanopyNum = 0;
+	}
 }
 
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
