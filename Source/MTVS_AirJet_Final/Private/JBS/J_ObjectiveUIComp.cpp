@@ -221,11 +221,16 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 			style = isSuccess ? ETextStyle::SUCCESS : ETextStyle::FAIL;
 		}
 		// 리치 텍스트 설정
-		FRichString str(data.ToStringProgressEnum(type), style);
+		
 		// 본문에 추가
-		objUIData.bodyTextAry.Add(str);
+		// objUIData.bodyTextAry.Add(str);
+		FDefaultTextUIData subObj;
+		subObj.headerText = FRichString(data.ToStringProgressEnum(type), style);
+		subObj.bodyTextAry = {
+			FRichString(TEXT("@@ 임시 시동설명텍스트"), ETextStyle::OBJDETAIL)
+		};
 
-		// FIXME 설명을 objdetail 태그로 \n 해서 추가
+		objUIData.bodyObjAry.Add(subObj);
 	}
 
 	// 상세 단

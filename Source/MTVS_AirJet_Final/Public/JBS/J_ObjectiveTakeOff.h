@@ -13,5 +13,13 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_ObjectiveTakeOff : public AJ_BaseMissionObjective
 {
 	GENERATED_BODY()
-	
+protected:
+
+
+public:
+
+protected:
+
+
+public:
 };

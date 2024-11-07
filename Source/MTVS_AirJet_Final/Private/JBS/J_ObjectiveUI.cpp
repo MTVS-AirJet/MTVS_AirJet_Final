@@ -6,13 +6,16 @@
 #include "Components/SlateWrapperTypes.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
 #include "Components/WidgetSwitcher.h"
 #include "Engine/Engine.h"
 #include "JBS/J_DetailUI.h"
 #include "JBS/J_ObjectiveSubElementUI.h"
 #include "JBS/J_ObjectiveTextUI.h"
+#include "Math/UnrealMathUtility.h"
 #include "Styling/SlateColor.h"
 #include "JBS/J_MissionCompleteUI.h"
+#include "TimerManager.h"
 
 
 
@@ -52,13 +55,48 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
     auto* vbox = GetObjTextUI()->OBJ_BODY_VBOX;
     if(idx < 0 || idx >= vbox->GetChildrenCount()) return;
     // 종료된 서브 목표 ui
-    auto* subUI = Cast<UJ_ObjectiveSubElementUI>(vbox->GetChildAt(idx));
+    auto* subUI = vbox->GetChildAt(idx);
+    auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
 
     // 서브 완료 UMG
-    PlaySubObjEndAnim(subUI);
+    PlaySubObjEndAnim(subUI,idx);
+
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this, slot,subUI]() mutable
+    {
+        FTimerHandle timerHandle2;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle2, [this, slot, subUI,timerHandle2]() mutable
+        {
+            //타이머에서 할 거
+            auto size = slot->GetSize();
+            size.Value = FMath::Clamp(size.Value - 0.05f, 0, 1);
+            
+            slot->SetSize(size);
+            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("doremi : %.2f"), size.Value));
+            if(size.Value <= 0)
+            {
+                subUI->SetVisibility(ESlateVisibility::Hidden);
+                GetWorld()->GetTimerManager().ClearTimer(timerHandle2);
+            }
+        }, 0.05, true);
+    }, 1.5f, false);
 }
 
+float UJ_ObjectiveUI::PlaySubObjEndAnimLerp(UVerticalBoxSlot *subSlot, float alpha)
+{
+    // 스케일 러프
+    float value = FMath::Lerp(1.0f, 0.f, alpha);
 
+    FSlateChildSize newSize(ESlateSizeRule::Fill);
+    newSize.Value = value;
+    subSlot->SetSize(newSize);
+
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%.2f"), newSize.Value));
+
+    return value;
+}
 
 void UJ_ObjectiveUI::ActiveResultUI(const TArray<FObjectiveData>& resultObjData)
 {

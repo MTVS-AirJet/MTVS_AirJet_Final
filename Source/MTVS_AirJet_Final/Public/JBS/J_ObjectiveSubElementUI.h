@@ -16,6 +16,9 @@ class MTVS_AIRJET_FINAL_API UJ_ObjectiveSubElementUI : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
+// 서브 목표 설명 아이콘 이미지 사이즈
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float subObjDetailiconSize = 32.f;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))

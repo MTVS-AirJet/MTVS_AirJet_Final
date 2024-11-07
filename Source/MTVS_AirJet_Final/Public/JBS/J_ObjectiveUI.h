@@ -65,9 +65,13 @@ protected:
 
 	// 서브 목표 완료 UMG
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlaySubObjEndAnim(class UJ_ObjectiveSubElementUI* subTextUI);
+	void PlaySubObjEndAnim(class UWidget* subTextUI, int32 idx);
 
-public:
+	// 서브 목표 완료 스케일 lerp
+	UFUNCTION(BlueprintCallable)
+	float PlaySubObjEndAnimLerp(class UVerticalBoxSlot *subSlot, float alpha);
+
+    public:
 	// 전술명령 텍스트 설정
     void SetObjUI(FTextUIData data, bool isInit = false);
 	void SetObjUI(TArray<FTextUIData>& data, bool isInit = false);
