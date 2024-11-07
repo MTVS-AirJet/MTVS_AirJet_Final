@@ -137,6 +137,10 @@ protected:
     // 스폰 포인트 액터 추가
     class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole);
 
+    // 0. 미션 레벨 시작 트리거 | 호스트가 시작 버튼 누르면 실행
+    UFUNCTION(BlueprintCallable)
+    void StartMissionLevel();
+
     // 1. 미션 시작지점 액터 추가
     void InitMissionStartPoint(const FMissionStartPos &startPointData);
 
@@ -155,6 +159,9 @@ protected:
     // 해당 pc에 로딩 스크린 UI 추가
     UFUNCTION(Server, Reliable)
     void SRPC_RemoveLoadingUIByPC(class AJ_MissionPlayerController *missionPC);
+
+    // 3. 전술 명령 미션 시작
+    void StartTacticalOrder();
 
     
 

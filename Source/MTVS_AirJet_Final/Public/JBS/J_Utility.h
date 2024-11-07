@@ -295,6 +295,8 @@ enum class ETacticalOrder : uint8
     ,MOVE_THIS_POINT = 1
     ,FORMATION_FLIGHT
     ,NEUTRALIZE_TARGET
+    ,ENGINE_START
+    ,TAKE_OFF
 
 };
 
@@ -327,11 +329,57 @@ public:
     // 목표 액터
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AJ_BaseMissionObjective* objectiveActor = nullptr;
+    // 목표 종류
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     ETacticalOrder objType = ETacticalOrder::NONE;
     // 목표 수행도 | 목표 완료시 갱신됨
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     float successPercent = 0.f;
+
+    FObjectiveData() {}
+
+    FObjectiveData(ETacticalOrder objType) : objType(objType) {}
+};
+
+// 텍스트 스타일 종류
+UENUM(BlueprintType)
+enum class ETextStyle : uint8
+{
+    DEFAULT
+    ,SUCCESS
+    ,FAIL
+    
+};
+
+// 리치 텍스트 데이터 구조체
+USTRUCT(BlueprintType)
+struct FRichString
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    FString value;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString formatStr;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    ETextStyle styleType;
+
+    FRichString() : value(""), styleType(ETextStyle::DEFAULT) {}
+    FRichString(FString value) : value(value), styleType(ETextStyle::DEFAULT)
+    {
+        formatStr = FormatString(value, styleType);
+    }
+    FRichString(FString value, ETextStyle styleType)
+        : value(value), styleType(styleType)
+    {
+        formatStr = FormatString(value, styleType);
+    }
+
+    FString FormatString(const FString &str, ETextStyle type);
+    FString GetFormatString() const
+    {
+        return formatStr;
+    }
 };
 
 // 편대 역할
@@ -372,28 +420,6 @@ enum class EFormationChecklist : uint8
     ,ALIGN_FORMATION = 2
 };
 
-// // XXXUI 텍스트, 완료 유무, 성공 유무
-// USTRUCT(BlueprintType)
-// struct FObjUITextData
-// {
-//     GENERATED_BODY()
-// public:
-//     // 텍스트
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     FString text;
-//     // 완료 유무
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     bool isEnd = false;
-//     // 성공 유무
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     bool isSuccess = true;
-
-//     FObjUITextData() {}
-
-//     FObjUITextData(const FString& text, bool isEnd = false, bool isSuccess = true) 
-//         : text(text), isEnd(isEnd), isSuccess(isSuccess) {}
-// };
-
 // 목표 UI 표시용 
 USTRUCT(BlueprintType)
 struct FTextUIData
@@ -401,11 +427,10 @@ struct FTextUIData
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString headerText;
+    FRichString headerText = FRichString();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FString> bodyTextAry;
-    
+    TArray<FRichString> bodyTextAry;
 };
 
 
@@ -457,6 +482,71 @@ public:
     FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
 };
 
+// 시동 절차 | 비트마스크 처리 하는거 포폴에 넣어도 될듯
+UENUM(BlueprintType)
+enum class EEngineProgress : uint8
+{
+    None = 0
+    ,MIC_SWITCH_ON = 1
+    ,ENGINE_GEN_SWITCH_ON = 2
+    ,ENGINE_CONTROL_SWITCH_ON = 3
+    ,JFS_STARTER_SWITCH_ON = 4
+    ,ENGINE_MASTER_SWITCH_ON = 5
+    ,JFS_HANDLE_PULL = 6
+    ,ENGINE_THROTTLE_IDLE = 7
+    ,CLOSE_CANOPY = 8
+    ,STANDBY_OTHER_PLAYER = 9
+    ,RELEASE_SIDE_BREAK = 10
+};
+
+// 시동 절차 확인 용 개인 pc 데이터
+USTRUCT(BlueprintType)
+struct FEngineProgressData
+{
+    GENERATED_BODY()
+public:
+    // 현재 수행 단계
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    EEngineProgress curProgress;
+    // 수행 점수 비트마스크
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int successValue;
+
+    FEngineProgressData() : curProgress(EEngineProgress::MIC_SWITCH_ON), successValue(0) {}
+
+    // 수행 점수 추가
+    void AddSuccessValue(EEngineProgress type);
+    // 다음 수행 단계로 넘어가기
+    void SetNextProgress();
+    // 절차의 최고 수행 값 반환
+    int GetMaxSuccessValue();
+    // 수행 점수로 수행 비율 계산
+    float CalcSuccessRate(int value);
+    // enum 값을 비트마스크 용 정수로 변환
+    int ConvertProgressEnumToInt(EEngineProgress type) const;
+    // enum 값을 string 으로 변환 | 목표 UI에서 사용
+    FString ToStringProgressEnum(EEngineProgress type) const;
+    // 해당 enum 성공 실패 여부 반환 | 비트마스크
+    bool CheckProgressSuccess(EEngineProgress type) const;
+};
+
+// 시동 절차 확인 용 전체 데이터
+USTRUCT(BlueprintType)
+struct FEngineProgressAllData
+{
+    GENERATED_BODY()
+public:
+    // pc 를 key로 함
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TMap<class AJ_MissionPlayerController*, FEngineProgressData> dataMap;
+
+    // 초기화
+    void InitDataMap(const TArray<AJ_MissionPlayerController *> &pcAry);
+};
+
+// 시동 절차 수행 알림 딜리게이트 선언
+DECLARE_DELEGATE_OneParam(FSuccessProgress, EEngineProgress);
+
 // 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
 USTRUCT(BlueprintType)
 struct FTacticalOrderData
@@ -469,6 +559,9 @@ public:
     FTacticalOrderData(
         ETacticalOrder orderType, FFormationFlightUIData ffData = FFormationFlightUIData(), FNeutralizeTargetUIData ntData = FNeutralizeTargetUIData()) 
         : orderType(orderType), ffData(ffData), ntData(ntData) {}
+    
+    FTacticalOrderData(ETacticalOrder orderType, FEngineProgressData epData)
+        : orderType(orderType), epData(epData) {}
 
     // 명령 종류
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -481,7 +574,15 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FNeutralizeTargetUIData ntData;
     // 이동
+
+    // 시동 절차
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FEngineProgressData epData;
 };
+
+
+
+
 
 #pragma endregion
 

@@ -10,6 +10,7 @@
 #include "Components/VerticalBoxSlot.h"
 #include "Components/WidgetComponent.h"
 #include "JBS/J_ObjectiveSubElementUI.h"
+#include "JBS/J_Utility.h"
 #include "Layout/Margin.h"
 #include "Math/MathFwd.h"
 #include "Slate/WidgetTransform.h"
@@ -32,14 +33,14 @@ void UJ_ObjectiveTextUI::SetTextUI(FTextUIData data, bool isInit)
     }
 }
 
-void UJ_ObjectiveTextUI::SetBodyTextValue(class UWidget *textWidget, const FString &str)
+void UJ_ObjectiveTextUI::SetBodyTextValue(class UWidget *textWidget, const FRichString &str)
 {
     auto* subEle = CastChecked<UJ_ObjectiveSubElementUI>(textWidget);
 
-    subEle->objSubText->SetText(FText::FromString(str));
+    subEle->SetSubText(str);
 }
 
-UWidget *UJ_ObjectiveTextUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str)
+UWidget *UJ_ObjectiveTextUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str)
 {
     auto* newObjSubEle = CreateWidget<UJ_ObjectiveSubElementUI>(this, objSubEleUIPrefab);
     // 값 설정
@@ -56,24 +57,3 @@ void UJ_ObjectiveTextUI::SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot)
     newSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 
 }
-
-// XXX
-// void UJ_ObjectiveTextUI::UpdateObjUIAnimValue(float canvasX, float bgPaddingBottom, float subEleScaleY)
-// {
-//     // 좌측으로 이동
-//     auto curSizeBoxTR = objectiveUI->GetRenderTransform();
-//     curSizeBoxTR.Translation.X = canvasX;
-    
-//     objectiveUI->SetRenderTransform(curSizeBoxTR);
-
-//     // bg 늘어나기
-//     auto* bgSlot = CastChecked<UOverlaySlot>(objectiveUIBG->Slot);
-//     auto curPadding = bgSlot->GetPadding();
-//     curPadding.Bottom = bgPaddingBottom;
-
-//     bgSlot->SetPadding(curPadding);
-
-//     // objBodyElementVBox->SetRenderScale(FVector2D(1, subEleScaleY));
-
-// }
-

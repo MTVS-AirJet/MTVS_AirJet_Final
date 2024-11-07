@@ -17,13 +17,13 @@ void UJ_BaseTextUI::SetTextUI(FTextUIData data, bool isInit)
     SetBodyText(data.bodyTextAry, isInit);
 }
 
-void UJ_BaseTextUI::SetHeaderText(const FString &str, URichTextBlock *headerText)
+void UJ_BaseTextUI::SetHeaderText(const FRichString &str, URichTextBlock *headerText)
 {
-    headerText->SetText(FText::FromString(str));
+    headerText->SetText(FText::FromString(str.GetFormatString()));
 }
 
-
-void UJ_BaseTextUI::SetBodyText(TArray<FString> strAry, bool isInit, UVerticalBox *bodyTextVBox)
+// @@ 리치 텍스트 로 색 바꿀려면 여기부터 다 TArray<FString, style enum >으로 구조체로 묶어서 보내야함
+void UJ_BaseTextUI::SetBodyText(const TArray<FRichString>& strAry, bool isInit, UVerticalBox *bodyTextVBox)
 {
     // 최초 생성
     if(isInit)
@@ -56,7 +56,7 @@ void UJ_BaseTextUI::SetBodyText(TArray<FString> strAry, bool isInit, UVerticalBo
 }
 
 // 상속받아 사용시 이거는 재정의 해야함
-UWidget *UJ_BaseTextUI::CreateBodyElement(TSubclassOf<UWidget> widgetClass, const FString &str)
+UWidget *UJ_BaseTextUI::CreateBodyElement(TSubclassOf<UWidget> widgetClass, const FRichString &str)
 {
     auto* newWidget = WidgetTree->ConstructWidget<UWidget>(widgetClass);
     auto* newRichText = CastChecked<URichTextBlock>(newWidget);
@@ -66,8 +66,8 @@ UWidget *UJ_BaseTextUI::CreateBodyElement(TSubclassOf<UWidget> widgetClass, cons
     return newRichText;
 }
 
-void UJ_BaseTextUI::SetBodyTextValue(class UWidget *textWidget, const FString &str)
+void UJ_BaseTextUI::SetBodyTextValue(class UWidget *textWidget, const FRichString &str)
 {
     auto* richText = CastChecked<URichTextBlock>(textWidget);
-    richText->SetText(FText::FromString(str));
+    richText->SetText(FText::FromString(str.GetFormatString()));
 }

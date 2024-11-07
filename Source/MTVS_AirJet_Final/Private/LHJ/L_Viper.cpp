@@ -2,6 +2,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "JBS/J_Utility.h"
 #include "MTVS_AirJet_Final.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -133,7 +134,7 @@ AL_Viper::AL_Viper()
 
 	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
 	JetFuelStarter->SetupAttachment(JetMesh);
-	JetFuelStarter->SetRelativeLocation(FVector(524 , 36 , 253));
+	JetFuelStarter->SetRelativeLocation(FVector(518 , 36.5 , 253));
 	JetFuelStarter->SetRelativeScale3D(FVector(4));
 	JetFuelStarter->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetFuelStarter->SetGenerateOverlapEvents(true);
@@ -176,6 +177,14 @@ AL_Viper::AL_Viper()
 	JetCanopy->SetGenerateOverlapEvents(true);
 	JetCanopy->OnClicked.AddDynamic(this , &AL_Viper::OnMyCanopyClicked);
 	//JetCanopy->SetHiddenInGame(false); // For Test
+
+	JetBreakHold = CreateDefaultSubobject<UBoxComponent>(TEXT("JetBreakHold"));
+	JetBreakHold->SetupAttachment(JetMesh);
+	JetBreakHold->SetRelativeLocationAndRotation(FVector(548 , 38.5 , 259.5) , FRotator(90 , 0 , 0));
+	JetBreakHold->SetRelativeScale3D(FVector(4));
+	JetBreakHold->SetBoxExtent(FVector(.2 , .15 , .8));
+	JetBreakHold->SetGenerateOverlapEvents(true);
+	JetBreakHold->OnClicked.AddDynamic(this , &AL_Viper::OnMyBreakHoldClicked);
 
 	JetLeftPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetLeftPannel"));
 	JetLeftPannel->SetRelativeLocation(FVector(-271 , -2 , 0));
@@ -307,6 +316,7 @@ void AL_Viper::PushQueue()
 	StartScenario.push("JFS_Handle");
 	StartScenario.push("Throttle");
 	StartScenario.push("Canopy");
+	StartScenario.push("BreakHold");
 }
 
 void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -345,10 +355,11 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+#pragma region Enhanced Input
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (input)
 	{
+#pragma region Keyboard & Moused
 		input->BindAction(IA_ViperEngine , ETriggerEvent::Started , this , &AL_Viper::F_ViperEngine);
 
 		input->BindAction(IA_ViperLook , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLook);
@@ -406,7 +417,37 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperDevelop , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperDevelopStarted);
+#pragma endregion
+
+#pragma region Controller
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton8Started);
+		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Completed , this , &AL_Viper::F_ThrottleButton8Completed);
+		input->BindAction(IA_ThrottleButton15 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton15Started);
+		input->BindAction(IA_ThrottleButton34 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton34Started);
+		input->BindAction(IA_ThrottleButton35 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton35Started);
+		input->BindAction(IA_ThrottleButton36 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton36Started);
+		input->BindAction(IA_ThrottleButton37 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton37Started);
+		input->BindAction(IA_ThrottleButton38 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton38Started);
+		input->BindAction(IA_ThrottleButton39 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton39Started);
+		input->BindAction(IA_ThrottleButton40 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton40Started);
+		input->BindAction(IA_ThrottleButton41 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton41Started);
+		input->BindAction(IA_ThrottleButton42 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton42Started);
+		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);
+		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);
+		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);
+		input->BindAction(IA_StickButton1 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton1Started);
+		input->BindAction(IA_StickButton2 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton2Started);
+		input->BindAction(IA_StickButton5 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton5Started);
+		input->BindAction(IA_StickButton11 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton11Started);
+		input->BindAction(IA_StickButton11 , ETriggerEvent::Completed , this , &AL_Viper::F_StickButton11Completed);
+		input->BindAction(IA_StickButton13 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton13Started);
+		input->BindAction(IA_StickButton13 , ETriggerEvent::Completed , this , &AL_Viper::F_StickButton13Completed);
+		input->BindAction(IA_StickAxis1 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis1);
+		input->BindAction(IA_StickAxis2 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis2);
+		input->BindAction(IA_StickAxis3 , ETriggerEvent::Triggered , this , &AL_Viper::F_StickAxis3);
+#pragma endregion
 	}
+#pragma endregion
 }
 
 void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
@@ -434,7 +475,7 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 	else
 	{
 		bMIC = false;
-		DummyMICMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyMICMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -450,7 +491,7 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	else
 	{
 		bEngineGen1 = false;
-		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineGenerMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -466,7 +507,7 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 	else
 	{
 		bEngineGen2 = false;
-		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineGenerMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -482,7 +523,7 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 	else
 	{
 		bEngineControl1 = false;
-		DummyEngineControlMesh1->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineControlMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -498,7 +539,7 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 	else
 	{
 		bEngineControl2 = false;
-		DummyEngineControlMesh2->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineControlMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -514,7 +555,7 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 	else
 	{
 		bJFS = false;
-		DummyJFSMesh->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyJFSMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -530,7 +571,7 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 	else
 	{
 		bEngineMaster1 = false;
-		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineMasterMesh1->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -546,7 +587,7 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 	else
 	{
 		bEngineMaster2 = false;
-		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(0 , 0 , 0));
+		DummyEngineMasterMesh2->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -589,6 +630,21 @@ void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct 
 	{
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
 		iCanopyNum = 1;
+	}
+}
+
+void AL_Viper::OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
+{
+	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
+	if (!bBreakHold)
+	{
+		bBreakHold = true;
+		DummyJFSBreakHold->SetRelativeRotation(FRotator(-30 , 0 , 0));
+	}
+	else
+	{
+		bBreakHold = false;
+		DummyJFSBreakHold->SetRelativeRotation(FRotator(30 , 0 , 0));
 	}
 }
 
@@ -833,38 +889,98 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 	bReadyTimeEndFlag = true;
 	if (!IsStart)
 	{
-		FKey lMouse = EKeys::LeftMouseButton;
-		if (JetMic && !bMIC)
-			OnMyMicClicked(JetMic , lMouse);
-		if (JetEngineGen && !bEngineGen1)
-			OnMyEngineGen1Clicked(JetEngineGen , lMouse);
-		if (JetEngineGen2 && !bEngineGen2)
-			OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
-		if (JetEngineControl && !bEngineControl1)
-			OnMyEngineControlClicked(JetEngineControl , lMouse);
-		if (JetEngineControl2 && !bEngineControl2)
-			OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
-		if (JetEngineMaster && !bEngineMaster1)
-			OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
-		if (JetEngineMaster2 && !bEngineMaster2)
-			OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
-		if (JetFuelStarter && !bJFS)
-			OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
-		if (JetJFSHandle && !bJFSHandle)
-			OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
-		if (JetFirstEngine && !bFirstEngine)
-			OnMyFirstEngineClicked(JetFirstEngine , lMouse);
-		if (JetCanopy && iCanopyNum != 2)
+		while (true)
 		{
-			JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-			iCanopyNum = 2;
+			FString ScenarioFront = StartScenario.front();
+			FKey lMouse = EKeys::LeftMouseButton;
+			if (ScenarioFront.Equals("MIC"))
+			{
+				if (JetMic && !bMIC)
+				{
+					OnMyMicClicked(JetMic , lMouse);
+				}
+				StartScenario.pop();
+				DummyMICMesh->SetRenderCustomDepth(false);
+				DummyMICMesh->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("EngineGen"))
+			{
+				if (JetEngineGen && !bEngineGen1)
+					OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+				if (JetEngineGen2 && !bEngineGen2)
+					OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+				StartScenario.pop();
+				DummyEngineGenerMesh1->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
+				DummyEngineGenerMesh2->SetRenderCustomDepth(false);
+				DummyEngineGenerMesh2->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("EngineControl"))
+			{
+				if (JetEngineControl && !bEngineControl1)
+					OnMyEngineControlClicked(JetEngineControl , lMouse);
+				if (JetEngineControl2 && !bEngineControl2)
+					OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+				StartScenario.pop();
+				DummyEngineControlMesh1->SetRenderCustomDepth(false);
+				DummyEngineControlMesh1->CustomDepthStencilValue = 0;
+				DummyEngineControlMesh2->SetRenderCustomDepth(false);
+				DummyEngineControlMesh2->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("EngineMaster"))
+			{
+				if (JetEngineMaster && !bEngineMaster1)
+					OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+				if (JetEngineMaster2 && !bEngineMaster2)
+					OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+				StartScenario.pop();
+				DummyEngineMasterMesh1->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
+				DummyEngineMasterMesh2->SetRenderCustomDepth(false);
+				DummyEngineMasterMesh2->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("JFS_Switch"))
+			{
+				if (JetFuelStarter && !bJFS)
+					OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+
+				StartScenario.pop();
+				DummyJFSMesh->SetRenderCustomDepth(false);
+				DummyJFSMesh->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("JFS_Handle"))
+			{
+				if (JetJFSHandle && !bJFSHandle)
+					OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+				StartScenario.pop();
+				DummyJFSHandleMesh->SetRenderCustomDepth(false);
+				DummyJFSHandleMesh->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("Throttle"))
+			{
+				if (JetFirstEngine && !bFirstEngine)
+					OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+				StartScenario.pop();
+				DummyThrottleMesh->SetRenderCustomDepth(false);
+				DummyThrottleMesh->CustomDepthStencilValue = 0;
+			}
+			else if (ScenarioFront.Equals("Canopy"))
+			{
+				if (JetCanopy && iCanopyNum != 2)
+				{
+					JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+					iCanopyNum = 2;
+				}
+
+				break;
+			}
 		}
 	}
 #pragma endregion
-	IsStart = true;
-	IsEngineOn = true;
-	intTriggerNum = 2;
-	IsFlyStart = true;
+	//IsStart = true;
+	//IsEngineOn = true;
+	//intTriggerNum = 2;
+	//IsFlyStart = true;
 }
 
 FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -918,41 +1034,41 @@ void AL_Viper::BeginPlay()
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
 
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle , [this]()
-		{
-			LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
-			bReadyTimeEndFlag = true;
-			if (!IsStart)
-			{
-				FKey lMouse = EKeys::LeftMouseButton;
-				if (JetMic && !bMIC)
-					OnMyMicClicked(JetMic , lMouse);
-				if (JetEngineGen && !bEngineGen1)
-					OnMyEngineGen1Clicked(JetEngineGen , lMouse);
-				if (JetEngineGen2 && !bEngineGen2)
-					OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
-				if (JetEngineControl && !bEngineControl1)
-					OnMyEngineControlClicked(JetEngineControl , lMouse);
-				if (JetEngineControl2 && !bEngineControl2)
-					OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
-				if (JetEngineMaster && !bEngineMaster1)
-					OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
-				if (JetEngineMaster2 && !bEngineMaster2)
-					OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
-				if (JetFuelStarter && !bJFS)
-					OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
-				if (JetJFSHandle && !bJFSHandle)
-					OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
-				if (JetFirstEngine && !bFirstEngine)
-					OnMyFirstEngineClicked(JetFirstEngine , lMouse);
-				if (JetCanopy && iCanopyNum != 2)
-				{
-					JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-					iCanopyNum = 2;
-				}
-			}
-		} , TimeToReady , false);
+		// 	FTimerHandle TimerHandle;
+		// 	GetWorldTimerManager().SetTimer(TimerHandle , [this]()
+		// 	{
+		// 		LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
+		// 		bReadyTimeEndFlag = true;
+		// 		if (!IsStart)
+		// 		{
+		// 			FKey lMouse = EKeys::LeftMouseButton;
+		// 			if (JetMic && !bMIC)
+		// 				OnMyMicClicked(JetMic , lMouse);
+		// 			if (JetEngineGen && !bEngineGen1)
+		// 				OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+		// 			if (JetEngineGen2 && !bEngineGen2)
+		// 				OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+		// 			if (JetEngineControl && !bEngineControl1)
+		// 				OnMyEngineControlClicked(JetEngineControl , lMouse);
+		// 			if (JetEngineControl2 && !bEngineControl2)
+		// 				OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+		// 			if (JetEngineMaster && !bEngineMaster1)
+		// 				OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+		// 			if (JetEngineMaster2 && !bEngineMaster2)
+		// 				OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+		// 			if (JetFuelStarter && !bJFS)
+		// 				OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+		// 			if (JetJFSHandle && !bJFSHandle)
+		// 				OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
+		// 			if (JetFirstEngine && !bFirstEngine)
+		// 				OnMyFirstEngineClicked(JetFirstEngine , lMouse);
+		// 			if (JetCanopy && iCanopyNum != 2)
+		// 			{
+		// 				JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		// 				iCanopyNum = 2;
+		// 			}
+		// 		}
+		// 	} , TimeToReady , false);
 	}
 
 	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
@@ -1065,6 +1181,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bMIC)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::MIC_SWITCH_ON);
 						DummyMICMesh->SetRenderCustomDepth(false);
 						DummyMICMesh->CustomDepthStencilValue = 0;
 					}
@@ -1082,6 +1199,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineGen1 && bEngineGen2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_GEN_SWITCH_ON);
 						DummyEngineGenerMesh1->SetRenderCustomDepth(false);
 						DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
 						DummyEngineGenerMesh2->SetRenderCustomDepth(false);
@@ -1101,6 +1219,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineControl1 && bEngineControl2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_CONTROL_SWITCH_ON);
 						DummyEngineControlMesh1->SetRenderCustomDepth(false);
 						DummyEngineControlMesh1->CustomDepthStencilValue = 0;
 						DummyEngineControlMesh2->SetRenderCustomDepth(false);
@@ -1118,6 +1237,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFS)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_STARTER_SWITCH_ON);
 						DummyJFSMesh->SetRenderCustomDepth(false);
 						DummyJFSMesh->CustomDepthStencilValue = 0;
 					}
@@ -1135,6 +1255,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineMaster1 && bEngineMaster2)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_MASTER_SWITCH_ON);
 						DummyEngineMasterMesh1->SetRenderCustomDepth(false);
 						DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
 						DummyEngineMasterMesh2->SetRenderCustomDepth(false);
@@ -1152,6 +1273,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFSHandle)
 					{
 						StartScenario.pop();
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_HANDLE_PULL);
 						DummyJFSHandleMesh->SetRenderCustomDepth(false);
 						DummyJFSHandleMesh->CustomDepthStencilValue = 0;
 					}
@@ -1165,6 +1287,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (bFirstEngine)
 				{
 					StartScenario.pop();
+					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_THROTTLE_IDLE);
 					DummyThrottleMesh->SetRenderCustomDepth(false);
 					DummyThrottleMesh->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 0);
@@ -1197,18 +1320,45 @@ void AL_Viper::Tick(float DeltaTime)
 						if (JetCanopy)
 						{
 							FKey lMouse = EKeys::LeftMouseButton;
-							bReadyTimeEndFlag = false;
 							OnMyCanopyClicked(JetCanopy , lMouse);
+							DummyCanopyMesh->SetRenderCustomDepth(false);
+							DummyCanopyMesh->CustomDepthStencilValue = 0;
+							StartScenario.pop();
 						}
 					}
 
-					if (iCanopyNum == 3)
+					if (!bReadyTimeEndFlag && iCanopyNum == 3)
 					{
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
-						CRPC_AudioControl(true , 1);
+						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
+						// CRPC_AudioControl(true , 1);
 					}
+				}
+			}
+			else if (ScenarioFront.Equals("BreakHold"))
+			{
+				DummyJFSBreakHold->SetRenderCustomDepth(true);
+				DummyJFSBreakHold->CustomDepthStencilValue = 1;
+
+				if (bReadyTimeEndFlag)
+				{
+					FKey lMouse = EKeys::LeftMouseButton;
+					OnMyBreakHoldClicked(JetBreakHold , lMouse);
+					StartScenario.pop();
+					DummyJFSBreakHold->SetRenderCustomDepth(false);
+					DummyJFSBreakHold->CustomDepthStencilValue = 0;
+					CRPC_AudioControl(true , 1);
+				}
+
+				if (!bReadyTimeEndFlag && bBreakHold)
+				{
+					StartScenario.pop();
+					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::RELEASE_SIDE_BREAK);
+					DummyJFSBreakHold->SetRenderCustomDepth(false);
+					DummyJFSBreakHold->CustomDepthStencilValue = 0;
+					CRPC_AudioControl(true , 1);
 				}
 			}
 #pragma endregion
@@ -1409,12 +1559,12 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 
 		SetAccelGear();
-		LOG_S(Warning, TEXT("Current Gear X LOC : %f"), JetFirstEngine->GetRelativeLocation().X);
-		LOG_S(Warning, TEXT("Current Gear : %d"), AccelGear);
+		// LOG_S(Warning , TEXT("Current Gear X LOC : %f") , JetFirstEngine->GetRelativeLocation().X);
+		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
 #pragma region Jet Move
-		ValueOfMoveForce += GetAddTickSpeed();
+		ValueOfMoveForce += (GetAddTickSpeed() * 6);
 		if (ValueOfMoveForce < 0)
 			ValueOfMoveForce = 0;
 		else if (ValueOfMoveForce > MaxValueOfMoveForce)
@@ -1447,10 +1597,10 @@ void AL_Viper::Tick(float DeltaTime)
 			if (IsRightRoll)
 				JetRoot->AddRelativeRotation(RotateValue);
 
-			if (IsLocallyControlled())
-			{
-				ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
-			}
+			// if (IsLocallyControlled())
+			// {
+			// 	ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
+			// }
 
 			// 카메라 쉐이크
 			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
@@ -1861,36 +2011,36 @@ void AL_Viper::PlayLockOnSound()
 void AL_Viper::CreateDumyComp()
 {
 	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
-	DummyMICMesh->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyMICMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 	DummyMICMesh->SetupAttachment(JetMic);
 
 	DummyEngineGenerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh1"));
 	DummyEngineGenerMesh1->SetupAttachment(JetEngineGen);
-	DummyEngineGenerMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineGenerMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
 	DummyEngineGenerMesh2->SetupAttachment(JetEngineGen2);
-	DummyEngineGenerMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineGenerMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyEngineControlMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh1"));
 	DummyEngineControlMesh1->SetupAttachment(JetEngineControl);
-	DummyEngineControlMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineControlMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyEngineControlMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh2"));
 	DummyEngineControlMesh2->SetupAttachment(JetEngineControl2);
-	DummyEngineControlMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineControlMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyJFSMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSMesh"));
 	DummyJFSMesh->SetupAttachment(JetFuelStarter);
-	DummyJFSMesh->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyJFSMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyEngineMasterMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh1"));
 	DummyEngineMasterMesh1->SetupAttachment(JetEngineMaster);
-	DummyEngineMasterMesh1->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineMasterMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
 	DummyEngineMasterMesh2->SetupAttachment(JetEngineMaster2);
-	DummyEngineMasterMesh2->SetRelativeLocation(FVector(0 , 0 , -.9));
+	DummyEngineMasterMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 
 	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
 	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
@@ -1904,6 +2054,10 @@ void AL_Viper::CreateDumyComp()
 	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
 	DummyCanopyMesh->SetupAttachment(JetCanopy);
 	DummyCanopyMesh->SetRelativeLocation(FVector(-521 , -40 , -268));
+
+	DummyJFSBreakHold = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSBreakHold"));
+	DummyJFSBreakHold->SetupAttachment(JetBreakHold);
+	DummyJFSBreakHold->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
 }
 
 void AL_Viper::SetAccelGear()
@@ -2194,5 +2348,157 @@ void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
 void AL_Viper::CRPC_CameraShake_Implementation()
 {
 	if (LoadCameraShake)
-		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 500.f);
+		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 700.f);
+}
+
+void AL_Viper::F_ThrottleButton8Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton8Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton8Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton8Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton15Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton15Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton34Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton34Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton35Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton35Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton36Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton36Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton37Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton37Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton38Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton38Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton39Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton39Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton40Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton40Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton41Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton41Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton42Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton42Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleButton43Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
+{
+	float data = value.Get<float>();
+	// LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+}
+
+void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
+{
+	float data = value.Get<float>();
+	// LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+}
+
+void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton11Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton13Started(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
+{
+	auto b = value.Get<bool>();
+	// LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
+}
+
+void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
+{
+	float data = value.Get<float>();
+	//LOG_S(Warning , TEXT("F_StickAxis1 : %f") , data);
+}
+
+void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
+{
+	// Up(1), Down(-1)
+	float data = value.Get<float>();
+	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+}
+
+void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
+{
+	// Left(-1), Right(1)
+	float data = value.Get<float>();
+	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
 }

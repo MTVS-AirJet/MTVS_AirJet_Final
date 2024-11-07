@@ -36,10 +36,6 @@ void UJ_ObjectiveUI::StartObjUI()
 {
     // 시작 UMG 애니메이션 바인드 | settextui 이후 실행
     objectiveTextUI->startAnimDel.BindUObject(this, &UJ_ObjectiveUI::PlayObjStartAnim);
-
-    // 글자 색 초기화
-    ResetTextColor();
-    
 }
 
 void UJ_ObjectiveUI::EndObjUI(bool isSuccess)
@@ -47,35 +43,19 @@ void UJ_ObjectiveUI::EndObjUI(bool isSuccess)
     // 완료 UMG
     PlayObjEndAnim(this->GetObjTextUI());
 
-    // @@ 취소선 처리?
     // umg 종료후 비활성화 | 지금은 하드코딩으로 맞추고 있음
 }
 
 void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
 {
-    // @@ 서브 완료 UMG
-    
-    // @@ 성공 유무에 따라 텍스트 색상 변경
-    // FIXME
-    // auto subUIs = objBodyElementVBox->GetAllChildren();
-    // TArray<UJ_ObjectiveSubElementUI*> subEleUIs;
-    // Algo::Transform(subUIs, subEleUIs, [](UWidget* temp){
-    //     return Cast<UJ_ObjectiveSubElementUI>(temp);
-    // });
-    // //캐스트 후
-    
-    // // 유효 체크
-    // if(subEleUIs.Num() <= idx)
-    // {
-    //     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("EndSubObjUI : subUI out of range"));
+    // objtextui 의 서브 목표 vbox 가져오기
+    auto* vbox = GetObjTextUI()->OBJ_BODY_VBOX;
+    if(idx < 0 || idx >= vbox->GetChildrenCount()) return;
+    // 종료된 서브 목표 ui
+    auto* subUI = Cast<UJ_ObjectiveSubElementUI>(vbox->GetChildAt(idx));
 
-    //     return;
-    // }
-
-    // FIXME 색상 변경
-    // subEleUIs[idx]->objSubText->SetColorAndOpacity(isSuccess ? successTextColor : failTextColor);
-
-    // @@ 취소선 처리?
+    // 서브 완료 UMG
+    PlaySubObjEndAnim(subUI);
 }
 
 
@@ -91,24 +71,7 @@ void UJ_ObjectiveUI::ActiveResultUI(const TArray<FObjectiveData>& resultObjData)
     missionCompleteUI->SetResultListValue(resultObjData);
 }
 
-void UJ_ObjectiveUI::ResetTextColor()
-{
-// objHeaderText->SetColorAndOpacity(defaultTextColor);
 
-    // FIXME
-    // auto allSub = objBodyElementVBox->GetAllChildren();
-    // TArray<UJ_ObjectiveSubElementUI*> subUIs;
-    // Algo::Transform(allSub, subUIs, [](UWidget* temp){
-    //     return Cast<UJ_ObjectiveSubElementUI>(temp);
-    // });
-    // //캐스트 후
-    // for(auto* subUI : subUIs)
-    // {
-    //     // FIXME 추가해야함
-    //     // subUI->objSubText->SetColorAndOpacity(defaultTextColor);
-    // }
-    // objBodyText->SetColorAndOpacity(defaultTextColor);
-}
 
 
 
@@ -156,4 +119,22 @@ void UJ_ObjectiveUI::ResetTextColor()
 
 //     // solved ary보다 child가 적을시 추가 생성
 // }
+// XXX
+// void UJ_ObjectiveUI::ResetTextColor()
+// {
+// // objHeaderText->SetColorAndOpacity(defaultTextColor);
 
+//     // FIXME
+//     // auto allSub = objBodyElementVBox->GetAllChildren();
+//     // TArray<UJ_ObjectiveSubElementUI*> subUIs;
+//     // Algo::Transform(allSub, subUIs, [](UWidget* temp){
+//     //     return Cast<UJ_ObjectiveSubElementUI>(temp);
+//     // });
+//     // //캐스트 후
+//     // for(auto* subUI : subUIs)
+//     // {
+//     //     // FIXME 추가해야함
+//     //     // subUI->objSubText->SetColorAndOpacity(defaultTextColor);
+//     // }
+//     // objBodyText->SetColorAndOpacity(defaultTextColor);
+// }

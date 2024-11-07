@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_Utility.h"
 #include "L_Viper.generated.h"
 
 UENUM()
@@ -74,6 +75,8 @@ private: // Component
 	class UBoxComponent* JetJFSHandle;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UBoxComponent* JetCanopy;
+	UPROPERTY(EditdefaultsOnly , Category="Components")
+	class UBoxComponent* JetBreakHold;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetLeftPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
@@ -95,15 +98,16 @@ private: // Component
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
 
+protected:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArmFPS;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCameraFPS;
-
+private:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
@@ -146,6 +150,8 @@ private:
 	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION()
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION()
+	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -481,6 +487,10 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
 	float ThrottleMoveSpeed2 = .15f;
 	void SetAccelGear();
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	class UStaticMeshComponent* DummyJFSBreakHold;
+	bool bBreakHold;
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
@@ -593,4 +603,106 @@ private:
 	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
 	UFUNCTION(Client, Reliable)
 	void CRPC_CameraShake();
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton8;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton15;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton34;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton35;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton36;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton37;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton38;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton39;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton40;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton41;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton42;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton43;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis4;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis6;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton5;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton11;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton13;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis3;
+
+	UFUNCTION()
+	void F_ThrottleButton8Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton8Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton15Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton34Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton35Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton36Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton37Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton38Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton39Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton40Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton41Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton42Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton43Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis4(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis6(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton1Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton2Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton5Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis1(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis2(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis3(const struct FInputActionValue& value);
+	
+#pragma region JBS 추가 부분
+public:
+	FSuccessProgress engineProgSuccessDel;
+#pragma endregion
 };

@@ -13,6 +13,7 @@
 #include "GameFramework/PlayerController.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveIconUI.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "JBS/J_Utility.h"
 #include "Materials/Material.h"
 #include "JBS/J_CustomWidgetComponent.h"
@@ -89,6 +90,15 @@ void AJ_BaseMissionObjective::BeginPlay()
 
 	objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
 	objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
+
+	// 목표 ui 관련 딜리게이트 바인드
+	// 활성화시 목표 UI 생성 바인드
+    // objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_StartNewObjUI);
+    // 수행도 갱신시 목표 UI 값 갱신 바인드
+    objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_UpdateObjUI);
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_EndObjUI);
+    // objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_EndSubObjUI);
 
 
 	// 로컬 pc 가져와서 pawn 넣기
@@ -190,7 +200,8 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 	if(!HasAuthority()) return;
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
 
-	
+	// 목표 UI 신규 갱신
+	SRPC_StartNewObjUI();
 }
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
@@ -212,18 +223,69 @@ void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 void AJ_BaseMissionObjective::SRPC_StartNewObjUI_Implementation()
 {
 	if(!HasAuthority()) return;
+
+	// 모든 pc 가져오기
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 crpc
+    for(auto* pc : allPC)
+    {
+		// 보낼 목표 데이터 구성
+		FTacticalOrderData orderData = SetObjUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUI(orderData);
+    }
+}
+
+FTacticalOrderData AJ_BaseMissionObjective::SetObjUIData(AJ_MissionPlayerController* pc)
+{
+	return FTacticalOrderData();
 }
 
 void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
 {
 	if(!HasAuthority()) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+		auto orderData = SetObjUIData(pc);
+        // 데이터 보내기
+        pc->objUIComp->CRPC_UpdateObjUI(orderData);
+    }
 }
 
 void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
 {
 	if(!HasAuthority()) return;
+
+	// 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+        pc->objUIComp->CRPC_EndObjUI();
+    }
 }
-void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation() {if(!HasAuthority()) return;}
+void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
+{
+	if(!HasAuthority()) return;
+
+	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
+
+	// // 모든 pc 가져오기
+    // auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // // pc에게 새 전술명령 UI 시작 srpc
+    // for(auto* pc : allPC)
+    // {
+    // }
+}
 
 void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
@@ -237,3 +299,4 @@ void AJ_BaseMissionObjective::OnRep_ObjActive()
 	iconWorldUIComp->SetActive(isObjectiveActive);
 	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
 }
+
