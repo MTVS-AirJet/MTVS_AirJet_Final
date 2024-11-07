@@ -45,48 +45,49 @@ private:
 	UFUNCTION()
 	void PrintNetLog();
 
-private: // Component
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+protected: // Component
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetRoot;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class USkeletalMeshComponent* JetMesh;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UArrowComponent* JetArrow;
 
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetFirstEngine;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetMic;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineGen;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineGen2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineControl;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineControl2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetFuelStarter;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineMaster;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineMaster2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetJFSHandle;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetCanopy;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetBreakHold;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetLeftPannel;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetRightPannel;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetJFSPannel;
 
+private:
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
-
+	
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UCharacterMovementComponent* movement;
 	UPROPERTY(EditDefaultsOnly , category="Components")
@@ -97,7 +98,6 @@ private: // Component
 	class UNiagaraComponent* JetTailVFXLeft;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
-
 protected:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
@@ -127,30 +127,30 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow2;
 
-private:
-	UFUNCTION()
+protected:
+	UFUNCTION(BlueprintCallable)
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
 private: // Input
@@ -262,8 +262,11 @@ private: // Input
 	UFUNCTION()
 	void F_ViperDevelopStarted(const struct FInputActionValue& value);
 
-private:
+protected:
+	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
+
+private:
 	// For Engine Using
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsEngineOn;
@@ -439,58 +442,70 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomOutValue = 140;
 
-private:
+protected:
 	void CreateDumyComp();
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyMICMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bMIC;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineGenerMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineGenerMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineGen1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineGen2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineControlMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineControlMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineControl1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineControl2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyJFSMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bJFS;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineMasterMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineMasterMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineMaster1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineMaster2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyJFSHandleMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bJFSHandle;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyThrottleMesh;
 	bool bThrottleAccel;
 	bool bThrottleBreak;
 	FVector ThrottleOffLoc = FVector(515 , -35 , 255);
 	FVector ThrottleMilLoc = FVector(525 , -35 , 255);
 	FVector ThrottleMaxLoc = FVector(530 , -35 , 255);
-	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
 	float ThrottleMoveSpeed1 = .1f;
-	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
 	float ThrottleMoveSpeed2 = .15f;
 	void SetAccelGear();
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyJFSBreakHold;
+	UPROPERTY(BlueprintReadOnly)
 	bool bBreakHold;
+	
+private:
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
@@ -630,6 +645,10 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleButton43;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton46;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton47;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleAxis4;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
 	class UInputAction* IA_ThrottleAxis6;
@@ -653,8 +672,6 @@ private:
 	UFUNCTION()
 	void F_ThrottleButton8Started(const struct FInputActionValue& value);
 	UFUNCTION()
-	void F_ThrottleButton8Completed(const struct FInputActionValue& value);
-	UFUNCTION()
 	void F_ThrottleButton15Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleButton34Started(const struct FInputActionValue& value);
@@ -676,6 +693,10 @@ private:
 	void F_ThrottleButton42Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleButton43Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton46Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton47Started(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ThrottleAxis4(const struct FInputActionValue& value);
 	UFUNCTION()
@@ -700,7 +721,8 @@ private:
 	void F_StickAxis2(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_StickAxis3(const struct FInputActionValue& value);
-	
+
+	float switchLate=0.4f;
 #pragma region JBS 추가 부분
 public:
 	FSuccessProgress engineProgSuccessDel;

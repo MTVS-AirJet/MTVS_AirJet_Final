@@ -31,6 +31,7 @@
 #include "GameFramework/PlayerState.h"
 #include "LHJ/L_Target.h"
 
+FKey lMouse = EKeys::LeftMouseButton;
 
 #pragma region Construct
 AL_Viper::AL_Viper()
@@ -421,7 +422,6 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 #pragma region Controller
 		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton8Started);
-		input->BindAction(IA_ThrottleButton8 , ETriggerEvent::Completed , this , &AL_Viper::F_ThrottleButton8Completed);
 		input->BindAction(IA_ThrottleButton15 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton15Started);
 		input->BindAction(IA_ThrottleButton34 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton34Started);
 		input->BindAction(IA_ThrottleButton35 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton35Started);
@@ -433,6 +433,8 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		input->BindAction(IA_ThrottleButton41 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton41Started);
 		input->BindAction(IA_ThrottleButton42 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton42Started);
 		input->BindAction(IA_ThrottleButton43 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton43Started);
+		input->BindAction(IA_ThrottleButton46 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton46Started);
+		input->BindAction(IA_ThrottleButton47 , ETriggerEvent::Started , this , &AL_Viper::F_ThrottleButton47Started);
 		input->BindAction(IA_ThrottleAxis4 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis4);
 		input->BindAction(IA_ThrottleAxis6 , ETriggerEvent::Triggered , this , &AL_Viper::F_ThrottleAxis6);
 		input->BindAction(IA_StickButton1 , ETriggerEvent::Started , this , &AL_Viper::F_StickButton1Started);
@@ -892,7 +894,6 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 		while (true)
 		{
 			FString ScenarioFront = StartScenario.front();
-			FKey lMouse = EKeys::LeftMouseButton;
 			if (ScenarioFront.Equals("MIC"))
 			{
 				if (JetMic && !bMIC)
@@ -1319,7 +1320,6 @@ void AL_Viper::Tick(float DeltaTime)
 					{
 						if (JetCanopy)
 						{
-							FKey lMouse = EKeys::LeftMouseButton;
 							OnMyCanopyClicked(JetCanopy , lMouse);
 							DummyCanopyMesh->SetRenderCustomDepth(false);
 							DummyCanopyMesh->CustomDepthStencilValue = 0;
@@ -1344,7 +1344,6 @@ void AL_Viper::Tick(float DeltaTime)
 
 				if (bReadyTimeEndFlag)
 				{
-					FKey lMouse = EKeys::LeftMouseButton;
 					OnMyBreakHoldClicked(JetBreakHold , lMouse);
 					StartScenario.pop();
 					DummyJFSBreakHold->SetRenderCustomDepth(false);
@@ -2353,80 +2352,125 @@ void AL_Viper::CRPC_CameraShake_Implementation()
 
 void AL_Viper::F_ThrottleButton8Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton8Started : %s") , b?*FString("true"):*FString("false"));
-}
-
-void AL_Viper::F_ThrottleButton8Completed(const struct FInputActionValue& value)
-{
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton8Completed : %s") , b?*FString("true"):*FString("false"));
+	bVoice = !bVoice;
+	if (bVoice)
+		StartVoiceChat();
+	else
+		StopVoiceChat();
 }
 
 void AL_Viper::F_ThrottleButton15Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton15Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetJFSHandle)
+		OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
 }
 
 void AL_Viper::F_ThrottleButton34Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton34Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetMic && !bMIC)
+		OnMyMicClicked(JetMic , lMouse);
 }
 
 void AL_Viper::F_ThrottleButton35Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton35Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetMic && bMIC)
+		OnMyMicClicked(JetMic , lMouse);
 }
 
 void AL_Viper::F_ThrottleButton36Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton36Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineGen && !bEngineGen1)
+		OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineGen2 && !bEngineGen2)
+			OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton37Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton37Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineGen && bEngineGen1)
+		OnMyEngineGen1Clicked(JetEngineGen , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineGen2 && bEngineGen2)
+			OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton38Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton38Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineControl && !bEngineControl1)
+		OnMyEngineControlClicked(JetEngineControl , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineControl2 && !bEngineControl2)
+			OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton39Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton39Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineControl && bEngineControl1)
+		OnMyEngineControlClicked(JetEngineControl , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineControl2 && bEngineControl2)
+			OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton40Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton40Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineMaster && !bEngineMaster1)
+		OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineMaster2 && !bEngineMaster2)
+			OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton41Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton41Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetEngineMaster && bEngineMaster1)
+		OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
+	FTimerHandle hnd;
+	GetWorld()->GetTimerManager().SetTimer(hnd , [&]()
+	{
+		if (JetEngineMaster2 && bEngineMaster2)
+			OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
+	} , switchLate , false);
 }
 
 void AL_Viper::F_ThrottleButton42Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton42Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetFuelStarter && !bJFS)
+		OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
 }
 
 void AL_Viper::F_ThrottleButton43Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_ThrottleButton43Started : %s") , b?*FString("true"):*FString("false"));
+	if (JetFuelStarter && bJFS)
+		OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
+}
+
+void AL_Viper::F_ThrottleButton46Started(const struct FInputActionValue& value)
+{
+	if (JetBreakHold && !bBreakHold)
+		OnMyBreakHoldClicked(JetBreakHold , lMouse);
+}
+
+void AL_Viper::F_ThrottleButton47Started(const struct FInputActionValue& value)
+{
+	if (JetBreakHold && bBreakHold)
+		OnMyBreakHoldClicked(JetBreakHold , lMouse);
 }
 
 void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
@@ -2438,7 +2482,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+	LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
 }
 
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
