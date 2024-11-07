@@ -329,6 +329,9 @@ FString FRichString::FormatString(const FString &str, ETextStyle type)
     case ETextStyle::FAIL:
         result = FString::Printf(TEXT("<Fail>%s</>"), *str);
         break;
+    case ETextStyle::OBJDETAIL:
+        result = FString::Printf(TEXT("<ObjDetail>%s</>"), *str);
+        break;
     }
 
     return result;

@@ -348,6 +348,7 @@ enum class ETextStyle : uint8
     DEFAULT
     ,SUCCESS
     ,FAIL
+    ,OBJDETAIL
     
 };
 
@@ -420,9 +421,9 @@ enum class EFormationChecklist : uint8
     ,ALIGN_FORMATION = 2
 };
 
-// 목표 UI 표시용 
+// 서브 목표 UI 표시용 
 USTRUCT(BlueprintType)
-struct FTextUIData
+struct FDefaultTextUIData
 {
     GENERATED_BODY()
 public:
@@ -431,6 +432,22 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     TArray<FRichString> bodyTextAry;
+};
+
+// 목표 UI 표시용 
+USTRUCT(BlueprintType)
+struct FTextUIData : public FDefaultTextUIData
+{
+    GENERATED_BODY()
+public:
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    // FRichString headerText = FRichString();
+
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    // TArray<FRichString> bodyTextAry;
+    // 복잡한 구조용
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FDefaultTextUIData> bodyObjAry;
 };
 
 
