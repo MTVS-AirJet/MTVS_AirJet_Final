@@ -13,7 +13,47 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRActor.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRActor.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/A_MannequinsXR_Grasp_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/A_MannequinsXR_Idle_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/A_MannequinsXR_IndexCurl_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/A_MannequinsXR_Point_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/A_MannequinsXR_ThumbUp_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/MDT_MannequinsXR.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Animations/MDT_MannequinsXR.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/B_MannequinsXR.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/MannequinsXR/B_MannequinsXR.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Materials/Instances/Manny/MI_Manny_01.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Materials/Instances/Manny/MI_Manny_01.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Materials/Instances/Quinn/MI_Quinn_01.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Materials/Instances/Quinn/MI_Quinn_01.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Materials/M_Mannequin.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/ABP_MannequinsXR.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/SKM_MannyXR_left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/SKM_MannyXR_right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/SKM_QuinnXR_left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/SKM_QuinnXR_right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Characters/MannequinsXR/Meshes/SK_MannequinsXR.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Maps/KHS/K_TestMap.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Maps/KHS/K_TestMap.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRGameMode.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRGameMode.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRPawn.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRPawn.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRTeleportVisualizer.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/VRTemplate/Blueprints/VRTeleportVisualizer.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_Grasp_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_Grasp_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_IndexCurl_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_IndexCurl_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_Point_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_Point_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_ThumbUp_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/Hands/IA_Hand_ThumbUp_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Grab_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Grab_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Menu_Toggle_Left.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Menu_Toggle_Right.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Move.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/Actions/IA_Turn.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/IMC_Default.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/VRTemplate/Input/IMC_Default.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/IMC_Hands.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/VRTemplate/Input/IMC_Hands.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/Input/PMI_VRTemplate.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/VFX/NS_TeleportRing.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/VRTemplate/VFX/NS_TeleportTrace.uasset" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,22 +114,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "C++ Project.MTVS_AirJet_Final.executor": "Debug",
-    "C++ 프로젝트.MTVS_AirJet_Final.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "com.codeium.enabled": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;C++ Project.MTVS_AirJet_Final.executor&quot;: &quot;Debug&quot;,
+    &quot;C++ 프로젝트.MTVS_AirJet_Final.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="C++ 프로젝트.MTVS_AirJet_Final">
     <configuration name="MTVS_AirJet_Final" type="CppProject" factoryName="C++ Project">
       <configuration_1>
@@ -229,6 +269,8 @@
       <workItem from="1730876854718" duration="1544000" />
       <workItem from="1730882004180" duration="2122000" />
       <workItem from="1730884578352" duration="1069000" />
+      <workItem from="1730889229774" duration="565000" />
+      <workItem from="1730890950655" duration="2527000" />
     </task>
     <servers />
   </component>
