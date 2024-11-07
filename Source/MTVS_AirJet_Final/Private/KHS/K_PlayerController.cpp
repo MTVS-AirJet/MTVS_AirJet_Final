@@ -83,6 +83,8 @@ void AK_PlayerController::SetupInputComponent()
 		                          &AK_PlayerController::ToggleCommonWidget);
 		EnhancedInput->BindAction(IA_ToggleMouseCursor , ETriggerEvent::Started , this ,
 		                          &AK_PlayerController::ToggleMouseCursor);
+		EnhancedInput->BindAction(IA_ThrottleButton7, ETriggerEvent::Triggered, this, &AK_PlayerController::ToggleCommonWidget);
+		EnhancedInput->BindAction(IA_RemoveUI, ETriggerEvent::Triggered, this, &AK_PlayerController::RemoveStandbyWidget);
 	}
 }
 
@@ -198,6 +200,16 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 			PlayerController->bShowMouseCursor = true; // 마우스 커서를 보이게
 			bIsMouseCursorShow = true;
 		}
+	}
+}
+
+// (임시) StandbyWidget 제거 함수
+void AK_PlayerController::RemoveStandbyWidget(const struct FInputActionValue& value)
+{
+	GEngine->AddOnScreenDebugMessage(-1 , 1.0f , FColor::Red , TEXT("Remove UI"));
+	if (StandbyUI)
+	{
+		StandbyUI->RemoveUI();
 	}
 }
 
