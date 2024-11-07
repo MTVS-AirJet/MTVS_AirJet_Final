@@ -2476,8 +2476,8 @@ void AL_Viper::F_ThrottleButton47Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 {
-	float data = value.Get<float>();	// 갱신용 데이터
-	float newData = data;	// 이동용 데이터
+	float data = value.Get<float>(); // 갱신용 데이터
+	float newData = data; // 이동용 데이터
 	LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
 
 	if (DeviceThrottleCurrentValue > data)
@@ -2501,7 +2501,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 	}
 	else
 	{
-		if(!bFirstEngine)
+		if (!bFirstEngine)
 			bFirstEngine = true;
 
 		if (StartScenario.size() > 0 && StartScenario.front() == "Throttle")
@@ -2510,7 +2510,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 			DummyThrottleMesh->SetRenderCustomDepth(false);
 			DummyThrottleMesh->CustomDepthStencilValue = 0;
 		}
-		
+
 		// 스로틀 up
 		if (intTriggerNum == 0)
 		{
@@ -2603,8 +2603,8 @@ void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 					JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 				JetCameraFPS->SetActive(false);
 			}
-		}			
-	}		
+		}
+	}
 }
 
 void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
@@ -2641,7 +2641,65 @@ void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
 void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
-	//LOG_S(Warning , TEXT("F_StickAxis1 : %f") , data);
+	data = FMath::RoundToFloat(data * 1000.0f) / 1000.0f;
+	FString strData = FString::Printf(TEXT("%.3f"), data);
+	//LOG_S(Warning , TEXT("F_StickAxis1 : %s") , *strData);
+
+	float X = 0;
+	float Y = 0;
+	if (strData.Equals("3.286"))
+	{
+		IsRotateTrigger = false;
+		return;
+	}
+	else if (strData.Equals("-1.000"))
+		Y = 1;
+	else if (strData.Equals("-0.714"))
+	{
+		X = 1;
+		Y = 1;
+	}
+	else if (strData.Equals("-0.429"))
+		X = 1;
+	else if (strData.Equals("-0.143"))
+	{
+		X = 1;
+		Y = -1;
+	}
+	else if (strData.Equals("0.143"))
+		Y = -1;
+	else if (strData.Equals("0.429"))
+	{
+		X = -1;
+		Y = -1;
+	}
+	else if (strData.Equals("0.714"))
+		X = -1;
+	else if (strData.Equals("1.000"))
+	{
+		X = -1;
+		Y = 1;
+	}
+	IsRotateTrigger = true;
+
+	if (JetCamera->IsActive())
+	{
+		FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+		float newTpsYaw = TPSrot.Yaw + X;
+		float newTpsPitch = TPSrot.Pitch + Y;
+		newTpsYaw = UKismetMathLibrary::FClamp(newTpsYaw , -360.f , 360.f);
+		newTpsPitch = UKismetMathLibrary::FClamp(newTpsPitch , -80.f , 80.f);
+		JetSprintArm->SetRelativeRotation(FRotator(newTpsPitch , newTpsYaw , 0));
+	}
+	else
+	{
+		FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+		float newFpsYaw = FPSrot.Yaw + X;
+		float newFpsPitch = FPSrot.Pitch + Y;
+		newFpsYaw = UKismetMathLibrary::FClamp(newFpsYaw , -100.f , 100.f);
+		newFpsPitch = UKismetMathLibrary::FClamp(newFpsPitch , -100.f , 100.f);
+		JetSprintArmFPS->SetRelativeRotation(FRotator(newFpsPitch , newFpsYaw , 0));
+	}
 }
 
 void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
