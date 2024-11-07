@@ -2484,6 +2484,30 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
 	LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
+	if(data>.8f)
+	{
+		// 잠금
+		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+		iCanopyNum = 3;
+	}
+	else if(data>.6f)
+	{
+		// 닫기
+		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		iCanopyNum = 2;
+	}
+	else if(data>.3f)
+	{
+		// 중립
+		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		iCanopyNum = 1;
+	}
+	else
+	{
+		// 열기
+		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+		iCanopyNum = 0;
+	}
 }
 
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
