@@ -123,7 +123,7 @@ private:
 	class UNiagaraSystem* DistroyVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class UArrowComponent* JetFlareArrow1;
+	class UArrowComponent* JetFlareArrow3;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow2;
 

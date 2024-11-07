@@ -284,9 +284,9 @@ AL_Viper::AL_Viper()
 	FlareMoveLoc3->SetupAttachment(RootComponent);
 	FlareMoveLoc3->SetRelativeLocation(FVector(400 , 0 , -600));
 	//============================================
-	JetFlareArrow1 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow1"));
-	JetFlareArrow1->SetupAttachment(JetMesh);
-	JetFlareArrow1->SetRelativeLocationAndRotation(FVector(-500 , 100 , 0) , FRotator(-120 , 0 , 0));
+	JetFlareArrow3 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow3"));
+	JetFlareArrow3->SetupAttachment(JetMesh);
+	JetFlareArrow3->SetRelativeLocationAndRotation(FVector(-500 , 100 , 0) , FRotator(-120 , 0 , 0));
 	//JetFlareArrow1->SetHiddenInGame(false); // For Test
 	JetFlareArrow2 = CreateDefaultSubobject<UArrowComponent>(TEXT("JetFlareArrow2"));
 	JetFlareArrow2->SetupAttachment(JetMesh);
@@ -1620,7 +1620,7 @@ void AL_Viper::Tick(float DeltaTime)
 			int32 randRot = FMath::RandRange(-150 , -110);
 			//LOG_SCREEN("%d" , randRot);
 			FRotator newFlareRot = FRotator(randRot , 0 , 0);
-			JetFlareArrow1->SetRelativeRotation(newFlareRot);
+			JetFlareArrow3->SetRelativeRotation(newFlareRot);
 			JetFlareArrow2->SetRelativeRotation(newFlareRot);
 		}
 #pragma endregion
@@ -1881,7 +1881,7 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = newOwner;
 			// 던질 위치 계산(캐릭터 위치에서 위로 조정)
-			FVector SpawnLocation = JetFlareArrow1->GetComponentLocation();
+			FVector SpawnLocation = JetFlareArrow3->GetComponentLocation();
 			// 던질 각도
 			FRotator SpawnRotation = JetMesh->GetComponentRotation();
 			// FlareFactory 이용해서 수류탄 스폰
@@ -2270,7 +2270,7 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 	AK_PlayerController* LocalPlayerController = Cast<AK_PlayerController>(GetWorld()->GetFirstPlayerController());
 	AK_PlayerController* MyPlayerController = Cast<AK_PlayerController>(GetOwner());
 
-	//Fisrt PC가 내 Owner와 동일하다면
+	//First PC가 내 Owner와 동일하다면
 	if (LocalPlayerController == MyPlayerController)
 	{
 		UK_StandbyWidget* LocalStandbyWidget = Cast<UK_StandbyWidget>(LocalPlayerController->StandbyUI);
@@ -2312,7 +2312,7 @@ void AL_Viper::Call_CRPC_MissileImpact(FVector ImpactLoc)
 		LOG_S(Warning , TEXT("GameState doesn't exist"));
 	}
 
-	//월드에 존재하는 PlayterController배열
+	//월드에 존재하는 PlayerController배열
 	TArray<AK_PlayerController*> allPC;
 	//배열에 GameState에 있는 PlayerArray에 접근해서 모든 PC담기
 	Algo::Transform(KGameState->PlayerArray , allPC , [](TObjectPtr<APlayerState> PS)
@@ -2570,8 +2570,12 @@ void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
+	if (CurrentWeapon == EWeapon::Missile)
+		ServerRPCMissile(this);
+	else if (CurrentWeapon == EWeapon::Flare)
+		ServerRPCFlare(this);
 }
 
 void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
