@@ -2563,8 +2563,9 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
 {
-	auto b = value.Get<bool>();
+	// auto b = value.Get<bool>();
 	// LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
+	CurrentWeapon = static_cast<EWeapon>((static_cast<int32>(CurrentWeapon) + 1) % static_cast<int32>(EWeapon::Max));
 }
 
 void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
