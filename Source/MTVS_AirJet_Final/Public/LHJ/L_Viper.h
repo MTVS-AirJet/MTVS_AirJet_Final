@@ -45,7 +45,7 @@ private:
 	UFUNCTION()
 	void PrintNetLog();
 
-protected: // Component
+public: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetRoot;
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
@@ -98,7 +98,7 @@ private:
 	class UNiagaraComponent* JetTailVFXLeft;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
-protected:
+public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
@@ -127,7 +127,7 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow2;
 
-protected:
+public:
 	UFUNCTION(BlueprintCallable)
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION(BlueprintCallable)
@@ -262,7 +262,7 @@ private: // Input
 	UFUNCTION()
 	void F_ViperDevelopStarted(const struct FInputActionValue& value);
 
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
 
@@ -442,7 +442,7 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomOutValue = 140;
 
-protected:
+public:
 	void CreateDumyComp();
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
