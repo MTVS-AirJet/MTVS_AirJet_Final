@@ -2501,6 +2501,16 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 	}
 	else
 	{
+		if(!bFirstEngine)
+			bFirstEngine = true;
+
+		if (StartScenario.size() > 0 && StartScenario.front() == "Throttle")
+		{
+			StartScenario.pop();
+			DummyThrottleMesh->SetRenderCustomDepth(false);
+			DummyThrottleMesh->CustomDepthStencilValue = 0;
+		}
+		
 		// 스로틀 up
 		if (intTriggerNum == 0)
 		{
