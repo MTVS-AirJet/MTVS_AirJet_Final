@@ -32,6 +32,7 @@
 #include "LHJ/L_Target.h"
 
 FKey lMouse = EKeys::LeftMouseButton;
+FKey rMouse = EKeys::RightMouseButton;
 
 #pragma region Construct
 AL_Viper::AL_Viper()
