@@ -273,10 +273,7 @@ public:
 	bool bFirstEngine;
 
 	// For Reset Arrow Rotate
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyUpPress;
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyDownPress;
+	
 	// UPROPERTY(BlueprintReadOnly)
 	// bool IsKeyRightPress;
 	// UPROPERTY(BlueprintReadOnly)
@@ -284,11 +281,17 @@ public:
 	
 	// Rotate vector
 	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyUpPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyDownPress;
+	UPROPERTY(BlueprintReadOnly)
 	bool IsRightRoll;
 	UPROPERTY(BlueprintReadOnly)
 	bool IsLeftRoll;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateValue = FRotator(0 , 0 , 2.f);
+	FRotator RotateRollValue = FRotator(0 , 0 , 2.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotatePitchValue = FRotator(1.5f , 0 , 0);
 
 	// Rotate Value
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
