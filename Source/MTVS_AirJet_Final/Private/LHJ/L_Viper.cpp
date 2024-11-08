@@ -425,7 +425,9 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		                  &AL_Viper::F_ViperDevelopStarted);
 
 		input->BindAction(IA_ViperMove , ETriggerEvent::Triggered , this ,
-						  &AL_Viper::F_ViperMoveTrigger);
+		                  &AL_Viper::F_ViperMoveTrigger);
+		input->BindAction(IA_ViperMove , ETriggerEvent::Completed , this ,
+		                  &AL_Viper::F_ViperMoveCompleted);
 #pragma endregion
 
 #pragma region Controller
@@ -1001,16 +1003,33 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
 	FVector2D moveVector = value.Get<FVector2D>();
-	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
-	float RollAngle = moveVector.Y * MaxRotationAngle;
-	float PitchAngle = moveVector.X * MaxRotationAngle;
 
-	// Roll과 Pitch 회전을 위한 쿼터니언 생성
-	FQuat RollRotation = FQuat(FVector(1.0f, 0.0f, 0.0f), FMath::DegreesToRadians(RollAngle));
-	FQuat PitchRotation = FQuat(FVector(0.0f, 1.0f, 0.0f), FMath::DegreesToRadians(PitchAngle));
-	
-	// Roll과 Pitch 회전을 결합
-	QuatTargetRotation = RollRotation * PitchRotation;
+	if (moveVector == FVector2D(0 , 1))
+	{
+		IsRightRoll = false;
+		IsLeftRoll = true;
+	}
+	else if (moveVector == FVector2D(0 , -1))
+	{
+		IsLeftRoll = false;
+		IsRightRoll = true;
+	}
+	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
+	// float RollAngle = moveVector.Y * MaxRotationAngle;
+	// float PitchAngle = moveVector.X * MaxRotationAngle;
+	//
+	// // Roll과 Pitch 회전을 위한 쿼터니언 생성
+	// FQuat RollRotation = FQuat(FVector(1.0f, 0.0f, 0.0f), FMath::DegreesToRadians(RollAngle));
+	// FQuat PitchRotation = FQuat(FVector(0.0f, 1.0f, 0.0f), FMath::DegreesToRadians(PitchAngle));
+	//
+	// // Roll과 Pitch 회전을 결합
+	// QuatTargetRotation = RollRotation * PitchRotation;
+}
+
+void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
+{
+	IsRightRoll = false;
+	IsLeftRoll = false;
 }
 
 // FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -1562,46 +1581,19 @@ void AL_Viper::Tick(float DeltaTime)
 		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
-#pragma region Jet Move
-		 ValueOfMoveForce += (GetAddTickSpeed() * 6);
-		 if (ValueOfMoveForce < 0)
-		 	ValueOfMoveForce = 0;
-		 else if (ValueOfMoveForce > MaxValueOfMoveForce)
-		 	ValueOfMoveForce = MaxValueOfMoveForce;
-		
-		 if (IsEngineOn)
-		 {
-		 	// Add Force
-		 	FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-		 	FVector forceLoc = JetRoot->GetComponentLocation();
-		 	if (JetRoot->IsSimulatingPhysics())
-		 		JetRoot->AddForceAtLocation(forceVec , forceLoc);
-		
-		 	// Move Up & Down
-		 	jetRot = JetArrow->GetRelativeRotation();
-		 	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-		 	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-		
-			 // 카메라 쉐이크
-			 // 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
-			 if (intTriggerNum < 2 && ValueOfMoveForce > 0)
-			 	CRPC_CameraShake();
-		}
-#pragma endregion
-
 #pragma region Quat Move
-		if(JetMesh)
+		if (JetMesh)
 		{
 			// 현재 회전값을 목표 회전값으로 부드럽게 보간
 			QuatCurrentRotation = FQuat::Slerp(
-				QuatCurrentRotation,
-				QuatTargetRotation,
-				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f, 0.0f, 1.0f)
+				QuatCurrentRotation ,
+				QuatTargetRotation ,
+				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
 			);
-			
+
 			// 쿼터니언 회전 적용
 			JetMesh->SetRelativeRotation(QuatCurrentRotation);
-			
+
 			// 화살표 컴포넌트에도 동일한 회전 적용
 			if (JetArrow)
 			{
@@ -1609,6 +1601,45 @@ void AL_Viper::Tick(float DeltaTime)
 			}
 		}
 #pragma endregion
+
+#pragma region Rotate Mesh
+		if (IsRightRoll)
+		{
+			JetRoot->AddRelativeRotation(RotateValue);
+		}
+		else if (IsLeftRoll)
+		{
+			JetRoot->AddRelativeRotation(RotateValue * -1);
+		}
+#pragma endregion
+
+#pragma region Jet Move
+		ValueOfMoveForce += (GetAddTickSpeed() * 6);
+		if (ValueOfMoveForce < 0)
+			ValueOfMoveForce = 0;
+		else if (ValueOfMoveForce > MaxValueOfMoveForce)
+			ValueOfMoveForce = MaxValueOfMoveForce;
+
+		if (IsEngineOn)
+		{
+			// Add Force
+			FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+			FVector forceLoc = JetRoot->GetComponentLocation();
+			if (JetRoot->IsSimulatingPhysics())
+				JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+			// Move Up & Down
+			jetRot = JetArrow->GetRelativeRotation();
+			float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+			JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+
+			// 카메라 쉐이크
+			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
+			if (intTriggerNum < 2 && ValueOfMoveForce > 0)
+				CRPC_CameraShake();
+		}
+#pragma endregion
+
 
 #pragma region LockOn
 		IsLockOn();
@@ -2642,7 +2673,7 @@ void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
 	data = FMath::RoundToFloat(data * 1000.0f) / 1000.0f;
-	FString strData = FString::Printf(TEXT("%.3f"), data);
+	FString strData = FString::Printf(TEXT("%.3f") , data);
 	//LOG_S(Warning , TEXT("F_StickAxis1 : %s") , *strData);
 
 	float X = 0;
@@ -2706,12 +2737,12 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+	 // LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+	 // LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
 }

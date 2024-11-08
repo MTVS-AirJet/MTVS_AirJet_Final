@@ -265,6 +265,8 @@ public: // Input
 	void F_ViperDevelopStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperMoveTrigger(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveCompleted(const struct FInputActionValue& value);
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -281,18 +283,18 @@ public:
 	// bool IsKeyLeftPress;
 	
 	// Rotate vector
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsRightRoll;
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsLeftRoll;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsRightRoll;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsLeftRoll;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotateValue = FRotator(0 , 0 , 2.f);
 
 	// Rotate Value
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	// FRotator ForceUnitRot;
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// FRotator RotateValue = FRotator(0 , 0 , 2.f);
 	// // Add Rotate Value ( ForceUnitRot To NewVector )
 	// UFUNCTION(BlueprintCallable)
 	// FRotator CombineRotate(FVector NewVector);
@@ -757,7 +759,7 @@ public:
 
 	// 최대 회전 각도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float MaxRotationAngle = 45.0f;
+	float MaxRotationAngle = 44.5f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
 	FQuat QuatCurrentRotation;
