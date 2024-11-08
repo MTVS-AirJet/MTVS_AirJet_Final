@@ -10,7 +10,15 @@
 /**
  * 
  */
-DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel)
+//  로딩 ui 제거
+DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
+
+// 이륙 딜리게이트
+DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool);
+
+// 미션 시작 딜리게이트
+DECLARE_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
+
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionGamemode : public AGameModeBase
@@ -88,12 +96,6 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     TSet<class AJ_MissionPlayerController*> flightedPCAry;
     
-    
-
-public:
-    // 로드할 미션 맵 이름
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString curMissionName;
     // 미션 데이터
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FMissionDataRes curMissionData;
@@ -108,12 +110,21 @@ public:
         curMissionData = value;
     }
         protected:
+public:
+    // XXX 로드할 미션 맵 이름
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString curMissionName;
 
     // 디버그용 더미 미션 데이터
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
     FMissionDataRes dummyMissionData;
 
     int pIdx = 0;
+
+    // 해당 파일럿 이륙 딜리게이트
+    FTakeOffDel onePilotTakeOffDel;
+
+    FStartTacticalOrderDel startTODel;
 
 protected:
     virtual void BeginPlay() override;
@@ -176,5 +187,5 @@ public:
 
     // 이륙한 pc 배열 추가
     UFUNCTION(BlueprintCallable)
-    bool AddFlightedPC(class AJ_MissionPlayerController *pc);
+    bool AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess = true);
 };

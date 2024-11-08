@@ -4,6 +4,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GenericPlatform/ICursor.h"
@@ -18,6 +19,7 @@
 #include <JBS/J_MissionGamemode.h>
 #include "KHS/K_StreamingUI.h"
 #include "Net/UnrealNetwork.h"
+#include "Templates/Casts.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
@@ -112,17 +114,32 @@ void AJ_MissionPlayerController::CRPC_SpawnMyPlayer_Implementation(APawn *newPaw
 void AJ_MissionPlayerController::OnPossess(APawn *newPawn)
 {
     Super::OnPossess(newPawn);
-
-    // 포제스 시 시동 절차 수행 딜리게이트 바인드
-    auto* pilot = Cast<AL_Viper>(newPawn);
-    pilot->engineProgSuccessDel.BindUObject(this, &AJ_MissionPlayerController::SendEngineProgressSuccess);
-    
-    if(this->IsLocalPlayerController())
+    // 서버 단임
+    // 로컬 클라에서 포제스시 작동
+    if(HasAuthority())
     {
-        // XXX 스트리밍 ui 의존성 제거
-        // InitStreamingUI(CastChecked<AJ_BaseMissionPawn>(newPawn));
+        FTimerHandle timerHandle;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle, [this,newPawn]() mutable
+        {
+            //타이머에서 할 거
+            // UE_LOG(LogTemp, Warning, TEXT("야 : %s"), *this->GetName());
+            CRPC_OnPossess();    
+        }, .5f, false);
+        
     }
 }
+
+void AJ_MissionPlayerController::CRPC_OnPossess_Implementation()
+{
+    // 폰 가져오기
+    auto* pilot = GetPawn<AL_Viper>();
+    // 포제스 시 시동 절차 수행 딜리게이트 바인드
+    pilot->engineProgSuccessDel.BindUObject(this, &AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess);
+    
+    // UE_LOG(LogTemp, Warning, TEXT("아기 바인드 pc : %s, 폰 있음 : %s"), *this->GetName(), *UJ_Utility::ToStringBool(pilot != nullptr));
+}
+
 // XXX 이제 안씀
 void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 {
@@ -168,10 +185,6 @@ void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
 
 void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
 {
-    // // UE_LOG(LogTemp, Warning, TEXT("asd제거할께 : %s, 로컬 유무 : %s, id : %d")
-    //     , loadingUI ? TEXT("있어") : TEXT("없어")
-    //     , IsLocalController() ? TEXT("예스") : TEXT("노")
-    //     , GetLocalPlayer()->GetControllerId());
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this]() mutable
@@ -183,15 +196,11 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
             missionReadyUI = nullptr;
         }
     }, 1.f, false);
-    // while(loadingUI)
-    {
-        
-    }
 }
 
 void AJ_MissionPlayerController::SRPC_RemoveLoadingUI_Implementation()
 {
-    UE_LOG(LogTemp, Warning, TEXT("asd나한테 왜그러는거니 : %s"), *this->GetName());
+    // UE_LOG(LogTemp, Warning, TEXT("asd나한테 왜그러는거니 : %s"), *this->GetName());
     CRPC_RemoveLoadingUI();
 }
 
@@ -209,8 +218,10 @@ void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransfo
     pawn->SetActorTransform(tpTR);
 }
 
-void AJ_MissionPlayerController::SendEngineProgressSuccess(EEngineProgress type)
+void AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess_Implementation(EEngineProgress type)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2 mpc"));
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("시동 절차 진행"));
+    
     sendEngineProgDel.ExecuteIfBound(this, type);
 }
+

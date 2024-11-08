@@ -46,16 +46,18 @@ protected:
     void CreateUIData(const FNeutralizeTargetUIData &data, TArray<FTextUIData> &outData, bool isInit = false);
 	// 시동 절차
     void CreateUIData(const FEngineProgressData &data, TArray<FTextUIData> &outData, bool isInit = false);
+	// 이륙 절차
+    void CreateUIData(const FTakeOffData &data, TArray<FTextUIData> &outData, bool isInit = false);
 
 public:
 	// 목표 UI 시작 및 갱신
 	UFUNCTION(Client, Reliable)
-    void CRPC_StartObjUI(FTacticalOrderData orderData);
+    void CRPC_StartObjUI(const FTacticalOrderData& orderData);
 
     // 목표 UI 갱신
 	// 지상 타겟 무력화
 	UFUNCTION(Client, Reliable)
-    void CRPC_UpdateObjUI(FTacticalOrderData orderData, bool isInit = false);
+    void CRPC_UpdateObjUI(const FTacticalOrderData& orderData, bool isInit = false);
 
 	// 서브 조건 완료 처리
 	UFUNCTION(Client, Reliable)

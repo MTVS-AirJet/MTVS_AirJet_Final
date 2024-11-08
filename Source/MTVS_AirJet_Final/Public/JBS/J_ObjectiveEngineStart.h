@@ -27,6 +27,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	TArray<class AJ_MissionPlayerController*> allPC;
 
+	// 이륙 준비 완료 체크
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isReadyTakeOff = false;
+
 public:
 
 protected:

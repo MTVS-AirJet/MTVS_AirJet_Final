@@ -91,8 +91,12 @@ protected:
 	void MRPC_TeleportStartPoint(FTransform tpTR);
 
 	// 시동 수행 알리기 | 서버단
-	UFUNCTION(BlueprintCallable)
-	void SendEngineProgressSuccess(EEngineProgress type);
+	UFUNCTION(Server, Reliable)
+	void SRPC_SendEngineProgressSuccess(EEngineProgress type);
+
+	// 포제스 시 로컬 클라에서 작동
+	UFUNCTION(Client, Reliable)
+	void CRPC_OnPossess();
 
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")

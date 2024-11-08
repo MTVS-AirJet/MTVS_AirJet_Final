@@ -73,7 +73,14 @@ protected:
 	}
 	void SetSuccessPercent(float value);
 
-    protected:
+		protected:
+
+	// 모든 pc에 대한 ui 정보 배열
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TMap<class AJ_MissionPlayerController*, FTacticalOrderData> prevObjUIDataMap;
+
+
+
     public:
 	// 명령 종류
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")

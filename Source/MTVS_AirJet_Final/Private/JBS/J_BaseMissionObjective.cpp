@@ -254,8 +254,16 @@ void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
     for(auto* pc : allPC)
     {
 		auto orderData = SetObjUIData(pc);
-        // 데이터 보내기
-        pc->objUIComp->CRPC_UpdateObjUI(orderData);
+		
+		
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || orderData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUI(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, orderData);
+		}
     }
 }
 
@@ -275,7 +283,7 @@ void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
 void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
 {
 	if(!HasAuthority()) return;
-
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *pc->GetName()));
 	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
 
 	// // 모든 pc 가져오기

@@ -249,6 +249,10 @@ void FEngineProgressData::SetNextProgress()
         break;
     case EEngineProgress::STANDBY_OTHER_PLAYER:
         this->curProgress = EEngineProgress::RELEASE_SIDE_BREAK;
+        break;
+    case EEngineProgress::RELEASE_SIDE_BREAK:
+        this->curProgress = EEngineProgress::TAKE_OFF;
+        break;
     }
 }
 
@@ -314,7 +318,7 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
     return str;
 }
 
-FString FRichString::FormatString(const FString &str, ETextStyle type)
+FString FRichString::FormatString(const FString &str, ETextStyle type) const
 {
     FString result = "";
 
@@ -337,9 +341,15 @@ FString FRichString::FormatString(const FString &str, ETextStyle type)
     return result;
 }
 
+FString FRichString::GetFormatString() const
+{
+    return FormatString(value, styleType);
+}
+
 bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
 {
     int checkType = ConvertProgressEnumToInt(type);
 
     return successValue & checkType;
 }
+
