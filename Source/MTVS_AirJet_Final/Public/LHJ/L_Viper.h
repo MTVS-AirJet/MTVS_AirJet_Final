@@ -271,31 +271,31 @@ public:
 	bool bFirstEngine;
 
 	// For Reset Arrow Rotate
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyUpPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyDownPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyRightPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyLeftPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyUpPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyDownPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyRightPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyLeftPress;
 	
 	// Rotate vector
-	UPROPERTY(BlueprintReadOnly)
-	bool IsRightRoll;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsLeftRoll;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsRightRoll;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsLeftRoll;
 
 	// Rotate Value
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator ForceUnitRot;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateValue = FRotator(0 , 0 , 2.f);
-	// Add Rotate Value ( ForceUnitRot To NewVector )
-	UFUNCTION(BlueprintCallable)
-	FRotator CombineRotate(FVector NewVector);
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FRotator ForceUnitRot;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FRotator RotateValue = FRotator(0 , 0 , 2.f);
+	// // Add Rotate Value ( ForceUnitRot To NewVector )
+	// UFUNCTION(BlueprintCallable)
+	// FRotator CombineRotate(FVector NewVector);
 	
 private:
 	// For Engine Using

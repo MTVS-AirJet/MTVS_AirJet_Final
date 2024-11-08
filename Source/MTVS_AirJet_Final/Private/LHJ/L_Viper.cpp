@@ -719,8 +719,8 @@ void AL_Viper::F_ViperZoomOutCompleted(const struct FInputActionValue& value)
 
 void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
 {
-	if (!IsKeyDownPress)
-		IsKeyUpPress = true;
+	// if (!IsKeyDownPress)
+	// 	IsKeyUpPress = true;
 
 	// if (CurrentTime < ChangeTime)
 	// 	return;
@@ -731,14 +731,14 @@ void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
 
 void AL_Viper::F_ViperUpCompleted(const FInputActionValue& value)
 {
-	IsKeyUpPress = false;
+	//IsKeyUpPress = false;
 	// ForceUnitRot = FRotator(0 , 0 , 0);
 }
 
 void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
 {
-	if (!IsKeyUpPress)
-		IsKeyDownPress = true;
+	// if (!IsKeyUpPress)
+	// 	IsKeyDownPress = true;
 
 	// if (CurrentTime < ChangeTime)
 	// 	return;
@@ -749,52 +749,52 @@ void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
 
 void AL_Viper::F_ViperDownCompleted(const FInputActionValue& value)
 {
-	IsKeyDownPress = false;
+	//IsKeyDownPress = false;
 	// ForceUnitRot = FRotator(0 , 0 , 0);
 }
 
 void AL_Viper::F_ViperRightTrigger(const FInputActionValue& value)
 {
-	if (!IsKeyLeftPress)
-		IsKeyRightPress = true;
+	// if (!IsKeyLeftPress)
+	// 	IsKeyRightPress = true;
 }
 
 void AL_Viper::F_ViperRightCompleted(const FInputActionValue& value)
 {
-	IsKeyRightPress = false;
+	//IsKeyRightPress = false;
 }
 
 void AL_Viper::F_ViperLeftTrigger(const FInputActionValue& value)
 {
-	if(!IsKeyRightPress)
-		IsKeyLeftPress = true;
+	// if(!IsKeyRightPress)
+	// 	IsKeyLeftPress = true;
 }
 
 void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
 {
-	IsKeyLeftPress = false;
+	//IsKeyLeftPress = false;
 }
 
 void AL_Viper::F_ViperTurnRightTrigger(const FInputActionValue& value)
 {
-	if(!IsLeftRoll)
-		IsRightRoll = true;
+	// if(!IsLeftRoll)
+	// 	IsRightRoll = true;
 }
 
 void AL_Viper::F_ViperTurnRightCompleted(const FInputActionValue& value)
 {
-	IsRightRoll = false;
+	//IsRightRoll = false;
 }
 
 void AL_Viper::F_ViperTurnLeftTrigger(const FInputActionValue& value)
 {
-	if(!IsRightRoll)
-		IsLeftRoll = true;
+	// if(!IsRightRoll)
+	// 	IsLeftRoll = true;
 }
 
 void AL_Viper::F_ViperTurnLeftCompleted(const FInputActionValue& value)
 {
-	IsLeftRoll = false;
+	//IsLeftRoll = false;
 }
 
 void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
@@ -1013,12 +1013,12 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	QuatTargetRotation = RollRotation * PitchRotation;
 }
 
-FRotator AL_Viper::CombineRotate(FVector NewVector)
-{
-	FRotator loc_rot = FRotator(NewVector.Y , NewVector.X , NewVector.Z);
-	return FRotator(ForceUnitRot.Pitch + loc_rot.Pitch , ForceUnitRot.Yaw + loc_rot.Yaw ,
-	                ForceUnitRot.Roll + loc_rot.Roll);
-}
+// FRotator AL_Viper::CombineRotate(FVector NewVector)
+// {
+// 	FRotator loc_rot = FRotator(NewVector.Y , NewVector.X , NewVector.Z);
+// 	return FRotator(ForceUnitRot.Pitch + loc_rot.Pitch , ForceUnitRot.Yaw + loc_rot.Yaw ,
+// 	                ForceUnitRot.Roll + loc_rot.Roll);
+// }
 #pragma endregion
 
 void AL_Viper::BeginPlay()
@@ -1434,44 +1434,44 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region Rotate JetArrow
 		FRotator jetRot = JetArrow->GetRelativeRotation();
 		// Check Distance Into Area
-		if (IsKeyUpPress || IsKeyDownPress)
-		{
-			if (jetRot.Pitch > MaxPitchValue)
-			{
-				JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
-				ForceUnitRot = FRotator(0 , 0 , 0);
-			}
-			else if (jetRot.Pitch < MinPitchValue)
-			{
-				JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
-				ForceUnitRot = FRotator(0 , 0 , 0);
-			}
-			else
-			{
-				JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
-			}
-		}
-
-		if (IsKeyLeftPress)
-		{
-			if (!IsKeyRightPress)
-			{
-				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-				JetArrow->SetRelativeRotation(resetRot);
-				FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
-				JetArrow->AddRelativeRotation(newRot);
-			}
-		}
-		else if (IsKeyRightPress)
-		{
-			if (!IsKeyLeftPress)
-			{
-				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-				JetArrow->SetRelativeRotation(resetRot);
-				FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
-				JetArrow->AddRelativeRotation(newRot);
-			}
-		}
+		// if (IsKeyUpPress || IsKeyDownPress)
+		// {
+		// 	if (jetRot.Pitch > MaxPitchValue)
+		// 	{
+		// 		JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
+		// 		ForceUnitRot = FRotator(0 , 0 , 0);
+		// 	}
+		// 	else if (jetRot.Pitch < MinPitchValue)
+		// 	{
+		// 		JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
+		// 		ForceUnitRot = FRotator(0 , 0 , 0);
+		// 	}
+		// 	else
+		// 	{
+		// 		JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
+		// 	}
+		// }
+		//
+		// if (IsKeyLeftPress)
+		// {
+		// 	if (!IsKeyRightPress)
+		// 	{
+		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+		// 		JetArrow->SetRelativeRotation(resetRot);
+		// 		FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
+		// 		JetArrow->AddRelativeRotation(newRot);
+		// 	}
+		// }
+		// else if (IsKeyRightPress)
+		// {
+		// 	if (!IsKeyLeftPress)
+		// 	{
+		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+		// 		JetArrow->SetRelativeRotation(resetRot);
+		// 		FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
+		// 		JetArrow->AddRelativeRotation(newRot);
+		// 	}
+		// }
 
 		// 방향전환중이 아니라면 방향을 가운데로 변환
 		// if (!IsKeyLeftPress && !IsKeyRightPress)
@@ -1481,36 +1481,7 @@ void AL_Viper::Tick(float DeltaTime)
 		//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
 #pragma endregion
 
-#pragma region Change Accel Value (backUp)
-		// if (IsAccel)
-		// {
-		// 	KeyDownAccel += DeltaTime;
-		// 	if (KeyDownAccel >= ChangeAccelTime)
-		// 	{
-		// 		KeyDownAccel = 0.f;
-		//
-		// 		// 기어 변경
-		// 		AccelGear++;
-		// 		if (AccelGear > 3)
-		// 			AccelGear = 3;
-		// 	}
-		// }
-		// else if (IsBreak)
-		// {
-		// 	KeyDownAccel += DeltaTime;
-		// 	if (KeyDownAccel >= ChangeAccelTime)
-		// 	{
-		// 		KeyDownAccel = 0.f;
-		//
-		// 		// 기어 변경
-		// 		AccelGear--;
-		// 		if (AccelGear < 0)
-		// 			AccelGear = 0;
-		// 	}
-		// }
-#pragma endregion
-
-#pragma region Change Accel Value2
+#pragma region Move Throttle
 		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
 
 		if (bThrottleAccel)
@@ -1601,41 +1572,21 @@ void AL_Viper::Tick(float DeltaTime)
 		 if (IsEngineOn)
 		 {
 		 	// Add Force
-		 	// LOG_S(Warning , TEXT("======================="));
 		 	FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
 		 	FVector forceLoc = JetRoot->GetComponentLocation();
-		 	// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
 		 	if (JetRoot->IsSimulatingPhysics())
 		 		JetRoot->AddForceAtLocation(forceVec , forceLoc);
 		
 		 	// Move Up & Down
 		 	jetRot = JetArrow->GetRelativeRotation();
 		 	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-		 	//LOG_S(Warning , TEXT("zRot %f") , zRot);
 		 	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-		
-		
-		 	// Rotate
-		 	// jetRot = JetArrow->GetRelativeRotation();
-		 	//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
-		 	// JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
-		
-		 	// if (IsLeftRoll)
-		 	// 	JetRoot->AddRelativeRotation(-1 * RotateValue);
-		 	// if (IsRightRoll)
-		 	// 	JetRoot->AddRelativeRotation(RotateValue);
-		
-		 	// if (IsLocallyControlled())
-		 	// {
-		 	// 	ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
-		 	// }
 		
 			 // 카메라 쉐이크
 			 // 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
 			 if (intTriggerNum < 2 && ValueOfMoveForce > 0)
 			 	CRPC_CameraShake();
 		}
-		// JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
 
 #pragma region Quat Move
