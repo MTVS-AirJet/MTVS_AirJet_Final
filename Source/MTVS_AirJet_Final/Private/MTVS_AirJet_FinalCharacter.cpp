@@ -65,7 +65,8 @@ void AMTVS_AirJet_FinalCharacter::BeginPlay()
 
 	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 
-	if ( CurrentMapName == "K_TestMap" || CurrentMapName == "K_LobbyMap" )
+	//if ( CurrentMapName == "K_TestMap" || CurrentMapName == "K_LobbyMap" )
+	if ( CurrentMapName == "K_TestMap" || CurrentMapName == "MAP_Lobby" )
 	{
 		if ( IsLocallyControlled() )
 		{

@@ -36,6 +36,7 @@ void UK_StreamingUI::NativeConstruct()
 	ButtonWindowScreen->OnClicked.AddDynamic(this , &UK_StreamingUI::OnButtonWindowScreen);
 	ButtonLookSharingScreen->SetVisibility(ESlateVisibility::Hidden);
 	ImageSharingScreen->SetVisibility(ESlateVisibility::Hidden);
+	ButtonWindowScreen->SetVisibility(ESlateVisibility::Hidden);
 
 	Me = Cast<AMTVS_AirJet_FinalCharacter>(GetOwningPlayerPawn());
 	if ( Me )
