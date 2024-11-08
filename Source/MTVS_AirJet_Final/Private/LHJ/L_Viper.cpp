@@ -1003,16 +1003,34 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
 	FVector2D moveVector = value.Get<FVector2D>();
-
+	LOG_SCREEN("%f, %f" , moveVector.X , moveVector.Y);
 	if (moveVector == FVector2D(0 , 1))
 	{
-		IsRightRoll = false;
 		IsLeftRoll = true;
+		IsKeyUpPress = false;
+		IsKeyDownPress = false;
+		IsRightRoll = false;
 	}
 	else if (moveVector == FVector2D(0 , -1))
 	{
-		IsLeftRoll = false;
 		IsRightRoll = true;
+		IsKeyUpPress = false;
+		IsKeyDownPress = false;
+		IsLeftRoll = false;
+	}
+	else if (moveVector == FVector2D(-1 , 0))
+	{
+		IsKeyUpPress = true;
+		IsKeyDownPress = false;
+		IsLeftRoll = false;
+		IsRightRoll = false;
+	}
+	else if (moveVector == FVector2D(1 , 0))
+	{
+		IsKeyDownPress = true;
+		IsKeyUpPress = false;
+		IsLeftRoll = false;
+		IsRightRoll = false;
 	}
 	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
 	// float RollAngle = moveVector.Y * MaxRotationAngle;
@@ -1030,6 +1048,8 @@ void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
 {
 	IsRightRoll = false;
 	IsLeftRoll = false;
+	IsKeyUpPress = false;
+	IsKeyDownPress = false;
 }
 
 // FRotator AL_Viper::CombineRotate(FVector NewVector)
@@ -1605,11 +1625,21 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region Rotate Mesh
 		if (IsRightRoll)
 		{
-			JetRoot->AddRelativeRotation(RotateValue);
+			JetRoot->AddRelativeRotation(RotateRollValue);
 		}
 		else if (IsLeftRoll)
 		{
-			JetRoot->AddRelativeRotation(RotateValue * -1);
+			JetRoot->AddRelativeRotation(RotateRollValue * -1);
+		}
+		else if (IsKeyUpPress)
+		{
+			// JetRoot->AddRelativeRotation(RotatePitchValue);
+			JetRoot->AddWorldRotation(RotatePitchValue* -1);
+		}
+		else if (IsKeyDownPress)
+		{
+			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
+			JetRoot->AddWorldRotation(RotatePitchValue);
 		}
 #pragma endregion
 
@@ -2737,12 +2767,12 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data = value.Get<float>();
-	 // LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data = value.Get<float>();
-	 // LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
 }
