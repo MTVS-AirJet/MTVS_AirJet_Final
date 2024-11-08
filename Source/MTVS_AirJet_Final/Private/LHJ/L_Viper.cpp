@@ -303,6 +303,10 @@ AL_Viper::AL_Viper()
 	this->Tags = TArray<FName>();
 	this->Tags.Add(FName("Viper"));
 
+	// 초기 회전값 설정
+	QuatCurrentRotation = FQuat::Identity;
+	QuatTargetRotation = FQuat::Identity;
+
 	bReplicates = true;
 	SetReplicateMovement(true);
 }
@@ -419,6 +423,11 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		input->BindAction(IA_ViperDevelop , ETriggerEvent::Started , this ,
 		                  &AL_Viper::F_ViperDevelopStarted);
+
+		input->BindAction(IA_ViperMove , ETriggerEvent::Triggered , this ,
+		                  &AL_Viper::F_ViperMoveTrigger);
+		input->BindAction(IA_ViperMove , ETriggerEvent::Completed , this ,
+		                  &AL_Viper::F_ViperMoveCompleted);
 #pragma endregion
 
 #pragma region Controller
@@ -712,76 +721,82 @@ void AL_Viper::F_ViperZoomOutCompleted(const struct FInputActionValue& value)
 
 void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
 {
-	IsKeyUpPress = true;
+	// if (!IsKeyDownPress)
+	// 	IsKeyUpPress = true;
 
-	if (CurrentTime < ChangeTime)
-		return;
-
-	CurrentTime = 0.f;
-	ForceUnitRot = CombineRotate(ChangeMoveVector);
+	// if (CurrentTime < ChangeTime)
+	// 	return;
+	//
+	// CurrentTime = 0.f;
+	// ForceUnitRot = CombineRotate(ChangeMoveVector);
 }
 
 void AL_Viper::F_ViperUpCompleted(const FInputActionValue& value)
 {
-	IsKeyUpPress = false;
-	ForceUnitRot = FRotator(0 , 0 , 0);
+	//IsKeyUpPress = false;
+	// ForceUnitRot = FRotator(0 , 0 , 0);
 }
 
 void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
 {
-	IsKeyDownPress = true;
+	// if (!IsKeyUpPress)
+	// 	IsKeyDownPress = true;
 
-	if (CurrentTime < ChangeTime)
-		return;
-
-	CurrentTime = 0.f;
-	ForceUnitRot = CombineRotate(-1 * ChangeMoveVector);
+	// if (CurrentTime < ChangeTime)
+	// 	return;
+	//
+	// CurrentTime = 0.f;
+	// ForceUnitRot = CombineRotate(-1 * ChangeMoveVector);
 }
 
 void AL_Viper::F_ViperDownCompleted(const FInputActionValue& value)
 {
-	IsKeyDownPress = false;
-	ForceUnitRot = FRotator(0 , 0 , 0);
+	//IsKeyDownPress = false;
+	// ForceUnitRot = FRotator(0 , 0 , 0);
 }
 
 void AL_Viper::F_ViperRightTrigger(const FInputActionValue& value)
 {
-	IsKeyRightPress = true;
+	// if (!IsKeyLeftPress)
+	// 	IsKeyRightPress = true;
 }
 
 void AL_Viper::F_ViperRightCompleted(const FInputActionValue& value)
 {
-	IsKeyRightPress = false;
+	//IsKeyRightPress = false;
 }
 
 void AL_Viper::F_ViperLeftTrigger(const FInputActionValue& value)
 {
-	IsKeyLeftPress = true;
+	// if(!IsKeyRightPress)
+	// 	IsKeyLeftPress = true;
 }
 
 void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
 {
-	IsKeyLeftPress = false;
+	//IsKeyLeftPress = false;
 }
 
 void AL_Viper::F_ViperTurnRightTrigger(const FInputActionValue& value)
 {
-	IsRightRoll = true;
+	// if(!IsLeftRoll)
+	// 	IsRightRoll = true;
 }
 
 void AL_Viper::F_ViperTurnRightCompleted(const FInputActionValue& value)
 {
-	IsRightRoll = false;
+	//IsRightRoll = false;
 }
 
 void AL_Viper::F_ViperTurnLeftTrigger(const FInputActionValue& value)
 {
-	IsLeftRoll = true;
+	// if(!IsRightRoll)
+	// 	IsLeftRoll = true;
 }
 
 void AL_Viper::F_ViperTurnLeftCompleted(const FInputActionValue& value)
 {
-	IsLeftRoll = false;
+	//IsLeftRoll = false;
 }
 
 void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
@@ -985,12 +1000,44 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 	//IsFlyStart = true;
 }
 
-FRotator AL_Viper::CombineRotate(FVector NewVector)
+void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
-	FRotator loc_rot = FRotator(NewVector.Y , NewVector.X , NewVector.Z);
-	return FRotator(ForceUnitRot.Pitch + loc_rot.Pitch , ForceUnitRot.Yaw + loc_rot.Yaw ,
-	                ForceUnitRot.Roll + loc_rot.Roll);
+	FVector2D moveVector = value.Get<FVector2D>();
+
+	if (moveVector == FVector2D(0 , 1))
+	{
+		IsRightRoll = false;
+		IsLeftRoll = true;
+	}
+	else if (moveVector == FVector2D(0 , -1))
+	{
+		IsLeftRoll = false;
+		IsRightRoll = true;
+	}
+	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
+	// float RollAngle = moveVector.Y * MaxRotationAngle;
+	// float PitchAngle = moveVector.X * MaxRotationAngle;
+	//
+	// // Roll과 Pitch 회전을 위한 쿼터니언 생성
+	// FQuat RollRotation = FQuat(FVector(1.0f, 0.0f, 0.0f), FMath::DegreesToRadians(RollAngle));
+	// FQuat PitchRotation = FQuat(FVector(0.0f, 1.0f, 0.0f), FMath::DegreesToRadians(PitchAngle));
+	//
+	// // Roll과 Pitch 회전을 결합
+	// QuatTargetRotation = RollRotation * PitchRotation;
 }
+
+void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
+{
+	IsRightRoll = false;
+	IsLeftRoll = false;
+}
+
+// FRotator AL_Viper::CombineRotate(FVector NewVector)
+// {
+// 	FRotator loc_rot = FRotator(NewVector.Y , NewVector.X , NewVector.Z);
+// 	return FRotator(ForceUnitRot.Pitch + loc_rot.Pitch , ForceUnitRot.Yaw + loc_rot.Yaw ,
+// 	                ForceUnitRot.Roll + loc_rot.Roll);
+// }
 #pragma endregion
 
 void AL_Viper::BeginPlay()
@@ -1406,83 +1453,54 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region Rotate JetArrow
 		FRotator jetRot = JetArrow->GetRelativeRotation();
 		// Check Distance Into Area
-		if (IsKeyUpPress || IsKeyDownPress)
-		{
-			if (jetRot.Pitch > MaxPitchValue)
-			{
-				JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
-				ForceUnitRot = FRotator(0 , 0 , 0);
-			}
-			else if (jetRot.Pitch < MinPitchValue)
-			{
-				JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
-				ForceUnitRot = FRotator(0 , 0 , 0);
-			}
-			else
-			{
-				JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
-			}
-		}
-
-		if (IsKeyLeftPress)
-		{
-			if (!IsKeyRightPress)
-			{
-				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-				JetArrow->SetRelativeRotation(resetRot);
-				FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
-				JetArrow->AddRelativeRotation(newRot);
-			}
-		}
-		else if (IsKeyRightPress)
-		{
-			if (!IsKeyLeftPress)
-			{
-				FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-				JetArrow->SetRelativeRotation(resetRot);
-				FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
-				JetArrow->AddRelativeRotation(newRot);
-			}
-		}
+		// if (IsKeyUpPress || IsKeyDownPress)
+		// {
+		// 	if (jetRot.Pitch > MaxPitchValue)
+		// 	{
+		// 		JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
+		// 		ForceUnitRot = FRotator(0 , 0 , 0);
+		// 	}
+		// 	else if (jetRot.Pitch < MinPitchValue)
+		// 	{
+		// 		JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
+		// 		ForceUnitRot = FRotator(0 , 0 , 0);
+		// 	}
+		// 	else
+		// 	{
+		// 		JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
+		// 	}
+		// }
+		//
+		// if (IsKeyLeftPress)
+		// {
+		// 	if (!IsKeyRightPress)
+		// 	{
+		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+		// 		JetArrow->SetRelativeRotation(resetRot);
+		// 		FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
+		// 		JetArrow->AddRelativeRotation(newRot);
+		// 	}
+		// }
+		// else if (IsKeyRightPress)
+		// {
+		// 	if (!IsKeyLeftPress)
+		// 	{
+		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
+		// 		JetArrow->SetRelativeRotation(resetRot);
+		// 		FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
+		// 		JetArrow->AddRelativeRotation(newRot);
+		// 	}
+		// }
 
 		// 방향전환중이 아니라면 방향을 가운데로 변환
-		if (!IsKeyLeftPress && !IsKeyRightPress)
-			JetArrow->SetRelativeRotation(FRotator(JetArrow->GetRelativeRotation().Pitch , 0 ,
-			                                       JetArrow->GetRelativeRotation().Roll));
+		// if (!IsKeyLeftPress && !IsKeyRightPress)
+		// 	JetArrow->SetRelativeRotation(FRotator(JetArrow->GetRelativeRotation().Pitch , 0 ,
+		// 	                                       JetArrow->GetRelativeRotation().Roll));
 
 		//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
 #pragma endregion
 
-#pragma region Change Accel Value (backUp)
-		// if (IsAccel)
-		// {
-		// 	KeyDownAccel += DeltaTime;
-		// 	if (KeyDownAccel >= ChangeAccelTime)
-		// 	{
-		// 		KeyDownAccel = 0.f;
-		//
-		// 		// 기어 변경
-		// 		AccelGear++;
-		// 		if (AccelGear > 3)
-		// 			AccelGear = 3;
-		// 	}
-		// }
-		// else if (IsBreak)
-		// {
-		// 	KeyDownAccel += DeltaTime;
-		// 	if (KeyDownAccel >= ChangeAccelTime)
-		// 	{
-		// 		KeyDownAccel = 0.f;
-		//
-		// 		// 기어 변경
-		// 		AccelGear--;
-		// 		if (AccelGear < 0)
-		// 			AccelGear = 0;
-		// 	}
-		// }
-#pragma endregion
-
-#pragma region Change Accel Value2
+#pragma region Move Throttle
 		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
 
 		if (bThrottleAccel)
@@ -1563,6 +1581,38 @@ void AL_Viper::Tick(float DeltaTime)
 		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
+#pragma region Quat Move
+		if (JetMesh)
+		{
+			// 현재 회전값을 목표 회전값으로 부드럽게 보간
+			QuatCurrentRotation = FQuat::Slerp(
+				QuatCurrentRotation ,
+				QuatTargetRotation ,
+				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
+			);
+
+			// 쿼터니언 회전 적용
+			JetMesh->SetRelativeRotation(QuatCurrentRotation);
+
+			// 화살표 컴포넌트에도 동일한 회전 적용
+			if (JetArrow)
+			{
+				JetArrow->SetRelativeRotation(QuatCurrentRotation);
+			}
+		}
+#pragma endregion
+
+#pragma region Rotate Mesh
+		if (IsRightRoll)
+		{
+			JetRoot->AddRelativeRotation(RotateValue);
+		}
+		else if (IsLeftRoll)
+		{
+			JetRoot->AddRelativeRotation(RotateValue * -1);
+		}
+#pragma endregion
+
 #pragma region Jet Move
 		ValueOfMoveForce += (GetAddTickSpeed() * 6);
 		if (ValueOfMoveForce < 0)
@@ -1573,42 +1623,23 @@ void AL_Viper::Tick(float DeltaTime)
 		if (IsEngineOn)
 		{
 			// Add Force
-			// LOG_S(Warning , TEXT("======================="));
 			FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
 			FVector forceLoc = JetRoot->GetComponentLocation();
-			// LOG_S(Warning , TEXT("forceLoc x : %f, y : %f, z : %f") , forceLoc.X , forceLoc.Y , forceLoc.Z);
 			if (JetRoot->IsSimulatingPhysics())
 				JetRoot->AddForceAtLocation(forceVec , forceLoc);
 
 			// Move Up & Down
 			jetRot = JetArrow->GetRelativeRotation();
 			float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-			//LOG_S(Warning , TEXT("zRot %f") , zRot);
 			JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-
-
-			// Rotate
-			jetRot = JetArrow->GetRelativeRotation();
-			//LOG_S(Warning , TEXT("Rotate Yaw %f") , jetRot.Yaw / ValueOfDivRot);
-			JetRoot->AddRelativeRotation(FRotator(0 , jetRot.Yaw / ValueOfDivRot , 0));
-
-			if (IsLeftRoll)
-				JetRoot->AddRelativeRotation(-1 * RotateValue);
-			if (IsRightRoll)
-				JetRoot->AddRelativeRotation(RotateValue);
-
-			// if (IsLocallyControlled())
-			// {
-			// 	ServerRPCLocationAndRotation(JetRoot->GetComponentLocation() , JetRoot->GetRelativeRotation());
-			// }
 
 			// 카메라 쉐이크
 			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
 			if (intTriggerNum < 2 && ValueOfMoveForce > 0)
 				CRPC_CameraShake();
 		}
-		JetArrow->SetRelativeRotation(FRotator(0 , 0 , 0));
 #pragma endregion
+
 
 #pragma region LockOn
 		IsLockOn();
@@ -2642,7 +2673,7 @@ void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
 	data = FMath::RoundToFloat(data * 1000.0f) / 1000.0f;
-	FString strData = FString::Printf(TEXT("%.3f"), data);
+	FString strData = FString::Printf(TEXT("%.3f") , data);
 	//LOG_S(Warning , TEXT("F_StickAxis1 : %s") , *strData);
 
 	float X = 0;
@@ -2706,12 +2737,12 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
+	 // LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+	 // LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
 }

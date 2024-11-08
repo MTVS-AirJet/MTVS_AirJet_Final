@@ -198,6 +198,8 @@ public: // Input
 	class UInputAction* IA_ViperVoice;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperDevelop;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperMove;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -261,37 +263,41 @@ public: // Input
 	void F_ViperVoiceStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperDevelopStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveTrigger(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveCompleted(const struct FInputActionValue& value);
 
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
 
 	// For Reset Arrow Rotate
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyUpPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyDownPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyRightPress;
-	UPROPERTY(BlueprintReadOnly)
-	bool IsKeyLeftPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyUpPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyDownPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyRightPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyLeftPress;
 	
 	// Rotate vector
 	UPROPERTY(BlueprintReadOnly)
 	bool IsRightRoll;
 	UPROPERTY(BlueprintReadOnly)
 	bool IsLeftRoll;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotateValue = FRotator(0 , 0 , 2.f);
 
 	// Rotate Value
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator ForceUnitRot;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateValue = FRotator(0 , 0 , .5f);
-	// Add Rotate Value ( ForceUnitRot To NewVector )
-	UFUNCTION(BlueprintCallable)
-	FRotator CombineRotate(FVector NewVector);
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FRotator ForceUnitRot;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
+	// // Add Rotate Value ( ForceUnitRot To NewVector )
+	// UFUNCTION(BlueprintCallable)
+	// FRotator CombineRotate(FVector NewVector);
 	
 private:
 	// For Engine Using
@@ -745,4 +751,19 @@ private:
 public:
 	FSuccessProgress engineProgSuccessDel;
 #pragma endregion
+
+public:
+	// 회전 속도 설정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float RotationSpeed = 5.0f;
+
+	// 최대 회전 각도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float MaxRotationAngle = 44.5f;
+
+	// 현재 회전 상태를 쿼터니언으로 저장
+	FQuat QuatCurrentRotation;
+    
+	// 목표 회전 상태를 쿼터니언으로 저장
+	FQuat QuatTargetRotation;
 };
