@@ -45,6 +45,10 @@ protected:
 	// 서브 조건 요소 UI 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TSubclassOf<class UJ_ObjectiveSubElementUI> objSubEleUIPrefab;
+
+	// 서브 조건 재귀 UI 프리팹
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TSubclassOf<class UJ_ObjectiveTextUI> objSubObjUIPrefab;
 public:
 	// 시작 애니메이션 딜리게이트
 	FUIAnimDel startAnimDel;
@@ -52,20 +56,36 @@ public:
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
+
+
     void SetBodyTextValue(class UWidget *textWidget, const FRichString &str) override;
+
+	// 사라짐과 나타남 애니메이션 적용
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayShowNewEle(class UWidget* hidden, class UWidget* show);
 
 public:
 	// 명령 UI 설정
     void SetTextUI(FTextUIData data, bool isInit = false) override;
+	// 오버로딩
+    void SetTextUI(FDefaultTextUIData data, bool isInit = false);
+    // 본문 설정
+    void SetBodyText(const TArray<FRichString> &strAry, bool isInit = false,
+                     class UVerticalBox *bodyTextVBox = nullptr) override;
+    // 본문 설정 오버로딩
+    void SetBodyText(const TArray<FDefaultTextUIData> &objAry, bool isInit = false,
+                     class UVerticalBox *bodyTextVBox = nullptr);
 
-	// 서브 조건 요소 설정
+    // 서브 조건 요소 설정
     UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str) override;
+	// 서브 목표 요소 설정 오버로딩
+    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FDefaultTextUIData &data);
 
-	// ui 애니메이션
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlayStartAnim(const TArray<UWidget*>& allSub);
+    // ui 애니메이션
+    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void PlayStartAnim(const TArray<UWidget *> &allSub);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlayEndAnim(const TArray<UWidget*>& allSub);
+    UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+    void PlayEndAnim(const TArray<UWidget *> &allSub);
 	
 };

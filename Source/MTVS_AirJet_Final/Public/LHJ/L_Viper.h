@@ -10,8 +10,8 @@
 #include "JBS/J_Utility.h"
 #include "L_Viper.generated.h"
 
-UENUM()
-enum class EWeapon
+UENUM(BlueprintType)
+enum class EWeapon : uint8
 {
 	Missile = 0 ,
 	Flare ,
@@ -153,7 +153,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
-private: // Input
+public: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Viper;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -245,13 +245,13 @@ private: // Input
 	void F_ViperBreakStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void F_ViperShootStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperFpsStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperTpsStarted(const struct FInputActionValue& value);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void F_ViperChangeWeaponStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperRotateTriggerStarted(const struct FInputActionValue& value);
@@ -266,6 +266,33 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
 
+	// For Reset Arrow Rotate
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyUpPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyDownPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyRightPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyLeftPress;
+	
+	// Rotate vector
+	UPROPERTY(BlueprintReadOnly)
+	bool IsRightRoll;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsLeftRoll;
+
+	// Rotate Value
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator ForceUnitRot;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector ChangeMoveVector = FVector(0 , .5f , 0);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotateValue = FRotator(0 , 0 , .5f);
+	// Add Rotate Value ( ForceUnitRot To NewVector )
+	UFUNCTION(BlueprintCallable)
+	FRotator CombineRotate(FVector NewVector);
+	
 private:
 	// For Engine Using
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
@@ -273,37 +300,20 @@ private:
 	// For Change Arrow Rotate
 	float CurrentTime;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	float ChangeTime = .3f;
-	// For Reset Arrow Rotate
-	bool IsKeyUpPress;
-	bool IsKeyDownPress;
-	bool IsKeyRightPress;
-	bool IsKeyLeftPress;
-	// Rotate vector
-	bool IsRightRoll;
-	bool IsLeftRoll;
+	float ChangeTime = .3f;		
 	// Zoom
 	bool IsZoomIn;
 	bool IsZoomOut;
-
-	UPROPERTY(EditDefaultsOnly)
-	FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	UPROPERTY(EditDefaultsOnly)
-	FRotator RotateValue = FRotator(0 , 0 , .5f);
-	// Rotate Value
-	FRotator ForceUnitRot;
-	// Add Rotate Value ( ForceUnitRot To NewVector )
-	FRotator CombineRotate(FVector NewVector);
-
-private:
+	
+public:
 	// For Check Distance
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MaxPitchValue = 85.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MinPitchValue = -85.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MaxYawValue = 80.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MinYawValue = -80.f;
 
 private:
@@ -489,10 +499,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyThrottleMesh;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	bool bThrottleAccel;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	bool bThrottleBreak;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	FVector ThrottleOffLoc = FVector(515 , -35 , 255);
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	FVector ThrottleMilLoc = FVector(525 , -35 , 255);
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	FVector ThrottleMaxLoc = FVector(530 , -35 , 255);
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
 	float ThrottleMoveSpeed1 = .1f;
@@ -514,8 +529,10 @@ private:
 	bool IsStart;
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Engine", BlueprintReadOnly)
 	int32 intTriggerNum = 0; // 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
+private:
 	UFUNCTION()
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
