@@ -63,7 +63,7 @@ void UJ_ObjectiveUIComp::InitObjUI()
 	objUI->AddToViewport();
 }
 
-void UJ_ObjectiveUIComp::CRPC_StartObjUI_Implementation(FTacticalOrderData orderData)
+void UJ_ObjectiveUIComp::CRPC_StartObjUI_Implementation(const FTacticalOrderData& orderData)
 {
 	// 비활성 상태시 활성화
 	if(objUI->GetVisibility() == ESlateVisibility::Hidden)
@@ -75,7 +75,7 @@ void UJ_ObjectiveUIComp::CRPC_StartObjUI_Implementation(FTacticalOrderData order
 	CRPC_UpdateObjUI(orderData, true);
 }
 
-void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(FTacticalOrderData orderData, bool isInit)
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderData& orderData, bool isInit)
 {
 	TArray<FTextUIData> textUIData;
 
@@ -106,9 +106,17 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(FTacticalOrderData orde
 			CreateUIData(epData, textUIData, isInit);
 		}
 			break;
+		case ETacticalOrder::TAKE_OFF:
+		{
+			auto& toData = orderData.toData;
+
+			CreateUIData(toData, textUIData, isInit);
+		}
+			break;
 
 	}
-	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::White, TEXT("doremi111"));
+
+	check(textUIData.Num() > 0);
 
 	// ui에 값 전달
 	if(isInit)
@@ -203,7 +211,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 	FTextUIData objUIData;
 	// 상세 ui 데이터
 	FTextUIData detailUIData;
-
+	check(this);
 	// 목표 단
 	objUIData.headerText = FRichString(TEXT("시동 절차"));
 	// 시동 절차 텍스트 설정
@@ -246,3 +254,19 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
 
+void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIData> &outData, bool isInit)
+{
+	// 목표 ui 데이터
+	FTextUIData objUIData;
+	// 상세 ui 데이터
+	FTextUIData detailUIData;
+	check(this);
+	// 목표 단
+	objUIData.headerText = FRichString(TEXT("이륙 절차"));
+
+	FString str = FString::Printf(TEXT("@@ 임시 이륙 텍스트 : %d / %d"), data.curTakeOffCnt, data.maxTakeOffCnt);
+	ETextStyle style = data.curTakeOffCnt <= data.maxTakeOffCnt ? ETextStyle::DEFAULT : ETextStyle::SUCCESS;
+	objUIData.bodyTextAry.Add(FRichString(str,style));
+
+	outData = TArray<FTextUIData> { objUIData , detailUIData};
+}

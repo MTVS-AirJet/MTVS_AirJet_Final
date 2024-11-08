@@ -99,9 +99,12 @@ protected:
     void InitObjectiveList(TArray<struct FMissionObject> missions);
 
 	// 해당 목표 활성화
-    void ActiveObjectiveByIdx(int mIdx);
+    void ActiveObjectiveByIdx(int mIdx, bool isFirst = false);
 
-	// 다음 목표 활성화 | 목표에 바인드
+	// 딜레이된 목표 활성화
+    void DelayedObjectiveActive(class AJ_BaseMissionObjective *obj, float delayTime);
+
+    // 다음 목표 활성화 | 목표에 바인드
     void ActiveNextObjective();
 
 	// 목표 수행도 갱신

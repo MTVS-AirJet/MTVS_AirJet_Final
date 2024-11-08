@@ -71,7 +71,7 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
         {
             //타이머에서 할 거
             auto size = slot->GetSize();
-            size.Value = FMath::Clamp(size.Value - 0.05f, 0, 1);
+            size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
             
             slot->SetSize(size);
             // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("doremi : %.2f"), size.Value));
@@ -80,7 +80,7 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
                 subUI->SetVisibility(ESlateVisibility::Hidden);
                 GetWorld()->GetTimerManager().ClearTimer(timerHandle2);
             }
-        }, 0.05, true);
+        }, 0.025, true);
     }, 1.5f, false);
 }
 

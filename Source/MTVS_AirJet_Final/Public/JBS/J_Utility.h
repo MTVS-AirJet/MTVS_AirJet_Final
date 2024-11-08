@@ -360,27 +360,20 @@ struct FRichString
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
     FString value;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString formatStr;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
     ETextStyle styleType;
 
     FRichString() : value(""), styleType(ETextStyle::DEFAULT) {}
     FRichString(FString value) : value(value), styleType(ETextStyle::DEFAULT)
     {
-        formatStr = FormatString(value, styleType);
     }
     FRichString(FString value, ETextStyle styleType)
         : value(value), styleType(styleType)
     {
-        formatStr = FormatString(value, styleType);
     }
 
-    FString FormatString(const FString &str, ETextStyle type);
-    FString GetFormatString() const
-    {
-        return formatStr;
-    }
+    FString FormatString(const FString &str, ETextStyle type) const;
+    FString GetFormatString() const;
 };
 
 // 편대 역할
@@ -479,6 +472,22 @@ public:
     FFormationFlightUIData(
         bool checkFormation, float checkHeight, float curHeight, EPilotRole pilotRole,  bool isCorrectPosition) :
         checkFormation(checkFormation), checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), isCorrectPosition(isCorrectPosition) {}
+
+         // == 연산자 오버로딩
+    bool operator==(const FFormationFlightUIData& Other) const
+    {
+        return checkFormation == Other.checkFormation &&
+               checkHeight == Other.checkHeight &&
+               curHeight == Other.curHeight &&
+               pilotRole == Other.pilotRole &&
+               isCorrectPosition == Other.isCorrectPosition;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FFormationFlightUIData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
 };
 
 // 2. 목표 무력화
@@ -497,6 +506,19 @@ public:
     FNeutralizeTargetUIData() {}
 
     FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FNeutralizeTargetUIData& Other) const
+    {
+        return allTargetAmt == Other.allTargetAmt &&
+               curTargetAmt == Other.curTargetAmt;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FNeutralizeTargetUIData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
 };
 
 // 시동 절차 | 비트마스크 처리 하는거 포폴에 넣어도 될듯
@@ -514,6 +536,7 @@ enum class EEngineProgress : uint8
     ,CLOSE_CANOPY = 8
     ,STANDBY_OTHER_PLAYER = 9
     ,RELEASE_SIDE_BREAK = 10
+    ,TAKE_OFF = 11
 };
 
 // 시동 절차 확인 용 개인 pc 데이터
@@ -545,6 +568,47 @@ public:
     FString ToStringProgressEnum(EEngineProgress type) const;
     // 해당 enum 성공 실패 여부 반환 | 비트마스크
     bool CheckProgressSuccess(EEngineProgress type) const;
+
+    // == 연산자 오버로딩
+    bool operator==(const FEngineProgressData& Other) const
+    {
+        return curProgress == Other.curProgress &&
+               successValue == Other.successValue;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FEngineProgressData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FTakeOffData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int curTakeOffCnt = 0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int maxTakeOffCnt;
+
+    FTakeOffData() {}
+    FTakeOffData(int cur, int max) : curTakeOffCnt(cur), maxTakeOffCnt(max) {}
+
+    // == 연산자 오버로딩
+    bool operator==(const FTakeOffData& Other) const
+    {
+        return curTakeOffCnt == Other.curTakeOffCnt &&
+               maxTakeOffCnt == Other.maxTakeOffCnt;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTakeOffData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+    
 };
 
 // 시동 절차 확인 용 전체 데이터
@@ -580,6 +644,9 @@ public:
     FTacticalOrderData(ETacticalOrder orderType, FEngineProgressData epData)
         : orderType(orderType), epData(epData) {}
 
+    FTacticalOrderData(ETacticalOrder orderType, FTakeOffData toData)
+        : orderType(orderType), toData(toData) {}
+
     // 명령 종류
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     ETacticalOrder orderType;
@@ -595,6 +662,26 @@ public:
     // 시동 절차
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FEngineProgressData epData;
+    // 이륙 절차
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FTakeOffData toData;
+    
+
+    // == 연산자 오버로딩
+    bool operator==(const FTacticalOrderData& Other) const
+    {
+        return orderType == Other.orderType &&
+               ffData == Other.ffData &&
+               ntData == Other.ntData &&
+               epData == Other.epData &&
+               toData == Other.toData;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTacticalOrderData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 이용한 간단한 구현
+    }
 };
 
 

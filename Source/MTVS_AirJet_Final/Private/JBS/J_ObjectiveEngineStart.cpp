@@ -44,15 +44,6 @@ void AJ_ObjectiveEngineStart::Tick(float deltaTime)
 
 void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc, EEngineProgress type)
 {
-    // 모든 pc가 이륙 대기 상태가 되면 종료 처리
-    if(CheckAllRunEngine(allPC, EEngineProgress::RELEASE_SIDE_BREAK))
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("이륙 준비 완료"));
-
-        ObjectiveEnd(true);
-        return;
-    }
-
     // 해당 pc 가 수행중인 type 과 일치하면 성공 처리 후 다음 수행으로 넘어가기
     bool isValid = allData.dataMap.Contains(pc);
     check(isValid);
@@ -72,25 +63,36 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     // 수행도 점수 처리
     CalcSuccessPercent();
 
-    // 모두가 스탠 바이 상태이면 다음 으로 진행 처리
-    if(CheckAllRunEngine(allPC, EEngineProgress::STANDBY_OTHER_PLAYER))
+    // 모두가 스탠 바이 상태 이상 다음 으로 진행 처리
+    if(!isReadyTakeOff && CheckAllRunEngine(allPC, EEngineProgress::STANDBY_OTHER_PLAYER))
     {
+        isReadyTakeOff = true;
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("전부 대기중"));
         
         for(auto* onePC : allPC)
         {
-            auto& oneData = allData.dataMap[pc];
-            CheckProgress(pc, oneData.curProgress);
+            auto& oneData = allData.dataMap[onePC];
+            CheckProgress(onePC, oneData.curProgress);
         }
+    }
+
+    // 모든 pc가 이륙 대기 상태가 되면 종료 처리
+    if(CheckAllRunEngine(allPC, EEngineProgress::TAKE_OFF))
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("이륙 준비 완료"));
+
+        ObjectiveEnd(true);
+        return;
     }
 }
 
 bool AJ_ObjectiveEngineStart::CheckAllRunEngine(const TArray<class AJ_MissionPlayerController *> pcs, EEngineProgress checkType)
 {
+    // 해당 절차 이상인지 전부 체크
     bool isAllEnd = true;
     for(auto* onePC : pcs)
     {
-        if(allData.dataMap[onePC].curProgress != checkType)
+        if(allData.dataMap[onePC].curProgress < checkType)
         {
             isAllEnd = false;
             break;

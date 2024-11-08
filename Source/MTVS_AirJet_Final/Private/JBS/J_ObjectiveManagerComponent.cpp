@@ -46,7 +46,7 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 
 void UJ_ObjectiveManagerComponent::InitDefaultObj()
 {
-	// @@ 전술명령 목표와는 별개로 동작하면서 비슷한 로직으로 구성
+	// solved 전술명령 목표와는 별개로 동작하면서 비슷한 로직으로 구성
 	
 	for(auto& dmData : defaultObjDataAry)
 	{
@@ -58,6 +58,17 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 
 		// 목표 수행도 갱신함수 바인드
 		objActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
+		
+		// 시동 절차 끝나고 이륙 절차 시작
+		if(dmData.objType == ETacticalOrder::ENGINE_START)
+		{
+			objActor->objectiveEndDel.AddLambda([this]{
+				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
+				check(takeOffObj);
+				// 활성화
+				DelayedObjectiveActive(takeOffObj, objSwitchInterval);
+			});
+		}
 	}
 }
 
@@ -70,8 +81,7 @@ void UJ_ObjectiveManagerComponent::StartDefualtObj()
 	check(engineObj);
 
 	// 활성화
-	engineObj->IS_OBJECTIVE_ACTIVE = true;
-	
+	DelayedObjectiveActive(engineObj, 0.001f);
 }
 
 void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObject> missions)
@@ -124,7 +134,7 @@ AJ_BaseMissionObjective*  UJ_ObjectiveManagerComponent::SpawnObjActor(ETacticalO
 	return objectiveActor;
 }
 
-void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
+void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 {
 	if(mIdx >= objectiveDataAry.Num())
 	{
@@ -132,11 +142,15 @@ void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx)
 
 		return;
 	}
-
+	// 목표 액터 가져오기
 	auto* obj = objectiveDataAry[mIdx].objectiveActor;
 	if(!obj) return;
+	
+	// 딜레이 여부
+	float delayTime = isFirst ? 0.001f : objSwitchInterval;
+
 	// 활성화
-	obj->IS_OBJECTIVE_ACTIVE = true;
+	DelayedObjectiveActive(obj, delayTime);
 }
 
 void UJ_ObjectiveManagerComponent::ActiveNextObjective()
@@ -147,23 +161,7 @@ void UJ_ObjectiveManagerComponent::ActiveNextObjective()
 	if(isMissionComplete) return;
 
 	// 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
-	if(CUR_ACTIVE_MISSION_IDX > 0)
-	{
-		FTimerHandle timerHandle;
-		GetWorld()->GetTimerManager()
-			.SetTimer(timerHandle, [this]() mutable
-		{
-			//타이머에서 할 거
-			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
-			// 해당 목표 활성화
-			ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
-			
-		}, objSwitchInterval, false);
-	}
-	else {
-		// 해당 목표 활성화
-		ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX);
-	}
+	ActiveObjectiveByIdx(CUR_ACTIVE_MISSION_IDX, CUR_ACTIVE_MISSION_IDX == 0);
 }
 
 void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
@@ -187,8 +185,8 @@ void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
 		return;
     }
 
-    // 활성 미션 액터 설정
-    CUR_ACTIVE_MISSION = objectiveDataAry[value].objectiveActor;
+    // 활성 미션 액터 설정 | delay active 쪽에서 하는중
+    // CUR_ACTIVE_MISSION = objectiveDataAry[value].objectiveActor;
 }
 
 void UJ_ObjectiveManagerComponent::MissionComplete()
@@ -237,3 +235,17 @@ void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjectiv
 	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("도당체 : %.2f"), data.successPercent));
 }
 
+void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime)
+{
+	check(obj);
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("dowdiwad"));
+	FTimerHandle timerHandle2;
+	
+	GetWorld()->GetTimerManager()
+		.SetTimer(timerHandle2, [this, obj]() mutable
+	{
+		obj->IS_OBJECTIVE_ACTIVE = true;
+		CUR_ACTIVE_MISSION = obj;		
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
+	}, delayTime, false);
+}
