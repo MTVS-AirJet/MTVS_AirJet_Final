@@ -198,6 +198,8 @@ public: // Input
 	class UInputAction* IA_ViperVoice;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperDevelop;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperMove;
 
 	UFUNCTION()
 	void F_ViperEngine(const struct FInputActionValue& value);
@@ -261,6 +263,8 @@ public: // Input
 	void F_ViperVoiceStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperDevelopStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveTrigger(const struct FInputActionValue& value);
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -288,7 +292,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector ChangeMoveVector = FVector(0 , .5f , 0);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateValue = FRotator(0 , 0 , .5f);
+	FRotator RotateValue = FRotator(0 , 0 , 2.f);
 	// Add Rotate Value ( ForceUnitRot To NewVector )
 	UFUNCTION(BlueprintCallable)
 	FRotator CombineRotate(FVector NewVector);
@@ -745,4 +749,19 @@ private:
 public:
 	FSuccessProgress engineProgSuccessDel;
 #pragma endregion
+
+public:
+	// 회전 속도 설정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float RotationSpeed = 5.0f;
+
+	// 최대 회전 각도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float MaxRotationAngle = 45.0f;
+
+	// 현재 회전 상태를 쿼터니언으로 저장
+	FQuat QuatCurrentRotation;
+    
+	// 목표 회전 상태를 쿼터니언으로 저장
+	FQuat QuatTargetRotation;
 };
