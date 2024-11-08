@@ -1004,34 +1004,45 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
 	FVector2D moveVector = value.Get<FVector2D>();
 	LOG_SCREEN("%f, %f" , moveVector.X , moveVector.Y);
-	if (moveVector == FVector2D(0 , 1))
-	{
-		IsLeftRoll = true;
-		IsKeyUpPress = false;
-		IsKeyDownPress = false;
-		IsRightRoll = false;
-	}
-	else if (moveVector == FVector2D(0 , -1))
-	{
-		IsRightRoll = true;
-		IsKeyUpPress = false;
-		IsKeyDownPress = false;
-		IsLeftRoll = false;
-	}
-	else if (moveVector == FVector2D(-1 , 0))
-	{
-		IsKeyUpPress = true;
-		IsKeyDownPress = false;
-		IsLeftRoll = false;
-		IsRightRoll = false;
-	}
-	else if (moveVector == FVector2D(1 , 0))
-	{
-		IsKeyDownPress = true;
-		IsKeyUpPress = false;
-		IsLeftRoll = false;
-		IsRightRoll = false;
-	}
+
+	// 입력값에 최대 회전 각도 제한 적용
+	float RollAngle =  moveVector.Y * MaxRotationAngle;
+	float PitchAngle = 0.15f * moveVector.X * MaxRotationAngle;
+
+	// Roll과 Pitch를 쿼터니언 회전으로 변환
+	FQuat RollRotation = FQuat(FVector(1, 0, 0), FMath::DegreesToRadians(RollAngle));
+	FQuat PitchRotation = FQuat(FVector(0, 1, 0), FMath::DegreesToRadians(PitchAngle));
+
+	// 목표 회전 설정 (RootComponent를 기준으로)
+	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+	// if (moveVector == FVector2D(0 , 1))
+	// {
+	// 	IsLeftRoll = true;
+	// 	IsKeyUpPress = false;
+	// 	IsKeyDownPress = false;
+	// 	IsRightRoll = false;
+	// }
+	// else if (moveVector == FVector2D(0 , -1))
+	// {
+	// 	IsRightRoll = true;
+	// 	IsKeyUpPress = false;
+	// 	IsKeyDownPress = false;
+	// 	IsLeftRoll = false;
+	// }
+	// else if (moveVector == FVector2D(-1 , 0))
+	// {
+	// 	IsKeyUpPress = true;
+	// 	IsKeyDownPress = false;
+	// 	IsLeftRoll = false;
+	// 	IsRightRoll = false;
+	// }
+	// else if (moveVector == FVector2D(1 , 0))
+	// {
+	// 	IsKeyDownPress = true;
+	// 	IsKeyUpPress = false;
+	// 	IsLeftRoll = false;
+	// 	IsRightRoll = false;
+	// }
 	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
 	// float RollAngle = moveVector.Y * MaxRotationAngle;
 	// float PitchAngle = moveVector.X * MaxRotationAngle;
@@ -1046,6 +1057,7 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
 {
+	QuatTargetRotation = QuatCurrentRotation;
 	IsRightRoll = false;
 	IsLeftRoll = false;
 	IsKeyUpPress = false;
@@ -1601,47 +1613,52 @@ void AL_Viper::Tick(float DeltaTime)
 		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
-#pragma region Quat Move
-		if (JetMesh)
-		{
-			// 현재 회전값을 목표 회전값으로 부드럽게 보간
-			QuatCurrentRotation = FQuat::Slerp(
-				QuatCurrentRotation ,
-				QuatTargetRotation ,
-				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
-			);
+		// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
+		QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation, QuatTargetRotation, RotationSpeed * DeltaTime);
 
-			// 쿼터니언 회전 적용
-			JetMesh->SetRelativeRotation(QuatCurrentRotation);
-
-			// 화살표 컴포넌트에도 동일한 회전 적용
-			if (JetArrow)
-			{
-				JetArrow->SetRelativeRotation(QuatCurrentRotation);
-			}
-		}
-#pragma endregion
-
-#pragma region Rotate Mesh
-		if (IsRightRoll)
-		{
-			JetRoot->AddRelativeRotation(RotateRollValue);
-		}
-		else if (IsLeftRoll)
-		{
-			JetRoot->AddRelativeRotation(RotateRollValue * -1);
-		}
-		else if (IsKeyUpPress)
-		{
-			// JetRoot->AddRelativeRotation(RotatePitchValue);
-			JetRoot->AddWorldRotation(RotatePitchValue* -1);
-		}
-		else if (IsKeyDownPress)
-		{
-			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
-			JetRoot->AddWorldRotation(RotatePitchValue);
-		}
-#pragma endregion
+		// RootComponent의 회전 설정
+		RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
+// #pragma region Quat Move
+// 		if (JetMesh)
+// 		{
+// 			// 현재 회전값을 목표 회전값으로 부드럽게 보간
+// 			QuatCurrentRotation = FQuat::Slerp(
+// 				QuatCurrentRotation ,
+// 				QuatTargetRotation ,
+// 				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
+// 			);
+//
+// 			// 쿼터니언 회전 적용
+// 			JetMesh->SetRelativeRotation(QuatCurrentRotation);
+//
+// 			// 화살표 컴포넌트에도 동일한 회전 적용
+// 			if (JetArrow)
+// 			{
+// 				JetArrow->SetRelativeRotation(QuatCurrentRotation);
+// 			}
+// 		}
+// #pragma endregion
+//
+// #pragma region Rotate Mesh
+// 		if (IsRightRoll)
+// 		{
+// 			JetRoot->AddRelativeRotation(RotateRollValue);
+// 		}
+// 		else if (IsLeftRoll)
+// 		{
+// 			JetRoot->AddRelativeRotation(RotateRollValue * -1);
+// 		}
+// 		else if (IsKeyUpPress)
+// 		{
+// 			// JetRoot->AddRelativeRotation(RotatePitchValue);
+// 			JetRoot->AddWorldRotation(RotatePitchValue* -1);
+// 		}
+// 		else if (IsKeyDownPress)
+// 		{
+// 			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
+// 			JetRoot->AddWorldRotation(RotatePitchValue);
+// 		}
+// #pragma endregion
 
 #pragma region Jet Move
 		ValueOfMoveForce += (GetAddTickSpeed() * 6);

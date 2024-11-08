@@ -289,9 +289,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsLeftRoll;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateRollValue = FRotator(0 , 0 , 2.f);
+	FRotator RotateRollValue = FRotator(0 , 0 , 1.0f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotatePitchValue = FRotator(1.5f , 0 , 0);
+	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
 
 	// Rotate Value
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -758,15 +758,15 @@ public:
 public:
 	// 회전 속도 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float RotationSpeed = 5.0f;
+	float RotationSpeed = 0.7f;
 
 	// 최대 회전 각도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float MaxRotationAngle = 44.5f;
+	float MaxRotationAngle = 89.5f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
-	FQuat QuatCurrentRotation;
+	FQuat QuatCurrentRotation = FQuat::Identity;
     
 	// 목표 회전 상태를 쿼터니언으로 저장
-	FQuat QuatTargetRotation;
+	FQuat QuatTargetRotation = FQuat::Identity;
 };
