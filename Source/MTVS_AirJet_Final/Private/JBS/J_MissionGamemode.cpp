@@ -364,7 +364,7 @@ FMissionDataRes AJ_MissionGamemode::LoadMissionData()
 void AJ_MissionGamemode::StartTacticalOrder()
 {
     // solved 기본 목표 종료 처리
-    startTODel.ExecuteIfBound(true);
+    startTODel.Broadcast(true);
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
 

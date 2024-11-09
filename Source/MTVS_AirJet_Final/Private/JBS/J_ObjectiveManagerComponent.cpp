@@ -63,6 +63,9 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 		if(dmData.objType == ETacticalOrder::ENGINE_START)
 		{
 			objActor->objectiveEndDel.AddLambda([this]{
+				// 미션 시작 시 활성화 안함
+				if(CUR_ACTIVE_MISSION_IDX >= 0) return;
+
 				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
 				check(takeOffObj);
 				// 활성화

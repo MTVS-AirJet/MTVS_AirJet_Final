@@ -17,7 +17,7 @@ DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
 DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool);
 
 // 미션 시작 딜리게이트
-DECLARE_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
 
 
 UCLASS()

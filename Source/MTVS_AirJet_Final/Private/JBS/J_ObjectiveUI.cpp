@@ -56,32 +56,49 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
     if(idx < 0 || idx >= vbox->GetChildrenCount()) return;
     // 종료된 서브 목표 ui
     auto* subUI = vbox->GetChildAt(idx);
-    auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
-
     // 서브 완료 UMG
     PlaySubObjEndAnim(subUI,idx);
 
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this, slot,subUI]() mutable
+        .SetTimer(timerHandle, [this, subUI]() mutable
     {
         FTimerHandle timerHandle2;
+        subObjTimerHandleMap.Add(subUI, timerHandle2);
+
         GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle2, [this, slot, subUI,timerHandle2]() mutable
+            .SetTimer(timerHandle2, [this, subUI]() mutable
         {
+            if(!subUI) return ClearSubObjTimer(subUI);
+
+            auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
+            if(!slot) return ClearSubObjTimer(subUI);
+            
             //타이머에서 할 거
+            // 사이즈 줄이기
             auto size = slot->GetSize();
             size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
             
             slot->SetSize(size);
-            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("doremi : %.2f"), size.Value));
+            // 사이즈 0 이됨
             if(size.Value <= 0)
             {
                 subUI->SetVisibility(ESlateVisibility::Hidden);
-                GetWorld()->GetTimerManager().ClearTimer(timerHandle2);
+                // 타이머 종료
+                ClearSubObjTimer(subUI);
+                return;
             }
         }, 0.025, true);
     }, 1.5f, false);
+}
+
+void UJ_ObjectiveUI::ClearSubObjTimer(class UWidget *subObj)
+{
+    if(!subObjTimerHandleMap.Contains(subObj)) return;
+
+    auto th = subObjTimerHandleMap[subObj];
+
+    GetWorld()->GetTimerManager().ClearTimer(th);
 }
 
 float UJ_ObjectiveUI::PlaySubObjEndAnimLerp(UVerticalBoxSlot *subSlot, float alpha)
