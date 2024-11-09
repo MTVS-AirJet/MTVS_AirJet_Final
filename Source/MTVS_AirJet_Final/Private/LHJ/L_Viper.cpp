@@ -2828,25 +2828,24 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	StickPitchAngle = 0.f;
 }
 
-void AL_Viper::VRSticAxis(const struct FInputActionValue& value)
+void AL_Viper::VRSticAxis(const FVector2D& value)
 {
-	auto data = value.Get<FVector2D>();
-	VRStickCurrentPitchValue = data.X;
-	VRStickCurrentRollValue = data.Y;
-	float VRStickRollAngle=0.f;
-	float VRStickPitchAngle=0.f;
+	VRStickCurrentPitchValue = value.Y;
+	VRStickCurrentRollValue = -1 * value.X;
+	float VRStickRollAngle = 0.f;
+	float VRStickPitchAngle = 0.f;
 	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
-	if ((VRStickRollAngle > VRStickMaxThreshold || VRStickRollAngle < VRStickMinThreshold) && (VRStickPitchAngle > VRStickMaxThreshold || VRStickPitchAngle < VRStickMinThreshold))
+	if ((VRStickCurrentRollValue > VRStickMaxThreshold || VRStickCurrentRollValue < VRStickMinThreshold) && (VRStickCurrentPitchValue >
+		VRStickMaxThreshold || VRStickCurrentPitchValue < VRStickMinThreshold))
 	{
-		VRStickRollAngle = VRStickRollAngle * MaxRotationAngle / VRStickBankRollDiv;
-		VRStickPitchAngle = VRStickPitchAngle * MaxRotationAngle / VRStickBankPitchDiv;
+		VRStickRollAngle = VRStickCurrentRollValue * MaxRotationAngle / VRStickBankRollDiv;
+		VRStickPitchAngle = VRStickCurrentPitchValue * MaxRotationAngle / VRStickBankPitchDiv;
 	}
 	else
 	{
-		VRStickRollAngle = VRStickRollAngle * MaxRotationAngle / VRStickkRollDiv;
-		VRStickPitchAngle = VRStickPitchAngle * MaxRotationAngle /VRStickPitchDiv;
+		VRStickRollAngle = VRStickCurrentRollValue * MaxRotationAngle / VRStickkRollDiv;
+		VRStickPitchAngle = VRStickCurrentPitchValue * MaxRotationAngle / VRStickPitchDiv;
 	}
-
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
 	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(VRStickRollAngle));
 	FQuat PitchRotation = FQuat(FVector(0 , 1 , 0) , FMath::DegreesToRadians(VRStickPitchAngle));

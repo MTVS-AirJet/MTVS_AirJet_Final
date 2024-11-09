@@ -781,13 +781,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
 	float VRStickMinThreshold=-0.6f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickBankRollDiv=3.f;
+	float VRStickBankRollDiv=5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickBankPitchDiv=3.f;
+	float VRStickBankPitchDiv=6.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickkRollDiv=5.f;
+	float VRStickkRollDiv=4.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickPitchDiv=6.f;
+	float VRStickPitchDiv=8.f;
 	UFUNCTION(BlueprintCallable)
-	void VRSticAxis(const struct FInputActionValue& value);
+	void VRSticAxis(const FVector2D& value);
 };
