@@ -758,15 +758,36 @@ public:
 public:
 	// 회전 속도 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float RotationSpeed = 0.7f;
+	float RotationSpeed = 15.f;
 
 	// 최대 회전 각도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float MaxRotationAngle = 89.5f;
+	float MaxRotationAngle = 15.f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
 	FQuat QuatCurrentRotation = FQuat::Identity;
     
 	// 목표 회전 상태를 쿼터니언으로 저장
 	FQuat QuatTargetRotation = FQuat::Identity;
+
+	float StickRollAngle = 0.f;
+	float StickPitchAngle = 0.f;
+
+public:
+	float VRStickCurrentRollValue=0.f;
+	float VRStickCurrentPitchValue=0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMaxThreshold=0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMinThreshold=-0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankRollDiv=3.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankPitchDiv=3.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickkRollDiv=5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickPitchDiv=6.f;
+	UFUNCTION(BlueprintCallable)
+	void VRSticAxis(const struct FInputActionValue& value);
 };

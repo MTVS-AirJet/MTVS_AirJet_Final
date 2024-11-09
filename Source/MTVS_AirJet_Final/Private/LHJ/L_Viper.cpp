@@ -1006,12 +1006,23 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	LOG_SCREEN("%f, %f" , moveVector.X , moveVector.Y);
 
 	// 입력값에 최대 회전 각도 제한 적용
-	float RollAngle =  moveVector.Y * MaxRotationAngle;
-	float PitchAngle = 0.15f * moveVector.X * MaxRotationAngle;
+	float RollAngle = 0.f;
+	float PitchAngle = 0.f;
+
+	if ((moveVector.Y > 0.6f || moveVector.Y < -0.6f) && (moveVector.X > 0.6f || moveVector.X < -0.6f))
+	{
+		RollAngle = moveVector.Y * MaxRotationAngle / 3.f;
+		PitchAngle = moveVector.X * MaxRotationAngle / 3.f;
+	}
+	else
+	{
+		RollAngle = moveVector.Y * MaxRotationAngle / 5.f;
+		PitchAngle = moveVector.X * MaxRotationAngle / 6.f;
+	}
 
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
-	FQuat RollRotation = FQuat(FVector(1, 0, 0), FMath::DegreesToRadians(RollAngle));
-	FQuat PitchRotation = FQuat(FVector(0, 1, 0), FMath::DegreesToRadians(PitchAngle));
+	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(RollAngle));
+	FQuat PitchRotation = FQuat(FVector(0 , 1 , 0) , FMath::DegreesToRadians(PitchAngle));
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
@@ -1614,51 +1625,52 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 		// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
-		QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation, QuatTargetRotation, RotationSpeed * DeltaTime);
+		QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation , RotationSpeed * DeltaTime);
 
 		// RootComponent의 회전 설정
-		RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
-// #pragma region Quat Move
-// 		if (JetMesh)
-// 		{
-// 			// 현재 회전값을 목표 회전값으로 부드럽게 보간
-// 			QuatCurrentRotation = FQuat::Slerp(
-// 				QuatCurrentRotation ,
-// 				QuatTargetRotation ,
-// 				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
-// 			);
-//
-// 			// 쿼터니언 회전 적용
-// 			JetMesh->SetRelativeRotation(QuatCurrentRotation);
-//
-// 			// 화살표 컴포넌트에도 동일한 회전 적용
-// 			if (JetArrow)
-// 			{
-// 				JetArrow->SetRelativeRotation(QuatCurrentRotation);
-// 			}
-// 		}
-// #pragma endregion
-//
-// #pragma region Rotate Mesh
-// 		if (IsRightRoll)
-// 		{
-// 			JetRoot->AddRelativeRotation(RotateRollValue);
-// 		}
-// 		else if (IsLeftRoll)
-// 		{
-// 			JetRoot->AddRelativeRotation(RotateRollValue * -1);
-// 		}
-// 		else if (IsKeyUpPress)
-// 		{
-// 			// JetRoot->AddRelativeRotation(RotatePitchValue);
-// 			JetRoot->AddWorldRotation(RotatePitchValue* -1);
-// 		}
-// 		else if (IsKeyDownPress)
-// 		{
-// 			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
-// 			JetRoot->AddWorldRotation(RotatePitchValue);
-// 		}
-// #pragma endregion
+		//RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
+		SetActorRotation(QuatCurrentRotation.Rotator());
+		// #pragma region Quat Move
+		// 		if (JetMesh)
+		// 		{
+		// 			// 현재 회전값을 목표 회전값으로 부드럽게 보간
+		// 			QuatCurrentRotation = FQuat::Slerp(
+		// 				QuatCurrentRotation ,
+		// 				QuatTargetRotation ,
+		// 				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
+		// 			);
+		//
+		// 			// 쿼터니언 회전 적용
+		// 			JetMesh->SetRelativeRotation(QuatCurrentRotation);
+		//
+		// 			// 화살표 컴포넌트에도 동일한 회전 적용
+		// 			if (JetArrow)
+		// 			{
+		// 				JetArrow->SetRelativeRotation(QuatCurrentRotation);
+		// 			}
+		// 		}
+		// #pragma endregion
+		//
+		// #pragma region Rotate Mesh
+		// 		if (IsRightRoll)
+		// 		{
+		// 			JetRoot->AddRelativeRotation(RotateRollValue);
+		// 		}
+		// 		else if (IsLeftRoll)
+		// 		{
+		// 			JetRoot->AddRelativeRotation(RotateRollValue * -1);
+		// 		}
+		// 		else if (IsKeyUpPress)
+		// 		{
+		// 			// JetRoot->AddRelativeRotation(RotatePitchValue);
+		// 			JetRoot->AddWorldRotation(RotatePitchValue* -1);
+		// 		}
+		// 		else if (IsKeyDownPress)
+		// 		{
+		// 			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
+		// 			JetRoot->AddWorldRotation(RotatePitchValue);
+		// 		}
+		// #pragma endregion
 
 #pragma region Jet Move
 		ValueOfMoveForce += (GetAddTickSpeed() * 6);
@@ -2784,6 +2796,7 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 {
 	// Up(1), Down(-1)
 	float data = value.Get<float>();
+	StickPitchAngle = data * -1;
 	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
@@ -2791,5 +2804,56 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 {
 	// Left(-1), Right(1)
 	float data = value.Get<float>();
+	StickRollAngle = data * -1;
 	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+	if ((StickRollAngle > 0.6f || StickRollAngle < -0.6f) && (StickPitchAngle > 0.6f || StickPitchAngle < -0.6f))
+	{
+		StickRollAngle = StickRollAngle * MaxRotationAngle / 3.f;
+		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 3.f;
+	}
+	else
+	{
+		StickRollAngle = StickRollAngle * MaxRotationAngle / 5.f;
+		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 6.f;
+	}
+
+	// Roll과 Pitch를 쿼터니언 회전으로 변환
+	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(StickRollAngle));
+	FQuat PitchRotation = FQuat(FVector(0 , 1 , 0) , FMath::DegreesToRadians(StickPitchAngle));
+
+	// 목표 회전 설정 (RootComponent를 기준으로)
+	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+
+	StickRollAngle = 0.f;
+	StickPitchAngle = 0.f;
+}
+
+void AL_Viper::VRSticAxis(const struct FInputActionValue& value)
+{
+	auto data = value.Get<FVector2D>();
+	VRStickCurrentPitchValue = data.X;
+	VRStickCurrentRollValue = data.Y;
+	float VRStickRollAngle=0.f;
+	float VRStickPitchAngle=0.f;
+	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+	if ((VRStickRollAngle > VRStickMaxThreshold || VRStickRollAngle < VRStickMinThreshold) && (VRStickPitchAngle > VRStickMaxThreshold || VRStickPitchAngle < VRStickMinThreshold))
+	{
+		VRStickRollAngle = VRStickRollAngle * MaxRotationAngle / VRStickBankRollDiv;
+		VRStickPitchAngle = VRStickPitchAngle * MaxRotationAngle / VRStickBankPitchDiv;
+	}
+	else
+	{
+		VRStickRollAngle = VRStickRollAngle * MaxRotationAngle / VRStickkRollDiv;
+		VRStickPitchAngle = VRStickPitchAngle * MaxRotationAngle /VRStickPitchDiv;
+	}
+
+	// Roll과 Pitch를 쿼터니언 회전으로 변환
+	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(VRStickRollAngle));
+	FQuat PitchRotation = FQuat(FVector(0 , 1 , 0) , FMath::DegreesToRadians(VRStickPitchAngle));
+
+	// 목표 회전 설정 (RootComponent를 기준으로)
+	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+
+	VRStickCurrentPitchValue = 0.f;
+	VRStickCurrentRollValue = 0.f;
 }
