@@ -2,6 +2,7 @@
 
 
 #include "JBS/J_ObjectiveTakeOff.h"
+#include "Engine/Engine.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_Utility.h"
 #include "JBS/J_MissionGamemode.h"
@@ -25,14 +26,14 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
     // 맵 초기화
     for(auto* pc : allPC)
     {
-        takeOffCheckMap.Add(pc, false);
+        takeOffCheckMap.Add(pc, {false, false});
     }
 
     // 게임모드 이륙 딜리게이트에 바인드
     auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
     gm->onePilotTakeOffDel.BindUObject(this, &AJ_ObjectiveTakeOff::SuccessTakeOff);
     // 미션 시작 딜리게이트 바인드
-    gm->startTODel.BindUObject(this, &AJ_ObjectiveTakeOff::ObjectiveEnd);
+    gm->startTODel.AddUObject(this, &AJ_ObjectiveTakeOff::ObjectiveEnd);
 
     // 위치 텔포 박스로 설정
     auto* tpBox = Cast<AK_CesiumTeleportBox>(
@@ -43,7 +44,7 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
     // 실패 체크 타이머 실행
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
-        .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, 0.5f, true);
+        .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, failCheckInterval, true);
 
     Super::ObjectiveActive();
 }
@@ -52,8 +53,7 @@ void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool is
 {
     if(!takeOffCheckMap.Contains(pc)) return;
     // 이륙 성공 처리
-    takeOffCheckMap[pc] = isSuccess;
-
+    takeOffCheckMap[pc] = {true, isSuccess};
     // 현재 이륙 점수 정보 갱신
     CalcSuccessPercent();
 }
@@ -61,18 +61,23 @@ void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool is
 void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 {
     // 모든 pc 데이터를 계산
+    int maxCnt = allPC.Num();
     int cnt = 0;
+    int curFlightCnt = 0;
     for(auto* pc : allPC)
     {
         // 성공 비율 계산
         if(!takeOffCheckMap.Contains(pc)) continue;
         // 이륙 성공 처리
-        if(takeOffCheckMap[pc])
+        if(takeOffCheckMap[pc].Value)
             cnt++;
+        if(takeOffCheckMap[pc].Key)
+            curFlightCnt++;
     }
 
     // 평균 계산
-    float rate = (float) cnt / allPC.Num();
+    float rate = (float) cnt / maxCnt;
+    curFlightPercent = (float) curFlightCnt / maxCnt;
     // 수행도에 적용
     this->SUCCESS_PERCENT = rate;
 }
@@ -80,7 +85,7 @@ void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 FTacticalOrderData AJ_ObjectiveTakeOff::SetObjUIData(class AJ_MissionPlayerController *pc)
 {
     int maxCnt = allPC.Num();
-    int curCnt = FMath::RoundToInt(this->SUCCESS_PERCENT * maxCnt);
+    int curCnt = FMath::RoundToInt(curFlightPercent);
 
     FTakeOffData data(curCnt, maxCnt);
     
@@ -110,7 +115,7 @@ void AJ_ObjectiveTakeOff::CheckFail()
     for(auto* pc : allPC)
     {
         // 이륙 아직 아닐때 체크
-        if(takeOffCheckMap[pc]) continue;
+        if(takeOffCheckMap[pc].Key) continue;
 
         // 목표를 넘어섰는데 true가 아닌거니깐 실패 처리
         auto* pawn = pc->GetPawn();
@@ -130,7 +135,8 @@ void AJ_ObjectiveTakeOff::CheckFail()
         bool isBehind = dot2 > 0;
 
         // 실패 거리만큼 떨어짐
-        bool isFar = failDis < FVector::Dist(this->GetActorLocation(), pawn->GetActorLocation());
+        float dis = FVector::Dist(this->GetActorLocation(), pawn->GetActorLocation());
+        bool isFar = failDis < dis;
         
         // 실패 처리
         if (isBehind && isFar)
@@ -139,8 +145,12 @@ void AJ_ObjectiveTakeOff::CheckFail()
             gm->AddFlightedPC(pc, false);
         }
 
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("체크중 : pc : %s, 내적 %s, 거리 %s")
-            , *pc->GetName(), *UJ_Utility::ToStringBool(isBehind), *UJ_Utility::ToStringBool(isFar)));
+        GEngine->AddOnScreenDebugMessage(-1, failCheckInterval, FColor::Red
+        , FString::Printf(TEXT("체크중 : pc : %s, 내적 %s : %.2f, 거리 %s : %.2f")
+            , *pc->GetName(), *UJ_Utility::ToStringBool(isBehind)
+            , dot
+            , *UJ_Utility::ToStringBool(isFar)
+            , dis));
     }
 }
 

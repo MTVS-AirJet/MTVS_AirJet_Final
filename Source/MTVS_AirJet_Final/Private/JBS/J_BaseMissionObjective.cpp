@@ -128,11 +128,7 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 	}
 	
 	// init 되기 전까지 무시
-	if(orderType == ETacticalOrder::NONE) return;
-
-	
-	if(!HasAuthority()) return;
-	
+	if(orderType == ETacticalOrder::NONE || !HasAuthority()) return;
 }
 
 void AJ_BaseMissionObjective::ObjectiveSuccess()
@@ -157,7 +153,7 @@ void AJ_BaseMissionObjective::ObjectiveFail()
 
 void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 	// 미션 비활성화
 	IS_OBJECTIVE_ACTIVE = false;
 
@@ -197,7 +193,7 @@ void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive
 
 void AJ_BaseMissionObjective::ObjectiveActive()
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
 
 	// 목표 UI 신규 갱신
@@ -206,7 +202,7 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() || IS_OBJECTIVE_ACTIVE) return;
 	
 }
 
@@ -222,7 +218,7 @@ void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 
 void AJ_BaseMissionObjective::SRPC_StartNewObjUI_Implementation()
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 
 	// 모든 pc 가져오기
 	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -244,7 +240,7 @@ FTacticalOrderData AJ_BaseMissionObjective::SetObjUIData(AJ_MissionPlayerControl
 
 void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 
 	// 보낼 데이터
     // 모든 pc 가져오기

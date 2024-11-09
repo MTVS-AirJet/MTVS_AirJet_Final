@@ -14,8 +14,8 @@ class MTVS_AIRJET_FINAL_API AJ_ObjectiveTakeOff : public AJ_BaseMissionObjective
 {
 	GENERATED_BODY()
 protected:
-	// 파일럿 이륙 수행 여부 배열
-	TMap<class AJ_MissionPlayerController*, bool> takeOffCheckMap;
+	// 파일럿 이륙 수행 여부 배열 | pc , 이륙 여부, 이륙 성공 여부
+	TMap<class AJ_MissionPlayerController*, TPair<bool, bool>> takeOffCheckMap;
 	
 	// 활성화 당시 모든 pc
 	TArray<class AJ_MissionPlayerController*> allPC;
@@ -26,7 +26,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float failDis = 1000.f;
 
+    // 실패 판정 체크 간격
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float failCheckInterval = .5f;
+
 	FTimerHandle checkTimeHandle;
+
+    // 현재 이륙 수행 퍼센트
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float curFlightPercent = 0;
 
 public:
 
