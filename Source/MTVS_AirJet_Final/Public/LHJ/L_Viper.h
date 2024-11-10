@@ -89,8 +89,6 @@ private:
 	class UWidgetComponent* JetWidget;
 	
 	UPROPERTY(EditDefaultsOnly , category="Components")
-	class UCharacterMovementComponent* movement;
-	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
@@ -159,25 +157,11 @@ public: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Fun;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperEngine;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperLook;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonIn;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonOut;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperUp;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperDown;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperRight;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnRight;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperResetRotation;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -202,8 +186,6 @@ public: // Input
 	class UInputAction* IA_ViperMove;
 
 	UFUNCTION()
-	void F_ViperEngine(const struct FInputActionValue& value);
-	UFUNCTION()
 	void F_ViperLook(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperZoomInStarted(const struct FInputActionValue& value);
@@ -213,30 +195,6 @@ public: // Input
 	void F_ViperZoomOutStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperZoomOutCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperUpTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperUpCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperResetRotation(const struct FInputActionValue& value);
 	UFUNCTION()
@@ -598,18 +556,6 @@ private:
 public:
 	UPROPERTY(Category="UI" , EditDefaultsOnly)
 	class UL_WaitingForStart* WaitingForStartUI;
-
-	int32 ReadyMemeberCnt = 0;
-	UFUNCTION()
-	void OnMyMemberReFresh();
-
-	UFUNCTION(Server , Reliable)
-	void ServerRPC_SetCurrentReadyMem();
-	UFUNCTION(NetMulticast , Reliable)
-	void MultiRPC_SetCurrentReadyMem(int32 cnt);
-
-public:
-	void ReadyAllMembers();
 
 private:
 	bool bReadyTimeEndFlag;

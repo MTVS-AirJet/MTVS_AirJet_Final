@@ -207,8 +207,6 @@ AL_Viper::AL_Viper()
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
 	JetWidget->SetDrawSize(FVector2D(200 , 150));
-
-	movement = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("movement"));
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -312,6 +310,61 @@ AL_Viper::AL_Viper()
 }
 #pragma endregion
 
+#pragma region Create Prop Component
+void AL_Viper::CreateDumyComp()
+{
+	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
+	DummyMICMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+	DummyMICMesh->SetupAttachment(JetMic);
+
+	DummyEngineGenerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh1"));
+	DummyEngineGenerMesh1->SetupAttachment(JetEngineGen);
+	DummyEngineGenerMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
+	DummyEngineGenerMesh2->SetupAttachment(JetEngineGen2);
+	DummyEngineGenerMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyEngineControlMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh1"));
+	DummyEngineControlMesh1->SetupAttachment(JetEngineControl);
+	DummyEngineControlMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyEngineControlMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh2"));
+	DummyEngineControlMesh2->SetupAttachment(JetEngineControl2);
+	DummyEngineControlMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyJFSMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSMesh"));
+	DummyJFSMesh->SetupAttachment(JetFuelStarter);
+	DummyJFSMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyEngineMasterMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh1"));
+	DummyEngineMasterMesh1->SetupAttachment(JetEngineMaster);
+	DummyEngineMasterMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
+	DummyEngineMasterMesh2->SetupAttachment(JetEngineMaster2);
+	DummyEngineMasterMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+
+	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
+	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
+	DummyJFSHandleMesh->SetRelativeLocation(FVector(-550 , -33 , -253));
+
+	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
+	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
+	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
+	DummyThrottleMesh->SetRelativeLocation(FVector(0 , 0 , -8));
+
+	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
+	DummyCanopyMesh->SetupAttachment(JetCanopy);
+	DummyCanopyMesh->SetRelativeLocation(FVector(-521 , -40 , -268));
+
+	DummyJFSBreakHold = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSBreakHold"));
+	DummyJFSBreakHold->SetupAttachment(JetBreakHold);
+	DummyJFSBreakHold->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
+}
+#pragma endregion
+
+#pragma region 시동절차 순서 정의
 void AL_Viper::PushQueue()
 {
 	StartScenario.push("MIC");
@@ -324,12 +377,24 @@ void AL_Viper::PushQueue()
 	StartScenario.push("Canopy");
 	StartScenario.push("BreakHold");
 }
+#pragma endregion
+
+void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AL_Viper , CurrentWeapon);
+	DOREPLIFETIME(AL_Viper , FlareCurCnt);
+	DOREPLIFETIME(AL_Viper , CanopyPitch);
+	DOREPLIFETIME(AL_Viper , FrontWheel);
+	DOREPLIFETIME(AL_Viper , RearWheel);
+	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
+}
 
 void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
                                UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
                                const FHitResult& SweepResult)
 {
-	//LOG_SCREEN("%s" , *OtherActor->GetName());
 	if (auto RT = Cast<AL_RoadTrigger>(OtherActor))
 	{
 		if (RT->TriggerIdx == 0)
@@ -344,18 +409,6 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 	}
 }
 
-void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AL_Viper , CurrentWeapon);
-	DOREPLIFETIME(AL_Viper , FlareCurCnt);
-	DOREPLIFETIME(AL_Viper , CanopyPitch);
-	DOREPLIFETIME(AL_Viper , FrontWheel);
-	DOREPLIFETIME(AL_Viper , RearWheel);
-	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
-}
-
 #pragma region Input
 // Called to bind functionality to input
 void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -366,27 +419,7 @@ void AL_Viper::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (input)
 	{
 #pragma region Keyboard & Moused
-		input->BindAction(IA_ViperEngine , ETriggerEvent::Started , this , &AL_Viper::F_ViperEngine);
-
 		input->BindAction(IA_ViperLook , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLook);
-
-		input->BindAction(IA_ViperUp , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperUpTrigger);
-		input->BindAction(IA_ViperUp , ETriggerEvent::Completed , this , &AL_Viper::F_ViperUpCompleted);
-
-		input->BindAction(IA_ViperDown , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperDownTrigger);
-		input->BindAction(IA_ViperDown , ETriggerEvent::Completed , this , &AL_Viper::F_ViperDownCompleted);
-
-		input->BindAction(IA_ViperRight , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperRightTrigger);
-		input->BindAction(IA_ViperRight , ETriggerEvent::Completed , this , &AL_Viper::F_ViperRightCompleted);
-
-		input->BindAction(IA_ViperLeft , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperLeftTrigger);
-		input->BindAction(IA_ViperLeft , ETriggerEvent::Completed , this , &AL_Viper::F_ViperLeftCompleted);
-
-		input->BindAction(IA_ViperTurnRight , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperTurnRightTrigger);
-		input->BindAction(IA_ViperTurnRight , ETriggerEvent::Completed , this , &AL_Viper::F_ViperTurnRightCompleted);
-
-		input->BindAction(IA_ViperTurnLeft , ETriggerEvent::Triggered , this , &AL_Viper::F_ViperTurnLeftTrigger);
-		input->BindAction(IA_ViperTurnLeft , ETriggerEvent::Completed , this , &AL_Viper::F_ViperTurnLeftCompleted);
 
 		input->BindAction(IA_ViperAccel , ETriggerEvent::Started , this , &AL_Viper::F_ViperAccelStarted);
 		input->BindAction(IA_ViperAccel , ETriggerEvent::Completed , this , &AL_Viper::F_ViperAccelCompleted);
@@ -477,7 +510,6 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 
 void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("MIC 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bMIC)
 	{
@@ -493,7 +525,6 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 
 void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("EngineGen 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineGen1)
 	{
@@ -509,7 +540,6 @@ void AL_Viper::OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , FKe
 
 void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("EngineGen2 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineGen2)
 	{
@@ -525,7 +555,6 @@ void AL_Viper::OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , FKe
 
 void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("EngineControl 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineControl1)
 	{
@@ -541,7 +570,6 @@ void AL_Viper::OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("EngineControl2 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineControl2)
 	{
@@ -557,7 +585,6 @@ void AL_Viper::OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent ,
 
 void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("JFS 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bJFS)
 	{
@@ -573,7 +600,6 @@ void AL_Viper::OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent ,
 
 void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("Engine Master1 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineMaster1)
 	{
@@ -589,7 +615,6 @@ void AL_Viper::OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , FKey ButtonPressed)
 {
-	//LOG_SCREEN("Engine Master2 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bEngineMaster2)
 	{
@@ -605,7 +630,6 @@ void AL_Viper::OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , 
 
 void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
-	//LOG_SCREEN("JFS 핸들 클릭");
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bJFSHandle)
 	{
@@ -660,18 +684,9 @@ void AL_Viper::OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , stru
 	}
 }
 
-void AL_Viper::F_ViperEngine(const FInputActionValue& value)
-{
-	// bool b = value.Get<bool>();
-	// IsEngineOn = !IsEngineOn;
-	// LOG_SCREEN("%s" , IsEngineOn?TEXT("True"):TEXT("false"));
-}
-
 void AL_Viper::F_ViperLook(const FInputActionValue& value)
 {
 	auto v = value.Get<FVector2D>();
-	// AddControllerYawInput(v.X);
-	// AddControllerPitchInput(v.Y);
 	if (IsRotateTrigger)
 	{
 		if (JetCamera->IsActive())
@@ -719,86 +734,6 @@ void AL_Viper::F_ViperZoomOutCompleted(const struct FInputActionValue& value)
 	IsZoomOut = false;
 }
 
-void AL_Viper::F_ViperUpTrigger(const FInputActionValue& value)
-{
-	// if (!IsKeyDownPress)
-	// 	IsKeyUpPress = true;
-
-	// if (CurrentTime < ChangeTime)
-	// 	return;
-	//
-	// CurrentTime = 0.f;
-	// ForceUnitRot = CombineRotate(ChangeMoveVector);
-}
-
-void AL_Viper::F_ViperUpCompleted(const FInputActionValue& value)
-{
-	//IsKeyUpPress = false;
-	// ForceUnitRot = FRotator(0 , 0 , 0);
-}
-
-void AL_Viper::F_ViperDownTrigger(const FInputActionValue& value)
-{
-	// if (!IsKeyUpPress)
-	// 	IsKeyDownPress = true;
-
-	// if (CurrentTime < ChangeTime)
-	// 	return;
-	//
-	// CurrentTime = 0.f;
-	// ForceUnitRot = CombineRotate(-1 * ChangeMoveVector);
-}
-
-void AL_Viper::F_ViperDownCompleted(const FInputActionValue& value)
-{
-	//IsKeyDownPress = false;
-	// ForceUnitRot = FRotator(0 , 0 , 0);
-}
-
-void AL_Viper::F_ViperRightTrigger(const FInputActionValue& value)
-{
-	// if (!IsKeyLeftPress)
-	// 	IsKeyRightPress = true;
-}
-
-void AL_Viper::F_ViperRightCompleted(const FInputActionValue& value)
-{
-	//IsKeyRightPress = false;
-}
-
-void AL_Viper::F_ViperLeftTrigger(const FInputActionValue& value)
-{
-	// if(!IsKeyRightPress)
-	// 	IsKeyLeftPress = true;
-}
-
-void AL_Viper::F_ViperLeftCompleted(const FInputActionValue& value)
-{
-	//IsKeyLeftPress = false;
-}
-
-void AL_Viper::F_ViperTurnRightTrigger(const FInputActionValue& value)
-{
-	// if(!IsLeftRoll)
-	// 	IsRightRoll = true;
-}
-
-void AL_Viper::F_ViperTurnRightCompleted(const FInputActionValue& value)
-{
-	//IsRightRoll = false;
-}
-
-void AL_Viper::F_ViperTurnLeftTrigger(const FInputActionValue& value)
-{
-	// if(!IsRightRoll)
-	// 	IsLeftRoll = true;
-}
-
-void AL_Viper::F_ViperTurnLeftCompleted(const FInputActionValue& value)
-{
-	//IsLeftRoll = false;
-}
-
 void AL_Viper::F_ViperResetRotation(const FInputActionValue& value)
 {
 	SetActorRotation(FRotator(0 , JetMesh->GetComponentRotation().Yaw , 0));
@@ -809,34 +744,22 @@ void AL_Viper::F_ViperAccelStarted(const FInputActionValue& value)
 {
 	if (!bThrottleBreak)
 		bThrottleAccel = true;
-	// AccelGear++;
-	// if (AccelGear > 3)
-	// 	AccelGear = 3;
-	// IsAccel = true;
 }
 
 void AL_Viper::F_ViperAccelCompleted(const FInputActionValue& value)
 {
 	bThrottleAccel = false;
-	// KeyDownAccel = 0.f;
-	// IsAccel = false;
 }
 
 void AL_Viper::F_ViperBreakStarted(const FInputActionValue& value)
 {
 	if (!bThrottleAccel)
 		bThrottleBreak = true;
-	// AccelGear--;
-	// if (AccelGear < 0)
-	// 	AccelGear = 0;
-	// IsBreak = true;
 }
 
 void AL_Viper::F_ViperBreakCompleted(const FInputActionValue& value)
 {
 	bThrottleBreak = false;
-	// KeyDownAccel = 0.f;
-	// IsBreak = false;
 }
 
 void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
@@ -880,7 +803,6 @@ void AL_Viper::F_ViperChangeWeaponStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperRotateTriggerStarted(const struct FInputActionValue& value)
 {
 	IsRotateTrigger = true;
-	// Value가 True일 때만 처리
 	if (value.Get<bool>())
 	{
 		PerformLineTrace();
@@ -994,10 +916,6 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 		}
 	}
 #pragma endregion
-	//IsStart = true;
-	//IsEngineOn = true;
-	//intTriggerNum = 2;
-	//IsFlyStart = true;
 }
 
 void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
@@ -1026,61 +944,12 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
-	// if (moveVector == FVector2D(0 , 1))
-	// {
-	// 	IsLeftRoll = true;
-	// 	IsKeyUpPress = false;
-	// 	IsKeyDownPress = false;
-	// 	IsRightRoll = false;
-	// }
-	// else if (moveVector == FVector2D(0 , -1))
-	// {
-	// 	IsRightRoll = true;
-	// 	IsKeyUpPress = false;
-	// 	IsKeyDownPress = false;
-	// 	IsLeftRoll = false;
-	// }
-	// else if (moveVector == FVector2D(-1 , 0))
-	// {
-	// 	IsKeyUpPress = true;
-	// 	IsKeyDownPress = false;
-	// 	IsLeftRoll = false;
-	// 	IsRightRoll = false;
-	// }
-	// else if (moveVector == FVector2D(1 , 0))
-	// {
-	// 	IsKeyDownPress = true;
-	// 	IsKeyUpPress = false;
-	// 	IsLeftRoll = false;
-	// 	IsRightRoll = false;
-	// }
-	// 스틱 입력값을 각도로 변환 (최대 회전 각도 제한 적용)
-	// float RollAngle = moveVector.Y * MaxRotationAngle;
-	// float PitchAngle = moveVector.X * MaxRotationAngle;
-	//
-	// // Roll과 Pitch 회전을 위한 쿼터니언 생성
-	// FQuat RollRotation = FQuat(FVector(1.0f, 0.0f, 0.0f), FMath::DegreesToRadians(RollAngle));
-	// FQuat PitchRotation = FQuat(FVector(0.0f, 1.0f, 0.0f), FMath::DegreesToRadians(PitchAngle));
-	//
-	// // Roll과 Pitch 회전을 결합
-	// QuatTargetRotation = RollRotation * PitchRotation;
 }
 
 void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
 {
 	QuatTargetRotation = QuatCurrentRotation;
-	IsRightRoll = false;
-	IsLeftRoll = false;
-	IsKeyUpPress = false;
-	IsKeyDownPress = false;
 }
-
-// FRotator AL_Viper::CombineRotate(FVector NewVector)
-// {
-// 	FRotator loc_rot = FRotator(NewVector.Y , NewVector.X , NewVector.Z);
-// 	return FRotator(ForceUnitRot.Pitch + loc_rot.Pitch , ForceUnitRot.Yaw + loc_rot.Yaw ,
-// 	                ForceUnitRot.Roll + loc_rot.Roll);
-// }
 #pragma endregion
 
 void AL_Viper::BeginPlay()
@@ -1125,56 +994,7 @@ void AL_Viper::BeginPlay()
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
-
-		// 	FTimerHandle TimerHandle;
-		// 	GetWorldTimerManager().SetTimer(TimerHandle , [this]()
-		// 	{
-		// 		LOG_S(Warning , TEXT("%s") , IsStart?*FString("true"):*FString("false"));
-		// 		bReadyTimeEndFlag = true;
-		// 		if (!IsStart)
-		// 		{
-		// 			FKey lMouse = EKeys::LeftMouseButton;
-		// 			if (JetMic && !bMIC)
-		// 				OnMyMicClicked(JetMic , lMouse);
-		// 			if (JetEngineGen && !bEngineGen1)
-		// 				OnMyEngineGen1Clicked(JetEngineGen , lMouse);
-		// 			if (JetEngineGen2 && !bEngineGen2)
-		// 				OnMyEngineGen2Clicked(JetEngineGen2 , lMouse);
-		// 			if (JetEngineControl && !bEngineControl1)
-		// 				OnMyEngineControlClicked(JetEngineControl , lMouse);
-		// 			if (JetEngineControl2 && !bEngineControl2)
-		// 				OnMyEngineControl2Clicked(JetEngineControl2 , lMouse);
-		// 			if (JetEngineMaster && !bEngineMaster1)
-		// 				OnMyEngineMaster1Clicked(JetEngineMaster , lMouse);
-		// 			if (JetEngineMaster2 && !bEngineMaster2)
-		// 				OnMyEngineMaster2Clicked(JetEngineMaster2 , lMouse);
-		// 			if (JetFuelStarter && !bJFS)
-		// 				OnMyJetFuelStarterClicked(JetFuelStarter , lMouse);
-		// 			if (JetJFSHandle && !bJFSHandle)
-		// 				OnMyJFSHandle1Clicked(JetJFSHandle , lMouse);
-		// 			if (JetFirstEngine && !bFirstEngine)
-		// 				OnMyFirstEngineClicked(JetFirstEngine , lMouse);
-		// 			if (JetCanopy && iCanopyNum != 2)
-		// 			{
-		// 				JetCanopy->SetRelativeLocation(CanopyCloseLoc);
-		// 				iCanopyNum = 2;
-		// 			}
-		// 		}
-		// 	} , TimeToReady , false);
 	}
-
-	// if (auto PC = Cast<AJ_MissionPlayerController>(GetOwner()))
-	// {
-	// 	if (PC->WaitingForStartFac)
-	// 	{
-	// 		WaitingForStartUI = CreateWidget<UL_WaitingForStart>(GetWorld() , PC->WaitingForStartFac);
-	// 		if (WaitingForStartUI)
-	// 		{
-	// 			WaitingForStartUI->AddToViewport(0);
-	// 			WaitingForStartUI->SetVisibility(ESlateVisibility::Hidden);
-	// 		}
-	// 	}
-	// }
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1183,7 +1003,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 	// PrintNetLog();
 
-	// 제트엔진 이펙트
+#pragma region 제트엔진 이펙트
 	if (bJetTailVFXOn)
 	{
 		if (JetTailVFXLeft && JetTailVFXLeft->GetAsset())
@@ -1194,6 +1014,7 @@ void AL_Viper::Tick(float DeltaTime)
 		CRPC_AudioControl(true , 2);
 		bJetTailVFXOn = false;
 	}
+#pragma endregion
 
 #pragma region Canopy Open & Close
 	if (iCanopyNum == 2)
@@ -1256,7 +1077,7 @@ void AL_Viper::Tick(float DeltaTime)
 	}
 #pragma endregion
 
-	// 시동 절차 단계
+#pragma region 시동 절차 단계
 	if (!IsStart)
 	{
 		if (StartScenario.size() > 0)
@@ -1387,9 +1208,6 @@ void AL_Viper::Tick(float DeltaTime)
 			}
 			else if (ScenarioFront.Equals("Canopy"))
 			{
-				// DummyCanopyMesh->SetRenderCustomDepth(true);
-				// DummyCanopyMesh->CustomDepthStencilValue = 1;
-
 				if (CanopyPitch > 0.f)
 				{
 					if (iCanopyNum == 2)
@@ -1424,7 +1242,6 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
 						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
-						// CRPC_AudioControl(true , 1);
 					}
 				}
 			}
@@ -1459,89 +1276,15 @@ void AL_Viper::Tick(float DeltaTime)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 			IsStart = true;
 			IsEngineOn = true;
-			// if (auto pc = Cast<AJ_MissionPlayerController>(GetOwner()))
-			// {
-			// 	UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<
-			// 		UEnhancedInputLocalPlayerSubsystem>(
-			// 		pc->GetLocalPlayer());
-			// 	if (subsys)
-			// 	{
-			// 		FModifyContextOptions options;
-			// 		subsys->RemoveMappingContext(IMC_Viper , options);
-			// 	}
-			//
-			// 	if (WaitingForStartUI)
-			// 	{
-			// 		WaitingForStartUI->SetVisibility(ESlateVisibility::Visible);
-			// 		if(HasAuthority())
-			// 		{
-			// 			MultiRPC_SetCurrentReadyMem(ReadyMemeberCnt);
-			// 		}
-			// 		else
-			// 		{
-			// 			ServerRPC_SetCurrentReadyMem();
-			// 		}
-			// 		// auto gi = Cast<UK_GameInstance>(GetGameInstance());
-			// 		// gi->ReadyMemeberCnt++;
-			// 		// gi->OnMyMemberReFresh();
-			// 	}
-			// }
 		}
 	}
-	// 운행 단계
+#pragma endregion
+#pragma region 운행 단계
 	else
 	{
 		CurrentTime += DeltaTime;
 
-#pragma region Rotate JetArrow
 		FRotator jetRot = JetArrow->GetRelativeRotation();
-		// Check Distance Into Area
-		// if (IsKeyUpPress || IsKeyDownPress)
-		// {
-		// 	if (jetRot.Pitch > MaxPitchValue)
-		// 	{
-		// 		JetArrow->SetRelativeRotation(FRotator(MaxPitchValue - 1.f , jetRot.Yaw , jetRot.Roll));
-		// 		ForceUnitRot = FRotator(0 , 0 , 0);
-		// 	}
-		// 	else if (jetRot.Pitch < MinPitchValue)
-		// 	{
-		// 		JetArrow->SetRelativeRotation(FRotator(MinPitchValue + 1.f , jetRot.Yaw , jetRot.Roll));
-		// 		ForceUnitRot = FRotator(0 , 0 , 0);
-		// 	}
-		// 	else
-		// 	{
-		// 		JetArrow->AddRelativeRotation(FRotator(ForceUnitRot.Pitch , 0 , 0));
-		// 	}
-		// }
-		//
-		// if (IsKeyLeftPress)
-		// {
-		// 	if (!IsKeyRightPress)
-		// 	{
-		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-		// 		JetArrow->SetRelativeRotation(resetRot);
-		// 		FRotator newRot = FRotator(jetRot.Pitch , MinYawValue , jetRot.Roll);
-		// 		JetArrow->AddRelativeRotation(newRot);
-		// 	}
-		// }
-		// else if (IsKeyRightPress)
-		// {
-		// 	if (!IsKeyLeftPress)
-		// 	{
-		// 		FRotator resetRot = FRotator(jetRot.Pitch , 0 , jetRot.Roll);
-		// 		JetArrow->SetRelativeRotation(resetRot);
-		// 		FRotator newRot = FRotator(jetRot.Pitch , MaxYawValue , jetRot.Roll);
-		// 		JetArrow->AddRelativeRotation(newRot);
-		// 	}
-		// }
-
-		// 방향전환중이 아니라면 방향을 가운데로 변환
-		// if (!IsKeyLeftPress && !IsKeyRightPress)
-		// 	JetArrow->SetRelativeRotation(FRotator(JetArrow->GetRelativeRotation().Pitch , 0 ,
-		// 	                                       JetArrow->GetRelativeRotation().Roll));
-
-		//LOG_SCREEN("현재 각도는 %f 입니다." , JetArrow->GetRelativeRotation().Pitch);
-#pragma endregion
 
 #pragma region Move Throttle
 		FVector engineLoc = JetFirstEngine->GetRelativeLocation();
@@ -1618,18 +1361,20 @@ void AL_Viper::Tick(float DeltaTime)
 			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
 			JetFirstEngine->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 		}
-
-		SetAccelGear();
-		// LOG_S(Warning , TEXT("Current Gear X LOC : %f") , JetFirstEngine->GetRelativeLocation().X);
-		// LOG_S(Warning , TEXT("Current Gear : %d") , AccelGear);
 #pragma endregion
 
+#pragma region Get Accel Gear Number
+		SetAccelGear();
+#pragma endregion
+
+#pragma region Retate Pawn
 		// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 		QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation , RotationSpeed * DeltaTime);
 
 		// RootComponent의 회전 설정
 		//RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
 		SetActorRotation(QuatCurrentRotation.Rotator());
+#pragma endregion
 
 #pragma region Jet Move
 		ValueOfMoveForce += (GetAddTickSpeed() * 6);
@@ -1658,22 +1403,20 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 #pragma endregion
 
-#pragma region LockOn
 		IsLockOn();
-#pragma endregion
 
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
 		{
 			int32 randRot = FMath::RandRange(-150 , -110);
-			//LOG_SCREEN("%d" , randRot);
 			FRotator newFlareRot = FRotator(randRot , 0 , 0);
 			JetFlareArrow3->SetRelativeRotation(newFlareRot);
 			JetFlareArrow2->SetRelativeRotation(newFlareRot);
 		}
 #pragma endregion
 	}
-
+#pragma endregion
+	
 	if (IsLocallyControlled())
 	{
 		ChangeBooster();
@@ -1700,7 +1443,7 @@ void AL_Viper::Tick(float DeltaTime)
 			HUDui->UpdateSpeedText(ValueOfMoveForceInNote);
 		}
 #pragma endregion
-		
+
 #pragma region Zoom In/Out
 		if (JetCameraFPS->IsActive())
 		{
@@ -1720,29 +1463,42 @@ void AL_Viper::Tick(float DeltaTime)
 				JetCameraFPS->SetFieldOfView(newViewValue);
 			}
 		}
-#pragma endregion                                      
-	}
+#pragma endregion
 
 #pragma region Recover CameraArm Rotation
-	if (!IsRotateTrigger||!IsRotateStickTrigger)
-	{
-		if (JetCamera->IsActive())
+		if (!IsRotateTrigger || !IsRotateStickTrigger)
 		{
-			FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-			//FRotator(-10 , 0 , 0)
-			auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-			JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			if (JetCamera->IsActive())
+			{
+				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+				auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
+				JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			}
+			else
+			{
+				// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+				// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+				// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+			}
 		}
-		else
-		{
-			// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-			// //FRotator(-30 , 0 , 0)
-			// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-			// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
-		}
-	}
 #pragma endregion
+	}
 }
+
+#pragma region Print Net Log
+void AL_Viper::PrintNetLog()
+{
+	const FString conStr = GetNetConnection() ? TEXT("Valid Connection") : TEXT("Invalid Connection");
+	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
+
+	FString logStr = FString::Printf(
+		TEXT("Connection : %s\nPawn Name : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr ,
+		*GetName() , *ownerName ,
+		*LOCALROLE , *REMOTEROLE);
+	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
+	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
+}
+#pragma endregion
 
 #pragma region Get Force
 float AL_Viper::GetAddTickSpeed()
@@ -1805,6 +1561,7 @@ void AL_Viper::IsLockOn()
 }
 #pragma endregion
 
+#pragma region Booster VFX
 void AL_Viper::ChangeBooster()
 {
 	if (IsEngineOn && AccelGear == 3)
@@ -1815,19 +1572,6 @@ void AL_Viper::ChangeBooster()
 	{
 		ServerRPCBoost(false);
 	}
-}
-
-void AL_Viper::PrintNetLog()
-{
-	const FString conStr = GetNetConnection() ? TEXT("Valid Connection") : TEXT("Invalid Connection");
-	const FString ownerName = GetOwner() ? GetOwner()->GetName() : TEXT("No Owner");
-
-	FString logStr = FString::Printf(
-		TEXT("Connection : %s\nPawn Name : %s\nOwner Name : %s\nLocal Role : %s\nRemote Role : %s") , *conStr ,
-		*GetName() , *ownerName ,
-		*LOCALROLE , *REMOTEROLE);
-	FVector loc = GetActorLocation() + GetActorUpVector() * 30;
-	DrawDebugString(GetWorld() , loc , logStr , nullptr , FColor::Yellow , 0 , true , 1.f);
 }
 
 void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
@@ -1873,7 +1617,9 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 		}
 	}
 }
+#pragma endregion
 
+#pragma region Set Location & Rotation
 void AL_Viper::ServerRPCLocationAndRotation_Implementation(FVector newLocaction , FRotator newRotator)
 {
 	MulticastRPCLocationAndRotation(newLocaction , newRotator);
@@ -1887,7 +1633,9 @@ void AL_Viper::MulticastRPCLocationAndRotation_Implementation(FVector newLocacti
 		SetActorRotation(newRotator);
 	}
 }
+#pragma endregion
 
+#pragma region Projectile
 void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 {
 	if (LockOnTarget)
@@ -1969,7 +1717,6 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 
 void AL_Viper::ServerRPCLockOn_Implementation()
 {
-	//LockOnTarget = nullptr;
 	AActor* searchTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
 	FVector ForwardVector = JetMesh->GetForwardVector();
@@ -2009,9 +1756,6 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 {
 	LockOnTarget = target;
-
-	// LOG_S(Warning , TEXT("Viper Name : %s, LockOnTarget Name : %s") , *GetName() ,
-	// 					  *LockOnTarget->GetName());
 }
 
 void AL_Viper::ClientRPCLockOnSound_Implementation(AL_Viper* CurrentViper)
@@ -2055,59 +1799,9 @@ void AL_Viper::PlayLockOnSound()
 	if (LockOnSound)
 		UGameplayStatics::PlaySound2D(this , LockOnSound);
 }
+#pragma endregion
 
-void AL_Viper::CreateDumyComp()
-{
-	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
-	DummyMICMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-	DummyMICMesh->SetupAttachment(JetMic);
-
-	DummyEngineGenerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh1"));
-	DummyEngineGenerMesh1->SetupAttachment(JetEngineGen);
-	DummyEngineGenerMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
-	DummyEngineGenerMesh2->SetupAttachment(JetEngineGen2);
-	DummyEngineGenerMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyEngineControlMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh1"));
-	DummyEngineControlMesh1->SetupAttachment(JetEngineControl);
-	DummyEngineControlMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyEngineControlMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh2"));
-	DummyEngineControlMesh2->SetupAttachment(JetEngineControl2);
-	DummyEngineControlMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyJFSMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSMesh"));
-	DummyJFSMesh->SetupAttachment(JetFuelStarter);
-	DummyJFSMesh->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyEngineMasterMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh1"));
-	DummyEngineMasterMesh1->SetupAttachment(JetEngineMaster);
-	DummyEngineMasterMesh1->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
-	DummyEngineMasterMesh2->SetupAttachment(JetEngineMaster2);
-	DummyEngineMasterMesh2->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-
-	DummyJFSHandleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSHandleMesh"));
-	DummyJFSHandleMesh->SetupAttachment(JetJFSHandle);
-	DummyJFSHandleMesh->SetRelativeLocation(FVector(-550 , -33 , -253));
-
-	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
-	DummyThrottleMesh->SetupAttachment(JetFirstEngine);
-	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
-	DummyThrottleMesh->SetRelativeLocation(FVector(0 , 0 , -8));
-
-	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
-	DummyCanopyMesh->SetupAttachment(JetCanopy);
-	DummyCanopyMesh->SetRelativeLocation(FVector(-521 , -40 , -268));
-
-	DummyJFSBreakHold = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyJFSBreakHold"));
-	DummyJFSBreakHold->SetupAttachment(JetBreakHold);
-	DummyJFSBreakHold->SetRelativeLocationAndRotation(FVector(0 , 0 , -.9) , FRotator(30 , 0 , 0));
-}
-
+#pragma region Set Gear Number
 void AL_Viper::SetAccelGear()
 {
 	// 기어 변동 구간
@@ -2118,26 +1812,24 @@ void AL_Viper::SetAccelGear()
 	auto per = currValue / SizeValue * 100;
 	if (per <= 5)
 	{
-		// IsEngineOn = false;
 		AccelGear = 0;
 	}
 	else if (per <= 50)
 	{
-		// IsEngineOn = true;
 		AccelGear = 1;
 	}
 	else if (per <= 90)
 	{
-		// IsEngineOn = true;
 		AccelGear = 2;
 	}
 	else
 	{
-		// IsEngineOn = true;
 		AccelGear = 3;
 	}
 }
+#pragma endregion
 
+#pragma region Right Mouse Click
 void AL_Viper::PerformLineTrace()
 {
 	FVector WorldLocation , WorldDirection;
@@ -2158,7 +1850,6 @@ void AL_Viper::PerformLineTrace()
 				if (HitResult.GetComponent()->ComponentHasTag("Canopy"))
 				{
 					BackMoveCanopyHandle();
-					//LOG_SCREEN("캐노피 우클릭");
 					// 디버그용 라인 시각화
 					//DrawDebugLine(GetWorld() , Start , End , FColor::Green , false , 2.0f , 0 , 2.0f);
 				}
@@ -2166,7 +1857,9 @@ void AL_Viper::PerformLineTrace()
 		}
 	}
 }
+#pragma endregion
 
+#pragma region Move Canopy Hnd
 void AL_Viper::BackMoveCanopyHandle()
 {
 	CRPC_PlaySwitchSound(JetCanopy->GetComponentLocation());
@@ -2209,7 +1902,9 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		LOG_S(Warning , TEXT("Close %f") , newPitch);
 	}
 }
+#pragma endregion
 
+#pragma region Landing Gear
 void AL_Viper::ServerRPC_Wheel_Implementation()
 {
 	float DeltaTime = GetWorld()->DeltaTimeSeconds;
@@ -2221,7 +1916,9 @@ void AL_Viper::ServerRPC_Wheel_Implementation()
 	FrontWheel = nowValue;
 	RearWheel = nowValue;
 }
+#pragma endregion
 
+#pragma region Voice Chat
 void AL_Viper::StartVoiceChat()
 {
 	GetController<AJ_MissionPlayerController>()->StartTalking();
@@ -2231,43 +1928,7 @@ void AL_Viper::StopVoiceChat()
 {
 	GetController<AJ_MissionPlayerController>()->StopTalking();
 }
-
-void AL_Viper::OnMyMemberReFresh()
-{
-}
-
-void AL_Viper::ServerRPC_SetCurrentReadyMem_Implementation()
-{
-	ReadyMemeberCnt++;
-	MultiRPC_SetCurrentReadyMem(ReadyMemeberCnt);
-}
-
-void AL_Viper::MultiRPC_SetCurrentReadyMem_Implementation(int32 cnt)
-{
-	ReadyMemeberCnt++;
-	WaitingForStartUI->SetMem(ReadyMemeberCnt);
-}
-
-void AL_Viper::ReadyAllMembers()
-{
-	if (WaitingForStartUI)
-	{
-		WaitingForStartUI->RemoveFromParent();
-	}
-	IsEngineOn = true;
-	auto pc = Cast<APlayerController>(Controller);
-	if (pc)
-	{
-		UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-			pc->GetLocalPlayer());
-		if (subsys)
-		{
-			subsys->AddMappingContext(IMC_Viper , 0);
-		}
-
-		pc->bEnableClickEvents = true;
-	}
-}
+#pragma endregion
 
 #pragma region KHS Works
 void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& newName)
@@ -2335,6 +1996,7 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 }
 #pragma endregion
 
+#pragma region SFX
 void AL_Viper::CRPC_AudioControl_Implementation(bool bStart , int32 idx)
 {
 	if (bStart)
@@ -2392,13 +2054,17 @@ void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
 	if (SwitchSound)
 		UGameplayStatics::PlaySoundAtLocation(this , SwitchSound , SoundLoc);
 }
+#pragma endregion
 
+#pragma region Camera Shake
 void AL_Viper::CRPC_CameraShake_Implementation()
 {
 	if (LoadCameraShake)
 		UGameplayStatics::PlayWorldCameraShake(GetWorld() , LoadCameraShake , GetActorLocation() , 300.f , 700.f);
 }
+#pragma endregion
 
+#pragma region Throttle Machine
 void AL_Viper::F_ThrottleButton8Started(const struct FInputActionValue& value)
 {
 	bVoice = !bVoice;
@@ -2582,7 +2248,6 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>();
-	// LOG_S(Warning , TEXT("F_ThrottleAxis6 : %f") , data);
 	if (data > .8f)
 	{
 		// 잠금
@@ -2608,18 +2273,16 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 		iCanopyNum = 0;
 	}
 }
+#pragma endregion
 
+#pragma region Stick Machine
 void AL_Viper::F_StickButton1Started(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton1Started : %s") , b?*FString("true"):*FString("false"));
 	CurrentWeapon = static_cast<EWeapon>((static_cast<int32>(CurrentWeapon) + 1) % static_cast<int32>(EWeapon::Max));
 }
 
 void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton2Started : %s") , b?*FString("true"):*FString("false"));
 	if (CurrentWeapon == EWeapon::Missile)
 		ServerRPCMissile(this);
 	else if (CurrentWeapon == EWeapon::Flare)
@@ -2628,8 +2291,6 @@ void AL_Viper::F_StickButton2Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton5Started : %s") , b?*FString("true"):*FString("false"));
 	if (JetCamera && JetCamera->IsActive())
 	{
 		JetCamera->SetActive(false);
@@ -2657,32 +2318,24 @@ void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 
 void AL_Viper::F_StickButton11Started(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton11Started : %s") , b?*FString("true"):*FString("false"));
 	if (!IsZoomOut)
 		IsZoomIn = true;
 }
 
 void AL_Viper::F_StickButton11Completed(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton11Completed : %s") , b?*FString("true"):*FString("false"));
 	// 중복 키입력 방지용
 	IsZoomIn = false;
 }
 
 void AL_Viper::F_StickButton13Started(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton13Started : %s") , b?*FString("true"):*FString("false"));
 	if (!IsZoomIn)
 		IsZoomOut = true;
 }
 
 void AL_Viper::F_StickButton13Completed(const struct FInputActionValue& value)
 {
-	// auto b = value.Get<bool>();
-	// LOG_S(Warning , TEXT("F_StickButton13Completed : %s") , b?*FString("true"):*FString("false"));
 	IsZoomOut = false;
 }
 
@@ -2691,7 +2344,6 @@ void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
 	float data = value.Get<float>();
 	data = FMath::RoundToFloat(data * 1000.0f) / 1000.0f;
 	FString strData = FString::Printf(TEXT("%.3f") , data);
-	//LOG_S(Warning , TEXT("F_StickAxis1 : %s") , *strData);
 
 	float X = 0;
 	float Y = 0;
@@ -2755,7 +2407,6 @@ void AL_Viper::F_StickAxis2(const struct FInputActionValue& value)
 	// Up(1), Down(-1)
 	float data = value.Get<float>();
 	StickPitchAngle = data * -1;
-	// LOG_S(Warning , TEXT("F_StickAxis2 : %f") , data);
 }
 
 void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
@@ -2763,7 +2414,7 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	// Left(-1), Right(1)
 	float data = value.Get<float>();
 	StickRollAngle = data * -1;
-	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+
 	if ((StickRollAngle > 0.6f || StickRollAngle < -0.6f) && (StickPitchAngle > 0.6f || StickPitchAngle < -0.6f))
 	{
 		StickRollAngle = StickRollAngle * MaxRotationAngle / 3.f;
@@ -2785,14 +2436,16 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	StickRollAngle = 0.f;
 	StickPitchAngle = 0.f;
 }
+#pragma endregion
 
+#pragma region VR Stick
 void AL_Viper::VRSticAxis(const FVector2D& value)
 {
 	VRStickCurrentPitchValue = value.Y;
 	VRStickCurrentRollValue = -1 * value.X;
 	float VRStickRollAngle = 0.f;
 	float VRStickPitchAngle = 0.f;
-	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
+
 	if ((VRStickCurrentRollValue > VRStickMaxThreshold || VRStickCurrentRollValue < VRStickMinThreshold) && (
 		VRStickCurrentPitchValue >
 		VRStickMaxThreshold || VRStickCurrentPitchValue < VRStickMinThreshold))
@@ -2815,3 +2468,4 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 	VRStickCurrentPitchValue = 0.f;
 	VRStickCurrentRollValue = 0.f;
 }
+#pragma endregion

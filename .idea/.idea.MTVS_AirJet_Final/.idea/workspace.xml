@@ -13,9 +13,11 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Input/LHJ/IA/IA_ViperMove.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Input/LHJ/IA/IA_ViperMove.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/LHJ/BP_Viper.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_HUDWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Missile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Missile.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_Viper.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_WaitingForStart.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/LHJ/L_WaitingForStart.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_Viper.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_Viper.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,17 +50,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="cidr-memory-view://0" root0="FORCE_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://4" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.gen.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.generated.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_VRControlScene.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -73,6 +65,9 @@
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_Target.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_TargetWidget.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/LHJ/L_ViperAnim.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Programs/AutomationTool/Mac/MacPlatform.Automation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Programs/UnrealBuildTool/Platform/Mac/MacToolChain.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/Core/Public/UObject/ScriptDelegates.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -89,10 +84,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "C++ Project.MTVS_AirJet_Final.executor": "Debug",
-    "C++ 프로젝트.MTVS_AirJet_Final.executor": "Run",
+    "C++ 프로젝트.MTVS_AirJet_Final.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "com.codeium.enabled": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "LHJ__Alpha__Real",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

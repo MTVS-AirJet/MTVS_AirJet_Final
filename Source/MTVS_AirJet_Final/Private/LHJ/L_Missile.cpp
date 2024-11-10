@@ -111,7 +111,6 @@ void AL_Missile::Tick(float DeltaTime)
 
 void AL_Missile::MissileUpdate(float Alpha)
 {
-	//LOG_S(Warning, TEXT("%f"), Alpha);
 	FVector newLoc = BezierMissile(MoveLoc[0] , MoveLoc[1] , MoveLoc[2] , MoveLoc[3] , Alpha);
 	this->SetActorLocation(newLoc);
 }

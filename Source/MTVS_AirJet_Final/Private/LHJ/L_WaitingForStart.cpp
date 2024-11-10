@@ -22,17 +22,17 @@ void UL_WaitingForStart::NativeConstruct()
 
 void UL_WaitingForStart::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	Super::NativeTick(MyGeometry , InDeltaTime);
-	MaxCnt = gs->ConnectedPlayerNames.Num();
-	//CurrentCnt = gi->ReadyMemeberCnt;
-	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
-	TxtReadyCnt->SetText(FText::FromString(txt));
-
-	if (MaxCnt == CurrentCnt || MaxCnt == 0)
-	{
-		if (auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
-			viper->ReadyAllMembers();
-	}
+	// Super::NativeTick(MyGeometry , InDeltaTime);
+	// MaxCnt = gs->ConnectedPlayerNames.Num();
+	// //CurrentCnt = gi->ReadyMemeberCnt;
+	// FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
+	// TxtReadyCnt->SetText(FText::FromString(txt));
+	//
+	// if (MaxCnt == CurrentCnt || MaxCnt == 0)
+	// {
+	// 	// if (auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
+	// 	// 	viper->ReadyAllMembers();
+	// }
 }
 
 void UL_WaitingForStart::SetMem(const int32& newMem)
@@ -46,7 +46,7 @@ void UL_WaitingForStart::SetMem(const int32& newMem)
 
 	if (MaxCnt == CurrentCnt || MaxCnt == 0)
 	{
-		if (auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
-			viper->ReadyAllMembers();
+		// if (auto viper = Cast<AL_Viper>(GetOwningPlayerPawn()))
+		// 	viper->ReadyAllMembers();
 	}
 }
