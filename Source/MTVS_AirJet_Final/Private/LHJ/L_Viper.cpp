@@ -1630,47 +1630,6 @@ void AL_Viper::Tick(float DeltaTime)
 		// RootComponent의 회전 설정
 		//RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
 		SetActorRotation(QuatCurrentRotation.Rotator());
-		// #pragma region Quat Move
-		// 		if (JetMesh)
-		// 		{
-		// 			// 현재 회전값을 목표 회전값으로 부드럽게 보간
-		// 			QuatCurrentRotation = FQuat::Slerp(
-		// 				QuatCurrentRotation ,
-		// 				QuatTargetRotation ,
-		// 				FMath::Clamp(DeltaTime * RotationSpeed / 90.0f , 0.0f , 1.0f)
-		// 			);
-		//
-		// 			// 쿼터니언 회전 적용
-		// 			JetMesh->SetRelativeRotation(QuatCurrentRotation);
-		//
-		// 			// 화살표 컴포넌트에도 동일한 회전 적용
-		// 			if (JetArrow)
-		// 			{
-		// 				JetArrow->SetRelativeRotation(QuatCurrentRotation);
-		// 			}
-		// 		}
-		// #pragma endregion
-		//
-		// #pragma region Rotate Mesh
-		// 		if (IsRightRoll)
-		// 		{
-		// 			JetRoot->AddRelativeRotation(RotateRollValue);
-		// 		}
-		// 		else if (IsLeftRoll)
-		// 		{
-		// 			JetRoot->AddRelativeRotation(RotateRollValue * -1);
-		// 		}
-		// 		else if (IsKeyUpPress)
-		// 		{
-		// 			// JetRoot->AddRelativeRotation(RotatePitchValue);
-		// 			JetRoot->AddWorldRotation(RotatePitchValue* -1);
-		// 		}
-		// 		else if (IsKeyDownPress)
-		// 		{
-		// 			//JetRoot->AddRelativeRotation(RotatePitchValue * -1);
-		// 			JetRoot->AddWorldRotation(RotatePitchValue);
-		// 		}
-		// #pragma endregion
 
 #pragma region Jet Move
 		ValueOfMoveForce += (GetAddTickSpeed() * 6);
@@ -1698,7 +1657,6 @@ void AL_Viper::Tick(float DeltaTime)
 				CRPC_CameraShake();
 		}
 #pragma endregion
-
 
 #pragma region LockOn
 		IsLockOn();
@@ -1742,7 +1700,7 @@ void AL_Viper::Tick(float DeltaTime)
 			HUDui->UpdateSpeedText(ValueOfMoveForceInNote);
 		}
 #pragma endregion
-
+		
 #pragma region Zoom In/Out
 		if (JetCameraFPS->IsActive())
 		{
@@ -1762,11 +1720,11 @@ void AL_Viper::Tick(float DeltaTime)
 				JetCameraFPS->SetFieldOfView(newViewValue);
 			}
 		}
-#pragma endregion
+#pragma endregion                                      
 	}
 
 #pragma region Recover CameraArm Rotation
-	if (!IsRotateTrigger)
+	if (!IsRotateTrigger||!IsRotateStickTrigger)
 	{
 		if (JetCamera->IsActive())
 		{
@@ -2739,38 +2697,38 @@ void AL_Viper::F_StickAxis1(const struct FInputActionValue& value)
 	float Y = 0;
 	if (strData.Equals("3.286"))
 	{
-		IsRotateTrigger = false;
+		IsRotateStickTrigger = false;
 		return;
 	}
 	else if (strData.Equals("-1.000"))
-		Y = 1;
+		Y = -1;
 	else if (strData.Equals("-0.714"))
 	{
-		X = 1;
-		Y = 1;
+		X = -1;
+		Y = -1;
 	}
 	else if (strData.Equals("-0.429"))
-		X = 1;
+		X = -1;
 	else if (strData.Equals("-0.143"))
-	{
-		X = 1;
-		Y = -1;
-	}
-	else if (strData.Equals("0.143"))
-		Y = -1;
-	else if (strData.Equals("0.429"))
-	{
-		X = -1;
-		Y = -1;
-	}
-	else if (strData.Equals("0.714"))
-		X = -1;
-	else if (strData.Equals("1.000"))
 	{
 		X = -1;
 		Y = 1;
 	}
-	IsRotateTrigger = true;
+	else if (strData.Equals("0.143"))
+		Y = 1;
+	else if (strData.Equals("0.429"))
+	{
+		X = 1;
+		Y = 1;
+	}
+	else if (strData.Equals("0.714"))
+		X = 1;
+	else if (strData.Equals("1.000"))
+	{
+		X = 1;
+		Y = -1;
+	}
+	IsRotateStickTrigger = true;
 
 	if (JetCamera->IsActive())
 	{
@@ -2835,7 +2793,8 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 	float VRStickRollAngle = 0.f;
 	float VRStickPitchAngle = 0.f;
 	// LOG_S(Warning , TEXT("F_StickAxis3 : %f") , data);
-	if ((VRStickCurrentRollValue > VRStickMaxThreshold || VRStickCurrentRollValue < VRStickMinThreshold) && (VRStickCurrentPitchValue >
+	if ((VRStickCurrentRollValue > VRStickMaxThreshold || VRStickCurrentRollValue < VRStickMinThreshold) && (
+		VRStickCurrentPitchValue >
 		VRStickMaxThreshold || VRStickCurrentPitchValue < VRStickMinThreshold))
 	{
 		VRStickRollAngle = VRStickCurrentRollValue * MaxRotationAngle / VRStickBankRollDiv;

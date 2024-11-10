@@ -454,6 +454,7 @@ private:
 
 private:
 	bool IsRotateTrigger = false;
+	bool IsRotateStickTrigger = false;
 
 private:
 	UPROPERTY(EditDefaultsOnly)
