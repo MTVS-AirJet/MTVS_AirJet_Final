@@ -1007,7 +1007,7 @@ void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	 PrintNetLog();
+	// PrintNetLog();
 
 #pragma region 제트엔진 이펙트
 	if (bJetTailVFXOn)
@@ -1076,10 +1076,13 @@ void AL_Viper::Tick(float DeltaTime)
 			pc->bEnableClickEvents = true;
 		}
 
-		if (FrontWheel < 1.f)
-			ServerRPC_Wheel();
-		else
-			IsFlyStart = false;
+		if(IsLocallyControlled())
+		{
+			if (FrontWheel < 1.f)
+				ServerRPC_Wheel();
+			else
+				IsFlyStart = false;
+		}		
 	}
 #pragma endregion
 
@@ -1374,21 +1377,9 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Jet Move
-		
-
 		if (IsEngineOn)
 		{
-			// // Add Force
-			// FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-			// FVector forceLoc = JetRoot->GetComponentLocation();
-			// if (JetRoot->IsSimulatingPhysics())
-			// 	JetRoot->AddForceAtLocation(forceVec , forceLoc);
-			//
-			// // Move Up & Down
-			// jetRot = JetArrow->GetRelativeRotation();
-			// float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-			// JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-			if(IsLocallyControlled())
+			if (IsLocallyControlled())
 				ClientRPCLocation();
 
 			// 카메라 쉐이크
@@ -1398,8 +1389,9 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 #pragma endregion
 
-		IsLockOn();
-
+		if (IsLocallyControlled())
+			IsLockOn();
+		
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
 		{
@@ -1552,7 +1544,7 @@ float AL_Viper::GetAddTickSpeed()
 
 void AL_Viper::IsLockOn()
 {
-	//ServerRPCLockOn();
+	ServerRPCLockOn();
 }
 #pragma endregion
 
@@ -1646,7 +1638,7 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 	SetActorRotation(QuatCurrentRotation.Rotator());
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
-} 
+}
 #pragma endregion
 
 #pragma region Projectile
@@ -2449,7 +2441,7 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 
 	StickRollAngle = 0.f;
 	StickPitchAngle = 0.f;
-	
+
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
 #pragma endregion
