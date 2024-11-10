@@ -87,11 +87,13 @@ protected:
     // 목표 서브 조건 UI 완료
     // virtual void SRPC_EndSubObjUI() override;
 
-	// 성공 판정 충돌
-	virtual void OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
-											UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-											const FHitResult &SweepResult) override;
+    virtual void ObjectiveActive() override;
 
-    public:
-        virtual void Tick(float deltaTime) override;
+    // 성공 판정 충돌
+    virtual void OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
+                                            UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                            const FHitResult &SweepResult) override;
+
+public:
+    virtual void Tick(float deltaTime) override;
 };

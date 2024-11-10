@@ -4,6 +4,7 @@
 #include "JBS/J_ObjectiveTakeOff.h"
 #include "Engine/Engine.h"
 #include "JBS/J_BaseMissionObjective.h"
+#include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_Utility.h"
 #include "JBS/J_MissionGamemode.h"
 #include "Math/UnrealMathUtility.h"
@@ -13,9 +14,26 @@
 #include "TimerManager.h"
 
 
+void AJ_ObjectiveTakeOff::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveTakeOff::SRPC_EndObjUI);
+}
+
 void AJ_ObjectiveTakeOff::ObjectiveActive()
 {
-    if(!HasAuthority()) return;
+    Super::ObjectiveActive();
+
+    // 이미 이륙 했으면 ( 디버그) 그냥 넘어가기
+    if(UJ_Utility::GetMissionGamemode(GetWorld())->isTPReady)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("이미 이륙해서 넘어감"));
+        this->ObjectiveEnd(false);
+        return;
+    }
+
 
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 이륙 시작"));
     
@@ -41,12 +59,19 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
     if(tpBox)
         SetPosition(tpBox);
 
+    // 편대장 위치 가져오기
+    auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
+    const auto& leaderLoc = localPawn->GetActorLocation();
+    // 기준 방향 구하기
+    baseDirection = (this->GetActorLocation() - leaderLoc).GetSafeNormal();
+
+
     // 실패 체크 타이머 실행
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
         .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, failCheckInterval, true);
 
-    Super::ObjectiveActive();
+    SRPC_StartNewObjUI();
 }
 
 void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool isSuccess)
@@ -118,39 +143,26 @@ void AJ_ObjectiveTakeOff::CheckFail()
         if(takeOffCheckMap[pc].Key) continue;
 
         // 목표를 넘어섰는데 true가 아닌거니깐 실패 처리
-        auto* pawn = pc->GetPawn();
-        // 전방 벡터
-        auto myFV = this->GetActorForwardVector();
-        auto pawnFV = pawn->GetActorForwardVector();
+        auto* pilot = pc->GetPawn();
+
+        // 현재 방향
+        const auto& curDir = (this->GetActorLocation() - pilot->GetActorLocation()).GetSafeNormal();
 
         // 내적
-        float dot = FVector::DotProduct(myFV, pawnFV);
-        
-        // A 액터와 B 액터 간의 위치 벡터
-        FVector toPawn = pawn->GetActorLocation() - this->GetActorLocation();
-        toPawn.Normalize(); // 정규화
-
-        // A가 B의 뒤쪽에 있는지 확인
-        float dot2 = FVector::DotProduct(toPawn, pawnFV);
-        bool isBehind = dot2 > 0;
-
-        // 실패 거리만큼 떨어짐
-        float dis = FVector::Dist(this->GetActorLocation(), pawn->GetActorLocation());
-        bool isFar = failDis < dis;
-        
-        // 실패 처리
-        if (isBehind && isFar)
+        float check = FVector::DotProduct(baseDirection, curDir);
+        // 거리
+        float dis = FVector::Dist(this->GetActorLocation(), pilot->GetActorLocation());
+        GEngine->AddOnScreenDebugMessage(-1, .5f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
+        , *this->GetName()
+        , check
+        , dis));
+        if(check < 0 && dis > failDis)
         {
             auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
             gm->AddFlightedPC(pc, false);
-        }
 
-        GEngine->AddOnScreenDebugMessage(-1, failCheckInterval, FColor::Red
-        , FString::Printf(TEXT("체크중 : pc : %s, 내적 %s : %.2f, 거리 %s : %.2f")
-            , *pc->GetName(), *UJ_Utility::ToStringBool(isBehind)
-            , dot
-            , *UJ_Utility::ToStringBool(isFar)
-            , dis));
+            continue;
+        }
     }
 }
 

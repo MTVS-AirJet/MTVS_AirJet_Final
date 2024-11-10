@@ -145,6 +145,14 @@ FString UJ_Utility::ToStringBool(bool value)
     return value ? TEXT("TRUE") : TEXT("FALSE");
 }
 
+// FQuat UJ_Utility::ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector)
+// {
+//     FVector forwardVector = rotation.GetForwardVector(); // 앞 방향 벡터
+
+//     // 타겟 벡터를 앞 방향 벡터로 변환하기 위한 회전 각도 계산
+//     return FQuat::FindBetweenVectors(forwardVector ,targetVector );
+// }
+
 // === 구조체 함수 구현
 
 ETacticalOrder FMissionObject::GetOrderType() const
@@ -352,4 +360,5 @@ bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
 
     return successValue & checkType;
 }
+
 
