@@ -388,7 +388,8 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
 	DOREPLIFETIME(AL_Viper , RearWheel);
-	//DOREPLIFETIME(AL_Viper , ReadyMemeberCnt);
+	DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
+	DOREPLIFETIME(AL_Viper , QuatTargetRotation);
 }
 
 void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -921,7 +922,6 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
 	FVector2D moveVector = value.Get<FVector2D>();
-	LOG_SCREEN("%f, %f" , moveVector.X , moveVector.Y);
 
 	// 입력값에 최대 회전 각도 제한 적용
 	float RollAngle = 0.f;
@@ -944,6 +944,12 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+	// LOG_S(Warning , TEXT("QuatTargetRotation.Rotator() : %f, %f, %f") , QuatTargetRotation.Rotator().Roll ,
+	// 	  QuatTargetRotation.Rotator().Pitch , QuatTargetRotation.Rotator().Yaw);
+
+#pragma region Retate Pawn
+	ServerRPCRotation(QuatTargetRotation);
+#pragma endregion
 }
 
 void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
@@ -1001,7 +1007,7 @@ void AL_Viper::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// PrintNetLog();
+	 PrintNetLog();
 
 #pragma region 제트엔진 이펙트
 	if (bJetTailVFXOn)
@@ -1367,34 +1373,23 @@ void AL_Viper::Tick(float DeltaTime)
 		SetAccelGear();
 #pragma endregion
 
-#pragma region Retate Pawn
-		// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
-		QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation , RotationSpeed * DeltaTime);
-
-		// RootComponent의 회전 설정
-		//RootComponent->SetWorldRotation(QuatCurrentRotation.Rotator());
-		SetActorRotation(QuatCurrentRotation.Rotator());
-#pragma endregion
-
 #pragma region Jet Move
-		ValueOfMoveForce += (GetAddTickSpeed() * 6);
-		if (ValueOfMoveForce < 0)
-			ValueOfMoveForce = 0;
-		else if (ValueOfMoveForce > MaxValueOfMoveForce)
-			ValueOfMoveForce = MaxValueOfMoveForce;
+		
 
 		if (IsEngineOn)
 		{
-			// Add Force
-			FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-			FVector forceLoc = JetRoot->GetComponentLocation();
-			if (JetRoot->IsSimulatingPhysics())
-				JetRoot->AddForceAtLocation(forceVec , forceLoc);
-
-			// Move Up & Down
-			jetRot = JetArrow->GetRelativeRotation();
-			float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-			JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+			// // Add Force
+			// FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+			// FVector forceLoc = JetRoot->GetComponentLocation();
+			// if (JetRoot->IsSimulatingPhysics())
+			// 	JetRoot->AddForceAtLocation(forceVec , forceLoc);
+			//
+			// // Move Up & Down
+			// jetRot = JetArrow->GetRelativeRotation();
+			// float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+			// JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+			if(IsLocallyControlled())
+				ClientRPCLocation();
 
 			// 카메라 쉐이크
 			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
@@ -1416,7 +1411,7 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 	}
 #pragma endregion
-	
+
 	if (IsLocallyControlled())
 	{
 		ChangeBooster();
@@ -1466,21 +1461,21 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-		if (!IsRotateTrigger || !IsRotateStickTrigger)
-		{
-			if (JetCamera->IsActive())
-			{
-				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-				auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-				JetSprintArm->SetRelativeRotation(lerpTPSrot);
-			}
-			else
-			{
-				// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-				// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-				// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
-			}
-		}
+		// if (!IsRotateTrigger || !IsRotateStickTrigger)
+		// {
+		// 	if (JetCamera->IsActive())
+		// 	{
+		// 		FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+		// 		auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
+		// 		JetSprintArm->SetRelativeRotation(lerpTPSrot);
+		// 	}
+		// 	else
+		// 	{
+		// 		// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+		// 		// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+		// 		// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+		// 	}
+		// }
 #pragma endregion
 	}
 }
@@ -1557,7 +1552,7 @@ float AL_Viper::GetAddTickSpeed()
 
 void AL_Viper::IsLockOn()
 {
-	ServerRPCLockOn();
+	//ServerRPCLockOn();
 }
 #pragma endregion
 
@@ -1620,19 +1615,38 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 #pragma endregion
 
 #pragma region Set Location & Rotation
-void AL_Viper::ServerRPCLocationAndRotation_Implementation(FVector newLocaction , FRotator newRotator)
+void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
 {
-	MulticastRPCLocationAndRotation(newLocaction , newRotator);
+	// Add Force
+	FVector forceVec = JetArrow->GetForwardVector() * MoveForce;
+	FVector forceLoc = JetRoot->GetComponentLocation();
+	if (JetRoot->IsSimulatingPhysics())
+		JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+	// Move Up & Down
+	auto jetRot = JetArrow->GetRelativeRotation();
+	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
 }
 
-void AL_Viper::MulticastRPCLocationAndRotation_Implementation(FVector newLocaction , FRotator newRotator)
+void AL_Viper::ClientRPCLocation_Implementation()
 {
-	if (!IsLocallyControlled())
-	{
-		SetActorLocation(newLocaction);
-		SetActorRotation(newRotator);
-	}
+	ValueOfMoveForce += (GetAddTickSpeed() * 6);
+	if (ValueOfMoveForce < 0)
+		ValueOfMoveForce = 0;
+	else if (ValueOfMoveForce > MaxValueOfMoveForce)
+		ValueOfMoveForce = MaxValueOfMoveForce;
+	ServerRPCLocation(ValueOfMoveForce);
 }
+
+void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
+{
+	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
+	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	SetActorRotation(QuatCurrentRotation.Rotator());
+	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
+} 
 #pragma endregion
 
 #pragma region Projectile
@@ -2435,6 +2449,10 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 
 	StickRollAngle = 0.f;
 	StickPitchAngle = 0.f;
+	
+#pragma region Retate Pawn
+	ServerRPCRotation(QuatTargetRotation);
+#pragma endregion
 }
 #pragma endregion
 
@@ -2467,5 +2485,9 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 
 	VRStickCurrentPitchValue = 0.f;
 	VRStickCurrentRollValue = 0.f;
+
+#pragma region Retate Pawn
+	ServerRPCRotation(QuatTargetRotation);
+#pragma endregion
 }
 #pragma endregion

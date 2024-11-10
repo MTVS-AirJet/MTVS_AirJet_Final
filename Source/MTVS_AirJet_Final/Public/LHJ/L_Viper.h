@@ -378,9 +378,11 @@ private:
 
 private:
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
-	UFUNCTION(NetMulticast , Reliable)
-	void MulticastRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
+	void ServerRPCLocation(const float& MoveForce);
+	UFUNCTION(Client , Reliable)
+	void ClientRPCLocation();
+	UFUNCTION(Server , Reliable)
+	void ServerRPCRotation(FQuat newQuat);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
@@ -712,9 +714,11 @@ public:
 	float MaxRotationAngle = 15.f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
+	UPROPERTY(Replicated)
 	FQuat QuatCurrentRotation = FQuat::Identity;
     
 	// 목표 회전 상태를 쿼터니언으로 저장
+	UPROPERTY(Replicated)
 	FQuat QuatTargetRotation = FQuat::Identity;
 
 	float StickRollAngle = 0.f;
