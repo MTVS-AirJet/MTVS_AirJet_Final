@@ -126,6 +126,10 @@ public:
 
     FStartTacticalOrderDel startTODel;
 
+    // 이륙함
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isTPReady = false;
+
 protected:
     virtual void BeginPlay() override;
 

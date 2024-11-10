@@ -80,6 +80,20 @@ protected:
 	TMap<class AJ_MissionPlayerController*, FTacticalOrderData> prevObjUIDataMap;
 
 
+	// 목표 완료했는지 여부
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isObjEnded = false;
+		public:
+	__declspec(property(get = GetObjEnded, put = SetObjEnded)) bool IS_OBJ_ENDED;
+	bool GetObjEnded()
+	{
+		return isObjEnded;
+	}
+	void SetObjEnded(bool value)
+	{
+		isObjEnded = value;
+	}
+		protected:
 
     public:
 	// 명령 종류

@@ -33,6 +33,14 @@ protected:
 	// FIXME 임시 타이머 핸들
 	FTimerHandle timerHandle;
 
+	// 실패 판정할 기준 방향 | 목표 <- 편대장 의 방향
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FVector baseDirection;
+
+	// 실패 판정할 거리 | 일단 100m
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float failDis = 10000.f;
+
 public:
 
 protected:
@@ -50,8 +58,13 @@ protected:
 
 	// 목표 완료 시 비활성화 처리
 	virtual void ObjectiveEnd(bool isSuccess = true) override;
-	
-public:
-    virtual void Tick(float deltaTime) override;
-    virtual void SetObjectiveActive(bool value) override;
+
+	// 실패 체크 | 기준 방향 보다 현재 상대 위치가 넘어가면 실패
+	bool CheckFail(const FVector &baseDir);
+
+	virtual void ObjectiveActive();
+
+    public:
+        virtual void Tick(float deltaTime) override;
+        virtual void SetObjectiveActive(bool value) override;
 };

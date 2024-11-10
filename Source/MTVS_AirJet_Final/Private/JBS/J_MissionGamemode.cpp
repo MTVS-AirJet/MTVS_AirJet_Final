@@ -336,7 +336,7 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     
 
     // 배열 크기가 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
-    bool isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
+    isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
     if(isTPReady)
         StartTacticalOrder();
 

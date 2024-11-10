@@ -18,11 +18,14 @@ void AJ_ObjectiveEngineStart::BeginPlay()
     auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
     // 미션 시작 딜리게이트 바인드
     gm->startTODel.AddUObject(this, &AJ_ObjectiveEngineStart::ObjectiveEnd);
+
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveEngineStart::SRPC_EndObjUI);
 }
 
 void AJ_ObjectiveEngineStart::ObjectiveActive()
 {
-    if(!HasAuthority()) return;
+    Super::ObjectiveActive();
 
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 시동 절차 시작"));
     // 현재 존재하는 모든 pc 가져오기
@@ -40,7 +43,8 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
     // 목표 종료시 수행도 결과 계산 바인드
     objectiveEndDel.AddUObject(this, &AJ_ObjectiveEngineStart::CalcSuccessPercent);
 
-    Super::ObjectiveActive();
+    // 목표 ui 신규 갱신
+    SRPC_StartNewObjUI();
 }
 
 void AJ_ObjectiveEngineStart::Tick(float deltaTime)

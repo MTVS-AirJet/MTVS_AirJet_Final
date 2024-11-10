@@ -22,6 +22,10 @@ protected:
 	// 활성화 당시 모든 폰
 	TArray<class APawn*> allPawn;
 
+    // 실패 판정 기준 방향
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FVector baseDirection;
+
 	// 실패 판정 거리
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float failDis = 1000.f;
@@ -39,7 +43,8 @@ protected:
 public:
 
 protected:
-	// 이륙 목표 활성화
+    virtual void BeginPlay() override;
+    // 이륙 목표 활성화
     virtual void ObjectiveActive() override;
     // 해당 파일럿 이륙 성공 처리
     void SuccessTakeOff(class AJ_MissionPlayerController *pc, bool isSuccess = true);

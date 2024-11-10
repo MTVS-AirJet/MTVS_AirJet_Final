@@ -8,6 +8,8 @@
 #include "Engine/HitResult.h"
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_Utility.h"
 #include "Math/MathFwd.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
@@ -20,6 +22,7 @@ AJ_ObjectiveMovePoint::AJ_ObjectiveMovePoint() : AJ_BaseMissionObjective()
     checkCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("checkCapsuleComp"));
     checkCapsuleComp->SetupAttachment(rootComp);
     checkCapsuleComp->SetCapsuleHalfHeight(40000);
+    checkCapsuleComp->SetCapsuleRadius(4000);
 }
 
 void AJ_ObjectiveMovePoint::BeginPlay()
@@ -82,7 +85,7 @@ void AJ_ObjectiveMovePoint::InitBeamVFX()
             false,
             .1f,
             0,
-            250.5f
+            4000.f
         );
 
         // GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::White, TEXT("빔 생성 중"));
@@ -129,6 +132,7 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
         GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
 }
+// FIXME 실패 로직 추가하기
 
 void AJ_ObjectiveMovePoint::Tick(float deltaTime)
 {
@@ -136,5 +140,49 @@ void AJ_ObjectiveMovePoint::Tick(float deltaTime)
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d"), checkCapsuleComp->IsActive()));
     
+    // 활성화 중 실패 체크
+    if(IS_OBJECTIVE_ACTIVE)
+    {
+        if(CheckFail(baseDirection))
+        {
+            this->ObjectiveEnd(false);
+        }
+    }
     
+}
+
+void AJ_ObjectiveMovePoint::ObjectiveActive()
+{
+    Super::ObjectiveActive();
+
+    // 편대장 위치 가져오기
+    auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
+    const auto& leaderLoc = localPawn->GetActorLocation();
+    // 기준 방향 구하기
+    baseDirection = (this->GetActorLocation() - leaderLoc).GetSafeNormal();
+}
+
+bool AJ_ObjectiveMovePoint::CheckFail(const FVector &baseDir)
+{
+    // 모든 파일럿 중 한 명이라도 기준 방향을 넘어가면 실패 처리
+    const auto& allPilot = UJ_Utility::GetAllMissionPawn(GetWorld());
+    
+    for(const auto* pilot : allPilot)
+    {
+        // 현재 방향
+        const auto& curDir = (this->GetActorLocation() - pilot->GetActorLocation()).GetSafeNormal();
+
+        // 내적
+        float check = FVector::DotProduct(baseDir, curDir);
+        // 거리
+        float dis = FVector::Dist(this->GetActorLocation(), pilot->GetActorLocation());
+        GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
+        , *this->GetName()
+        , check
+        , dis));
+        if(check < 0 && dis > failDis)
+            return true;
+    }
+
+    return false;
 }
