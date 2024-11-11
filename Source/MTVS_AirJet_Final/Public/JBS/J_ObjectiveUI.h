@@ -75,7 +75,7 @@ protected:
 	float PlaySubObjEndAnimLerp(class UVerticalBoxSlot *subSlot, float alpha);
 
 	// 서브 목표 완료 애니메이션 타이머 종료
-        void ClearSubObjTimer(class UWidget *subObj);
+	void ClearSubObjTimer(class UWidget *subObj);
 
     public:
 	// 전술명령 텍스트 설정

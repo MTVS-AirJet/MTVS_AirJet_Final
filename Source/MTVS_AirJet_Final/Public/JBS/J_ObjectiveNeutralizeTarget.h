@@ -118,6 +118,9 @@ protected:
 	// 과녁 점수 갱신
 	void UpdateTargetScore(class AJ_MissionPlayerController *pc, float score);
 
+	// 수행도 계산
+	float CalcSuccessPercent();
+
         // 서브 이동 목표 위치 구하기 | 기준 위치, 인덱스
 	FTransform CalcSubMPTransform(const FTransform &baseTR, const int &idx);
 

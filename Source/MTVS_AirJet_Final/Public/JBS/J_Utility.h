@@ -406,6 +406,7 @@ enum class ETextStyle : uint8
     ,SUCCESS
     ,FAIL
     ,OBJDETAIL
+    ,RESULTDEFAULT
     
 };
 
@@ -478,10 +479,10 @@ struct FDefaultTextUIData
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FRichString headerText = FRichString();
+    FString headerText = FString();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FRichString> bodyTextAry;
+    TArray<FString> bodyTextAry;
 };
 
 // 목표 UI 표시용 
@@ -823,6 +824,18 @@ public:
     static FString ToStringBool(bool value);
     // XXX 해당 로테이션의 전방 벡터를 타겟 벡터로 변환하기
     // static FQuat ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector);
+    // 평균 구하기
+    static float CalcAverage(TArray<float> valueAry);
+    // enum string 값에서 :: 뒤의 값만 반환
+    template<typename EnumType>
+    static FString ToStringEnumPure(const EnumType type)
+    {
+        return SubStrEnumString(UEnum::GetValueAsString(type));
+    }
+    static FString SubStrEnumString(const FString &typeStr);
+
+    // 0~1 float 값 백분율 string으로 반환
+    static FString ToStringPercent(float percent);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1500000.f;

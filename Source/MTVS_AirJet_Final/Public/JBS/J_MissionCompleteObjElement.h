@@ -17,7 +17,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UTextBlock* objNameText;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
-	class UTextBlock* objResultText;
+	class URichTextBlock* objResultText;
 
 public:
 

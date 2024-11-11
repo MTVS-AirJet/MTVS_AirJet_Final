@@ -153,7 +153,7 @@ void AJ_BaseMissionObjective::ObjectiveFail()
 
 void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 {
-	if(!HasAuthority()) return;
+	if(!HasAuthority() && !this->IS_OBJECTIVE_ACTIVE) return;
 	// 미션 비활성화
 	IS_OBJECTIVE_ACTIVE = false;
 	// 완료 체크
@@ -166,7 +166,7 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 	// 성공 여부에 따라 함수 실행
 	isSuccess ? ObjectiveSuccess() : ObjectiveFail();
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("??? actor : %s"), *this->GetName()));
+	// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("??? actor : %s"), *this->GetName()));
 }
 
 void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
@@ -283,7 +283,7 @@ void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
 void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
 {
 	if(!HasAuthority()) return;
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *pc->GetName()));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *pc->GetName()));
 	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
 
 	// // 모든 pc 가져오기

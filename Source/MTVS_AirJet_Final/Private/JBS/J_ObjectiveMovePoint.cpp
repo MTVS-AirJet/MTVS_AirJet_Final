@@ -98,6 +98,9 @@ void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
     int32 OtherBodyIndex, bool bFromSweep,
     const FHitResult &SweepResult)
 {
+    // 활성화 상태일때만
+    if(!this->IS_OBJECTIVE_ACTIVE) return;
+
     // 충돌한게 미션 폰이면 목표 성공 처리
     if(OtherActor->IsA<AJ_BaseMissionPawn>())
     {
@@ -132,7 +135,6 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
         GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
 }
-// FIXME 실패 로직 추가하기
 
 void AJ_ObjectiveMovePoint::Tick(float deltaTime)
 {
@@ -141,13 +143,10 @@ void AJ_ObjectiveMovePoint::Tick(float deltaTime)
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d"), checkCapsuleComp->IsActive()));
     
     // 활성화 중 실패 체크
-    if(IS_OBJECTIVE_ACTIVE || HasAuthority())
-    {
-        if(CheckFail(baseDirection))
-        {
-            this->ObjectiveEnd(false);
-        }
-    }
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+    if(CheckFail(baseDirection))
+        this->ObjectiveEnd(false);
     
 }
 
@@ -176,10 +175,13 @@ bool AJ_ObjectiveMovePoint::CheckFail(const FVector &baseDir)
         float check = FVector::DotProduct(baseDir, curDir);
         // 거리
         float dis = FVector::Dist(this->GetActorLocation(), pilot->GetActorLocation());
-        GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
-        , *this->GetName()
-        , check
-        , dis));
+
+        // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
+        // , *this->GetName()
+        // , check
+        // , dis));
+
+        // 실패
         if(check < 0 && dis > failDis)
             return true;
     }

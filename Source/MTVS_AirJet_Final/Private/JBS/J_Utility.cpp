@@ -2,12 +2,16 @@
 
 
 #include "JBS/J_Utility.h"
+#include "Algo/Accumulate.h"
+#include "Containers/UnrealString.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_MissionGameState.h"
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
 #include "Math/UnrealMathUtility.h"
+#include "Misc/CoreMiscDefines.h"
+#include "UObject/Class.h"
 #include "UObject/Object.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
@@ -144,6 +148,32 @@ FString UJ_Utility::ToStringBool(bool value)
 {
     return value ? TEXT("TRUE") : TEXT("FALSE");
 }
+
+float UJ_Utility::CalcAverage(TArray<float> valueAry)
+{
+    if(valueAry.Num() == 0)
+        return 0.0f;
+
+    float sum = Algo::Accumulate(valueAry, 0.0f);
+
+    return sum / valueAry.Num();
+}
+
+FString UJ_Utility::SubStrEnumString(const FString &typeStr)
+{
+    // 자를 인덱스
+    int idx = typeStr.Find("::");
+    if(idx == INDEX_NONE) return "";
+
+    // :: 다음 부분 추출
+    return typeStr.RightChop(idx + 2);
+}
+
+FString UJ_Utility::ToStringPercent(float percent)
+{
+    return FString::Printf(TEXT("%d%%"), static_cast<int>(percent * 100));
+}
+
 
 // FQuat UJ_Utility::ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector)
 // {
@@ -328,23 +358,31 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
 
 FString FRichString::FormatString(const FString &str, ETextStyle type) const
 {
-    FString result = "";
 
-    switch(type)
-    {
-    case ETextStyle::DEFAULT:
-        result = FString::Printf(TEXT("<Default>%s</>"), *str);
-        break;
-    case ETextStyle::SUCCESS:
-        result = FString::Printf(TEXT("<Success>%s</>"), *str);
-        break;
-    case ETextStyle::FAIL:
-        result = FString::Printf(TEXT("<Fail>%s</>"), *str);
-        break;
-    case ETextStyle::OBJDETAIL:
-        result = FString::Printf(TEXT("<ObjDetail>%s</>"), *str);
-        break;
-    }
+    // XXX 동적으로 하려고 enum 값대로 변경
+    // FString result = "";
+    // switch(type)
+    // {
+    // case ETextStyle::DEFAULT:
+    //     result = FString::Printf(TEXT("<Default>%s</>"), *str);
+    //     break;
+    // case ETextStyle::SUCCESS:
+    //     result = FString::Printf(TEXT("<Success>%s</>"), *str);
+    //     break;
+    // case ETextStyle::FAIL:
+    //     result = FString::Printf(TEXT("<Fail>%s</>"), *str);
+    //     break;
+    // case ETextStyle::OBJDETAIL:
+    //     result = FString::Printf(TEXT("<ObjDetail>%s</>"), *str);
+    //     break;
+    // case ETextStyle::RESULTDEFAULT:
+    //     result = FString::Printf(TEXT("<ResultDefault>%s</>"), *str);
+    //     break;
+    // }
+
+    FString result = FString::Printf(TEXT("<%s>%s</>")
+    , *UJ_Utility::ToStringEnumPure(type)
+    , *str);
 
     return result;
 }
@@ -360,5 +398,4 @@ bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
 
     return successValue & checkType;
 }
-
 

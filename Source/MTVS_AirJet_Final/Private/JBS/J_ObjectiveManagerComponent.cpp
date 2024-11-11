@@ -199,10 +199,15 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	isMissionComplete = true;
 
 	// 여기부터 결산 단계
+	// 시동,이륙, 목표 데이터를 다 가진 전체 데이터
+	TArray<FObjectiveData> fullObjData;
+	fullObjData.Append(defaultObjDataAry);
+	fullObjData.Append(objectiveDataAry);
+	
 	// 미션 완료 ui 전환
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager()
-		.SetTimer(timerHandle, [this]() mutable
+		.SetTimer(timerHandle, [this, fullObjData]() mutable
 	{
 		//타이머에서 할 거
 		auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -210,7 +215,7 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 		for(AJ_MissionPlayerController* pc : allPC)
 		{
 			// 결산 UI 전환
-			pc->objUIComp->CRPC_SwitchResultUI(objectiveDataAry);
+			pc->objUIComp->CRPC_SwitchResultUI(fullObjData);
 		}
 	}, objSwitchInterval, false);
 }
