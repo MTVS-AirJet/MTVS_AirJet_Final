@@ -7,7 +7,10 @@
 #include "JBS/J_MissionActorInterface.h"
 #include "J_GroundTarget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FDestroyedTargetDelegate)
+DECLARE_MULTICAST_DELEGATE(FDestroyedTargetDelegate);
+
+// 과녁 타격 점수 반환 | pc, 점수
+DECLARE_MULTICAST_DELEGATE_TwoParams(FSendTargetScoreDelegate, class AJ_MissionPlayerController*, float);
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_GroundTarget : public ACharacter, public IJ_MissionActorInterface
@@ -38,6 +41,9 @@ protected:
 public:
 	// 파괴 딜리게이트
 	FDestroyedTargetDelegate destroyedDelegate;
+
+	// 피격 시 점수 반환 딜리게이트
+	FSendTargetScoreDelegate sendScoreDel;
 
 protected:
 	// 파괴

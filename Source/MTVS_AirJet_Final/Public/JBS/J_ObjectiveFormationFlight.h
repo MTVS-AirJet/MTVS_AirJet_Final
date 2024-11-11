@@ -75,20 +75,25 @@ protected:
 	// 좌우에 있는지 확인
     bool CheckLeftRight(AActor *actor, AActor* otherActors, bool checkLeft = true);
 
-	// 목표 UI 시작 | 목표 활성화 시 호출
+	// 목표 UI에 표시할 데이터 구성
+    virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController* pc = nullptr) override;
+
+    // 목표 UI 시작 | 목표 활성화 시 호출
     virtual void SRPC_StartNewObjUI() override;
     // 목표 UI 값 갱신 | 수행도 갱신 시 호출
     virtual void SRPC_UpdateObjUI() override;
     // 목표 UI 완료 | 목표 완료시 호출
     virtual void SRPC_EndObjUI() override;
     // 목표 서브 조건 UI 완료
-    virtual void SRPC_EndSubObjUI() override;
+    // virtual void SRPC_EndSubObjUI() override;
 
-	// 성공 판정 충돌
-	virtual void OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
-											UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-											const FHitResult &SweepResult) override;
+    virtual void ObjectiveActive() override;
 
-    public:
-        virtual void Tick(float deltaTime) override;
+    // 성공 판정 충돌
+    virtual void OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
+                                            UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                            const FHitResult &SweepResult) override;
+
+public:
+    virtual void Tick(float deltaTime) override;
 };

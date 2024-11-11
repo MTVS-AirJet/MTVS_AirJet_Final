@@ -36,14 +36,6 @@ void AK_CesiumTeleportBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-    //(임시) LA위경도
-	DestLongitude = 34.0194 ;
-	DestLatitude = -118.411;
-	
-	//BoxComp->OnComponentBeginOverlap.AddDynamic(this , &AK_CesiumTeleportBox::OnMyBoxBeginOverlap);
-
-    /*DestLatitude = KGameInstance->MissionData.latitude;
-    DestLongitude = KGameInstance->MissionData.longitude;*/
 
 } 
 

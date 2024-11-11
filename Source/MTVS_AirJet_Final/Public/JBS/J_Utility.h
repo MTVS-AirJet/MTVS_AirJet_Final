@@ -295,7 +295,66 @@ enum class ETacticalOrder : uint8
     ,MOVE_THIS_POINT = 1
     ,FORMATION_FLIGHT
     ,NEUTRALIZE_TARGET
+    ,ENGINE_START
+    ,TAKE_OFF
 
+};
+
+USTRUCT(BlueprintType)
+struct FObjSucceedData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isEnd;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isSuccess;
+
+    FObjSucceedData() : isEnd(false), isSuccess(false) {}
+
+    FObjSucceedData(bool isEnd, bool isSuccess) : isEnd(isEnd), isSuccess(isSuccess) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FObjSucceedData& Other) const
+    {
+        return isEnd == Other.isEnd &&
+               isSuccess == Other.isSuccess;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FObjSucceedData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+};
+
+// 공대지 과녁 점수 데이터
+USTRUCT(BlueprintType)
+struct FTargetScoreData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isEnd;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float score;
+
+    FTargetScoreData() : isEnd(false), score(0.f) {}
+
+    FTargetScoreData(bool isEnd, float score) : isEnd(isEnd), score(score) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FTargetScoreData& Other) const
+    {
+        return isEnd == Other.isEnd &&
+               score == Other.score;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTargetScoreData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
 };
 
 USTRUCT(BlueprintType)
@@ -327,11 +386,51 @@ public:
     // 목표 액터
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AJ_BaseMissionObjective* objectiveActor = nullptr;
+    // 목표 종류
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     ETacticalOrder objType = ETacticalOrder::NONE;
     // 목표 수행도 | 목표 완료시 갱신됨
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     float successPercent = 0.f;
+
+    FObjectiveData() {}
+
+    FObjectiveData(ETacticalOrder objType) : objType(objType) {}
+};
+
+// 텍스트 스타일 종류
+UENUM(BlueprintType)
+enum class ETextStyle : uint8
+{
+    DEFAULT
+    ,SUCCESS
+    ,FAIL
+    ,OBJDETAIL
+    
+};
+
+// 리치 텍스트 데이터 구조체
+USTRUCT(BlueprintType)
+struct FRichString
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    FString value;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")  
+    ETextStyle styleType;
+
+    FRichString() : value(""), styleType(ETextStyle::DEFAULT) {}
+    FRichString(FString value) : value(value), styleType(ETextStyle::DEFAULT)
+    {
+    }
+    FRichString(FString value, ETextStyle styleType)
+        : value(value), styleType(styleType)
+    {
+    }
+
+    FString FormatString(const FString &str, ETextStyle type) const;
+    FString GetFormatString() const;
 };
 
 // 편대 역할
@@ -372,40 +471,33 @@ enum class EFormationChecklist : uint8
     ,ALIGN_FORMATION = 2
 };
 
-// // XXXUI 텍스트, 완료 유무, 성공 유무
-// USTRUCT(BlueprintType)
-// struct FObjUITextData
-// {
-//     GENERATED_BODY()
-// public:
-//     // 텍스트
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     FString text;
-//     // 완료 유무
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     bool isEnd = false;
-//     // 성공 유무
-//     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-//     bool isSuccess = true;
-
-//     FObjUITextData() {}
-
-//     FObjUITextData(const FString& text, bool isEnd = false, bool isSuccess = true) 
-//         : text(text), isEnd(isEnd), isSuccess(isSuccess) {}
-// };
-
-// 목표 UI 표시용 
+// 서브 목표 UI 표시용 
 USTRUCT(BlueprintType)
-struct FObjUIData
+struct FDefaultTextUIData
 {
     GENERATED_BODY()
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    FString headerText;
+    FRichString headerText = FRichString();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FString> bodyTextAry;
-    
+    TArray<FRichString> bodyTextAry;
+};
+
+// 목표 UI 표시용 
+USTRUCT(BlueprintType)
+struct FTextUIData : public FDefaultTextUIData
+{
+    GENERATED_BODY()
+public:
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    // FRichString headerText = FRichString();
+
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    // TArray<FRichString> bodyTextAry;
+    // 복잡한 구조용
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FDefaultTextUIData> bodyObjAry;
 };
 
 
@@ -435,8 +527,24 @@ public:
     FFormationFlightUIData() {}
 
     FFormationFlightUIData(
-        float checkHeight, float curHeight, EPilotRole pilotRole, bool checkFormation, bool isCorrectPosition) :
-        checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), checkFormation(checkFormation), isCorrectPosition(isCorrectPosition) {}
+        bool checkFormation, float checkHeight, float curHeight, EPilotRole pilotRole,  bool isCorrectPosition) :
+        checkFormation(checkFormation), checkHeight(checkHeight), curHeight(curHeight), pilotRole(pilotRole), isCorrectPosition(isCorrectPosition) {}
+
+         // == 연산자 오버로딩
+    bool operator==(const FFormationFlightUIData& Other) const
+    {
+        return checkFormation == Other.checkFormation &&
+               checkHeight == Other.checkHeight &&
+               curHeight == Other.curHeight &&
+               pilotRole == Other.pilotRole &&
+               isCorrectPosition == Other.isCorrectPosition;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FFormationFlightUIData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
 };
 
 // 2. 목표 무력화
@@ -452,14 +560,205 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int curTargetAmt;
 
+    // 서브 이동 목표 | 수행 여부, 성공 여부
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FObjSucceedData> subMPSucceedDataAry;
+
+    // XXX 과녁 타격 정보 | 수행 여부, 점수 여부 | 일단 베타때 하자
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FTargetScoreData> targetAtkDataAry;
+
     FNeutralizeTargetUIData() {}
 
-    FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
+    FNeutralizeTargetUIData(int allAmt, int curAmt, const TArray<FObjSucceedData>& subMPSucceedDataAry) 
+    : allTargetAmt(allAmt), curTargetAmt(curAmt), subMPSucceedDataAry(subMPSucceedDataAry) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FNeutralizeTargetUIData& Other) const
+    {
+        return allTargetAmt == Other.allTargetAmt &&
+               curTargetAmt == Other.curTargetAmt &&
+               subMPSucceedDataAry == Other.subMPSucceedDataAry &&
+               targetAtkDataAry == Other.targetAtkDataAry;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FNeutralizeTargetUIData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
 };
+
+// 시동 절차 | 비트마스크 처리 하는거 포폴에 넣어도 될듯
+UENUM(BlueprintType)
+enum class EEngineProgress : uint8
+{
+    None = 0
+    ,MIC_SWITCH_ON = 1
+    ,ENGINE_GEN_SWITCH_ON = 2
+    ,ENGINE_CONTROL_SWITCH_ON = 3
+    ,JFS_STARTER_SWITCH_ON = 4
+    ,ENGINE_MASTER_SWITCH_ON = 5
+    ,JFS_HANDLE_PULL = 6
+    ,ENGINE_THROTTLE_IDLE = 7
+    ,CLOSE_CANOPY = 8
+    ,STANDBY_OTHER_PLAYER = 9
+    ,RELEASE_SIDE_BREAK = 10
+    ,TAKE_OFF = 11
+};
+
+// 시동 절차 확인 용 개인 pc 데이터
+USTRUCT(BlueprintType)
+struct FEngineProgressData
+{
+    GENERATED_BODY()
+public:
+    // 현재 수행 단계
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    EEngineProgress curProgress;
+    // 수행 점수 비트마스크
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int successValue;
+
+    FEngineProgressData() : curProgress(EEngineProgress::MIC_SWITCH_ON), successValue(0) {}
+
+    // 수행 점수 추가
+    void AddSuccessValue(EEngineProgress type);
+    // 다음 수행 단계로 넘어가기
+    void SetNextProgress();
+    // 절차의 최고 수행 값 반환
+    int GetMaxSuccessValue();
+    // 수행 점수로 수행 비율 계산
+    float CalcSuccessRate(int value);
+    // enum 값을 비트마스크 용 정수로 변환
+    int ConvertProgressEnumToInt(EEngineProgress type) const;
+    // enum 값을 string 으로 변환 | 목표 UI에서 사용
+    FString ToStringProgressEnum(EEngineProgress type) const;
+    // 해당 enum 성공 실패 여부 반환 | 비트마스크
+    bool CheckProgressSuccess(EEngineProgress type) const;
+
+    // == 연산자 오버로딩
+    bool operator==(const FEngineProgressData& Other) const
+    {
+        return curProgress == Other.curProgress &&
+               successValue == Other.successValue;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FEngineProgressData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+};
+
+USTRUCT(BlueprintType)
+struct FTakeOffData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int curTakeOffCnt = 0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int maxTakeOffCnt;
+
+    FTakeOffData() {}
+    FTakeOffData(int cur, int max) : curTakeOffCnt(cur), maxTakeOffCnt(max) {}
+
+    // == 연산자 오버로딩
+    bool operator==(const FTakeOffData& Other) const
+    {
+        return curTakeOffCnt == Other.curTakeOffCnt &&
+               maxTakeOffCnt == Other.maxTakeOffCnt;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTakeOffData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+    
+};
+
+// 시동 절차 확인 용 전체 데이터
+USTRUCT(BlueprintType)
+struct FEngineProgressAllData
+{
+    GENERATED_BODY()
+public:
+    // pc 를 key로 함
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TMap<class AJ_MissionPlayerController*, FEngineProgressData> dataMap;
+
+    // 초기화
+    void InitDataMap(const TArray<AJ_MissionPlayerController *> &pcAry);
+};
+
+// 시동 절차 수행 알림 딜리게이트 선언
+DECLARE_DELEGATE_OneParam(FSuccessProgress, EEngineProgress);
+
+// 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
+USTRUCT(BlueprintType)
+struct FTacticalOrderData
+{
+    GENERATED_BODY()
+public:
+    // 생성자
+    FTacticalOrderData() {}
+
+    FTacticalOrderData(
+        ETacticalOrder orderType, FFormationFlightUIData ffData = FFormationFlightUIData(), FNeutralizeTargetUIData ntData = FNeutralizeTargetUIData()) 
+        : orderType(orderType), ffData(ffData), ntData(ntData) {}
+    
+    FTacticalOrderData(ETacticalOrder orderType, FEngineProgressData epData)
+        : orderType(orderType), epData(epData) {}
+
+    FTacticalOrderData(ETacticalOrder orderType, FTakeOffData toData)
+        : orderType(orderType), toData(toData) {}
+
+    // 명령 종류
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    ETacticalOrder orderType;
+
+    // 편대비행
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FFormationFlightUIData ffData;
+    // 지대공 무력화
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FNeutralizeTargetUIData ntData;
+    // 이동
+
+    // 시동 절차
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FEngineProgressData epData;
+    // 이륙 절차
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FTakeOffData toData;
+    
+
+    // == 연산자 오버로딩
+    bool operator==(const FTacticalOrderData& Other) const
+    {
+        return orderType == Other.orderType &&
+               ffData == Other.ffData &&
+               ntData == Other.ntData &&
+               epData == Other.epData &&
+               toData == Other.toData;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTacticalOrderData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 이용한 간단한 구현
+    }
+};
+
+
+
+
 
 #pragma endregion
 
-// @@ 테스트 용
+// solved 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
 {
@@ -518,6 +817,12 @@ public:
     static FString PilotRoleToString(EPilotRole role);
     // 전술명령 enum -> string 변환
     static FString TacticalOrderToString(ETacticalOrder type);
+    // 레벨 로컬 플레이어 컨트롤러 가져오기
+    static bool GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC);
+    // bool 값 FString 으로 변환
+    static FString ToStringBool(bool value);
+    // XXX 해당 로테이션의 전방 벡터를 타겟 벡터로 변환하기
+    // static FQuat ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1500000.f;

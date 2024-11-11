@@ -19,18 +19,15 @@ class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
 {
 	GENERATED_BODY()
 public:	
-	// Sets default values for this actor's properties
 	AJ_BaseMissionObjective();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	// 미션 액터 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class USceneComponent* rootComp;
 
@@ -40,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UArrowComponent* forWComp;
 
-	// world UI 아이콘 컴포넌트
+	// 아이콘 3d ui 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UJ_CustomWidgetComponent* iconWorldUIComp;
 	// 아이콘 UI
@@ -76,7 +73,28 @@ protected:
 	}
 	void SetSuccessPercent(float value);
 
-    protected:
+		protected:
+
+	// 모든 pc에 대한 ui 정보 배열
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TMap<class AJ_MissionPlayerController*, FTacticalOrderData> prevObjUIDataMap;
+
+
+	// 목표 완료했는지 여부
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isObjEnded = false;
+		public:
+	__declspec(property(get = GetObjEnded, put = SetObjEnded)) bool IS_OBJ_ENDED;
+	bool GetObjEnded()
+	{
+		return isObjEnded;
+	}
+	void SetObjEnded(bool value)
+	{
+		isObjEnded = value;
+	}
+		protected:
+
     public:
 	// 명령 종류
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -120,15 +138,21 @@ protected:
 	// 목표 UI 시작 | 목표 활성화 시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_StartNewObjUI();
+
+	// 개인 목표 ui에 표시할 데이터 만들기 | 상속하면 재정의
+	UFUNCTION(BlueprintCallable)
+	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController* pc = nullptr);
+
 	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_UpdateObjUI();
 	// 목표 UI 완료 | 목표 완료시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_EndObjUI();
-	// 목표 서브 조건 UI 완료 
+	// 개인 목표 서브 조건 UI 완료 
 	UFUNCTION(Server, Reliable)
-	virtual void SRPC_EndSubObjUI();
+	virtual void SRPC_EndSubObjUI(class AJ_MissionPlayerController* pc, int idx = 0, bool isSuccess = true);
+	// @@ 모든 pc에서 서브 조건 완료 처리
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
 

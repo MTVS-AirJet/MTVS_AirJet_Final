@@ -8,7 +8,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
-#include "JBS/J_ObjectiveUIComponent.h"
+#include "JBS/J_ObjectiveUIComp.h"
 #include "UObject/Class.h"
 #include <algorithm>
 
@@ -22,10 +22,6 @@ void AJ_ObjectiveFormationFlight::BeginPlay()
         allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
     });
 
-    // 활성화시 목표 UI 생성 바인드
-    objectiveActiveDel.AddUObject(this, &AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI);
-    // 수행도 갱신시 목표 UI 값 갱신 바인드
-    objSuccessUpdateDel.AddUObject(this, &AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI);
     // 목표 완료시 목표 UI 완료 바인드
     objectiveEndDel.AddUObject(this, &AJ_ObjectiveFormationFlight::SRPC_EndObjUI);
 }
@@ -190,72 +186,39 @@ bool AJ_ObjectiveFormationFlight::CheckLeftRight(AActor *actor, AActor* otherAct
     return isPass;
 }
 
-void AJ_ObjectiveFormationFlight::SRPC_EndSubObjUI()
-{
-    Super::SRPC_EndSubObjUI();
+// void AJ_ObjectiveFormationFlight::SRPC_EndSubObjUI()
+// {
+//     Super::SRPC_EndSubObjUI();
 
     
-}
+// }
 
 void AJ_ObjectiveFormationFlight::SRPC_EndObjUI()
 {
     Super::SRPC_EndObjUI();
-
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-        pc->objUIComp->CRPC_EndObjUI();
-    }
 }
 
 void AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI()
 {
     Super::SRPC_UpdateObjUI();
-
-    // 보낼 데이터
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-        // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("aaa -> %s"), *UEnum::GetValueAsString(pc->pilotRole)));
-        FFormationFlightUIData data;
-        data.checkHeight = checkHeight;
-        data.curHeight = pc->GetPawn()->GetActorLocation().Z;
-        data.pilotRole = pc->pilotRole;
-        data.checkFormation = isFormation;
-        // 진형 유지 성공 여부
-        data.isCorrectPosition = checklistValue >= static_cast<int>(EFormationChecklist::ALIGN_FORMATION);
-
-        pc->objUIComp->CRPC_UpdateFFObjUI(this->orderType, data);
-    }
 }
 
 void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
 {
     Super::SRPC_StartNewObjUI();
+}
+// 최초에 설정만
+FTacticalOrderData AJ_ObjectiveFormationFlight::SetObjUIData(AJ_MissionPlayerController* pc)
+{
+    FFormationFlightUIData data(
+        isFormation
+        , this->checkHeight
+        , pc->GetPawn()->GetActorLocation().Z
+        , pc->pilotRole
+        , checklistValue >= static_cast<int>(EFormationChecklist::ALIGN_FORMATION));
 
-    // 보낼 데이터
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-        FFormationFlightUIData data;
-        data.checkHeight = checkHeight;
-        data.curHeight = pc->GetPawn()->GetActorLocation().Z;
-        data.pilotRole = pc->pilotRole;
-        data.checkFormation = isFormation;
-
-
-        // UE_LOG(LogTemp, Warning, TEXT("11 objforflig pc 이름 : %s, 역할 : %s"), *pc->GetName(), *UJ_Utility::PilotRoleToString(pc->pilotRole));
-        pc->objUIComp->CRPC_StartFFObjUI(this->orderType, data);
-    }
+    // 보낼 목표 데이터
+    return FTacticalOrderData(this->orderType, data);
 }
 
 void AJ_ObjectiveFormationFlight::OnCheckCapsuleBeginOverlap(UPrimitiveComponent *OverlappedComponent,
@@ -272,4 +235,12 @@ void AJ_ObjectiveFormationFlight::OnCheckCapsuleBeginOverlap(UPrimitiveComponent
         // SUCCESS_PERCENT = 1.f;
         this->ObjectiveEnd(true);
     }   
+}
+
+void AJ_ObjectiveFormationFlight::ObjectiveActive()
+{
+    Super::ObjectiveActive();
+
+    // 목표 ui 신규 갱신
+    SRPC_StartNewObjUI();
 }

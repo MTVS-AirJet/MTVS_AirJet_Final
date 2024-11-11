@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ImageUtils.h"
 #include <MTVS_AirJet_Final.h>
+#include "KHS/K_CesiumTeleportBox.h"
 
 UK_StandbyWidget::UK_StandbyWidget(const FObjectInitializer& ObjectInitialize)
 {
@@ -42,7 +43,7 @@ void UK_StandbyWidget::NativeConstruct()
     //}
 
     // 1초마다 PlayerListUpdateChildren 호출
-    GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateTimer , this , &UK_StandbyWidget::PlayerListUpdateChildren , 1.0f , true);
+    //GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateTimer , this , &UK_StandbyWidget::PlayerListUpdateChildren , 1.0f , true);
 
 }
 
@@ -86,13 +87,17 @@ void UK_StandbyWidget::SetPlayerList()
     // 기존 PlayerList 초기화
     StandbyMenu_PlayerList->ClearChildren();
 
+
     // 각 플레이어의 이름과 인덱스를 사용해 K_PlayerList 항목 추가
     for ( int32 Index = 0; Index < KGameState->ConnectedPlayerNames.Num(); ++Index ) {
         FString PlayerName = KGameState->ConnectedPlayerNames[Index];
 
+        LOG_S(Warning, TEXT("Set PlayerName(%s) in PlayerList"), *PlayerName);
+
         // K_PlayerList 인스턴스 생성
         PlayerList = CreateWidget<UK_PlayerList>(this , PlayerListFactory);
-        if ( PlayerList ) {
+        if ( PlayerList ) 
+        {
             // 플레이어 이름과 인덱스 설정
             PlayerList->PlayerNickName->SetText(FText::FromString(PlayerName));  // 플레이어 이름 텍스트 설정
             PlayerList->PlayerNum->SetText(FText::AsNumber(Index));  // 인덱스를 텍스트로 설정
@@ -153,7 +158,10 @@ void UK_StandbyWidget::ClientUpdatePlayerList_Implementation(const TArray<FStrin
 //게임시작 버튼 바인딩 함수
 void UK_StandbyWidget::StartMission()
 {
-    RemoveUI();
+    PlayerController = Cast<AK_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld() , 0));
+    if(PlayerController)
+        PlayerController->SRPC_StartGame();
+    //RemoveUI();
 }
 
 //로비레벨로 돌아가는 함수
@@ -214,6 +222,14 @@ void UK_StandbyWidget::InitializeMissionData()
     {
         UE_LOG(LogTemp , Warning , TEXT("Failed to decode mission data image"));
     }
+
+    //(추가) 위경도 변화예정값 담기(Cesium GeoReference)
+    AK_CesiumTeleportBox* TelBox = Cast<AK_CesiumTeleportBox>(UGameplayStatics::GetActorOfClass(GetWorld(),AK_CesiumTeleportBox::StaticClass()));
+    if ( TelBox )
+    {
+        TelBox->SetDestinationLogitudeLatitude(MissionData.longitude, MissionData.latitude);
+    }
+
 
 }
 

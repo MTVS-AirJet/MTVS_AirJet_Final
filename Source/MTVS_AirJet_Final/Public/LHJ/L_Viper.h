@@ -7,10 +7,11 @@
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_Utility.h"
 #include "L_Viper.generated.h"
 
-UENUM()
-enum class EWeapon
+UENUM(BlueprintType)
+enum class EWeapon : uint8
 {
 	Missile = 0 ,
 	Flare ,
@@ -44,50 +45,49 @@ private:
 	UFUNCTION()
 	void PrintNetLog();
 
-private: // Component
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+public: // Component
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetRoot;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class USkeletalMeshComponent* JetMesh;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UArrowComponent* JetArrow;
 
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetFirstEngine;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetMic;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
-	class UBoxComponent* JetEngineMaster1;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineGen;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineGen2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineControl;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineControl2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetFuelStarter;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineMaster;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetEngineMaster2;
-	UPROPERTY(EditdefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetJFSHandle;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetCanopy;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
+	class UBoxComponent* JetBreakHold;
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetLeftPannel;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetRightPannel;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetJFSPannel;
 
+private:
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
-
-	UPROPERTY(EditDefaultsOnly , category="Components")
-	class UCharacterMovementComponent* movement;
+	
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
@@ -96,77 +96,72 @@ private: // Component
 	class UNiagaraComponent* JetTailVFXLeft;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
-
+public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArm;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCamera;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USpringArmComponent* JetSprintArmFPS;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
 	class UCameraComponent* JetCameraFPS;
-
+private:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class UAudioComponent* JetAudio;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* SwitchSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* LockOnSound;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class USoundBase* ImpactSound;
+	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
+	class UNiagaraSystem* DistroyVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class UArrowComponent* JetFlareArrow1;
+	class UArrowComponent* JetFlareArrow3;
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow2;
 
-private:
-	UFUNCTION()
+public:
+	UFUNCTION(BlueprintCallable)
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyMicClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineGen1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineGen2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineControlClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineControl2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyJetFuelStarterClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineMaster1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyEngineMaster2Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+	UFUNCTION(BlueprintCallable)
+	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 
-private: // Input
+public: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Viper;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Fun;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperEngine;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperLook;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonIn;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonOut;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperUp;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperDown;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperRight;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnRight;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperResetRotation;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -185,9 +180,11 @@ private: // Input
 	class UInputAction* IA_ViperRotateViewTrigger;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperVoice;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperDevelop;
+	UPROPERTY(EditDefaultsOnly , Category="Inputs")
+	class UInputAction* IA_ViperMove;
 
-	UFUNCTION()
-	void F_ViperEngine(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperLook(const struct FInputActionValue& value);
 	UFUNCTION()
@@ -199,30 +196,6 @@ private: // Input
 	UFUNCTION()
 	void F_ViperZoomOutCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
-	void F_ViperUpTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperUpCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
 	void F_ViperResetRotation(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperAccelStarted(const struct FInputActionValue& value);
@@ -232,13 +205,13 @@ private: // Input
 	void F_ViperBreakStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void F_ViperShootStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperFpsStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperTpsStarted(const struct FInputActionValue& value);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void F_ViperChangeWeaponStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperRotateTriggerStarted(const struct FInputActionValue& value);
@@ -246,46 +219,68 @@ private: // Input
 	void F_ViperRotateTriggerCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperVoiceStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperDevelopStarted(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveTrigger(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ViperMoveCompleted(const struct FInputActionValue& value);
 
-private:
+public:
+	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
+
+	// For Reset Arrow Rotate
+	
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyRightPress;
+	// UPROPERTY(BlueprintReadOnly)
+	// bool IsKeyLeftPress;
+	
+	// Rotate vector
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyUpPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsKeyDownPress;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsRightRoll;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsLeftRoll;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotateRollValue = FRotator(0 , 0 , 1.0f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
+
+	// Rotate Value
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FRotator ForceUnitRot;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
+	// // Add Rotate Value ( ForceUnitRot To NewVector )
+	// UFUNCTION(BlueprintCallable)
+	// FRotator CombineRotate(FVector NewVector);
+	
+private:
 	// For Engine Using
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsEngineOn;
 	// For Change Arrow Rotate
 	float CurrentTime;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	float ChangeTime = .3f;
-	// For Reset Arrow Rotate
-	bool IsKeyUpPress;
-	bool IsKeyDownPress;
-	bool IsKeyRightPress;
-	bool IsKeyLeftPress;
-	// Rotate vector
-	bool IsRightRoll;
-	bool IsLeftRoll;
+	float ChangeTime = .3f;		
 	// Zoom
 	bool IsZoomIn;
 	bool IsZoomOut;
-
-	UPROPERTY(EditDefaultsOnly)
-	FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	UPROPERTY(EditDefaultsOnly)
-	FRotator RotateValue = FRotator(0 , 0 , .5f);
-	// Rotate Value
-	FRotator ForceUnitRot;
-	// Add Rotate Value ( ForceUnitRot To NewVector )
-	FRotator CombineRotate(FVector NewVector);
-
-private:
+	
+public:
 	// For Check Distance
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MaxPitchValue = 85.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MinPitchValue = -85.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MaxYawValue = 80.f;
-	UPROPERTY(EditDefaultsOnly , Category="Rotate")
+	UPROPERTY(EditDefaultsOnly , Category="Rotate", BlueprintReadOnly)
 	float MinYawValue = -80.f;
 
 private:
@@ -341,11 +336,15 @@ private:
 	float TurnFlightAB = 6500.f;
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
 	float HeightOfSea = -480000; // Cesium 해수면 높이
-	UPROPERTY(EditDefaultsOnly , Category="HUD")
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
 	TSubclassOf<class UUserWidget> HUD_UI;
-
+	UPROPERTY(EditDefaultsOnly , Category="Default|UI")
+	TSubclassOf<class AL_Target> TargetUIActorFac;
+	UPROPERTY()
+	class AL_Target* TargetActor;
+	
 private:
 	UFUNCTION()
 	void IsLockOn();
@@ -358,14 +357,20 @@ private:
 	TSubclassOf<class AL_Flare> FlareFactory;
 
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack")
 	int32 RangeCnt = 14;
 
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
 	AActor* LockOnTarget = nullptr;
-	UPROPERTY(EditDefaultsOnly , Category="Attack" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
 	class USceneComponent* MissileMoveLoc;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack" , BlueprintReadWrite)
+	class USceneComponent* FlareMoveLoc3;
 
 private:
 	UFUNCTION()
@@ -373,9 +378,11 @@ private:
 
 private:
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
-	UFUNCTION(NetMulticast , Reliable)
-	void MulticastRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
+	void ServerRPCLocation(const float& MoveForce);
+	UFUNCTION(Client , Reliable)
+	void ClientRPCLocation();
+	UFUNCTION(Server , Reliable)
+	void ServerRPCRotation(FQuat newQuat);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
@@ -386,11 +393,15 @@ private:
 	void ServerRPCLockOn();
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCLockOn(AActor* target);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCLockOnSound(AL_Viper* CurrentViper);
+	UFUNCTION(Client,Reliable)
+	void ClientRPCSetLockOnUI(AL_Viper* CurrentViper, AActor* target);
+
+	void PlayLockOnSound();
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCMissile(AActor* newOwner);
-	UFUNCTION(NetMulticast , Reliable)
-	void MulticastRPCMissile(AActor* newOwner);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCFlare(AActor* newOwner);
@@ -403,6 +414,7 @@ private:
 
 private:
 	bool IsRotateTrigger = false;
+	bool IsRotateStickTrigger = false;
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -410,54 +422,75 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float ZoomOutValue = 140;
 
-private:
+public:
 	void CreateDumyComp();
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyMICMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bMIC;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineGenerMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineGenerMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineGen1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineGen2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineControlMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineControlMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineControl1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineControl2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyJFSMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bJFS;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineMasterMesh1;
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyEngineMasterMesh2;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineMaster1;
+	UPROPERTY(BlueprintReadOnly)
 	bool bEngineMaster2;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyJFSHandleMesh;
+	UPROPERTY(BlueprintReadOnly)
 	bool bJFSHandle;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
 	class UStaticMeshComponent* DummyThrottleMesh;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	bool bThrottleAccel;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	bool bThrottleBreak;
-	FVector ThrottleOffLoc = FVector(385 , -28 , 239);
-	FVector ThrottleMilLoc = FVector(395 , -28 , 239);
-	FVector ThrottleMaxLoc = FVector(405 , -28 , 239);
-	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
-	float ThrottleMoveSpeed1 = .15f;
-	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed")
-	float ThrottleMoveSpeed2 = .25f;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
+	FVector ThrottleOffLoc = FVector(515 , -35 , 255);
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
+	FVector ThrottleMilLoc = FVector(525 , -35 , 255);
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
+	FVector ThrottleMaxLoc = FVector(530 , -35 , 255);
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
+	float ThrottleMoveSpeed1 = .1f;
+	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
+	float ThrottleMoveSpeed2 = .15f;
 	void SetAccelGear();
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
+	class UStaticMeshComponent* DummyJFSBreakHold;
+	UPROPERTY(BlueprintReadOnly)
+	bool bBreakHold;
+	
+private:
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
@@ -466,8 +499,10 @@ private:
 	bool IsStart;
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
+public:
+	UPROPERTY(EditDefaultsOnly , Category="Engine", BlueprintReadOnly)
 	int32 intTriggerNum = 0; // 0=출발, 1=80%까지만 가능, 2 = 100%까지 가능
+private:
 	UFUNCTION()
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
@@ -477,21 +512,29 @@ private:
 	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
 	void PerformLineTrace();
 	void BackMoveCanopyHandle();
-	FVector CanopyOpenLoc = FVector(368 , 30 , 253);
-	FVector CanopyNormalLoc = FVector(373 , 30 , 253);
-	FVector CanopyCloseLoc = FVector(378 , 30 , 253);
-	FVector CanopyHoldLoc = FVector(383 , 30 , 253);
+	FVector CanopyOpenLoc = FVector(492 , 37 , 274);
+	FVector CanopyNormalLoc = FVector(497, 37 , 274);
+	FVector CanopyCloseLoc = FVector(502 ,37, 274);
+	FVector CanopyHoldLoc = FVector(507 , 37, 274);
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
-	float CanopyRotatePitchValue = 2;
+	float CanopyRotatePitchValue = .5f;
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
+	//=====================================
+	// 바퀴
+	UFUNCTION(Server , Reliable)
+	void ServerRPC_Wheel();
 
 public:
-	UPROPERTY(EditAnywhere , Category="Canopy" , Replicated)
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
 	float CanopyPitch = 80.f;
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
+	float FrontWheel = 0.f;
+	UPROPERTY(EditAnywhere , Category="Default|Anim" , Replicated)
+	float RearWheel = 0.f;
 
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
@@ -511,18 +554,191 @@ private:
 	bool bVoice;
 	void StartVoiceChat();
 	void StopVoiceChat();
+
 public:
 	UPROPERTY(Category="UI" , EditDefaultsOnly)
 	class UL_WaitingForStart* WaitingForStartUI;
 
-	int32 ReadyMemeberCnt = 0;
-	UFUNCTION()
-	void OnMyMemberReFresh();
+private:
+	bool bReadyTimeEndFlag;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Engine")
+	float TimeToReady = 30.f;
 
+#pragma region KHS Works
+
+	//KHS 작업부분
+public : 
+	// 플레이어리스트 업데이트 서버 요청
 	UFUNCTION(Server, Reliable)
-	void ServerRPC_SetCurrentReadyMem();
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiRPC_SetCurrentReadyMem(int32 cnt);
+	void ServerRPC_SetConnectedPlayerNames(const FString& newName);
+	// 플레이어리스트 Multicast 업데이트
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_SetConnectedPlayerNames(const TArray<FString>& newNames);
+
+
+#pragma endregion
+
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_MissileImpact(FVector ImpactLoc);
+	UFUNCTION(Client, Reliable)
+	void CRPC_AudioControl(bool bStart, int32 idx=0);
+	UFUNCTION(Client, Reliable)
+	void CRPC_PlaySwitchSound(FVector SoundLoc);
 public:
-	void ReadyAllMembers();
+	void Call_CRPC_MissileImpact(FVector ImpactLoc);
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Default|Camera")
+	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
+	UFUNCTION(Client, Reliable)
+	void CRPC_CameraShake();
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton8;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton15;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton34;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton35;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton36;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton37;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton38;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton39;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton40;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton41;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton42;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton43;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton46;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleButton47;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis4;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Throttle")
+	class UInputAction* IA_ThrottleAxis6;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton5;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton11;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickButton13;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis1;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis2;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Inputs|Stick")
+	class UInputAction* IA_StickAxis3;
+
+	UFUNCTION()
+	void F_ThrottleButton8Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton15Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton34Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton35Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton36Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton37Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton38Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton39Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton40Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton41Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton42Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton43Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton46Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleButton47Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis4(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_ThrottleAxis6(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton1Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton2Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton5Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton11Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Started(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickButton13Completed(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis1(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis2(const struct FInputActionValue& value);
+	UFUNCTION()
+	void F_StickAxis3(const struct FInputActionValue& value);
+
+	float switchLate=0.4f;
+	float DeviceThrottleCurrentValue = 0.f;
+#pragma region JBS 추가 부분
+public:
+	FSuccessProgress engineProgSuccessDel;
+#pragma endregion
+
+public:
+	// 회전 속도 설정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float RotationSpeed = 15.f;
+
+	// 최대 회전 각도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float MaxRotationAngle = 15.f;
+
+	// 현재 회전 상태를 쿼터니언으로 저장
+	UPROPERTY(Replicated)
+	FQuat QuatCurrentRotation = FQuat::Identity;
+    
+	// 목표 회전 상태를 쿼터니언으로 저장
+	UPROPERTY(Replicated)
+	FQuat QuatTargetRotation = FQuat::Identity;
+
+	float StickRollAngle = 0.f;
+	float StickPitchAngle = 0.f;
+
+public:
+	float VRStickCurrentRollValue=0.f;
+	float VRStickCurrentPitchValue=0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMaxThreshold=0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMinThreshold=-0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankRollDiv=5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankPitchDiv=6.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickkRollDiv=4.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickPitchDiv=8.f;
+	UFUNCTION(BlueprintCallable)
+	void VRSticAxis(const FVector2D& value);
 };

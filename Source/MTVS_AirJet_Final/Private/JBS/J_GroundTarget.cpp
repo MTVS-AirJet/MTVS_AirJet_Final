@@ -3,6 +3,10 @@
 
 #include "JBS/J_GroundTarget.h"
 #include "Engine/World.h"
+#include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_Utility.h"
+#include "Templates/Casts.h"
 #include "TimerManager.h"
 
 // Sets default values
@@ -49,7 +53,17 @@ void AJ_GroundTarget::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AJ_GroundTarget::GetDamage(AActor *attacker, FVector hitPoint, FVector hitNormal)
 {
-	Death();
+	// FIXME 맞은 포인트로 점수 계산 필요
+
+	// 공격한 플레이어 가져오기
+	const auto* pilot = CastChecked<AJ_BaseMissionPawn>(attacker);
+	auto* hitPC = pilot->GetController<AJ_MissionPlayerController>();
+	check(hitPC);
+
+	// 점수 보내기
+	sendScoreDel.Broadcast(hitPC, 1.0f);
+
+	// Death();
 }
 
 void AJ_GroundTarget::Death()

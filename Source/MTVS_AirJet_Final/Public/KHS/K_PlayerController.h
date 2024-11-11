@@ -9,10 +9,22 @@
 /**
  * 
  */
+//게임시작 델리게이트 -> CRPC_GameStart에 연결
+DECLARE_MULTICAST_DELEGATE(FOnStartGameforViper);
+DECLARE_MULTICAST_DELEGATE(FOnStartGameforMission);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API AK_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	//델리게이트 변수 선언
+	FOnStartGameforMission StartGameDel_Mission; //미션용
+	FOnStartGameforViper StartGameDel_Viper; //클라용
+
+	//클래스 인스턴스 참조 선언
+	class AK_GameState* KGameState;
 	
 public:
 	virtual void BeginPlay() override;
@@ -35,28 +47,43 @@ public:
 
    FString CurrentMapName; //현재 맵네임
 
-    UPROPERTY(EditDefaultsOnly , Category="Inputs")
+    UPROPERTY(EditDefaultsOnly , Category="Defaults|InputMappingContext")
 	class UInputMappingContext* IMC_Viper;
 
-   //클라이언트 UI생성 및 imc 맵핑 RPC함수
-   UFUNCTION(Client, Reliable)
-   void CRPC_SetIMCnCreateStandbyUI();
+    //클라이언트 UI생성 및 imc 맵핑 RPC함수
+    UFUNCTION(Client, Reliable)
+    void CRPC_SetIMCnCreateStandbyUI();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SRPC_StartGame(); // 전체 클라에 게임시작 선언 델리게이트 바인딩
+
+	UFUNCTION(Client, Reliable)
+	void CRPC_StartGame(); // 전체 클라에 게임시작 전달 Client RPC
+
+
+	// Common Input Widget 관련
+#pragma region Common Input, Widget 관련
     // 공통 입력 키 EnhancedInput 관련 --------------------------------------------
-    UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+    UPROPERTY(EditAnywhere, Category = "Defaults|EnhancedInput")
     class UInputMappingContext* IMC_Common; // Mapping Context 참조
 
-    UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+    UPROPERTY(EditAnywhere, Category = "Defaults|EnhancedInput")
     class UInputAction* IA_ToggleCommonWidget; // InputAction 참조
 
-    UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+    UPROPERTY(EditAnywhere, Category = "Defaults|EnhancedInput")
     class UInputAction* IA_ToggleMouseCursor; // InputAction 참조
 
+	UPROPERTY(EditAnywhere, Category= "Defaults|EnhancedInput")
+	class UInputAction* IA_ThrottleButton7;
+
+	UPROPERTY(EditAnywhere, Category= "Defaults|EnhancedInput")
+	class UInputAction* IA_RemoveUI;
+	
     bool bIsCommonWidgetVisible; // CommonWidget 가시성 상태 변수
 
     bool bIsMouseCursorShow; // 마우스커서 상태 변수
 
-    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    UPROPERTY(EditDefaultsOnly, Category = "Defaults|UI")
     TSubclassOf<class UK_CommonWidget> CommonWidgetFactory; // CommonWidget(UI) 공장
     class UK_CommonWidget* CommonWidget; // CommonWidget(UI) 참조 선언
 
@@ -66,19 +93,13 @@ public:
     // 마우스커서 토글 함수
     void ToggleMouseCursor(const struct FInputActionValue& value);
 
-
-   //클라이언트 PlayerList Update RPC함수
-   //UFUNCTION(Client, Reliable)
-   //void ClientRPC_UpdatePlayerList(const TArray<FString>& playerNames);
-
-   //클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
-   /*UFUNCTION(Server, Reliable)
-   void ServerRPC_RequestPlayerListUpdate();*/
-
+	// (임시) StandbyWidget 제거 함수
+	void RemoveStandbyWidget(const struct FInputActionValue& value);
+	
     // 클라이언트를 로비 레벨로 트래블시키는 함수
     UFUNCTION(BlueprintCallable)
     virtual void TravelToLobbyLevel();
 
-
+#pragma endregion 
 
 };

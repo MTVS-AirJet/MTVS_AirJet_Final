@@ -6,14 +6,16 @@
 #include "KHS/K_GameInstance.h"
 #include "KHS/K_CommonWidget.h"
 #include "KHS/K_WidgetBase.h"
+#include "KHS/K_GameState.h"
+#include "KHS/K_ServerWidget.h"
 #include "LHJ/L_Viper.h"
-#include "Kismet/GameplayStatics.h"
 #include <MTVS_AirJet_Final.h>
+
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
-#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "GameFramework/PlayerController.h"
-#include "KHS/K_ServerWidget.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 void AK_PlayerController::BeginPlay()
 {
@@ -26,6 +28,8 @@ void AK_PlayerController::BeginPlay()
 		if (CommonWidget)
 		{
 			CommonWidget->SetInterface(Cast<IK_SessionInterface>(GetGameInstance()));
+			CommonWidget->AddToViewport(1);
+			CommonWidget->SetVisibility(ESlateVisibility::Hidden);
 			bIsCommonWidgetVisible = false; //평소엔 안보이게 처리
 		}
 	}
@@ -35,7 +39,7 @@ void AK_PlayerController::BeginPlay()
 		GetLocalPlayer());
 	if (Subsystem)
 	{
-		Subsystem->AddMappingContext(IMC_Common , 1); //Zorder를 1번으로 설정.
+		Subsystem->AddMappingContext(IMC_Common , 0); //Zorder를 1번으로 설정.
 	}
 
 	//마우스커서는 평소엔 안보이게 처리
@@ -79,8 +83,57 @@ void AK_PlayerController::SetupInputComponent()
 		                          &AK_PlayerController::ToggleCommonWidget);
 		EnhancedInput->BindAction(IA_ToggleMouseCursor , ETriggerEvent::Started , this ,
 		                          &AK_PlayerController::ToggleMouseCursor);
+		EnhancedInput->BindAction(IA_ThrottleButton7, ETriggerEvent::Triggered, this, &AK_PlayerController::ToggleCommonWidget);
+		EnhancedInput->BindAction(IA_RemoveUI, ETriggerEvent::Triggered, this, &AK_PlayerController::RemoveStandbyWidget);
 	}
 }
+
+// 전체 클라에 게임시작 선언 델리게이트 바인딩
+void AK_PlayerController::SRPC_StartGame_Implementation()
+{
+	//Host PC가 아니면 Return
+	auto pc = Cast<AK_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld() , 0));
+	if(pc != this)
+		return;
+	
+	LOG_S(Warning , TEXT("Start Game SRPC is Called"));
+	//월드에 존재하는 PlayerController배열 받기
+	KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
+	TArray<AK_PlayerController*> allPC;
+	Algo::Transform(KGameState->PlayerArray, allPC, [](TObjectPtr<APlayerState> PS)
+	{
+		check(PS);
+		auto* tempPC = CastChecked<AK_PlayerController>(PS->GetPlayerController());
+		check(tempPC);
+		return tempPC; //tempPC를 차곡차곡 allPC에 넣고
+	});
+
+	//PC배열에 전체 CRPC작동 명령
+	for(auto localPC : allPC)
+	{
+		localPC->CRPC_StartGame();
+	}
+	//Mission용 Del 실행
+	StartGameDel_Mission.Broadcast();
+}
+
+bool AK_PlayerController::SRPC_StartGame_Validate()
+{
+	return true;
+}
+
+// 전체 클라에 게임시작 전달 Client RPC
+void AK_PlayerController::CRPC_StartGame_Implementation()
+{
+	if(StandbyUI)
+	{
+		StandbyUI->RemoveUI();
+	}
+	StartGameDel_Viper.Broadcast();
+}
+
+
+
 
 //Common Widget 토글 함수
 void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
@@ -95,17 +148,17 @@ void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
 	//플래그에 따라 UI상태 제어
 	if (bIsCommonWidgetVisible)
 	{
-		if (CommonWidget->IsInViewport())
-			CommonWidget->RemoveFromParent();
-
+		// if (CommonWidget->IsInViewport())
+		// 	CommonWidget->RemoveFromParent();
+		CommonWidget->SetVisibility(ESlateVisibility::Hidden);
 		FInputModeGameOnly InputGameOnly;
 		SetInputMode(InputGameOnly);
 		bIsCommonWidgetVisible = false;
 	}
 	else
 	{
-		CommonWidget->AddToViewport(1);
-
+		//CommonWidget->AddToViewport(1);
+		CommonWidget->SetVisibility(ESlateVisibility::Visible);
 		FInputModeGameAndUI InputGameAndUI;
 		SetInputMode(InputGameAndUI);
 		bIsCommonWidgetVisible = true;
@@ -147,6 +200,16 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 			PlayerController->bShowMouseCursor = true; // 마우스 커서를 보이게
 			bIsMouseCursorShow = true;
 		}
+	}
+}
+
+// (임시) StandbyWidget 제거 함수
+void AK_PlayerController::RemoveStandbyWidget(const struct FInputActionValue& value)
+{
+	GEngine->AddOnScreenDebugMessage(-1 , 1.0f , FColor::Red , TEXT("Remove UI"));
+	if (StandbyUI)
+	{
+		StandbyUI->RemoveUI();
 	}
 }
 
@@ -197,24 +260,10 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 	LOG_S(Warning , TEXT("Is Not Local Controller"));
 }
 
-//void AK_PlayerController::ClientRPC_UpdatePlayerList_Implementation(const TArray<FString>& playerNames)
-//{
-//	
-//}
-
-
-////클라이언트가 UI업로드 후 서버에 업데이트 수신RPC 함수
-//void AK_PlayerController::ServerRPC_RequestPlayerListUpdate_Implementation()
-//{
-//	if ( UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()) )
-//	{
-//		GI->SendPlayerListToClient(this);
-//	}
-//}
-
-
+// 클라이언트를 로비 레벨로 트래블시키는 함수
 void AK_PlayerController::TravelToLobbyLevel()
 {
 	// 로비 맵으로 클라이언트를 이동
-	ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
+	ClientTravel("/Game/Maps/SSM/MAP_Lobby" , ETravelType::TRAVEL_Absolute);
+	//ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
 }

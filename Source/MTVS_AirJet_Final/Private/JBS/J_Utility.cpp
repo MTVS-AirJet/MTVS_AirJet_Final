@@ -7,9 +7,12 @@
 #include "KHS/K_GameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
+#include "Math/UnrealMathUtility.h"
+#include "UObject/Object.h"
 #include <JBS/J_GameInstance.h>
 #include <KHS/K_GameInstance.h>
 #include <JBS/J_MissionGamemode.h>
+#include "JBS/J_MissionPlayerController.h"
 #include <Engine/World.h>
 
 // 전역 함수
@@ -137,7 +140,18 @@ FString UJ_Utility::TacticalOrderToString(ETacticalOrder type)
     return result;
 }
 
+FString UJ_Utility::ToStringBool(bool value)
+{
+    return value ? TEXT("TRUE") : TEXT("FALSE");
+}
 
+// FQuat UJ_Utility::ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector)
+// {
+//     FVector forwardVector = rotation.GetForwardVector(); // 앞 방향 벡터
+
+//     // 타겟 벡터를 앞 방향 벡터로 변환하기 위한 회전 각도 계산
+//     return FQuat::FindBetweenVectors(forwardVector ,targetVector );
+// }
 
 // === 구조체 함수 구현
 
@@ -177,6 +191,174 @@ FTransform FJVector2D::GetTransform() const
     FTransform tr = FTransform(rot,vec,  FVector::OneVector);
 
     return tr;
+}
+
+bool UJ_Utility::GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC)
+{
+    // 로컬 플레이어 찾기
+    outPC = Cast<AJ_MissionPlayerController>(world->GetFirstPlayerController());
+
+    // 유효성 체크
+    return IsValid(outPC);
+}
+
+// 엔진 수행 맵 초기화
+void FEngineProgressAllData::InitDataMap(const TArray<AJ_MissionPlayerController *> &pcAry)
+{
+    for(auto* pc : pcAry)
+    {
+        dataMap.Add(pc, FEngineProgressData());
+    }
+}
+
+int FEngineProgressData::ConvertProgressEnumToInt(EEngineProgress type) const
+{
+    // uint8 범위 넘어가서 그대로 사용 불가 변환 해야함 | 2의 type -1 제곱
+    int pow = static_cast<int>(type) - 1;
+    int value = static_cast<int>(FMath::Pow(2.0, pow));
+
+    return value;
+}
+
+void FEngineProgressData::AddSuccessValue(EEngineProgress type)
+{
+    this->successValue += ConvertProgressEnumToInt(type);
+}
+
+void FEngineProgressData::SetNextProgress()
+{
+    switch(this->curProgress)
+    {
+    case EEngineProgress::None:
+        break;
+    case EEngineProgress::MIC_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_GEN_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_GEN_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_CONTROL_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
+        this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
+        break;
+    case EEngineProgress::JFS_STARTER_SWITCH_ON:
+        this->curProgress = EEngineProgress::ENGINE_MASTER_SWITCH_ON;
+        break;
+    case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+        this->curProgress = EEngineProgress::JFS_HANDLE_PULL;
+        break;
+    case EEngineProgress::JFS_HANDLE_PULL:
+        this->curProgress = EEngineProgress::ENGINE_THROTTLE_IDLE;
+        break;
+    case EEngineProgress::ENGINE_THROTTLE_IDLE:
+        this->curProgress = EEngineProgress::CLOSE_CANOPY;
+        break;
+    case EEngineProgress::CLOSE_CANOPY:
+        this->curProgress = EEngineProgress::STANDBY_OTHER_PLAYER;
+        break;
+    case EEngineProgress::STANDBY_OTHER_PLAYER:
+        this->curProgress = EEngineProgress::RELEASE_SIDE_BREAK;
+        break;
+    case EEngineProgress::RELEASE_SIDE_BREAK:
+        this->curProgress = EEngineProgress::TAKE_OFF;
+        break;
+    }
+}
+
+float FEngineProgressData::CalcSuccessRate(int value)
+{
+    int cnt = 0;
+    int enumCnt = 0;
+
+    for(int i = static_cast<int>(EEngineProgress::MIC_SWITCH_ON); i <= static_cast<int>(EEngineProgress::RELEASE_SIDE_BREAK); i++)
+    {
+        // @@ 어떤 거 틀렸는지 반환 할 수 있게 고도화 가능
+        // 수행 절차 하나하나 성공 확인
+        bool isSuccess = value & i;
+        if(isSuccess)
+            cnt++;
+
+        enumCnt++;
+    }
+    // 비율 반환
+    return (float) cnt / enumCnt;
+}
+
+FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
+{
+    FString str = "";
+
+    switch (type) {
+    case EEngineProgress::None:
+        str = TEXT("미설정");
+        break;
+    case EEngineProgress::MIC_SWITCH_ON:
+        str = TEXT("통신 시스템 활성화");
+        break;
+    case EEngineProgress::ENGINE_GEN_SWITCH_ON:
+        str = TEXT("엔진 발전기 준비 완료");
+        break;
+    case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
+        str = TEXT("엔진 제어 장치 가동");
+        break;
+    case EEngineProgress::JFS_STARTER_SWITCH_ON:
+        str = TEXT("JFS 스타트 준비");
+        break;
+    case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+        str = TEXT("엔진 마스터 켜기");
+        break;
+    case EEngineProgress::JFS_HANDLE_PULL:
+        str = TEXT("JFS 작동 시작");
+        break;
+    case EEngineProgress::ENGINE_THROTTLE_IDLE:
+        str = TEXT("엔진 공회전 상태 유지");
+        break;
+    case EEngineProgress::CLOSE_CANOPY:
+        str = TEXT("조종석 밀폐");
+        break;
+    case EEngineProgress::STANDBY_OTHER_PLAYER:
+        str = TEXT("@@다른 파일럿 대기");
+        break;
+    case EEngineProgress::RELEASE_SIDE_BREAK:
+        str = TEXT("@@사이드 브레이드 해제");
+        break;
+    }
+
+    return str;
+}
+
+FString FRichString::FormatString(const FString &str, ETextStyle type) const
+{
+    FString result = "";
+
+    switch(type)
+    {
+    case ETextStyle::DEFAULT:
+        result = FString::Printf(TEXT("<Default>%s</>"), *str);
+        break;
+    case ETextStyle::SUCCESS:
+        result = FString::Printf(TEXT("<Success>%s</>"), *str);
+        break;
+    case ETextStyle::FAIL:
+        result = FString::Printf(TEXT("<Fail>%s</>"), *str);
+        break;
+    case ETextStyle::OBJDETAIL:
+        result = FString::Printf(TEXT("<ObjDetail>%s</>"), *str);
+        break;
+    }
+
+    return result;
+}
+
+FString FRichString::GetFormatString() const
+{
+    return FormatString(value, styleType);
+}
+
+bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
+{
+    int checkType = ConvertProgressEnumToInt(type);
+
+    return successValue & checkType;
 }
 
 

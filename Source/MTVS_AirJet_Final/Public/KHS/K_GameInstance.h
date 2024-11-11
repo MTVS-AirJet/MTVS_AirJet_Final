@@ -56,11 +56,12 @@ public:
 
 	FMissionDataRes MissionData; //미션관리자가 사용할 미션데이터 구조체
 
-	UPROPERTY(BlueprintReadOnly , Category = "Session" , ReplicatedUsing=OnConnectedPlayerNames)
+	//UPROPERTY(BlueprintReadOnly , Category = "Session" , ReplicatedUsing=OnConnectedPlayerNames)
+	
 	TArray<FString> ConnectedPlayerNames; // 세션에 접속한 플레이어 이름 배열
 
-	UFUNCTION()
-	void OnConnectedPlayerNames();
+	//UFUNCTION()
+	//void OnConnectedPlayerNames();
 	//===============================================================
 	// Functions
 	//===============================================================
@@ -197,7 +198,8 @@ public:
 	//유저ID 저장용도
 	void SetUserId(const FString& NewUserId);
 	FString GetUserId() const;
-	FString UserId;
+
+	FString UserId = "Guest"; //로그인 Response Data에서 UserID기억(기본은 Guest)
 	//=============================================================
 
 	// 전송 타입 맵
@@ -305,6 +307,11 @@ public:
 
 #pragma endregion
 
+
+
+#pragma region 데이터 동기화 처리 (정리전)
+
+
 public:
 	FString MyName;
 	FString JoinRoomName;
@@ -314,4 +321,10 @@ public:
 	int32 ReadyMemeberCnt = 0;
 	UFUNCTION()
 	void OnMyMemberReFresh();
+
+
+
+
+#pragma endregion
+
 };

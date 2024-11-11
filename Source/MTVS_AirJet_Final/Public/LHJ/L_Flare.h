@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "L_Flare.generated.h"
 
@@ -24,17 +25,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Components")
 	class UStaticMeshComponent* FlareMesh;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Components")
 	class UBoxComponent* FlareBoxComp;
-	UPROPERTY(EditDefaultsOnly , Category="Speed")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
 	float FlareSpeed = 1000.f;
 
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX" , BlueprintReadWrite)
 	class UNiagaraComponent* FlareEffect;
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX" , BlueprintReadWrite)
 	class USplineComponent* FlareSpline;
 
 private:
@@ -43,22 +44,39 @@ private:
 	                         UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
 	                         const FHitResult& SweepResult);
 
-	UFUNCTION(Server , Reliable)
-	void ServerRPCFlare();
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
+	class UCurveFloat* FlareCurve;
+	UPROPERTY()
+	FTimeline FlareTimeline;
+	UFUNCTION()
+	void FlareUpdate(float Alpha);
+	UFUNCTION()
+	void FlareFinished();
+
+	FVector BezierFlare(FVector P1 , FVector P2 , FVector P3 , FVector P4 , float Alpha);
+
+	TArray<FVector> MoveLoc;
+	
+	bool bPursuit;
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float MaxLifeTime = 3.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float MinLifeTime = 50.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float MaxScaleSprite = 1200.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float MinScaleSprite = 300.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float SpawnRadius = 0.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	float SpawnRate = 50.f;
-	UPROPERTY(EditDefaultsOnly , Category="Effect")
+	UPROPERTY(EditDefaultsOnly , Category="Default|VFX")
 	FLinearColor LColor = FLinearColor(0.147027 , 0.147027 , 0.147027 , 1);
+
+private:
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class UAudioComponent* AudioComponent;
 };

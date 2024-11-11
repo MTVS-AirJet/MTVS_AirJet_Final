@@ -27,7 +27,18 @@ void AJ_MissionGamemode::BeginPlay()
 {
     Super::BeginPlay();
 
-    
+    // FIXME 호스트 시작 버튼에 딜리게이트 바인드 해야함
+    // 임시로 키고 1.5 뒤에 되도록
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+    {
+        // 호스트 pc 가져와서 시작 함수 바인드
+        AJ_MissionPlayerController* outPC;
+        UJ_Utility::GetLocalPlayerController(GetWorld(), outPC);
+        
+        outPC->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
+    }, .1f, false);
 }
 
 // 사실상 beginplay
@@ -35,6 +46,7 @@ void AJ_MissionGamemode::StartMission()
 {
     if(enableUsingDummyMissionData)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("현재 디버그용 더미 미션 데이터 사용 중"));
         curMissionData = dummyMissionData;
     }
     else {
@@ -46,6 +58,9 @@ void AJ_MissionGamemode::StartMission()
 
     // 목표 매니저 컴포넌트 설정
     check(objectiveManagerComp);
+    // 시동 및 이륙 목표 추가
+    objectiveManagerComp->InitDefaultObj();
+    // 전술 명령 목표 추가
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
 
     // XXX 미션 맵 로드
@@ -64,6 +79,12 @@ void AJ_MissionGamemode::StartMission()
         CacheCesiumActors();
     }, .1f, false);
     
+}
+
+void AJ_MissionGamemode::StartMissionLevel()
+{
+    // 시동 목표 시작
+    objectiveManagerComp->StartDefualtObj();
 }
 
 void AJ_MissionGamemode::Tick(float DeltaSeconds)
@@ -294,47 +315,37 @@ void AJ_MissionGamemode::CacheCesiumActors()
 }
 
 // 이륙 체크 및 미션 시작 단
-bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc)
+bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess)
 {
     // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("이륙 추가 : %s"), *pc->GetName()));
-
+    // 이륙 배열에 추가
     flightedPCAry.Add(pc);
 
-    // 해당 pc에게 로딩 UI 추가
-    pc->CRPC_AddLoadingUI();
-        // pc->SRPC_RemoveLoadingUI();
+    // 이륙 딜리게이트 실행
+    onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
+
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this,pc]() mutable
+    {
+        //타이머에서 할 거
+        // 해당 pc에게 로딩 UI 추가
+        pc->CRPC_AddLoadingUI();    
+    }, 1.5f, false);
+
+    
 
     // 배열 크기가 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
-    bool isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
+    isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
     if(isTPReady)
-    {
-        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
+        StartTacticalOrder();
 
-        FTimerHandle timerHandle;
-        GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle, [this]() mutable
-        {
-            //타이머에서 할 거
-            TeleportAllStartPoint(startPointActor);
-
-            FTimerHandle timerHandle;
-            GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle, [this]() mutable
-            {
-                //타이머에서 할 거
-                // 미션 시작
-                // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음
-                this->objectiveManagerComp->ActiveNextObjective();
-                
-            }, 1.5, false);
-        }, 1.5f, false);
-
-
-        
-    }
+    
 
     return isTPReady;
 }
+
+
 
 void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_MissionPlayerController *missionPC)
 {
@@ -346,4 +357,34 @@ FMissionDataRes AJ_MissionGamemode::LoadMissionData()
     auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
     
     return gi->MissionData;
+}
+
+
+
+void AJ_MissionGamemode::StartTacticalOrder()
+{
+    // solved 기본 목표 종료 처리
+    startTODel.Broadcast(true);
+
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
+
+    // @@ 임시로 조금 늦게 텔포
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+    {
+        //타이머에서 할 거
+        TeleportAllStartPoint(startPointActor);
+
+        FTimerHandle timerHandle;
+        GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+        {
+            //타이머에서 할 거
+            // 미션 시작
+            // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음 | 나중엔 로딩 뽕맛 보여줘야지
+            this->objectiveManagerComp->ActiveNextObjective();
+            
+        }, 1.5, false);
+    }, 1.5f, false);
 }

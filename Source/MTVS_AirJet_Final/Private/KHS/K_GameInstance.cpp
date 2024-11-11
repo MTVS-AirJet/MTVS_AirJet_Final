@@ -39,17 +39,17 @@ const static FName SERVER_DATA_SETTINGS_KEY = TEXT("ServerData");
 
 void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps)
 {
-	DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
+	//DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
 }
 
-void UK_GameInstance::OnConnectedPlayerNames()
-{
-	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
-	if (KGameState)
-	{
-		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
-	}
-}
+//void UK_GameInstance::OnConnectedPlayerNames()
+//{
+//	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
+//	if (KGameState)
+//	{
+//		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
+//	}
+//}
 
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
@@ -454,7 +454,8 @@ void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
 		}
 
 		// PlayerController를 통해 LobbyMap으로 이동시킨다.
-		pc->ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
+		pc->ClientTravel("/Game/Maps/SSM/MAP_Lobby" , ETravelType::TRAVEL_Absolute);
+		//pc->ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
 	}
 
 	else

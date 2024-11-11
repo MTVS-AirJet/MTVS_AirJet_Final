@@ -3,6 +3,7 @@
 
 #include "LHJ/L_HUDWidget.h"
 
+#include "MTVS_AirJet_Final.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -16,7 +17,6 @@ void UL_HUDWidget::NativeConstruct()
 void UL_HUDWidget::UpdateHeightBar(float NewHeight)
 {
 	float newPercent = NewHeight / 1500;
-	//LOG_SCREEN("Current Feet Percent : %f" , newPercent);
 	prg_Height->SetPercent(newPercent);
 	UpdateHeightText(NewHeight);
 
@@ -34,7 +34,8 @@ void UL_HUDWidget::UpdateHeightBar(float NewHeight)
 
 void UL_HUDWidget::UpdateHeightText(int32 NewHeight)
 {
-	txtHeight->SetText(FText::AsNumber(NewHeight));
+	FString h = FString::FormatAsNumber(NewHeight);
+	txtHeight->SetText(FText::FromString(h));
 }
 
 void UL_HUDWidget::UpdateSpeedText(float NewSpeed)

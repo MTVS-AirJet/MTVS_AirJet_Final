@@ -25,20 +25,23 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="Components" )
+	UPROPERTY(EditDefaultsOnly , Category="Defalut|Components" )
 	class UStaticMeshComponent* MissileMesh;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Defalut|Components")
 	class UBoxComponent* MissileBoxComp;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Defalut|Components")
 	class UNiagaraComponent* EngineVFX;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Defalut|Components")
 	class UNiagaraComponent* SmokeVFX;
 
-	UPROPERTY(EditDefaultsOnly , category="VFX")
-	class UNiagaraSystem* DistroyVFX;
+	
+
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class UAudioComponent* AudioComponent;
+	
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="Missile")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
 	class UCurveFloat* MissileCurve;
 	UPROPERTY()
 	FTimeline MissileTimeline;
@@ -50,14 +53,14 @@ private:
 	FVector BezierMissile(FVector P1 , FVector P2 , FVector P3 , FVector P4 , float Alpha);
 
 private:
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
 	AActor* Target = nullptr;
 
 	TArray<FVector> MoveLoc;
 
 	bool bPursuit;
 
-	UPROPERTY(EditDefaultsOnly , Category="Attack")
+	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
 	float MoveSpeed = 500.f;
 
 private:
@@ -68,6 +71,4 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCDamage(AActor* HitActor);
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastRPCDamage(AActor* HitActor);
 };
