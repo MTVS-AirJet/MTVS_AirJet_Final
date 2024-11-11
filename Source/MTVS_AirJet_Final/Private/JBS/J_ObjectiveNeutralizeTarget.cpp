@@ -325,6 +325,7 @@ void AJ_ObjectiveNeutralizeTarget::UpdateTargetScore(class AJ_MissionPlayerContr
         if(targetScoreMap[onePC] == 0.f) 
             return;
     }
+    // @@ 수행도 산정
     // 모두 타격했으니 종료
     ObjectiveEnd(true);
 }

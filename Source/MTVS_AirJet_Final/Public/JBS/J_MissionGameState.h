@@ -13,6 +13,8 @@ UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionGameState : public AK_GameState
 {
 	GENERATED_BODY()
+public:
+    AJ_MissionGameState();
 protected:
 
 
@@ -40,4 +42,6 @@ public:
     virtual TArray<class APawn *> GetAllPlayerPawn();
 
     void RemoveAllLoadingUI();
+
+    virtual void Tick(float deltaTime) override;
 };
