@@ -1009,6 +1009,8 @@ void AL_Viper::BeginPlay()
 			} , 0.1f , false);
 		}
 	}
+
+	QuatCurrentRotation = GetActorRotation().Quaternion();
 }
 
 void AL_Viper::Tick(float DeltaTime)
