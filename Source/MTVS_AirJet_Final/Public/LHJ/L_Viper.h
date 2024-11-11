@@ -516,7 +516,7 @@ private:
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
-	float CanopyRotatePitchValue = .5f;
+	float CanopyRotatePitchValue = .3f;
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
