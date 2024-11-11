@@ -174,28 +174,20 @@ struct FMapInfoResponse
     FString mapName; // 맵 이름
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members | Image")
     FString mapImage; // 썸네일 이미지 바이트 배열
-    //TArray<uint8> mapImage;
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    //int pinNo; // 핀 Num
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    //int missionX; // 핀 X값
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    //int missionY; // 핀 Y값
-    //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
-    //int commandNo; // 지휘명령 Num
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
     int startPointX; // 시작점 X값
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
     int startPointY; // 시작점 Y값
     // 목표 데이터 배열
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    TArray<FMissionObject> missionData; //미션정보 구조체 배열
+    TArray<FMissionObject> mission; //미션정보 구조체 배열
 
 
     FString ResponseToString() const
     {
         FString missionList = TEXT("[");
-        for ( auto m : missionData )
+        for ( auto m : mission )
         {
             FString temp = FString::Printf(TEXT("{\n    %s\n    },") , *m.ToString());
             missionList.Append(temp);
@@ -220,7 +212,7 @@ struct FMapInfoResponse
     FString ResponseToServerData() const
     {
         FString missionList = TEXT("[");
-        for ( auto m : missionData )
+        for ( auto m : mission )
         {
             FString temp = FString::Printf(TEXT("{\n    %s\n    },") , *m.ToString());
             missionList.Append(temp);

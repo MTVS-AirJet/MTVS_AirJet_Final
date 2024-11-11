@@ -3,6 +3,7 @@
 
 #include "JBS/J_MissionGameState.h"
 #include "Containers/Array.h"
+#include "Containers/UnrealString.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "JBS/J_BaseMissionPawn.h"
@@ -11,6 +12,11 @@
 #include "KHS/K_StreamingUI.h"
 #include "Templates/Casts.h"
 #include "UObject/ObjectPtr.h"
+
+AJ_MissionGameState::AJ_MissionGameState()
+{
+    PrimaryActorTick.bCanEverTick = true;
+}
 
 void AJ_MissionGameState::OnRep_StreamingID()
 {
@@ -39,10 +45,14 @@ void AJ_MissionGameState::RemoveStreamUserId(const FString &userId)
 
 TArray<AJ_MissionPlayerController *> AJ_MissionGameState::GetAllPlayerController()
 {
+    if(!HasAuthority()) return TArray<AJ_MissionPlayerController*>();
+
     TArray<AJ_MissionPlayerController*> allPC;
     Algo::Transform(this->PlayerArray, allPC, [](TObjectPtr<APlayerState> temp){
         check(temp);
-        auto* tempPC = CastChecked<AJ_MissionPlayerController>(temp->GetPlayerController());
+        auto* tempPC0 = temp->GetPlayerController();
+        check(tempPC0);
+        auto* tempPC = CastChecked<AJ_MissionPlayerController>(tempPC0);
         check(tempPC);
 
         return tempPC;
@@ -53,6 +63,8 @@ TArray<AJ_MissionPlayerController *> AJ_MissionGameState::GetAllPlayerController
 
 TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
 {
+    if(!HasAuthority()) return TArray<APawn*>();
+
     // 플레이어 스테이트->PS->폰 으로 가져오기
     // 모든 pc
     auto allPC = GetAllPlayerController();
@@ -71,9 +83,30 @@ TArray<APawn *> AJ_MissionGameState::GetAllPlayerPawn()
 
 void AJ_MissionGameState::RemoveAllLoadingUI()
 {
+    if(!HasAuthority()) return;
+
     auto allPC = GetAllPlayerController();
     for(auto* pc : allPC)
     {
         pc->CRPC_RemoveLoadingUI();
     }
+}
+
+void AJ_MissionGameState::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
+
+    // if(!HasAuthority()) return;
+
+    // TArray<AJ_MissionPlayerController*> allPC;
+    // Algo::Transform(this->PlayerArray, allPC, [](TObjectPtr<APlayerState> temp){
+    //     auto* tempPC = Cast<AJ_MissionPlayerController>(temp->GetPlayerController());
+    //     return tempPC;
+    // });
+
+    // FString a1 = FString::Printf(TEXT("pc1 : %s"), allPC[0] ? TEXT("있어") : TEXT("없어"));
+    
+    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("%s 권한 : %s")
+    // , *a1
+    // , *UJ_Utility::ToStringBool(HasAuthority())));
 }

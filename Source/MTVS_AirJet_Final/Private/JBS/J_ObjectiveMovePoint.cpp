@@ -141,7 +141,7 @@ void AJ_ObjectiveMovePoint::Tick(float deltaTime)
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d"), checkCapsuleComp->IsActive()));
     
     // 활성화 중 실패 체크
-    if(IS_OBJECTIVE_ACTIVE)
+    if(IS_OBJECTIVE_ACTIVE || HasAuthority())
     {
         if(CheckFail(baseDirection))
         {

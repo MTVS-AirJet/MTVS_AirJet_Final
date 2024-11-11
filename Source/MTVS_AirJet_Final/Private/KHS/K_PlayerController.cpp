@@ -8,6 +8,7 @@
 #include "KHS/K_WidgetBase.h"
 #include "KHS/K_GameState.h"
 #include "KHS/K_ServerWidget.h"
+#include "KHS/K_LobbyWidget.h"
 #include "LHJ/L_Viper.h"
 #include <MTVS_AirJet_Final.h>
 
@@ -44,6 +45,19 @@ void AK_PlayerController::BeginPlay()
 
 	//마우스커서는 평소엔 안보이게 처리
 	bIsMouseCursorShow = false;
+
+	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if (CurrentMapName == FString::Printf(TEXT("MAP_Lobby")))
+	{
+		if (LobbyUIFactory)
+		{
+			LobbyUI = CreateWidget<UK_LobbyWidget>(this , LobbyUIFactory);
+			if (LobbyUI)
+			{
+				LobbyUI->AddToViewport(0);
+			}
+		}
+	}
 }
 
 void AK_PlayerController::OnPossess(APawn* InPawn)
@@ -266,4 +280,26 @@ void AK_PlayerController::TravelToLobbyLevel()
 	// 로비 맵으로 클라이언트를 이동
 	ClientTravel("/Game/Maps/SSM/MAP_Lobby" , ETravelType::TRAVEL_Absolute);
 	//ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
+}
+//VR모드 전환 시 델리게이트 발동 함수
+void AK_PlayerController::ToggleVRMode()
+{
+	//VR전환용 Del실행
+	StartVRModeDel.Broadcast();
+
+	//VRMode로 전환했을때
+	if(true == bVRModeEnabled)
+	{
+		
+
+
+		
+		bVRModeEnabled = false;
+	}
+	//데스크탑모드로 전환했을때
+	else
+	{
+		//이후에 구현 예정
+		bVRModeEnabled = true;
+	}
 }

@@ -100,8 +100,9 @@ void UK_StandbyWidget::SetPlayerList()
         {
             // 플레이어 이름과 인덱스 설정
             PlayerList->PlayerNickName->SetText(FText::FromString(PlayerName));  // 플레이어 이름 텍스트 설정
-            PlayerList->PlayerNum->SetText(FText::AsNumber(Index));  // 인덱스를 텍스트로 설정
-            PlayerList->Setup(this , Index);  // 상위 위젯과 인덱스를 전달하여 초기화
+            int tempidx = Index + 1;
+            PlayerList->PlayerNum->SetText(FText::AsNumber(tempidx));  // 인덱스를 텍스트로 설정
+            PlayerList->Setup(this , tempidx);  // 상위 위젯과 인덱스를 전달하여 초기화
 
             // StandbyMenu_PlayerList에 추가
             StandbyMenu_PlayerList->AddChild(PlayerList);
@@ -147,8 +148,9 @@ void UK_StandbyWidget::ClientUpdatePlayerList_Implementation(const TArray<FStrin
         if ( PlayerList )
         {
             PlayerList->PlayerNickName->SetText(FText::FromString(PlayerNames[Index]));  // 플레이어 이름 설정
-            PlayerList->PlayerNum->SetText(FText::AsNumber(Index));  // 인덱스 설정
-            PlayerList->Setup(this , Index);
+            int tempidx = Index + 1;
+            PlayerList->PlayerNum->SetText(FText::AsNumber(tempidx));  // 인덱스 설정
+            PlayerList->Setup(this , tempidx);
 
             StandbyMenu_PlayerList->AddChild(PlayerList);
         }
@@ -197,13 +199,18 @@ void UK_StandbyWidget::InitializeMissionData()
     StandbyMenu_txt_Longitude->SetText(FText::AsNumber(MissionData.longitude));
 
     // 미션 목록을 설정
-    FString MissionList;
-    for ( const auto& Mission : MissionData.mission )
+    FString MissionList = TEXT("");
+    for (auto Mission : MissionData.mission )
     {
-        MissionList.Append(FString::Printf(TEXT("핀 번호: %d, 명령: %d\n") , Mission.pinNo , Mission.commandNo));
+        FString pinNo = FString::FromInt(Mission.pinNo + 1);
+        FString commandNo;
+        if(Mission.commandNo == 1){  commandNo = TEXT("편대 비행"); }
+        else if(Mission.commandNo == 2) { commandNo = TEXT("지상 타격"); }      
+                
+        MissionList.Append(FString::Printf(TEXT("No.%s - %s\n") , *pinNo , *commandNo));
     }
     StandbyMenu_txt_CommandList->SetText(FText::FromString(MissionList));
-
+    
     // 썸네일 이미지 설정
     TArray<uint8> MapImageData;
     if ( FBase64::Decode(MissionData.mapImage , MapImageData) )
@@ -265,7 +272,7 @@ void UK_StandbyWidget::ResMapInfo(const FMapInfoResponse& resData)
     md.mapImage = resData.mapImage;
     md.startPoint.x = resData.startPointX;
     md.startPoint.y = resData.startPointY;
-    md.mission = resData.missionData;
+    md.mission = resData.mission;
 
     GameInstance->InitializeMission(md);
     InitializeMissionData();

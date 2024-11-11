@@ -12,6 +12,8 @@
 //게임시작 델리게이트 -> CRPC_GameStart에 연결
 DECLARE_MULTICAST_DELEGATE(FOnStartGameforViper);
 DECLARE_MULTICAST_DELEGATE(FOnStartGameforMission);
+//VR 전환 델리게이트
+DECLARE_MULTICAST_DELEGATE(FVRTransition);
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AK_PlayerController : public APlayerController
@@ -22,7 +24,8 @@ public:
 	//델리게이트 변수 선언
 	FOnStartGameforMission StartGameDel_Mission; //미션용
 	FOnStartGameforViper StartGameDel_Viper; //클라용
-
+	FVRTransition StartVRModeDel; //VR모드 전환 델리게이트
+	
 	//클래스 인스턴스 참조 선언
 	class AK_GameState* KGameState;
 	
@@ -47,6 +50,12 @@ public:
 
    FString CurrentMapName; //현재 맵네임
 
+	//인게임 LobbyUI===================================
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> LobbyUIFactory;
+	UPROPERTY(BlueprintReadWrite)
+	class UK_LobbyWidget* LobbyUI;
+	
     UPROPERTY(EditDefaultsOnly , Category="Defaults|InputMappingContext")
 	class UInputMappingContext* IMC_Viper;
 
@@ -102,4 +111,18 @@ public:
 
 #pragma endregion 
 
+
+#pragma region VR Transition control
+
+public:
+	//VR모드 전환 시 델리게이트 발동 함수
+	UFUNCTION(BlueprintCallable, Category = "Defulats|VR")
+	void ToggleVRMode();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Defulats|VR")
+	bool bVRModeEnabled = false;
+	
+#pragma endregion
+
+	
 };
