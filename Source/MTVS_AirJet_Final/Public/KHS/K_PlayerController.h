@@ -50,6 +50,12 @@ public:
 
    FString CurrentMapName; //현재 맵네임
 
+	//인게임 LobbyUI===================================
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UUserWidget> LobbyUIFactory;
+	UPROPERTY(BlueprintReadWrite)
+	class UK_LobbyWidget* LobbyUI;
+	
     UPROPERTY(EditDefaultsOnly , Category="Defaults|InputMappingContext")
 	class UInputMappingContext* IMC_Viper;
 

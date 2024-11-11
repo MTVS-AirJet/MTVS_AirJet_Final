@@ -8,6 +8,7 @@
 #include "KHS/K_WidgetBase.h"
 #include "KHS/K_GameState.h"
 #include "KHS/K_ServerWidget.h"
+#include "KHS/K_LobbyWidget.h"
 #include "LHJ/L_Viper.h"
 #include <MTVS_AirJet_Final.h>
 
@@ -44,6 +45,19 @@ void AK_PlayerController::BeginPlay()
 
 	//마우스커서는 평소엔 안보이게 처리
 	bIsMouseCursorShow = false;
+
+	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if (CurrentMapName == FString::Printf(TEXT("MAP_Lobby")))
+	{
+		if (LobbyUIFactory)
+		{
+			LobbyUI = CreateWidget<UK_LobbyWidget>(this , LobbyUIFactory);
+			if (LobbyUI)
+			{
+				LobbyUI->AddToViewport(0);
+			}
+		}
+	}
 }
 
 void AK_PlayerController::OnPossess(APawn* InPawn)
