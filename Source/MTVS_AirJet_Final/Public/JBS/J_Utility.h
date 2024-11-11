@@ -301,6 +301,63 @@ enum class ETacticalOrder : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FObjSucceedData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isEnd;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isSuccess;
+
+    FObjSucceedData() : isEnd(false), isSuccess(false) {}
+
+    FObjSucceedData(bool isEnd, bool isSuccess) : isEnd(isEnd), isSuccess(isSuccess) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FObjSucceedData& Other) const
+    {
+        return isEnd == Other.isEnd &&
+               isSuccess == Other.isSuccess;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FObjSucceedData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+};
+
+// 공대지 과녁 점수 데이터
+USTRUCT(BlueprintType)
+struct FTargetScoreData
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isEnd;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float score;
+
+    FTargetScoreData() : isEnd(false), score(0.f) {}
+
+    FTargetScoreData(bool isEnd, float score) : isEnd(isEnd), score(score) {}
+
+     // == 연산자 오버로딩
+    bool operator==(const FTargetScoreData& Other) const
+    {
+        return isEnd == Other.isEnd &&
+               score == Other.score;
+    }
+
+    // != 연산자 오버로딩
+    bool operator!=(const FTargetScoreData& Other) const
+    {
+        return !(*this == Other); // == 연산자를 재사용
+    }
+};
+
+USTRUCT(BlueprintType)
 struct FMissionPlayerSpawnPoints
 {
     GENERATED_BODY()
@@ -503,15 +560,26 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int curTargetAmt;
 
+    // 서브 이동 목표 | 수행 여부, 성공 여부
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FObjSucceedData> subMPSucceedDataAry;
+
+    // XXX 과녁 타격 정보 | 수행 여부, 점수 여부 | 일단 베타때 하자
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FTargetScoreData> targetAtkDataAry;
+
     FNeutralizeTargetUIData() {}
 
-    FNeutralizeTargetUIData(int allAmt, int curAmt) : allTargetAmt(allAmt), curTargetAmt(curAmt) {}
+    FNeutralizeTargetUIData(int allAmt, int curAmt, const TArray<FObjSucceedData>& subMPSucceedDataAry) 
+    : allTargetAmt(allAmt), curTargetAmt(curAmt), subMPSucceedDataAry(subMPSucceedDataAry) {}
 
      // == 연산자 오버로딩
     bool operator==(const FNeutralizeTargetUIData& Other) const
     {
         return allTargetAmt == Other.allTargetAmt &&
-               curTargetAmt == Other.curTargetAmt;
+               curTargetAmt == Other.curTargetAmt &&
+               subMPSucceedDataAry == Other.subMPSucceedDataAry &&
+               targetAtkDataAry == Other.targetAtkDataAry;
     }
 
     // != 연산자 오버로딩
@@ -753,6 +821,8 @@ public:
     static bool GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC);
     // bool 값 FString 으로 변환
     static FString ToStringBool(bool value);
+    // XXX 해당 로테이션의 전방 벡터를 타겟 벡터로 변환하기
+    // static FQuat ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1500000.f;

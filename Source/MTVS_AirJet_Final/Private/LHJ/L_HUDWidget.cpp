@@ -17,7 +17,6 @@ void UL_HUDWidget::NativeConstruct()
 void UL_HUDWidget::UpdateHeightBar(float NewHeight)
 {
 	float newPercent = NewHeight / 1500;
-	//LOG_SCREEN("Current Feet Percent : %f" , newPercent);
 	prg_Height->SetPercent(newPercent);
 	UpdateHeightText(NewHeight);
 

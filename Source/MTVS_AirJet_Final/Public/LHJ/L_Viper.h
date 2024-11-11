@@ -89,8 +89,6 @@ private:
 	class UWidgetComponent* JetWidget;
 	
 	UPROPERTY(EditDefaultsOnly , category="Components")
-	class UCharacterMovementComponent* movement;
-	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterLeftVFX;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterRightVFX;
@@ -159,25 +157,11 @@ public: // Input
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Fun;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperEngine;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperLook;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonIn;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperZoonOut;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperUp;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperDown;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperRight;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnLeft;
-	UPROPERTY(EditDefaultsOnly , Category="Inputs")
-	class UInputAction* IA_ViperTurnRight;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputAction* IA_ViperResetRotation;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -202,8 +186,6 @@ public: // Input
 	class UInputAction* IA_ViperMove;
 
 	UFUNCTION()
-	void F_ViperEngine(const struct FInputActionValue& value);
-	UFUNCTION()
 	void F_ViperLook(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperZoomInStarted(const struct FInputActionValue& value);
@@ -213,30 +195,6 @@ public: // Input
 	void F_ViperZoomOutStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperZoomOutCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperUpTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperUpCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperDownCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperLeftCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnRightCompleted(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftTrigger(const struct FInputActionValue& value);
-	UFUNCTION()
-	void F_ViperTurnLeftCompleted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperResetRotation(const struct FInputActionValue& value);
 	UFUNCTION()
@@ -289,9 +247,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsLeftRoll;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotateRollValue = FRotator(0 , 0 , 2.f);
+	FRotator RotateRollValue = FRotator(0 , 0 , 1.0f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FRotator RotatePitchValue = FRotator(1.5f , 0 , 0);
+	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
 
 	// Rotate Value
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -420,9 +378,11 @@ private:
 
 private:
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
-	UFUNCTION(NetMulticast , Reliable)
-	void MulticastRPCLocationAndRotation(FVector newLocaction , FRotator newRotator);
+	void ServerRPCLocation(const float& MoveForce);
+	UFUNCTION(Client , Reliable)
+	void ClientRPCLocation();
+	UFUNCTION(Server , Reliable)
+	void ServerRPCRotation(FQuat newQuat);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
@@ -454,6 +414,7 @@ private:
 
 private:
 	bool IsRotateTrigger = false;
+	bool IsRotateStickTrigger = false;
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -558,7 +519,7 @@ private:
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
-	float CanopyRotatePitchValue = 2;
+	float CanopyRotatePitchValue = .5f;
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
@@ -597,18 +558,6 @@ private:
 public:
 	UPROPERTY(Category="UI" , EditDefaultsOnly)
 	class UL_WaitingForStart* WaitingForStartUI;
-
-	int32 ReadyMemeberCnt = 0;
-	UFUNCTION()
-	void OnMyMemberReFresh();
-
-	UFUNCTION(Server , Reliable)
-	void ServerRPC_SetCurrentReadyMem();
-	UFUNCTION(NetMulticast , Reliable)
-	void MultiRPC_SetCurrentReadyMem(int32 cnt);
-
-public:
-	void ReadyAllMembers();
 
 private:
 	bool bReadyTimeEndFlag;
@@ -758,15 +707,38 @@ public:
 public:
 	// 회전 속도 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float RotationSpeed = 5.0f;
+	float RotationSpeed = 15.f;
 
 	// 최대 회전 각도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float MaxRotationAngle = 44.5f;
+	float MaxRotationAngle = 15.f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
-	FQuat QuatCurrentRotation;
+	UPROPERTY(Replicated)
+	FQuat QuatCurrentRotation = FQuat::Identity;
     
 	// 목표 회전 상태를 쿼터니언으로 저장
-	FQuat QuatTargetRotation;
+	UPROPERTY(Replicated)
+	FQuat QuatTargetRotation = FQuat::Identity;
+
+	float StickRollAngle = 0.f;
+	float StickPitchAngle = 0.f;
+
+public:
+	float VRStickCurrentRollValue=0.f;
+	float VRStickCurrentPitchValue=0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMaxThreshold=0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickMinThreshold=-0.6f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankRollDiv=5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickBankPitchDiv=6.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickkRollDiv=4.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
+	float VRStickPitchDiv=8.f;
+	UFUNCTION(BlueprintCallable)
+	void VRSticAxis(const FVector2D& value);
 };

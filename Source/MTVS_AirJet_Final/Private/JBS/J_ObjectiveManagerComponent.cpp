@@ -63,6 +63,9 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 		if(dmData.objType == ETacticalOrder::ENGINE_START)
 		{
 			objActor->objectiveEndDel.AddLambda([this]{
+				// 미션 시작 시 활성화 안함
+				if(CUR_ACTIVE_MISSION_IDX >= 0) return;
+
 				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
 				check(takeOffObj);
 				// 활성화
@@ -238,7 +241,7 @@ void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjectiv
 void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime)
 {
 	check(obj);
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("dowdiwad"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("dowdiwad"));
 	FTimerHandle timerHandle2;
 	
 	GetWorld()->GetTimerManager()
@@ -246,6 +249,6 @@ void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 	{
 		obj->IS_OBJECTIVE_ACTIVE = true;
 		CUR_ACTIVE_MISSION = obj;		
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
 	}, delayTime, false);
 }

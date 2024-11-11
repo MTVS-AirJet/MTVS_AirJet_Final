@@ -21,6 +21,9 @@ void AJ_ObjectiveFormationFlight::BeginPlay()
     {
         allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
     });
+
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveFormationFlight::SRPC_EndObjUI);
 }
 
 void AJ_ObjectiveFormationFlight::Tick(float deltaTime)
@@ -234,3 +237,10 @@ void AJ_ObjectiveFormationFlight::OnCheckCapsuleBeginOverlap(UPrimitiveComponent
     }   
 }
 
+void AJ_ObjectiveFormationFlight::ObjectiveActive()
+{
+    Super::ObjectiveActive();
+
+    // 목표 ui 신규 갱신
+    SRPC_StartNewObjUI();
+}

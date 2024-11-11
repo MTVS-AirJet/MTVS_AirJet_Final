@@ -116,7 +116,13 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderDat
 
 	}
 
-	check(textUIData.Num() > 0);
+	// ui 데이터 확인
+	if(!(textUIData.Num() > 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+
+		return;
+	}
 
 	// ui에 값 전달
 	if(isInit)
@@ -146,7 +152,7 @@ void UJ_ObjectiveUIComp::CRPC_SwitchResultUI_Implementation(const TArray<FObject
 {
 	objUI->ActiveResultUI(resultObjData);
 }
-// @@ 이 시점에서 텍스트 스타일 결정해야함
+// 이 시점에서 텍스트 스타일 결정해야함
 void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray<FTextUIData>& outData, bool isInit)
 {
 	// 목표 ui 데이터
@@ -189,18 +195,73 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 	FTextUIData detailUIData;
 
 	// 목표 단
-	objUIData.headerText = FRichString(TEXT("지상 목표 무력화"));
-	objUIData.bodyTextAry.Add(FRichString(FString::Printf(TEXT("남은 지상 목표 %d/%d"), data.curTargetAmt, data.allTargetAmt)));
+	objUIData.headerText = FRichString(TEXT("공대지 훈련"));
+	objUIData.bodyObjAry;
 
-	// 상세 단
-	if(isInit)
+	// 서브 이동 목표 
+	for(int i = 0; i < data.subMPSucceedDataAry.Num(); i++)
 	{
-		detailUIData.headerText = FRichString(TEXT("임시 지대공 상세 텍스트"));
-		detailUIData.bodyTextAry = {
-			FRichString(TEXT("임시 상세 1"))
-			,FRichString(TEXT("doremi 상세 2"))
-		};
+		const auto& subObjData = data.subMPSucceedDataAry[i];
+		FDefaultTextUIData subObjUI;
+
+		// 헤더 텍스트
+		FString text = FString::Printf(TEXT("%d번 웨이포인트 도달"), (i+1));
+		// 완료된 목표면 성공 유무에 따라, 아직이면 기본
+		ETextStyle style = subObjData.isEnd 
+				? subObjData.isSuccess 
+					? ETextStyle::SUCCESS 
+					: ETextStyle::FAIL
+				: ETextStyle::DEFAULT;
+
+		// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, FString::Printf(TEXT("%s"), ));
+		UE_LOG(LogTemp, Warning, TEXT("%d : %s"), i,*UEnum::GetValueAsString(style));
+
+		subObjUI.headerText = FRichString(text, style); 
+
+		// 설명 텍스트
+		switch(i)
+		{
+			// 첫 번째 이동 목표
+			case 0:
+			{
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@이동 목표 눈으로 확인하기"), ETextStyle::OBJDETAIL));
+			}
+				break;
+			case 1:
+			{
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@3번 웨이포인트로 이동하는 동안 자신의 위치를 보고하는 임무를 수행하십시오."), ETextStyle::OBJDETAIL));
+			}
+				break;
+			case 3:
+			{
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@미사일 발사 알림."), ETextStyle::OBJDETAIL));
+			}
+				break;
+		}
+
+		objUIData.bodyObjAry.Add(subObjUI);
 	}
+
+	// 타격 목표 텍스트
+	FDefaultTextUIData neutTarget;
+
+	neutTarget.headerText = FRichString(TEXT("과녁 조준 및 미사일 발사"));
+	neutTarget.bodyTextAry.Add(FRichString(TEXT("목표물을 향해 미사일 발사"), ETextStyle::OBJDETAIL));
+
+	objUIData.bodyObjAry.Add(neutTarget);
+
+
+	// objUIData.bodyTextAry.Add(FRichString(FString::Printf(TEXT("남은 지상 목표 %d/%d"), data.curTargetAmt, data.allTargetAmt)));
+
+	// // 상세 단
+	// if(isInit)
+	// {
+	// 	detailUIData.headerText = FRichString(TEXT("임시 지대공 상세 텍스트"));
+	// 	detailUIData.bodyTextAry = {
+	// 		FRichString(TEXT("임시 상세 1"))
+	// 		,FRichString(TEXT("doremi 상세 2"))
+	// 	};
+	// }
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }

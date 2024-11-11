@@ -17,7 +17,7 @@ DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
 DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool);
 
 // 미션 시작 딜리게이트
-DECLARE_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
 
 
 UCLASS()
@@ -125,6 +125,10 @@ public:
     FTakeOffDel onePilotTakeOffDel;
 
     FStartTacticalOrderDel startTODel;
+
+    // 이륙함
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isTPReady = false;
 
 protected:
     virtual void BeginPlay() override;

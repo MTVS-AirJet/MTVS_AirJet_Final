@@ -111,7 +111,6 @@ void AL_Missile::Tick(float DeltaTime)
 
 void AL_Missile::MissileUpdate(float Alpha)
 {
-	//LOG_S(Warning, TEXT("%f"), Alpha);
 	FVector newLoc = BezierMissile(MoveLoc[0] , MoveLoc[1] , MoveLoc[2] , MoveLoc[3] , Alpha);
 	this->SetActorLocation(newLoc);
 }
@@ -150,7 +149,8 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 	// 데미지 처리
 	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
-		mai->GetDamage();
+		// JBS 수정 오너 == viper 를 공격자로서 보냄
+		mai->GetDamage(this->GetOwner());
 		if (auto viper = Cast<AL_Viper>(GetOwner()))
 			viper->Call_CRPC_MissileImpact(HitActor->GetActorLocation());
 	}

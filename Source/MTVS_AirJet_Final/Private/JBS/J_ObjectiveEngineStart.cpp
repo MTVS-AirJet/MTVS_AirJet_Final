@@ -5,17 +5,27 @@
 #include "Engine/Engine.h"
 #include "GraphEditAction.h"
 #include "JBS/J_MissionPlayerController.h"
+#include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
 
 void AJ_ObjectiveEngineStart::BeginPlay()
 {
     Super::BeginPlay();
 
+    if(!this->HasAuthority()) return;
+    
+    // 게임모드 이륙 딜리게이트에 바인드
+    auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
+    // 미션 시작 딜리게이트 바인드
+    gm->startTODel.AddUObject(this, &AJ_ObjectiveEngineStart::ObjectiveEnd);
+
+    // 목표 완료시 목표 UI 완료 바인드
+    objectiveEndDel.AddUObject(this, &AJ_ObjectiveEngineStart::SRPC_EndObjUI);
 }
 
 void AJ_ObjectiveEngineStart::ObjectiveActive()
 {
-    if(!HasAuthority()) return;
+    Super::ObjectiveActive();
 
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 시동 절차 시작"));
     // 현재 존재하는 모든 pc 가져오기
@@ -33,7 +43,8 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
     // 목표 종료시 수행도 결과 계산 바인드
     objectiveEndDel.AddUObject(this, &AJ_ObjectiveEngineStart::CalcSuccessPercent);
 
-    Super::ObjectiveActive();
+    // 목표 ui 신규 갱신
+    SRPC_StartNewObjUI();
 }
 
 void AJ_ObjectiveEngineStart::Tick(float deltaTime)
@@ -54,11 +65,18 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
 
     // 해당 인덱스 서브 목표 완료 처리
     SRPC_EndSubObjUI(pc, enumIdx, isSuccess);
+    
 
     GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("다음 절차 수행, 성공 여부 : %s"), *UJ_Utility::ToStringBool(isSuccess)));
 
     // 성공처리
     ActiveNextProgress(data, isSuccess);
+
+    // @@ 하드코딩 해결 필요 | 대기 상태일때 그냥 사이드 켜버리면 넘어가게 처리
+    if(!isSuccess && data.curProgress == EEngineProgress::RELEASE_SIDE_BREAK)
+    {
+        CheckProgress(pc, data.curProgress);
+    }
 
     // 수행도 점수 처리
     CalcSuccessPercent();
@@ -72,14 +90,19 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
         for(auto* onePC : allPC)
         {
             auto& oneData = allData.dataMap[onePC];
-            CheckProgress(onePC, oneData.curProgress);
+            if(oneData.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
+            {
+                CheckProgress(onePC, oneData.curProgress);
+            }
         }
+
+        return;
     }
 
     // 모든 pc가 이륙 대기 상태가 되면 종료 처리
     if(CheckAllRunEngine(allPC, EEngineProgress::TAKE_OFF))
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("이륙 준비 완료"));
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이륙 준비 완료"));
 
         ObjectiveEnd(true);
         return;

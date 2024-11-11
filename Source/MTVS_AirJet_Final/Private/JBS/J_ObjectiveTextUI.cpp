@@ -108,7 +108,11 @@ void UJ_ObjectiveTextUI::SetBodyText(const TArray<FDefaultTextUIData> &objAry, b
         {
             // 본문 값 설정
             auto& objData = objAry[i];
-            auto* subObj = Cast<UJ_ObjectiveTextUI>(bodyTextVBox->GetChildAt(i));
+            auto* subUI = bodyTextVBox->GetChildAt(i);
+            if(!subUI) return;
+
+            auto* subObj = Cast<UJ_ObjectiveTextUI>(subUI);
+            if(!subObj) return;
 
             subObj->SetTextUI(objData);
         }
