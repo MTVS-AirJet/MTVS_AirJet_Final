@@ -42,14 +42,6 @@ void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	//DOREPLIFETIME(UK_GameInstance , ConnectedPlayerNames);
 }
 
-//void UK_GameInstance::OnConnectedPlayerNames()
-//{
-//	KGameState = Cast<AK_GameState>(GetWorld()->GetGameState());
-//	if (KGameState)
-//	{
-//		KGameState->SetConnectedPlayerNames(ConnectedPlayerNames);
-//	}
-//}
 
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {

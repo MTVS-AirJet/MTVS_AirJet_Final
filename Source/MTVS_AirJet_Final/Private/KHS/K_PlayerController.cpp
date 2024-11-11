@@ -267,3 +267,25 @@ void AK_PlayerController::TravelToLobbyLevel()
 	ClientTravel("/Game/Maps/SSM/MAP_Lobby" , ETravelType::TRAVEL_Absolute);
 	//ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
 }
+//VR모드 전환 시 델리게이트 발동 함수
+void AK_PlayerController::ToggleVRMode()
+{
+	//VR전환용 Del실행
+	StartVRModeDel.Broadcast();
+
+	//VRMode로 전환했을때
+	if(true == bVRModeEnabled)
+	{
+		
+
+
+		
+		bVRModeEnabled = false;
+	}
+	//데스크탑모드로 전환했을때
+	else
+	{
+		//이후에 구현 예정
+		bVRModeEnabled = true;
+	}
+}

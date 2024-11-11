@@ -379,7 +379,7 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	md.mapImage = resData.mapImage;
 	md.startPoint.x = resData.startPointX;
 	md.startPoint.y = resData.startPointY;
-	md.mission = resData.missionData;
+	md.mission = resData.mission;
 
 	GameInstance->InitializeMission(md);
 }
