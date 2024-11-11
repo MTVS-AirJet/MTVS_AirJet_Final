@@ -144,7 +144,9 @@ public:
 
 	FString CreatedMapData;
 
-
+	UPROPERTY(EditDefaultsOnly)
+	class USoundWave* ButtonClickSound; //버튼클릭사운드
+	
 	//===============================================================
 	// Functions
 	//===============================================================

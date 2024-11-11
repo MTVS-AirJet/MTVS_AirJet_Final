@@ -106,6 +106,9 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 	if (HideHostMenuAnim)
 		PlayAnimation(HideHostMenuAnim);
 
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	// 타이머로 시간 제어를 통해 ServerMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
@@ -147,6 +150,9 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 	if (HideServerMenuAnim)
 		PlayAnimation(HideServerMenuAnim);
 
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	// 타이머로 시간 제어를 통해 HostMenu 전환 및 전환 애니메이션 실행
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
@@ -170,6 +176,9 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 // Lobby 맵으로 돌아가는 함수
 void UK_ServerWidget::OpenLobbyLevel()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	this->RemoveUI();
 }
 
@@ -219,6 +228,9 @@ void UK_ServerWidget::SelecetIndex(int Index)
 //ServerList업데이트(PanelWidget 내장기능 사용)
 void UK_ServerWidget::ServerListUpdateChildren()
 {
+	// //ButtonClickSound를 재생하고싶다.
+	// UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	for (int32 i = 0; i < ServerMenu_ServerList->GetChildrenCount(); ++i)
 	{
 		UK_ServerList* List = Cast<UK_ServerList>(ServerMenu_ServerList->GetChildAt(i));
@@ -275,6 +287,9 @@ void UK_ServerWidget::OnResSessionInfo(const FMapInfoResponse& resData)
 // 생성된 Session에 접속하는 함수
 void UK_ServerWidget::JoinRoom()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	//인덱스가 Set되고, Interface클래스 변수가 부모에 존재하면
 	if (SelectedIndex.IsSet() && WidgetInterface != nullptr)
 	{
@@ -327,6 +342,9 @@ void UK_ServerWidget::CreateRoom()
 	//콜백함수에 Create Room관련 내용들을 설정(정보를 받아두고 세션을 열기 위함)
 	ReqMapInfo();
 
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	//// Interface에서 Host 함수를 호출 -> GameInstance에 있는 Host함수를 작동
 	//if ( SessionInterface )
 	//{

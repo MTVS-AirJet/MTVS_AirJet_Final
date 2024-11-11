@@ -3,8 +3,6 @@
 
 #include "KHS/K_LoginRegisterWidget.h"
 #include "KHS/K_GameInstance.h"
-#include "Json.h"
-#include "JsonUtilities.h"
 #include "Serialization/JsonSerializer.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
@@ -16,6 +14,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Engine/TimerHandle.h"
+#include "Kismet/GameplayStatics.h"
 
 
 //생성자&초기화
@@ -76,6 +75,9 @@ void UK_LoginRegisterWidget::OpenRegisterMenu()
 	if ( HideLoginMenuAnim )
 		PlayAnimation(HideLoginMenuAnim);
 
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
 	{
@@ -90,6 +92,9 @@ void UK_LoginRegisterWidget::OpenRegisterMenu()
 //로그인 요청함수
 void UK_LoginRegisterWidget::OnMyLogin()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	// 1. 입력된 정보를 가져옴
 	FString LoginUserID = LoginMenu_txt_UserID->GetText().ToString();
 	FString LoginPassword = LoginMenu_txt_UserPW->GetText().ToString();
@@ -248,6 +253,9 @@ void UK_LoginRegisterWidget::ShowLoginFailure()
 //게스트 로그인 (바로 로비로 입장)
 void UK_LoginRegisterWidget::OnClickedGuestLogin()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	UK_GameInstance* GameInstance = Cast<UK_GameInstance>(GetWorld()->GetGameInstance());
 	if ( GameInstance )
 	{
@@ -258,6 +266,9 @@ void UK_LoginRegisterWidget::OnClickedGuestLogin()
 //Quit버튼 클릭(게임종료)
 void UK_LoginRegisterWidget::OnClickedQuit()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	UWorld* World = GetWorld();
 	APlayerController* pc = World->GetFirstPlayerController();
 
@@ -275,7 +286,10 @@ void UK_LoginRegisterWidget::OpenLoginMenu()
 	{
 		PlayAnimation(HideRegisterMenuAnim);
 	}
-
+	
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	FTimerHandle TimerHandle_MenuSwitch;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_MenuSwitch , [this]()
 	{
@@ -291,6 +305,9 @@ void UK_LoginRegisterWidget::OpenLoginMenu()
 //계정생성 요청함수
 void UK_LoginRegisterWidget::OnMyRegister()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+	
 	// 입력된 회원가입 정보를 가져옴.
 	FString RegisterUserID = RegisterMenu_txt_UserID->GetText().ToString();
 	FString RegisterNickname = RegisterMenu_txt_NIckName->GetText().ToString();
@@ -438,6 +455,8 @@ void UK_LoginRegisterWidget::ShowRegisterFailed()
 //계정생성 성공UI 확인버튼바인딩
 void UK_LoginRegisterWidget::OnClickedRegisterSuccess()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
 	// 계정생성 성공 시 나타나는 확인 버튼을 누를경우,
 	OpenLoginMenu();
 	// 성공 안내 관련 위젯 모두 숨김
@@ -450,6 +469,8 @@ void UK_LoginRegisterWidget::OnClickedRegisterSuccess()
 //계정생성 실패UI 확인버튼바인딩
 void UK_LoginRegisterWidget::OnClickedRegisterFailed()
 {
+	//ButtonClickSound를 재생하고싶다.
+	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
 	// 실패 안내 관련 위젯 모두 숨김
 	if ( RegisterMenu_img_Failed ) 
 		RegisterMenu_img_Failed->SetVisibility(ESlateVisibility::Hidden);
