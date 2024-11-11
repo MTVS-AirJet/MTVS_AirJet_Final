@@ -119,6 +119,8 @@ private:
 	class USoundBase* ImpactSound;
 	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
 	class UNiagaraSystem* DistroyVFX;
+	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
+	class UStaticMeshComponent* AirResistanceVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow3;
@@ -226,17 +228,14 @@ public: // Input
 	UFUNCTION()
 	void F_ViperMoveCompleted(const struct FInputActionValue& value);
 
+private:
+	UPROPERTY(EditDefaultsOnly)
+	FRotator TargetArmRotation = FRotator(-10, 0, 0);
+	
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
 
-	// For Reset Arrow Rotate
-	
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyRightPress;
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyLeftPress;
-	
 	// Rotate vector
 	UPROPERTY(BlueprintReadOnly)
 	bool IsKeyUpPress;
@@ -383,6 +382,8 @@ private:
 	void ClientRPCLocation();
 	UFUNCTION(Server , Reliable)
 	void ServerRPCRotation(FQuat newQuat);
+	UFUNCTION(NetMulticast , Unreliable)
+	void MultiRPCVisibleAirVFX(bool isOn);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
@@ -519,7 +520,7 @@ private:
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
-	float CanopyRotatePitchValue = .5f;
+	float CanopyRotatePitchValue = .3f;
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
 	class UStaticMeshComponent* DummyCanopyMesh;
@@ -539,6 +540,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
 	bool bJetTailVFXOn;
+	UPROPERTY(EditAnywhere , Category="Default|JetAirVFX" , BlueprintReadWrite)
+	bool bJetAirVFXOn;
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Sound")

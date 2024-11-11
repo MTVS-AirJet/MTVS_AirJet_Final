@@ -262,6 +262,23 @@ AL_Viper::AL_Viper()
 		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 0.f);
 	}
 
+	AirResistanceVFX = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AirResistanceVFX"));
+	AirResistanceVFX->SetupAttachment(JetMesh);
+	AirResistanceVFX->SetRelativeLocation(FVector(-150 , -16.5 , 285));	
+	ConstructorHelpers::FObjectFinder<UStaticMesh> AirResistanceMesh(TEXT(
+		"/Script/Engine.StaticMesh'/Game/Blueprints/LHJ/resource/Mat/wings_snoke.wings_snoke'"));
+	if (AirResistanceMesh.Succeeded())
+	{
+		AirResistanceVFX->SetStaticMesh(AirResistanceMesh.Object);
+
+		ConstructorHelpers::FObjectFinder<UMaterial> AirVFX(TEXT(
+			"/Script/Engine.Material'/Game/Asset/TrailPack/Materials/M_Wave.M_Wave'"));
+		if (AirVFX.Succeeded())
+		{
+			AirResistanceVFX->SetMaterial(0 , AirVFX.Object);
+		}
+	}
+
 	JetAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAudio"));
 	JetAudio->SetupAttachment(RootComponent);
 
@@ -999,8 +1016,12 @@ void AL_Viper::BeginPlay()
 			LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
+
 		}
-	}
+	}						
+	AirResistanceVFX->SetVisibility(false);
+
+	QuatCurrentRotation = GetActorRotation().Quaternion();
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1076,13 +1097,13 @@ void AL_Viper::Tick(float DeltaTime)
 			pc->bEnableClickEvents = true;
 		}
 
-		if(IsLocallyControlled())
+		if (IsLocallyControlled())
 		{
 			if (FrontWheel < 1.f)
 				ServerRPC_Wheel();
 			else
 				IsFlyStart = false;
-		}		
+		}
 	}
 #pragma endregion
 
@@ -1391,7 +1412,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 		if (IsLocallyControlled())
 			IsLockOn();
-		
+
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
 		{
@@ -1423,7 +1444,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 #pragma region 속도계
 		// 100 = 1m, 1000000=1km, 1km = 0.539957 Note
-		float km = ValueOfMoveForce / 1000000.f;
+		float km = ValueOfMoveForce / 100000.f;
 		int32 ValueOfMoveForceInNote = static_cast<int32>(km * 0.539957);
 		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
 		{
@@ -1453,21 +1474,21 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-		// if (!IsRotateTrigger || !IsRotateStickTrigger)
-		// {
-		// 	if (JetCamera->IsActive())
-		// 	{
-		// 		FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-		// 		auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-		// 		JetSprintArm->SetRelativeRotation(lerpTPSrot);
-		// 	}
-		// 	else
-		// 	{
-		// 		// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-		// 		// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-		// 		// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
-		// 	}
-		// }
+		if (!IsRotateTrigger || !IsRotateStickTrigger)
+		{
+			if (JetCamera->IsActive())
+			{
+				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+				auto lerpTPSrot = FMath::Lerp(TPSrot , TargetArmRotation , DeltaTime);
+				JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			}
+			else
+			{
+				// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+				// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+				// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+			}
+		}
 #pragma endregion
 	}
 }
@@ -1561,6 +1582,8 @@ void AL_Viper::ChangeBooster()
 	}
 }
 
+
+
 void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
 {
 	MulticastRPCBoost(isOn);
@@ -1623,7 +1646,7 @@ void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
 
 void AL_Viper::ClientRPCLocation_Implementation()
 {
-	ValueOfMoveForce += (GetAddTickSpeed() * 6);
+	ValueOfMoveForce += (GetAddTickSpeed() * 2);
 	if (ValueOfMoveForce < 0)
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
@@ -1633,11 +1656,24 @@ void AL_Viper::ClientRPCLocation_Implementation()
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 {
+	if(bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= newQuat.Rotator().Pitch)
+			MultiRPCVisibleAirVFX(true);
+		else
+			MultiRPCVisibleAirVFX(false);
+	}	
+
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 	SetActorRotation(QuatCurrentRotation.Rotator());
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
+}
+
+void AL_Viper::MultiRPCVisibleAirVFX_Implementation(bool isOn)
+{
+	AirResistanceVFX->SetVisibility(isOn);
 }
 #pragma endregion
 
