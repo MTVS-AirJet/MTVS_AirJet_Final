@@ -36,14 +36,14 @@ public:
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
-    void SetBodyTextValue(class UWidget *textWidget, const FRichString &str) override;
+    void SetBodyTextValue(class UWidget *textWidget, const FString &str) override;
 
 public:
 	// 명령 UI 설정
     void SetTextUI(FTextUIData data, bool isInit = false) override;
 
 	// 서브 조건 요소 설정
-    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str) override;
+    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str) override;
 
 	
 

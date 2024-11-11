@@ -58,7 +58,7 @@ protected:
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
 
 
-    void SetBodyTextValue(class UWidget *textWidget, const FRichString &str) override;
+    void SetBodyTextValue(class UWidget *textWidget, const FString &str) override;
 
 	// 사라짐과 나타남 애니메이션 적용
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
@@ -70,14 +70,14 @@ public:
 	// 오버로딩
     void SetTextUI(FDefaultTextUIData data, bool isInit = false);
     // 본문 설정
-    void SetBodyText(const TArray<FRichString> &strAry, bool isInit = false,
+    void SetBodyText(const TArray<FString> &strAry, bool isInit = false,
                      class UVerticalBox *bodyTextVBox = nullptr) override;
     // 본문 설정 오버로딩
     void SetBodyText(const TArray<FDefaultTextUIData> &objAry, bool isInit = false,
                      class UVerticalBox *bodyTextVBox = nullptr);
 
     // 서브 조건 요소 설정
-    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str) override;
+    UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str) override;
 	// 서브 목표 요소 설정 오버로딩
     UWidget *CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FDefaultTextUIData &data);
 

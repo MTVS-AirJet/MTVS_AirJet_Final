@@ -15,6 +15,7 @@
 #include <cfloat>
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUIComp.h"
+#include "Math/UnrealMathUtility.h"
 #include "TimerManager.h"
 
 void AJ_ObjectiveNeutralizeTarget::BeginPlay()
@@ -116,7 +117,7 @@ void AJ_ObjectiveNeutralizeTarget::ActiveNextObjective()
 
 }
 
-void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
+void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(volatile int mIdx, bool isFirst)
 {
     if(mIdx >= subMPArray.Num())
 	{
@@ -132,7 +133,7 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 	if(!obj) return;
 	
 	// @@ 딜레이 여부 | 애니 끝나는걸 애초에 알면 좋을듯
-	float delayTime = isFirst ? 0.001f : 1.5f;
+	float delayTime = isFirst ? 0.01f : 1.5f;
 
 	// 활성화
 	DelayedObjectiveActive(obj, delayTime);
@@ -239,7 +240,7 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
     }
 
     // solved gt 캐시 해야 하려나?
-    // @@ 여러개 소환하려면 분산시켜야 할 듯
+    // XXX 여러개 소환하려면 분산시켜야 할 듯
     for(int i = 0; i < spawnTargetAmt; i++)
     {
         auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
@@ -325,7 +326,33 @@ void AJ_ObjectiveNeutralizeTarget::UpdateTargetScore(class AJ_MissionPlayerContr
         if(targetScoreMap[onePC] == 0.f) 
             return;
     }
-    // @@ 수행도 산정
+    // 수행도 산정
+    SUCCESS_PERCENT = CalcSuccessPercent();
     // 모두 타격했으니 종료
     ObjectiveEnd(true);
+}
+
+float AJ_ObjectiveNeutralizeTarget::CalcSuccessPercent()
+{
+    // @@ 필요하면 베타때 직접적인 값을 반환할 지도
+    // 1. 이동 목표 수행 데이터
+    // 수행도 배열
+    TArray<float> subMPSPAry;
+    Algo::Transform(subMPArray, subMPSPAry, [](AJ_ObjectiveMovePoint* temp){
+        return temp->SUCCESS_PERCENT;
+    });
+    //캐스트 후
+    // 수행도의 평균
+    float subMPResult = UJ_Utility::CalcAverage(subMPSPAry);
+
+    // 2. 과녁 점수 데이터 | 일단 1로 가정 
+    TArray<float> targetScoreAry;
+    Algo::Transform(allPC, targetScoreAry, [this](AJ_MissionPlayerController* temp){
+        return targetScoreMap[temp];
+    });
+    //캐스트 후
+    float targetScoreResult = UJ_Utility::CalcAverage(targetScoreAry);
+
+    // 과녁 점수의 평균
+    return UJ_Utility::CalcAverage({subMPResult, targetScoreResult});
 }

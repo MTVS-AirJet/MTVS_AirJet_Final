@@ -22,14 +22,14 @@ void UJ_DetailUI::SetTextUI(FTextUIData data, bool isInit)
     }
 }
 
-void UJ_DetailUI::SetBodyTextValue(class UWidget *textWidget, const FRichString &str)
+void UJ_DetailUI::SetBodyTextValue(class UWidget *textWidget, const FString &str)
 {
     auto* subEle = CastChecked<UJ_ObjectiveSubElementUI>(textWidget);
 
-    subEle->objSubText->SetText(FText::FromString(str.GetFormatString()));
+    subEle->objSubText->SetText(FText::FromString(str));
 }
 
-UWidget *UJ_DetailUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str)
+UWidget *UJ_DetailUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str)
 {
     auto* newObjSubEle = CreateWidget<UJ_ObjectiveSubElementUI>(this, detailSubEleUIPrefab);
     // 값 설정

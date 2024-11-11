@@ -65,5 +65,5 @@ void UJ_StreamingUI::SetUserID(FString ID, const bool &bAddPlayer)
 {
     Super::SetUserID(ID, bAddPlayer);
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("4. 유저 아이디 설정"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("4. 유저 아이디 설정"));
 }

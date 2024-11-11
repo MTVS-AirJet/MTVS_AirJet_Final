@@ -54,7 +54,7 @@ void UJ_ObjectiveTextUI::SetTextUI(FDefaultTextUIData data, bool isInit)
     }
 }
 
-void UJ_ObjectiveTextUI::SetBodyText(const TArray<FRichString> &strAry, bool isInit, class UVerticalBox *bodyTextVBox)
+void UJ_ObjectiveTextUI::SetBodyText(const TArray<FString> &strAry, bool isInit, class UVerticalBox *bodyTextVBox)
 {
     Super::SetBodyText(strAry, isInit, bodyTextVBox);
 
@@ -122,14 +122,14 @@ void UJ_ObjectiveTextUI::SetBodyText(const TArray<FDefaultTextUIData> &objAry, b
      
 }
 
-void UJ_ObjectiveTextUI::SetBodyTextValue(class UWidget *textWidget, const FRichString &str)
+void UJ_ObjectiveTextUI::SetBodyTextValue(class UWidget *textWidget, const FString &str)
 {
     auto* subEle = CastChecked<UJ_ObjectiveSubElementUI>(textWidget);
 
     subEle->SetSubText(str);
 }
 
-UWidget *UJ_ObjectiveTextUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FRichString &str)
+UWidget *UJ_ObjectiveTextUI::CreateBodyElement(TSubclassOf<class UWidget> widgetClass, const FString &str)
 {
     auto* newObjSubEle = CreateWidget<UJ_ObjectiveSubElementUI>(this, objSubEleUIPrefab);
     // 값 설정

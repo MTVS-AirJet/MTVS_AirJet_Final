@@ -27,7 +27,7 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
 {
     Super::ObjectiveActive();
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 시동 절차 시작"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 시동 절차 시작"));
     // 현재 존재하는 모든 pc 가져오기
     allPC = UJ_Utility::GetAllMissionPC(GetWorld());
  
@@ -67,7 +67,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     SRPC_EndSubObjUI(pc, enumIdx, isSuccess);
     
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("다음 절차 수행, 성공 여부 : %s"), *UJ_Utility::ToStringBool(isSuccess)));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("다음 절차 수행, 성공 여부 : %s"), *UJ_Utility::ToStringBool(isSuccess)));
 
     // 성공처리
     ActiveNextProgress(data, isSuccess);
@@ -85,7 +85,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     if(!isReadyTakeOff && CheckAllRunEngine(allPC, EEngineProgress::STANDBY_OTHER_PLAYER))
     {
         isReadyTakeOff = true;
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("전부 대기중"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("전부 대기중"));
         
         for(auto* onePC : allPC)
         {
@@ -102,7 +102,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     // 모든 pc가 이륙 대기 상태가 되면 종료 처리
     if(CheckAllRunEngine(allPC, EEngineProgress::TAKE_OFF))
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이륙 준비 완료"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이륙 준비 완료"));
 
         ObjectiveEnd(true);
         return;

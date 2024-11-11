@@ -9,13 +9,13 @@
 #include "Math/MathFwd.h"
 #include "Styling/SlateTypes.h"
 
-void UJ_ObjectiveSubElementUI::SetSubText(const FRichString& str)
+void UJ_ObjectiveSubElementUI::SetSubText(const FString& str)
 {
-    this->objSubText->SetText(FText::FromString(str.GetFormatString()));
+    this->objSubText->SetText(FText::FromString(str));
 
-    // 서브 목표 설명이면 이미지 사이즈 작게
-    if(str.styleType == ETextStyle::OBJDETAIL)
-    {
-        objSubIcon->SetDesiredSizeOverride(FVector2D(subObjDetailiconSize,subObjDetailiconSize));
-    }
+    // FIXME 서브 목표 설명이면 이미지 사이즈 작게
+    // if(str.styleType == ETextStyle::OBJDETAIL)
+    // {
+    //     objSubIcon->SetDesiredSizeOverride(FVector2D(subObjDetailiconSize,subObjDetailiconSize));
+    // }
 }

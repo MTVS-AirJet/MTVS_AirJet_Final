@@ -67,8 +67,8 @@ bool AJ_StreamingActor::TryInitScreen()
     //SceneCapture2D 초기화 한번더
     if ( !(RenderTarget && SceneCapture) )
     {
-        UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
-        GEngine->AddOnScreenDebugMessage(-1, 33.f, FColor::Red, TEXT("Initialization failed in BeginPlay"));
+        // UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
+        // GEngine->AddOnScreenDebugMessage(-1, 33.f, FColor::Red, TEXT("Initialization failed in BeginPlay"));
 
         return false;
     }

@@ -41,5 +41,5 @@ public:
 	void PlaySubEndAnim();
 
 	// 리치 텍스트 설정
-	void SetSubText(const FRichString& str);
+	void SetSubText(const FString& str);
 };

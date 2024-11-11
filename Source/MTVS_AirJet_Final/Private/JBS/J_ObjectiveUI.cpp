@@ -110,7 +110,7 @@ float UJ_ObjectiveUI::PlaySubObjEndAnimLerp(UVerticalBoxSlot *subSlot, float alp
     newSize.Value = value;
     subSlot->SetSize(newSize);
 
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%.2f"), newSize.Value));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%.2f"), newSize.Value));
 
     return value;
 }
