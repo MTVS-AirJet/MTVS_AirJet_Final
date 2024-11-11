@@ -262,6 +262,23 @@ AL_Viper::AL_Viper()
 		JetTailVFXRight->SetFloatParameter(FName("Lifetime") , 0.f);
 	}
 
+	AirResistanceVFX = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AirResistanceVFX"));
+	AirResistanceVFX->SetupAttachment(JetMesh);
+	AirResistanceVFX->SetRelativeLocation(FVector(-150 , -16.5 , 285));	
+	ConstructorHelpers::FObjectFinder<UStaticMesh> AirResistanceMesh(TEXT(
+		"/Script/Engine.StaticMesh'/Game/Blueprints/LHJ/resource/Mat/wings_snoke.wings_snoke'"));
+	if (AirResistanceMesh.Succeeded())
+	{
+		AirResistanceVFX->SetStaticMesh(AirResistanceMesh.Object);
+
+		ConstructorHelpers::FObjectFinder<UMaterial> AirVFX(TEXT(
+			"/Script/Engine.Material'/Game/Asset/TrailPack/Materials/M_Wave.M_Wave'"));
+		if (AirVFX.Succeeded())
+		{
+			AirResistanceVFX->SetMaterial(0 , AirVFX.Object);
+		}
+	}
+
 	JetAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAudio"));
 	JetAudio->SetupAttachment(RootComponent);
 
@@ -1000,15 +1017,9 @@ void AL_Viper::BeginPlay()
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 
-			JetSprintArm->bInheritYaw = true;
-			FTimerHandle tHnd;
-			GetWorld()->GetTimerManager().SetTimer(tHnd , [&]()
-			{
-				JetSprintArm->SetRelativeRotation(TargetArmRotation);
-				JetSprintArm->bInheritYaw = false;
-			} , 0.1f , false);
 		}
-	}
+	}						
+	AirResistanceVFX->SetVisibility(false);
 
 	QuatCurrentRotation = GetActorRotation().Quaternion();
 }
@@ -1571,6 +1582,8 @@ void AL_Viper::ChangeBooster()
 	}
 }
 
+
+
 void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
 {
 	MulticastRPCBoost(isOn);
@@ -1643,11 +1656,24 @@ void AL_Viper::ClientRPCLocation_Implementation()
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 {
+	if(bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= newQuat.Rotator().Pitch)
+			MultiRPCVisibleAirVFX(true);
+		else
+			MultiRPCVisibleAirVFX(false);
+	}	
+
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 	SetActorRotation(QuatCurrentRotation.Rotator());
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
+}
+
+void AL_Viper::MultiRPCVisibleAirVFX_Implementation(bool isOn)
+{
+	AirResistanceVFX->SetVisibility(isOn);
 }
 #pragma endregion
 

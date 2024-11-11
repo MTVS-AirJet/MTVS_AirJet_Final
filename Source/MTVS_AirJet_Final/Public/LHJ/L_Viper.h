@@ -119,6 +119,8 @@ private:
 	class USoundBase* ImpactSound;
 	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
 	class UNiagaraSystem* DistroyVFX;
+	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
+	class UStaticMeshComponent* AirResistanceVFX;
 public:
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UArrowComponent* JetFlareArrow3;
@@ -228,7 +230,7 @@ public: // Input
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	FRotator TargetArmRotation = FRotator(-10, 180, 0);
+	FRotator TargetArmRotation = FRotator(-10, 0, 0);
 	
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -380,6 +382,8 @@ private:
 	void ClientRPCLocation();
 	UFUNCTION(Server , Reliable)
 	void ServerRPCRotation(FQuat newQuat);
+	UFUNCTION(NetMulticast , Unreliable)
+	void MultiRPCVisibleAirVFX(bool isOn);
 
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
@@ -536,6 +540,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere , Category="JetTail" , BlueprintReadWrite)
 	bool bJetTailVFXOn;
+	UPROPERTY(EditAnywhere , Category="Default|JetAirVFX" , BlueprintReadWrite)
+	bool bJetAirVFXOn;
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Sound")
