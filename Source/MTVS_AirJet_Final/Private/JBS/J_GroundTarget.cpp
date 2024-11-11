@@ -4,6 +4,7 @@
 #include "JBS/J_GroundTarget.h"
 #include "Engine/World.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "Templates/Casts.h"
 #include "TimerManager.h"
@@ -54,10 +55,13 @@ void AJ_GroundTarget::GetDamage(AActor *attacker, FVector hitPoint, FVector hitN
 {
 	// FIXME 맞은 포인트로 점수 계산 필요
 
-	// @@ 임시로 일단 0번 pc 가 한 걸로
-	auto* local = UJ_Utility::GetBaseMissionPawn(GetWorld());
+	// 공격한 플레이어 가져오기
+	const auto* pilot = CastChecked<AJ_BaseMissionPawn>(attacker);
+	auto* hitPC = pilot->GetController<AJ_MissionPlayerController>();
+	check(hitPC);
 
-	sendScoreDel.Broadcast(CastChecked<AJ_MissionPlayerController>(local->GetController()), 1.0f);
+	// 점수 보내기
+	sendScoreDel.Broadcast(hitPC, 1.0f);
 
 	// Death();
 }
