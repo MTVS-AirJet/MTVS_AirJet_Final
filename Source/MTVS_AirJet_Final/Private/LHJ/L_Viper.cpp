@@ -999,6 +999,14 @@ void AL_Viper::BeginPlay()
 			LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
+
+			JetSprintArm->bInheritYaw = true;
+			FTimerHandle tHnd;
+			GetWorld()->GetTimerManager().SetTimer(tHnd , [&]()
+			{
+				JetSprintArm->SetRelativeRotation(TargetArmRotation);
+				JetSprintArm->bInheritYaw = false;
+			} , 0.1f , false);
 		}
 	}
 }
@@ -1076,13 +1084,13 @@ void AL_Viper::Tick(float DeltaTime)
 			pc->bEnableClickEvents = true;
 		}
 
-		if(IsLocallyControlled())
+		if (IsLocallyControlled())
 		{
 			if (FrontWheel < 1.f)
 				ServerRPC_Wheel();
 			else
 				IsFlyStart = false;
-		}		
+		}
 	}
 #pragma endregion
 
@@ -1391,7 +1399,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 		if (IsLocallyControlled())
 			IsLockOn();
-		
+
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
 		{
@@ -1423,7 +1431,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 #pragma region 속도계
 		// 100 = 1m, 1000000=1km, 1km = 0.539957 Note
-		float km = ValueOfMoveForce / 1000000.f;
+		float km = ValueOfMoveForce / 100000.f;
 		int32 ValueOfMoveForceInNote = static_cast<int32>(km * 0.539957);
 		if (auto HUDui = Cast<UL_HUDWidget>(JetWidget->GetWidget()))
 		{
@@ -1453,21 +1461,21 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-		// if (!IsRotateTrigger || !IsRotateStickTrigger)
-		// {
-		// 	if (JetCamera->IsActive())
-		// 	{
-		// 		FRotator TPSrot = JetSprintArm->GetRelativeRotation();
-		// 		auto lerpTPSrot = FMath::Lerp(TPSrot , FRotator(-10 , 0 , 0) , DeltaTime);
-		// 		JetSprintArm->SetRelativeRotation(lerpTPSrot);
-		// 	}
-		// 	else
-		// 	{
-		// 		// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
-		// 		// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
-		// 		// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
-		// 	}
-		// }
+		if (!IsRotateTrigger || !IsRotateStickTrigger)
+		{
+			if (JetCamera->IsActive())
+			{
+				FRotator TPSrot = JetSprintArm->GetRelativeRotation();
+				auto lerpTPSrot = FMath::Lerp(TPSrot , TargetArmRotation , DeltaTime);
+				JetSprintArm->SetRelativeRotation(lerpTPSrot);
+			}
+			else
+			{
+				// FRotator FPSrot = JetSprintArmFPS->GetRelativeRotation();
+				// auto lerpFPSrot = FMath::Lerp(FPSrot , FRotator(-30 , 0 , 0) , DeltaTime);
+				// JetSprintArmFPS->SetRelativeRotation(lerpFPSrot);
+			}
+		}
 #pragma endregion
 	}
 }
@@ -1623,7 +1631,7 @@ void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
 
 void AL_Viper::ClientRPCLocation_Implementation()
 {
-	ValueOfMoveForce += (GetAddTickSpeed() * 6);
+	ValueOfMoveForce += (GetAddTickSpeed() * 2);
 	if (ValueOfMoveForce < 0)
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)

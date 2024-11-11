@@ -226,17 +226,14 @@ public: // Input
 	UFUNCTION()
 	void F_ViperMoveCompleted(const struct FInputActionValue& value);
 
+private:
+	UPROPERTY(EditDefaultsOnly)
+	FRotator TargetArmRotation = FRotator(-10, 180, 0);
+	
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bFirstEngine;
 
-	// For Reset Arrow Rotate
-	
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyRightPress;
-	// UPROPERTY(BlueprintReadOnly)
-	// bool IsKeyLeftPress;
-	
 	// Rotate vector
 	UPROPERTY(BlueprintReadOnly)
 	bool IsKeyUpPress;
