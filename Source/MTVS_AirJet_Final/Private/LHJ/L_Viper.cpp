@@ -264,7 +264,7 @@ AL_Viper::AL_Viper()
 
 	AirResistanceVFX = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AirResistanceVFX"));
 	AirResistanceVFX->SetupAttachment(JetMesh);
-	AirResistanceVFX->SetRelativeLocation(FVector(-150 , -16.5 , 285));	
+	AirResistanceVFX->SetRelativeLocation(FVector(-150 , -16.5 , 285));
 	ConstructorHelpers::FObjectFinder<UStaticMesh> AirResistanceMesh(TEXT(
 		"/Script/Engine.StaticMesh'/Game/Blueprints/LHJ/resource/Mat/wings_snoke.wings_snoke'"));
 	if (AirResistanceMesh.Succeeded())
@@ -281,6 +281,9 @@ AL_Viper::AL_Viper()
 
 	JetAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAudio"));
 	JetAudio->SetupAttachment(RootComponent);
+
+	JetCanopyAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetCanopyAudio"));
+	JetCanopyAudio->SetupAttachment(RootComponent);
 
 	//============================================
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
@@ -673,16 +676,19 @@ void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct 
 	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+		CRPC_CanopyAudioControl(true , 1);
 		iCanopyNum = 3;
 	}
 	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		CRPC_CanopyAudioControl(true , 0);
 		iCanopyNum = 2;
 	}
 	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		CRPC_CanopyAudioControl(false);
 		iCanopyNum = 1;
 	}
 }
@@ -979,6 +985,7 @@ void AL_Viper::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CRPC_CanopyAudioControl(false);
 	CRPC_AudioControl(false);
 
 	auto pc = Cast<APlayerController>(Controller);
@@ -1004,7 +1011,7 @@ void AL_Viper::BeginPlay()
 		auto KGameInstace = CastChecked<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 		if (!KGameInstace)
 		{
-			LOG_S(Warning , TEXT("GameInstance doesn't exist"));
+			//LOG_S(Warning , TEXT("GameInstance doesn't exist"));
 		}
 		//GI에서 자신의 로그인 ID를 받아오고
 		FString MyUserID = KGameInstace->GetUserId();
@@ -1013,12 +1020,11 @@ void AL_Viper::BeginPlay()
 		//클라이언트일때
 		if (kpc && kpc->IsLocalController())
 		{
-			LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
+			//LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
-
 		}
-	}						
+	}
 	AirResistanceVFX->SetVisibility(false);
 
 	QuatCurrentRotation = GetActorRotation().Quaternion();
@@ -1583,7 +1589,6 @@ void AL_Viper::ChangeBooster()
 }
 
 
-
 void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
 {
 	MulticastRPCBoost(isOn);
@@ -1656,13 +1661,13 @@ void AL_Viper::ClientRPCLocation_Implementation()
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 {
-	if(bJetAirVFXOn)
+	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= newQuat.Rotator().Pitch)
 			MultiRPCVisibleAirVFX(true);
 		else
 			MultiRPCVisibleAirVFX(false);
-	}	
+	}
 
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
@@ -1696,17 +1701,17 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 			if (SpawnedMissile)
 			{
 				// Optionally add any initialization for the spawned missile here
-				LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
+				//LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
 			}
 		}
 		else
 		{
-			LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
+			//LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
 		}
 	}
 	else
 	{
-		LOG_S(Warning , TEXT("타겟이 없습니다!!"));
+		//LOG_S(Warning , TEXT("타겟이 없습니다!!"));
 	}
 }
 
@@ -1748,12 +1753,12 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 		}
 		else
 		{
-			LOG_S(Warning , TEXT("남은 Flare가 없습니다."));
+			//LOG_S(Warning , TEXT("남은 Flare가 없습니다."));
 		}
 	}
 	else
 	{
-		LOG_S(Warning , TEXT("FlareFactory가 없습니다."));
+		//LOG_S(Warning , TEXT("FlareFactory가 없습니다."));
 	}
 }
 
@@ -1911,16 +1916,21 @@ void AL_Viper::BackMoveCanopyHandle()
 	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		if (CanopyPitch > 0)
+			CRPC_CanopyAudioControl(true , 1);
 		iCanopyNum = 2;
 	}
 	else if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		CRPC_CanopyAudioControl(false);
 		iCanopyNum = 1;
 	}
 	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
 	{
 		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+		if (CanopyPitch < 80)
+			CRPC_CanopyAudioControl(true , 0);
 		iCanopyNum = 0;
 	}
 }
@@ -1933,7 +1943,7 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch + CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		LOG_S(Warning , TEXT("Open %f") , newPitch);
+		//LOG_S(Warning , TEXT("Open %f") , newPitch);
 	}
 	else
 	{
@@ -1941,7 +1951,7 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch - CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		LOG_S(Warning , TEXT("Close %f") , newPitch);
+		//LOG_S(Warning , TEXT("Close %f") , newPitch);
 	}
 }
 #pragma endregion
@@ -1978,9 +1988,9 @@ void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& n
 	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
 	if (!KGameState)
 	{
-		LOG_S(Warning , TEXT("GameState doesn't exist"));
+		// LOG_S(Warning , TEXT("GameState doesn't exist"));
 	}
-	LOG_S(Warning , TEXT("MyUserID : %s") , *newName);
+	// LOG_S(Warning , TEXT("MyUserID : %s") , *newName);
 
 	//GameState의 ConnectedPlayerNames 배열에 자신의 ID Set(Replicated)
 	KGameState->SetConnectedPlayerNames(newName);
@@ -1991,7 +2001,7 @@ void AL_Viper::ServerRPC_SetConnectedPlayerNames_Implementation(const FString& n
 	//로그출력
 	for (auto s : temp)
 	{
-		LOG_S(Warning , TEXT("The Name in PlayerList : %s") , *s);
+		// LOG_S(Warning , TEXT("The Name in PlayerList : %s") , *s);
 	}
 
 	//월드에 존재하는 PlayterController배열
@@ -2039,6 +2049,23 @@ void AL_Viper::ClientRPC_SetConnectedPlayerNames_Implementation(const TArray<FSt
 #pragma endregion
 
 #pragma region SFX
+void AL_Viper::CRPC_CanopyAudioControl_Implementation(bool bStart , int32 idx)
+{
+	if (bStart)
+	{
+		if (JetCanopyAudio && JetCanopyAudio->GetSound())
+		{
+			JetCanopyAudio->SetIntParameter("JetSoundIdx" , idx);
+			JetCanopyAudio->Play(0.f);
+		}
+	}
+	else
+	{
+		if (JetCanopyAudio && JetCanopyAudio->GetSound())
+			JetCanopyAudio->Stop();
+	}
+}
+
 void AL_Viper::CRPC_AudioControl_Implementation(bool bStart , int32 idx)
 {
 	if (bStart)
@@ -2061,7 +2088,7 @@ void AL_Viper::Call_CRPC_MissileImpact(FVector ImpactLoc)
 	auto KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
 	if (!KGameState)
 	{
-		LOG_S(Warning , TEXT("GameState doesn't exist"));
+		// LOG_S(Warning , TEXT("GameState doesn't exist"));
 	}
 
 	//월드에 존재하는 PlayerController배열
@@ -2234,7 +2261,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 {
 	float data = value.Get<float>(); // 갱신용 데이터
 	float newData = data; // 이동용 데이터
-	LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
+	// LOG_S(Warning , TEXT("F_ThrottleAxis4 : %f") , data);
 
 	if (DeviceThrottleCurrentValue > data)
 	{
@@ -2292,26 +2319,58 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 	float data = value.Get<float>();
 	if (data > .8f)
 	{
+		bCanopyNormalSound = false;
+		bCanopyOpenSound = false;
+		bCanopyCloseSound = false;
 		// 잠금
 		JetCanopy->SetRelativeLocation(CanopyHoldLoc);
+		if (!bCanopyHoldSound)
+		{
+			bCanopyHoldSound = true;
+			CRPC_CanopyAudioControl(true , 1);
+		}
 		iCanopyNum = 3;
 	}
 	else if (data > .6f)
 	{
+		bCanopyHoldSound = false;
+		bCanopyNormalSound = false;
+		bCanopyOpenSound = false;
 		// 닫기
 		JetCanopy->SetRelativeLocation(CanopyCloseLoc);
+		if (!bCanopyCloseSound && CanopyPitch > 0)
+		{
+			bCanopyCloseSound = true;
+			CRPC_CanopyAudioControl(true , 0);
+		}
 		iCanopyNum = 2;
 	}
 	else if (data > .3f)
 	{
+		bCanopyHoldSound = false;
+		bCanopyOpenSound = false;
+		bCanopyCloseSound = false;
 		// 중립
 		JetCanopy->SetRelativeLocation(CanopyNormalLoc);
+		if (!bCanopyNormalSound)
+		{
+			bCanopyNormalSound = true;
+			CRPC_CanopyAudioControl(false);
+		}
 		iCanopyNum = 1;
 	}
 	else
 	{
+		bCanopyHoldSound = false;
+		bCanopyNormalSound = false;
+		bCanopyNormalSound = false;
 		// 열기
 		JetCanopy->SetRelativeLocation(CanopyOpenLoc);
+		if (!bCanopyOpenSound && CanopyPitch < 80)
+		{
+			bCanopyOpenSound = true;
+			CRPC_CanopyAudioControl(true , 0);
+		}
 		iCanopyNum = 0;
 	}
 }
