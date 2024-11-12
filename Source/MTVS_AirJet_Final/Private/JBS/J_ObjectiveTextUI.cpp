@@ -125,7 +125,8 @@ void UJ_ObjectiveTextUI::SetBodyText(const TArray<FDefaultTextUIData> &objAry, b
 
 void UJ_ObjectiveTextUI::SetBodyTextValue(class UWidget *textWidget, const FString &str)
 {
-    auto* subEle = CastChecked<UJ_ObjectiveSubElementUI>(textWidget);
+    auto* subEle = Cast<UJ_ObjectiveSubElementUI>(textWidget);
+    if(!subEle) return;
 
     subEle->SetSubText(str);
 }

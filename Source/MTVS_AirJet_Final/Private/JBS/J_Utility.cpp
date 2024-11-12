@@ -403,3 +403,31 @@ FString FAIFeedbackRes::ToString() const
 {
     return FString::Printf(TEXT("결과 등급 : %d, 코멘트 : %s"), rank,*comment);
 }
+
+int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
+{
+    // FIXME 정의서 확인 후 수정 필요
+    int result = -1;
+    switch (type) {
+    case ETacticalOrder::NONE:
+        result = 0;
+        break;
+    case ETacticalOrder::MOVE_THIS_POINT:
+        result = 0;
+        break;
+    case ETacticalOrder::FORMATION_FLIGHT:
+        result = 0;
+        break;
+    case ETacticalOrder::NEUTRALIZE_TARGET:
+        result = 0;
+        break;
+    case ETacticalOrder::ENGINE_START:
+        result = 0;
+        break;
+    case ETacticalOrder::TAKE_OFF:
+        result = 0;
+        break;
+    }
+
+    return result;
+}

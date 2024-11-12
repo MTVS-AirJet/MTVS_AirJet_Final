@@ -4,6 +4,13 @@
 #include "JBS/J_JsonManager.h"
 #include "Engine/Engine.h"
 #include "JBS/J_Utility.h"
+#include "Serialization/BulkData.h"
+#include "Sound/SoundWave.h"
+#include "Sound/SoundCue.h"
+#include "Misc/Base64.h"
+#include "Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundWaveProcedural.h"
+#include "UObject/UObjectGlobals.h"
 #include <JBS/J_JsonUtility.h>
 #include <KHS/K_GameInstance.h>
 
@@ -111,6 +118,10 @@ void AJ_JsonManager::ReqCV()
 void AJ_JsonManager::OnGetCVData(const FCommanderVoiceRes &resData)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.voice));
+
+	tempVoice = UJ_JsonUtility::ConvertBase64WavToSound(resData.voice);
+
+	PlayTempVoice();
 }
 
 void AJ_JsonManager::ReqAIFeedback()

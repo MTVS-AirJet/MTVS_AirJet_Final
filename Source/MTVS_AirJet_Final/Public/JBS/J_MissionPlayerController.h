@@ -40,6 +40,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UJ_ObjectiveUIComp* objUIComp;
 
+	// 지휘관 보이스 라인 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
+	class UAudioComponent* commanderAudioComp;
+
 	// 파일럿 역할
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", Replicated)
 	EPilotRole pilotRole;
@@ -97,6 +101,10 @@ protected:
 	// 포제스 시 로컬 클라에서 작동
 	UFUNCTION(Client, Reliable)
 	void CRPC_OnPossess();
+
+	// 목표 시작시 지휘관 보이스 라인 재생
+	UFUNCTION(Client, Reliable)
+	void CRPC_PlayCommanderVoice(const FString &voiceBase64);
 
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")

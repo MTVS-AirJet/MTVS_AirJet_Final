@@ -355,8 +355,18 @@ void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_Missio
 FMissionDataRes AJ_MissionGamemode::LoadMissionData()
 {
     auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+
+    FMissionDataRes& resultData = gi->MissionData;
+
+    // 잘못된 미션 데이터 일 경우 더미 데이터 사용
+    if(resultData.mapName.IsEmpty())
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("잘못된 미션 데이터 | 더미 데이터 사용"));
+
+        resultData = dummyMissionData;
+    }
     
-    return gi->MissionData;
+    return resultData;
 }
 
 
@@ -367,12 +377,17 @@ void AJ_MissionGamemode::StartTacticalOrder()
     startTODel.Broadcast(true);
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
+    
 
     // @@ 임시로 조금 늦게 텔포
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this]() mutable
     {
+        // 미션 영역 변경
+        cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
+        cesiumTPBox->ChangeMissionArea();
+
         //타이머에서 할 거
         TeleportAllStartPoint(startPointActor);
 

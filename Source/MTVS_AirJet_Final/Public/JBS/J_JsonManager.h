@@ -47,6 +47,9 @@ protected:
 	FAIFeedbackReq tempAIFBReq;
 
 public:
+	// 테스트용 사운드 파일
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	class USoundWaveProcedural* tempVoice;
 
 protected:
 #pragma region 웹 통신 테스트
@@ -85,6 +88,9 @@ protected:
 	void ReqAIFeedback();
 	UFUNCTION(BlueprintCallable)
 	void OnGetAIFeedbackData(const FAIFeedbackRes &resData);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayTempVoice();
 
 #pragma endregion
     public:

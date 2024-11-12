@@ -152,10 +152,10 @@ void AJ_ObjectiveTakeOff::CheckFail()
         float check = FVector::DotProduct(baseDirection, curDir);
         // 거리
         float dis = FVector::Dist(this->GetActorLocation(), pilot->GetActorLocation());
-        GEngine->AddOnScreenDebugMessage(-1, .5f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
-        , *this->GetName()
-        , check
-        , dis));
+        // GEngine->AddOnScreenDebugMessage(-1, .5f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
+        // , *this->GetName()
+        // , check
+        // , dis));
         if(check < 0 && dis > failDis)
         {
             auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
