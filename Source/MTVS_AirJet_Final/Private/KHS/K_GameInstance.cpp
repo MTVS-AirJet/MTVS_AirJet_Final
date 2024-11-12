@@ -333,6 +333,7 @@ void UK_GameInstance::Join(uint32 Index)
 	{
 		ServerWidget->RemoveUI(); //서버 UI제거
 	}
+	
 	auto s = SessionSearch->SearchResults[Index].Session.SessionSettings.Settings[SERVER_DATA_SETTINGS_KEY].Data;
 	FString Value;
 	s.GetValue(Value);

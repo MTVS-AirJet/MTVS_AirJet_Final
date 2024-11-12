@@ -231,8 +231,8 @@ void UK_ServerWidget::ServerListUpdateChildren()
 	// //ButtonClickSound를 재생하고싶다.
 	// UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
 
-	if (WidgetInterface)
-		WidgetInterface->RefreshServerList();
+	// if (WidgetInterface)
+	// 	WidgetInterface->RefreshServerList();
 	
 	for (int32 i = 0; i < ServerMenu_ServerList->GetChildrenCount(); ++i)
 	{
