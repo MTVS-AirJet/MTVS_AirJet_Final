@@ -27,6 +27,9 @@ enum class EJsonType : uint8
     ,LOGIN
     ,TEMP02_AUTH
     ,MISSION_DATA_RECEIVE
+    ,COMMANDER_VOICE
+    ,RESULT_GRADE
+    ,AI_FEEDBACK
 };
 
 #pragma region 웹 통신 용 구조체

@@ -216,6 +216,9 @@ void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransfo
     // 전송
     auto* pawn = this->GetPawn();
     pawn->SetActorTransform(tpTR);
+    auto* viper = Cast<AL_Viper>(pawn);
+    viper->QuatCurrentRotation = tpTR.GetRotation();
+    
 }
 
 void AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess_Implementation(EEngineProgress type)
