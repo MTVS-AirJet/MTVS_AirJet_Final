@@ -126,6 +126,9 @@ public:
 	void TravelMainLobbyMap(bool bKeepCurrentSound); // Lobby 맵으로 트래블시키는 함수
 
 	// 4) 사운드 관련 함수 --------------------------------------------------------------------------------------
+	UFUNCTION()
+	void PlayLoginSound(); //로그인 사운드 재생함수
+	UFUNCTION()
 	void PlayLobbySound(); // 로비 사운드 재생 함수
 	UFUNCTION()
 	void PlayStageSound(); // 시뮬레이션 스테이지 사운드 재생 함수
@@ -167,6 +170,9 @@ public:
 	//class UK_IngameWidget* IngmaeWidget; // IngameWidget(UI) 참조 선언
 
 	// 1) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere , Category = "Sound")
+	class USoundWave* LoginSound; // 로그인 사운드
+
 	UPROPERTY(EditAnywhere , Category = "Sound")
 	class USoundWave* LobbySound; // 로비 사운드
 
