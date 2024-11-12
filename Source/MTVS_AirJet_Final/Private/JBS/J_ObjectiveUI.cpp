@@ -2,6 +2,7 @@
 
 
 #include "JBS/J_ObjectiveUI.h"
+#include "Components/PanelSlot.h"
 #include "Components/RichTextBlock.h"
 #include "Components/SlateWrapperTypes.h"
 #include "Components/TextBlock.h"
@@ -16,6 +17,8 @@
 #include "Styling/SlateColor.h"
 #include "JBS/J_MissionCompleteUI.h"
 #include "TimerManager.h"
+#include "UObject/Object.h"
+#include "UObject/WeakObjectPtrTemplates.h"
 
 
 
@@ -55,33 +58,37 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
     auto* vbox = GetObjTextUI()->OBJ_BODY_VBOX;
     if(idx < 0 || idx >= vbox->GetChildrenCount()) return;
     // 종료된 서브 목표 ui
-    auto* subUI = vbox->GetChildAt(idx);
+    TWeakObjectPtr<UWidget> subUI = vbox->GetChildAt(idx);
     // 서브 완료 UMG
-    PlaySubObjEndAnim(subUI,idx);
+    PlaySubObjEndAnim(subUI.Get(),idx);
 
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle, [this, subUI]() mutable
     {
+        auto* subUIPtr = subUI.Get();
+        if(!IsValid(this) || !IsValid(subUIPtr) || !IsValid(subUIPtr->Slot)) return;
         FTimerHandle timerHandle2;
         subObjTimerHandleMap.Add(subUI, timerHandle2);
-
-        if(!subUI) return;
-
-        
 
         GetWorld()->GetTimerManager()
             .SetTimer(timerHandle2, [this, &subUI]() mutable
         {
-            if(!this->IsValidLowLevel() || !subUI->IsValidLowLevel() || !subUI->Slot->IsValidLowLevel())
+            if(!IsValid(subUI.Get()))
             {
                 // 타이머 종료
-                ClearSubObjTimer(subUI);
+                ClearSubObjTimer(subUI.Get());
                 return;
             }
-            
-            //타이머에서 할 거
-            auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
+            auto* slot = Cast<UVerticalBoxSlot>(subUI.Get()->Slot);
+
+            if(!IsValid(slot))
+            {
+                // 타이머 종료
+                ClearSubObjTimer(subUI.Get());
+                return;
+            }
+
             // 사이즈 줄이기
             auto size = slot->GetSize();
             size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
@@ -90,9 +97,9 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
             // 사이즈 0 이됨
             if(size.Value <= 0)
             {
-                subUI->SetVisibility(ESlateVisibility::Hidden);
+                subUI.Get()->SetVisibility(ESlateVisibility::Hidden);
                 // 타이머 종료
-                ClearSubObjTimer(subUI);
+                ClearSubObjTimer(subUI.Get());
                 return;
             }
         }, 0.025, true);

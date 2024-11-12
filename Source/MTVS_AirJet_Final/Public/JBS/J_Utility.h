@@ -28,7 +28,6 @@ enum class EJsonType : uint8
     ,TEMP02_AUTH
     ,MISSION_DATA_RECEIVE
     ,COMMANDER_VOICE
-    ,RESULT_GRADE
     ,AI_FEEDBACK
 };
 
@@ -86,6 +85,50 @@ struct FMissionDataReq
 
     FMissionDataReq() : mapName(TEXT("미설정")) {}
     FMissionDataReq(const FString& mapName) : mapName(mapName) {}
+};
+
+USTRUCT(BlueprintType)
+struct FCommanderVoiceReq
+{
+    GENERATED_BODY()
+public:
+    // 보이스 enum
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int id;
+};
+
+USTRUCT(BlueprintType)
+struct FAIFeedbackReq
+{
+    GENERATED_BODY()
+public:
+    // 결과 값 4개
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float engineStart;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float takeOff;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float formation;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float airToGround;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int playTime;
+
+    FAIFeedbackReq() {}
+    
+    FAIFeedbackReq(TArray<float> successValues)
+    {
+        if(successValues.Num() < 4) return;
+        
+        engineStart = successValues[0];
+        takeOff = successValues[1];
+        formation = successValues[2];
+        airToGround = successValues[3];
+    }
 };
 
 #pragma endregion
@@ -272,6 +315,34 @@ struct FAllMissionDataRes
     TArray<FMissionDataRes> allMissionData;
 
     // @@ 모든 미션 썸네일 이미지 받아오는 기능 추가
+};
+
+
+
+
+USTRUCT(BlueprintType)
+struct FCommanderVoiceRes
+{
+    GENERATED_BODY()
+public:
+    // 보이스 파일 base64 인코딩
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString voice;
+};
+
+USTRUCT(BlueprintType)
+struct FAIFeedbackRes
+{
+    GENERATED_BODY()
+public:
+    // 결산 등급
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int rank;
+    // ai 코멘트
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString comment;
+
+    FString ToString() const;
 };
 
 

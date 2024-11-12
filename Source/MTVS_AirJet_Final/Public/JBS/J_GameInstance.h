@@ -22,6 +22,11 @@ DECLARE_DELEGATE_OneParam(FLoginResDelegate, const FLoginRes&);
 
 DECLARE_DELEGATE_OneParam(FMissionDataGetResDelegate, const FMissionDataRes&);
 
+DECLARE_DELEGATE_OneParam(FCommanderVoiceResDelegate, const FCommanderVoiceRes&);
+
+DECLARE_DELEGATE_OneParam(FAIFeedbackResDelegate, const FAIFeedbackRes&);
+
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
 {
@@ -41,8 +46,6 @@ protected:
 	FResponseDelegate missionDataGetDel;
 
 	FResponseDelegate commanderVoiceDel;
-
-	FResponseDelegate resultGradeDel;
 
 	FResponseDelegate aiFeedbackDel;
 
@@ -68,6 +71,12 @@ protected:
 	UFUNCTION()
 	virtual void ResMissionDataReceive(const FString &jsonData, bool isSuccess);
 
+	UFUNCTION()
+	virtual void ResCommanderVoice(const FString &jsonData, bool isSuccess);
+
+	UFUNCTION()
+	virtual void ResAIFeedback(const FString &jsonData, bool isSuccess);
+
 #pragma endregion
 
 #pragma region 사용 함수 연결용 딜리게이트 단
@@ -81,6 +90,10 @@ public:
 	FLoginResDelegate loginResUseDelegate;
 
 	FMissionDataGetResDelegate missionDataResDelegate;
+
+	FCommanderVoiceResDelegate commanderVoiceResUseDel;
+
+	FAIFeedbackResDelegate aiFeedbackResUseDel;
 #pragma endregion
 
 #pragma endregion

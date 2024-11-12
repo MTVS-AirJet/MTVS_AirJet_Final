@@ -55,6 +55,18 @@ void UJ_GameInstance::RequestToServerByType(EJsonType type, const FString &sendJ
             RequestData(missionDataGetDel, sendJsonData, TEXT("map/data"));
             break;
         }
+		case EJsonType::COMMANDER_VOICE:
+        {
+            commanderVoiceDel.BindUObject(this, &UJ_GameInstance::ResCommanderVoice);
+            RequestData(commanderVoiceDel, sendJsonData, TEXT("voice/main"));
+            break;
+        }
+		case EJsonType::AI_FEEDBACK:
+        {
+            aiFeedbackDel.BindUObject(this, &UJ_GameInstance::ResAIFeedback);
+            RequestData(aiFeedbackDel, sendJsonData, TEXT("result"));
+            break;
+        }
     }
 }
 
@@ -190,6 +202,23 @@ void UJ_GameInstance::ResMissionDataReceive(const FString &jsonData, bool isSucc
 
 	missionDataResDelegate.ExecuteIfBound(resData);
 }
+
+void UJ_GameInstance::ResCommanderVoice(const FString &jsonData, bool isSuccess)
+{
+	FCommanderVoiceRes resData;
+	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
+
+	commanderVoiceResUseDel.ExecuteIfBound(resData);
+}
+
+void UJ_GameInstance::ResAIFeedback(const FString &jsonData, bool isSuccess)
+{
+	FAIFeedbackRes resData;
+	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
+
+	aiFeedbackResUseDel.ExecuteIfBound(resData);
+}
+
 
 
 
