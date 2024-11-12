@@ -112,6 +112,8 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class UAudioComponent* JetAudio;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
+	class UAudioComponent* JetCanopyAudio;
+	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class USoundBase* SwitchSound;
 	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class USoundBase* LockOnSound;
@@ -593,6 +595,8 @@ private:
 	void CRPC_PlaySwitchSound(FVector SoundLoc);
 public:
 	void Call_CRPC_MissileImpact(FVector ImpactLoc);
+	UFUNCTION(Client, Reliable)
+	void CRPC_CanopyAudioControl(bool bStart, int32 idx=0);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Default|Camera")
@@ -747,4 +751,10 @@ public:
 	float VRStickPitchDiv=8.f;
 	UFUNCTION(BlueprintCallable)
 	void VRSticAxis(const FVector2D& value);
+
+private:
+	bool bCanopyHoldSound;
+	bool bCanopyCloseSound;
+	bool bCanopyNormalSound;
+	bool bCanopyOpenSound;
 };
