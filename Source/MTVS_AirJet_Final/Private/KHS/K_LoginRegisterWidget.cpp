@@ -236,6 +236,7 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 			if ( JsonObject->TryGetStringField(TEXT("response") , errorMessage) )
 			{
 				UE_LOG(LogTemp , Warning , TEXT("Login Failed: %s") , *errorMessage);
+				LoginMenu_txt_FailedMSG->SetText(FText::FromString(errorMessage));
 			}
 			ShowLoginFailure();
 		}
