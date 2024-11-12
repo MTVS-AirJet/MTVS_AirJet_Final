@@ -10,6 +10,9 @@
 /**
  * 
  */
+// 자식 지울때 관련 타이머도 같이 지우도록
+DECLARE_DELEGATE(FClearChildDelegate);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_BaseTextUI : public UUserWidget
 {
@@ -23,6 +26,7 @@ protected:
 	// class UVerticalBox* bodyTextVBox;
 
 public:
+	FClearChildDelegate clearChildDel;
 
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)

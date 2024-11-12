@@ -18,6 +18,7 @@
 #include "JBS/J_MissionCompleteUI.h"
 #include "TimerManager.h"
 #include "UObject/Object.h"
+#include "UObject/ObjectPtr.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
 
@@ -25,13 +26,16 @@
 void UJ_ObjectiveUI::SetObjUI(FTextUIData data, bool isInit)
 {
     // ui 설정
+    objectiveTextUI->clearChildDel.BindUObject(this, &UJ_ObjectiveUI::ClearSubObjTimer);
     objectiveTextUI->SetTextUI(data, isInit);
+    
 }
 
 void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)
 {
     // ui 설정
-    objectiveTextUI->SetTextUI(data[0], isInit);
+    SetObjUI(data[0], isInit);
+    
     // 상세 ui 설정
     DETAIL_TEXT_UI->SetTextUI(data[1], isInit);
 }
@@ -56,63 +60,83 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
 {
     // objtextui 의 서브 목표 vbox 가져오기
     auto* vbox = GetObjTextUI()->OBJ_BODY_VBOX;
-    if(idx < 0 || idx >= vbox->GetChildrenCount()) return;
+    if(idx < 0 || idx >= vbox->GetChildrenCount())
+    {
+        ClearSubObjTimer();
+        return;
+    } 
     // 종료된 서브 목표 ui
-    TWeakObjectPtr<UWidget> subUI = vbox->GetChildAt(idx);
+    TObjectPtr<UWidget> subUI = vbox->GetChildAt(idx);
     // 서브 완료 UMG
-    PlaySubObjEndAnim(subUI.Get(),idx);
+    PlaySubObjEndAnim(subUI.Get() ,idx);
 
+    // 사이즈 애니메이션 시작
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this, subUI]() mutable
+        .SetTimer(timerHandle, [this, subUI]()
     {
-        auto* subUIPtr = subUI.Get();
-        if(!IsValid(this) || !IsValid(subUIPtr) || !IsValid(subUIPtr->Slot)) return;
-        FTimerHandle timerHandle2;
-        subObjTimerHandleMap.Add(subUI, timerHandle2);
-
-        GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle2, [this, &subUI]() mutable
-        {
-            if(!IsValid(subUI.Get()))
-            {
-                // 타이머 종료
-                ClearSubObjTimer(subUI.Get());
-                return;
-            }
-            auto* slot = Cast<UVerticalBoxSlot>(subUI.Get()->Slot);
-
-            if(!IsValid(slot))
-            {
-                // 타이머 종료
-                ClearSubObjTimer(subUI.Get());
-                return;
-            }
-
-            // 사이즈 줄이기
-            auto size = slot->GetSize();
-            size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
-            
-            slot->SetSize(size);
-            // 사이즈 0 이됨
-            if(size.Value <= 0)
-            {
-                subUI.Get()->SetVisibility(ESlateVisibility::Hidden);
-                // 타이머 종료
-                ClearSubObjTimer(subUI.Get());
-                return;
-            }
-        }, 0.025, true);
+        RunSubObjTimer(subUI.Get());
     }, 1.5f, false);
 }
 
-void UJ_ObjectiveUI::ClearSubObjTimer(class UWidget *subObj)
+void UJ_ObjectiveUI::RunSubObjTimer(UWidget* subObjUI)
 {
-    if(!subObjTimerHandleMap.Contains(subObj)) return;
+    ClearSubObjTimer();
+    if(!IsValid(this) || !IsValid(subObjUI) || !IsValid(subObjUI->Slot))
+        return;
+    // 다른 서브 타이머 전부 종료 및 배열 초기화
+    // 타이머 추가
+    FTimerHandle timerHandle2;
+    subObjTimerAry.Add(timerHandle2);
 
-    auto th = subObjTimerHandleMap[subObj];
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle2, [this, subObjUI, timerHandle2]()
+    {
+        if(timerHandle2.IsValid())
+            RunAlphaSubObjTimer(subObjUI);
+    }, 0.025, true);
+}
 
-    GetWorld()->GetTimerManager().ClearTimer(th);
+void UJ_ObjectiveUI::RunAlphaSubObjTimer(UWidget *subObjUI)
+{
+    if(!IsValid(subObjUI) || !subObjUI)
+    {
+        // 타이머 종료
+        ClearSubObjTimer();
+        return;
+    }
+    auto* slot = Cast<UVerticalBoxSlot>(subObjUI->Slot);
+
+    if(!IsValid(slot))
+    {
+        // 타이머 종료
+        ClearSubObjTimer();
+        return;
+    }
+
+    // 사이즈 줄이기
+    auto size = slot->GetSize();
+    size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
+    
+    slot->SetSize(size);
+    // 사이즈 0 이됨
+    if(size.Value <= .1f)
+    {
+        subObjUI->SetVisibility(ESlateVisibility::Hidden);
+        // 타이머 종료
+        ClearSubObjTimer();
+        return;
+    }
+}
+
+void UJ_ObjectiveUI::ClearSubObjTimer()
+{
+    // 다른 서브 타이머 전부 종료 및 배열 초기화
+    for(auto& timer : subObjTimerAry)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(timer);
+    }
+    subObjTimerAry.Empty();
 }
 
 float UJ_ObjectiveUI::PlaySubObjEndAnimLerp(UVerticalBoxSlot *subSlot, float alpha)

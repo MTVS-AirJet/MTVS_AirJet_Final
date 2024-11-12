@@ -66,6 +66,7 @@ void UJ_ObjectiveTextUI::SetBodyText(const TArray<FDefaultTextUIData> &objAry, b
     if(isInit)
     {
         // 본문 vbox 초기화
+        clearChildDel.ExecuteIfBound();
         bodyTextVBox->ClearChildren();
         // objAry 개수 만큼 objUI 생성
         for(auto objData : objAry)
