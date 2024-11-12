@@ -251,15 +251,6 @@ public:
 	FRotator RotateRollValue = FRotator(0 , 0 , 1.0f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
-
-	// Rotate Value
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// FRotator ForceUnitRot;
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	// // Add Rotate Value ( ForceUnitRot To NewVector )
-	// UFUNCTION(BlueprintCallable)
-	// FRotator CombineRotate(FVector NewVector);
 	
 private:
 	// For Engine Using
@@ -286,7 +277,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
-	float MaxValueOfMoveForce = 305580000.f;
+	float MaxValueOfMoveForce = 244464000.f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
 	float ValueOfMoveForce = 0.0f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
