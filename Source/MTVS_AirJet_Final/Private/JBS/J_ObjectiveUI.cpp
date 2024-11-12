@@ -73,7 +73,7 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
         GetWorld()->GetTimerManager()
             .SetTimer(timerHandle2, [this, &subUI]() mutable
         {
-            if(!subUI->IsValidLowLevel())
+            if(!this->IsValidLowLevel() || !subUI->IsValidLowLevel() || !subUI->Slot->IsValidLowLevel())
             {
                 // 타이머 종료
                 ClearSubObjTimer(subUI);
