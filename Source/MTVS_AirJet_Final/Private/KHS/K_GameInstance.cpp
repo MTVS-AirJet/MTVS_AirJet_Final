@@ -76,7 +76,7 @@ void UK_GameInstance::Init()
 void UK_GameInstance::OnStart()
 {
 	// 처음에는 로비 사운드 재생
-	PlayLobbySound();
+	//PlayLobbySound();
 }
 
 // 세션 생성 완료 시 호출될 함수

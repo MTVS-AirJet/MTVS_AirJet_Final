@@ -119,7 +119,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UImage* RegisterMenu_img_Failed; //생성실패 이미지
-
+	
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UTextBlock* RegisterMenu_txt_Success; //생성성공 메시지
+	
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* RegisterMenu_txt_Failed; //생성실패 메시지
 
