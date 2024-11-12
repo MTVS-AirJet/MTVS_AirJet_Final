@@ -512,7 +512,10 @@ private:
 	// 캐노피
 	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
 	void PerformLineTrace();
+public:
+	UFUNCTION(BlueprintCallable)
 	void BackMoveCanopyHandle();
+private:
 	FVector CanopyOpenLoc = FVector(492 , 37 , 274);
 	FVector CanopyNormalLoc = FVector(497, 37 , 274);
 	FVector CanopyCloseLoc = FVector(502 ,37, 274);
