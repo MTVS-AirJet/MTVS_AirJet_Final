@@ -952,13 +952,13 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	if ((moveVector.Y > 0.6f || moveVector.Y < -0.6f) && (moveVector.X > 0.6f || moveVector.X < -0.6f))
 	{
-		RollAngle = moveVector.Y * MaxRotationAngle / 3.f;
-		PitchAngle = moveVector.X * MaxRotationAngle / 3.f;
+		RollAngle = moveVector.Y * MaxRotationAngle / 9.f;
+		PitchAngle = moveVector.X * MaxRotationAngle / 8.f;
 	}
 	else
 	{
 		RollAngle = moveVector.Y * MaxRotationAngle / 5.f;
-		PitchAngle = moveVector.X * MaxRotationAngle / 6.f;
+		PitchAngle = moveVector.X * MaxRotationAngle / 10.f;
 	}
 
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
@@ -1277,6 +1277,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
+						CRPC_AudioControl(true , 0);
 						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
 					}
 				}
@@ -2292,6 +2293,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 			StartScenario.pop();
 			DummyThrottleMesh->SetRenderCustomDepth(false);
 			DummyThrottleMesh->CustomDepthStencilValue = 0;
+			engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_THROTTLE_IDLE);
 		}
 
 		// 스로틀 up
@@ -2519,12 +2521,12 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	if ((StickRollAngle > 0.6f || StickRollAngle < -0.6f) && (StickPitchAngle > 0.6f || StickPitchAngle < -0.6f))
 	{
 		StickRollAngle = StickRollAngle * MaxRotationAngle / 3.f;
-		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 3.f;
+		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 5.f;
 	}
 	else
 	{
 		StickRollAngle = StickRollAngle * MaxRotationAngle / 5.f;
-		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 6.f;
+		StickPitchAngle = StickPitchAngle * MaxRotationAngle / 8.f;
 	}
 
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
