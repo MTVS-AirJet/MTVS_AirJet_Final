@@ -50,7 +50,7 @@ protected:
 		protected:
 
 	// obj ui 서브 완료 타이머 맵
-	TMap<class UWidget*, FTimerHandle> subObjTimerHandleMap;
+	TMap<TWeakObjectPtr<UWidget>, FTimerHandle> subObjTimerHandleMap;
 
 public:
 	// 결산 UI
@@ -68,7 +68,7 @@ protected:
 
 	// 서브 목표 완료 UMG
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void PlaySubObjEndAnim(class UWidget* subTextUI, int32 idx);
+	void PlaySubObjEndAnim(UWidget* subTextUI, int32 idx);
 
 	// 서브 목표 완료 스케일 lerp
 	UFUNCTION(BlueprintCallable)

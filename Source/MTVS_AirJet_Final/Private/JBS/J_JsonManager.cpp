@@ -97,3 +97,33 @@ void AJ_JsonManager::OnGetMissionData(const FMissionDataRes &resData)
 
 	tempGetMissionData = resData;
 }
+
+void AJ_JsonManager::ReqCV()
+{
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_JsonManager::OnGetCVData);
+
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, tempCVReq);
+}
+
+void AJ_JsonManager::OnGetCVData(const FCommanderVoiceRes &resData)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.voice));
+}
+
+void AJ_JsonManager::ReqAIFeedback()
+{
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+	gi->aiFeedbackResUseDel.BindUObject(this, &AJ_JsonManager::OnGetAIFeedbackData);
+
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, tempAIFBReq);
+}
+
+void AJ_JsonManager::OnGetAIFeedbackData(const FAIFeedbackRes &resData)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
+}

@@ -399,3 +399,7 @@ bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
     return successValue & checkType;
 }
 
+FString FAIFeedbackRes::ToString() const
+{
+    return FString::Printf(TEXT("결과 등급 : %d, 코멘트 : %s"), rank,*comment);
+}

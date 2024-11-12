@@ -29,7 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	// @@ 임시 요청 데이터
+	// 임시 요청 데이터
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FSignupReq tempSignup;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -39,6 +39,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FMissionDataRes tempGetMissionData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FCommanderVoiceReq tempCVReq;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FAIFeedbackReq tempAIFBReq;
 
 public:
 
@@ -70,6 +76,15 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void OnGetMissionData(const FMissionDataRes &resData);
+
+	UFUNCTION(BlueprintCallable)
+	void ReqCV();
+	UFUNCTION(BlueprintCallable)
+	void OnGetCVData(const FCommanderVoiceRes &resData);
+	UFUNCTION(BlueprintCallable)
+	void ReqAIFeedback();
+	UFUNCTION(BlueprintCallable)
+	void OnGetAIFeedbackData(const FAIFeedbackRes &resData);
 
 #pragma endregion
     public:
