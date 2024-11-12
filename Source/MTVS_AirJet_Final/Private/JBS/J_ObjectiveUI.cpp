@@ -10,9 +10,11 @@
 #include "Components/VerticalBoxSlot.h"
 #include "Components/WidgetSwitcher.h"
 #include "Engine/Engine.h"
+#include "Engine/TimerHandle.h"
 #include "JBS/J_DetailUI.h"
 #include "JBS/J_ObjectiveSubElementUI.h"
 #include "JBS/J_ObjectiveTextUI.h"
+#include "JBS/J_Utility.h"
 #include "Math/UnrealMathUtility.h"
 #include "Styling/SlateColor.h"
 #include "JBS/J_MissionCompleteUI.h"
@@ -86,15 +88,18 @@ void UJ_ObjectiveUI::RunSubObjTimer(UWidget* subObjUI)
         return;
     // 다른 서브 타이머 전부 종료 및 배열 초기화
     // 타이머 추가
-    FTimerHandle timerHandle2;
-    subObjTimerAry.Add(timerHandle2);
+    subObjTimerAry.Add(FTimerHandle());
+
+    auto& timerHandle2 = subObjTimerAry[subObjTimerAry.Num() -1];
 
     GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle2, [this, subObjUI, timerHandle2]()
+        .SetTimer(timerHandle2, [this, subObjUI, &timerHandle2]()
     {
         if(timerHandle2.IsValid())
             RunAlphaSubObjTimer(subObjUI);
-    }, 0.025, true);
+
+        // GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("timer 유효성 : %s"), *UJ_Utility::ToStringBool(timerHandle2.IsValid())));
+    }, subObjEndTimerInterval, true);
 }
 
 void UJ_ObjectiveUI::RunAlphaSubObjTimer(UWidget *subObjUI)
@@ -116,7 +121,7 @@ void UJ_ObjectiveUI::RunAlphaSubObjTimer(UWidget *subObjUI)
 
     // 사이즈 줄이기
     auto size = slot->GetSize();
-    size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
+    size.Value = FMath::Clamp(size.Value - subObjEndTimerInterval, 0, 1);
     
     slot->SetSize(size);
     // 사이즈 0 이됨

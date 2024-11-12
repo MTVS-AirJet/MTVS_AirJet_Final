@@ -58,7 +58,7 @@ void UJ_GameInstance::RequestToServerByType(EJsonType type, const FString &sendJ
 		case EJsonType::COMMANDER_VOICE:
         {
             commanderVoiceDel.BindUObject(this, &UJ_GameInstance::ResCommanderVoice);
-            RequestData(commanderVoiceDel, sendJsonData, TEXT("voice/main"));
+            RequestData(commanderVoiceDel, sendJsonData, TEXT("voice/man"));
             break;
         }
 		case EJsonType::AI_FEEDBACK:

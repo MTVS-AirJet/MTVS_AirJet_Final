@@ -54,4 +54,7 @@ public:
                             , EJsonType type
                             , const FString &sendJsonData = TEXT("")
                             , UJ_GameInstance *gameInstance = nullptr);
+    
+    // base64 인코딩 한 wav 파일을 USoundWaveProcedural 로 변환
+    static USoundWaveProcedural *ConvertBase64WavToSound(const FString& base64Wav);
 };

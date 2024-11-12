@@ -52,6 +52,9 @@ protected:
 	// obj ui 서브 완료 타이머 관리 배열
 	TArray<FTimerHandle> subObjTimerAry;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float subObjEndTimerInterval = 0.025f;
+
 public:
 	// 결산 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
@@ -99,6 +102,7 @@ protected:
     // void ResetTextColor();
 
     // 결산 UI 표시
+	UFUNCTION(BlueprintCallable)
     void ActiveResultUI(const TArray<FObjectiveData>& resultObjData);
 
 };
