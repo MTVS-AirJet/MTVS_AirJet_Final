@@ -40,6 +40,12 @@ protected:
 
 	FResponseDelegate missionDataGetDel;
 
+	FResponseDelegate commanderVoiceDel;
+
+	FResponseDelegate resultGradeDel;
+
+	FResponseDelegate aiFeedbackDel;
+
 #pragma endregion
 	// solved 테스트용 데이터 주고 받기
 	UFUNCTION(BlueprintCallable)

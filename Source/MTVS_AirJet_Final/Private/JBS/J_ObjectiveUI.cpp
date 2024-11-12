@@ -66,15 +66,22 @@ void UJ_ObjectiveUI::EndSubObjUI(int idx, bool isSuccess)
         FTimerHandle timerHandle2;
         subObjTimerHandleMap.Add(subUI, timerHandle2);
 
-        GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle2, [this, subUI]() mutable
-        {
-            if(!subUI) return ClearSubObjTimer(subUI);
+        if(!subUI) return;
 
-            auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
-            if(!slot) return ClearSubObjTimer(subUI);
+        
+
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle2, [this, &subUI]() mutable
+        {
+            if(!subUI->IsValidLowLevel())
+            {
+                // 타이머 종료
+                ClearSubObjTimer(subUI);
+                return;
+            }
             
             //타이머에서 할 거
+            auto* slot = Cast<UVerticalBoxSlot>(subUI->Slot);
             // 사이즈 줄이기
             auto size = slot->GetSize();
             size.Value = FMath::Clamp(size.Value - 0.025f, 0, 1);
