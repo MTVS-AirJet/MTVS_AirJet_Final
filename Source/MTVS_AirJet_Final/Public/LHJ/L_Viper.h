@@ -209,7 +209,7 @@ public: // Input
 	void F_ViperBreakStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void F_ViperShootStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperFpsStarted(const struct FInputActionValue& value);
@@ -393,16 +393,15 @@ private:
 	void ClientRPCSetLockOnUI(AL_Viper* CurrentViper, AActor* target);
 
 	void PlayLockOnSound();
-
-	UFUNCTION(Server , Reliable)
+	
+public:
+	UFUNCTION(Server , Reliable, BlueprintCallable)
 	void ServerRPCMissile(AActor* newOwner);
-
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Reliable, BlueprintCallable)
 	void ServerRPCFlare(AActor* newOwner);
-
-private:
-	UPROPERTY(replicated)
+	UPROPERTY(replicated, BlueprintReadOnly)
 	EWeapon CurrentWeapon = EWeapon::Missile;
+private:
 	UPROPERTY(replicated , EditDefaultsOnly)
 	float FlareCurCnt = 60;
 
