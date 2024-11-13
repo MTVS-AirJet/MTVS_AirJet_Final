@@ -248,10 +248,12 @@ void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 	check(obj);
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("dowdiwad"));
 	FTimerHandle timerHandle2;
-	
+	// check(UJ_Utility::GetBaseMissionPawn(GetWorld()));
+
 	GetWorld()->GetTimerManager()
 		.SetTimer(timerHandle2, [this, obj]() mutable
 	{
+		// check(UJ_Utility::GetBaseMissionPawn(GetWorld()));
 		obj->IS_OBJECTIVE_ACTIVE = true;
 		CUR_ACTIVE_MISSION = obj;		
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
