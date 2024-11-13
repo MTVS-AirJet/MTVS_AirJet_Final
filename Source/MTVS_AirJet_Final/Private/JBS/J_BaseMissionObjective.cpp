@@ -119,9 +119,6 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 로컬 폰 과의 거리 설정
-	AJ_MissionPlayerController* localPC;
-	if(!UJ_Utility::GetLocalPlayerController(GetWorld(), localPC)) return;
-
 	auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
 	// if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
 	if(localPawn && localPawn->IsLocallyControlled())
