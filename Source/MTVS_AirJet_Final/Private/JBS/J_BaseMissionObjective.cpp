@@ -71,6 +71,7 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 	iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
 	iconWorldUIComp->SetupAttachment(RootComponent);
 	iconWorldUIComp->SetIsReplicated(true);
+	iconWorldUIComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
 
 	// 위젯 블루프린트를 찾습니다.
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Blueprints/UI/JBS/WBP_Objective3DIconUI"));
@@ -224,6 +225,8 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 
 void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)
 {
+	if(!HasAuthority()) return;
+	
 	// 2. 요청 한 보이스 라인 crpc로 재생
 	// 모든 pc에게 crpc로 사운드 재생
 	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());

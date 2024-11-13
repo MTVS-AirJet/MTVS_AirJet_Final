@@ -324,7 +324,16 @@ FTacticalOrderData AJ_ObjectiveNeutralizeTarget::SetObjUIData(class AJ_MissionPl
         subObjData.Add(FObjSucceedData(subMP->IS_OBJ_ENDED, subMP->SUCCESS_PERCENT > 0));
     }
 
-    FNeutralizeTargetUIData data(spawnTargetAmt, spawnTargetAmt - destroyedTargetAmt, subObjData);
+    // 모든 pc 가 타격시 목표 종료
+    int all = allPC.Num();
+    int cnt = 0;
+    for(auto* onePC : allPC)
+    {
+        if(targetScoreMap[onePC] != 0.f) 
+            cnt++;
+    }
+
+    FNeutralizeTargetUIData data(all, cnt, subObjData);
 
     return FTacticalOrderData(this->orderType, FFormationFlightUIData(), data);
 }

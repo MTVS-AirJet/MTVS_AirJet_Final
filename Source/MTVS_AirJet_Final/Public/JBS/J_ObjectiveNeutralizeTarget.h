@@ -121,6 +121,7 @@ protected:
 	void DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime);
 
 	// 과녁 점수 갱신
+	UFUNCTION(BlueprintCallable)
 	void UpdateTargetScore(class AJ_MissionPlayerController *pc, float score);
 
 	// 수행도 계산

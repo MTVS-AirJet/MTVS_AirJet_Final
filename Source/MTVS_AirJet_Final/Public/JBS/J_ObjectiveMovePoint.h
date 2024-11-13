@@ -22,13 +22,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UCapsuleComponent* checkCapsuleComp;
 
+	// 빔 이펙트 메시
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
+	class UStaticMeshComponent* beamMeshComp;
+
 	// 빔 길이
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	float beamLength = 500000.f;
+	float beamLength = 500000.0f;
 
 	// 빔 충돌 판정 폭
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	float beamRadius = 500.f;
+	float beamRadius = 4000.0f;
 
 	// FIXME 임시 타이머 핸들
 	FTimerHandle timerHandle;

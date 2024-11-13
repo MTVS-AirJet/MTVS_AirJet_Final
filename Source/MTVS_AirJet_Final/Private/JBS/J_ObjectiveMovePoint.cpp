@@ -3,6 +3,7 @@
 
 #include "JBS/J_ObjectiveMovePoint.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "Engine/HitResult.h"
@@ -22,8 +23,16 @@ AJ_ObjectiveMovePoint::AJ_ObjectiveMovePoint() : AJ_BaseMissionObjective()
 
     checkCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("checkCapsuleComp"));
     checkCapsuleComp->SetupAttachment(rootComp);
+    // 비긴에서 어차피 덮어씌워짐
     checkCapsuleComp->SetCapsuleHalfHeight(40000);
     checkCapsuleComp->SetCapsuleRadius(4000);
+
+    beamMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("beamMeshComp"));
+    beamMeshComp->SetupAttachment(rootComp);
+    beamMeshComp->SetRelativeScale3D(FVector(40,40,20000));
+    beamMeshComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+    
+
 }
 
 void AJ_ObjectiveMovePoint::BeginPlay()
@@ -74,23 +83,23 @@ void AJ_ObjectiveMovePoint::InitBeamVFX()
     }
 
     // 해당 포인트에서 상공 아주 높게 빔 생성
-    // FIXME 임시로 디버그 라인 생성
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this,beamStartLoc,beamEndLoc]() mutable
-    {
-        DrawDebugLine(
-            GetWorld(),
-            beamStartLoc,
-            beamEndLoc,
-            FColor::Blue,
-            false,
-            .1f,
-            0,
-            4000.f
-        );
+    // solved 임시로 디버그 라인 생성
+    // GetWorld()->GetTimerManager()
+    //     .SetTimer(timerHandle, [this,beamStartLoc,beamEndLoc]() mutable
+    // {
+    //     DrawDebugLine(
+    //         GetWorld(),
+    //         beamStartLoc,
+    //         beamEndLoc,
+    //         FColor::Blue,
+    //         false,
+    //         .1f,
+    //         0,
+    //         4000.f
+    //     );
 
-        // GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::White, TEXT("빔 생성 중"));
-    }, 0.1, true);
+    //     // GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::White, TEXT("빔 생성 중"));
+    // }, 0.1, true);
 }
 
 void AJ_ObjectiveMovePoint::OnCheckCapsuleBeginOverlap(
@@ -129,11 +138,14 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
     FName profile = value ? FName(TEXT("MovePoint")) : FName(TEXT("NoCollision"));
     checkCapsuleComp->SetCollisionProfileName(profile);
 
+    // 이펙트 활/비활성화
+    beamMeshComp->SetHiddenInGame(!value);
+
     if(!value)
     {
         // 빔 이펙트 종료
         // @@ VFx 로 변경하면 제거해야함
-        GetWorld()->GetTimerManager().ClearTimer(timerHandle);
+        // GetWorld()->GetTimerManager().ClearTimer(timerHandle);
     }
 }
 

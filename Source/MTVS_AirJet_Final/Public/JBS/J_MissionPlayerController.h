@@ -38,6 +38,9 @@ protected:
 	// 로딩 ui 제거용 타이머
 	FTimerHandle removeLoadingUITH;
 
+	// 로딩 ui 제거 햇음
+	bool wasRemovedUI = false;
+
 public:
 	// 목표 UI 관리 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")

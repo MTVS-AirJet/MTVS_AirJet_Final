@@ -152,7 +152,7 @@ UWidget *UJ_ObjectiveTextUI::CreateBodyElement(TSubclassOf<class UWidget> widget
 void UJ_ObjectiveTextUI::SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot)
 {
     // @@ 시동 절차 이상해져서 뺏음
-    // newSlot->SetPadding(FMargin(0,0,0,20));
+    newSlot->SetPadding(FMargin(20,0,0,5));
     newSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill); // 수평 정렬
     newSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Center); // 수직 정렬
     newSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));

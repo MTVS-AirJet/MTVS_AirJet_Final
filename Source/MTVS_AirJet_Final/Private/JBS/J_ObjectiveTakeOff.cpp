@@ -18,6 +18,8 @@ void AJ_ObjectiveTakeOff::BeginPlay()
 {
     Super::BeginPlay();
 
+    if(!HasAuthority()) return;
+
     // 목표 완료시 목표 UI 완료 바인드
     objectiveEndDel.AddUObject(this, &AJ_ObjectiveTakeOff::SRPC_EndObjUI);
 }
@@ -76,6 +78,8 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
 
 void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool isSuccess)
 {
+    if(!HasAuthority()) return;
+
     if(!takeOffCheckMap.Contains(pc)) return;
     // 이륙 성공 처리
     takeOffCheckMap[pc] = {true, isSuccess};
@@ -85,6 +89,7 @@ void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool is
 
 void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 {
+    if(!HasAuthority()) return;
     // 모든 pc 데이터를 계산
     int maxCnt = allPC.Num();
     int cnt = 0;
@@ -109,6 +114,7 @@ void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 
 FTacticalOrderData AJ_ObjectiveTakeOff::SetObjUIData(class AJ_MissionPlayerController *pc)
 {
+    if(!HasAuthority()) return FTacticalOrderData();
     int maxCnt = allPC.Num();
     int curCnt = FMath::RoundToInt(curFlightPercent);
 
@@ -120,10 +126,13 @@ FTacticalOrderData AJ_ObjectiveTakeOff::SetObjUIData(class AJ_MissionPlayerContr
 void AJ_ObjectiveTakeOff::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
+
+    if(!HasAuthority()) return;
 }
 
 void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
 {
+    if(!HasAuthority()) return;
     // 위치 텔포 박스로
     this->SetActorLocation(tpBox->GetActorLocation());
     // 편대장 바라보게 회전
@@ -136,6 +145,7 @@ void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
 
 void AJ_ObjectiveTakeOff::CheckFail()
 {
+    if(!HasAuthority()) return;
     // 모든 폰 검사
     for(auto* pc : allPC)
     {
@@ -175,6 +185,7 @@ void AJ_ObjectiveTakeOff::ObjectiveEnd(bool isSuccess)
 {
     Super::ObjectiveEnd(isSuccess);
 
+    if(!HasAuthority()) return;
     // 타이머 핸들 해제
     GetWorld()->GetTimerManager().ClearTimer(checkTimeHandle);
 }
