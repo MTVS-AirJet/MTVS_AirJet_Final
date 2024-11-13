@@ -18,6 +18,9 @@ void UJ_CustomWidgetComponent::BeginPlay()
     // 원래 스케일 저장
     // orgUIScale = this->GetRelativeScale3D();
     orgUIScale = FVector::OneVector;
+    // FIXME
+    this->SetActive(false);
+	this->SetHiddenInGame(!false);
 
 }
 
@@ -85,4 +88,11 @@ void UJ_CustomWidgetComponent::FixHeight(APlayerController * pc)
     temp.Z = height;
 
     this->SetWorldLocation(temp);
+}
+
+void UJ_CustomWidgetComponent::SetVisible(bool value)
+{
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
+    this->SetActive(value);
+	this->SetHiddenInGame(!value);
 }

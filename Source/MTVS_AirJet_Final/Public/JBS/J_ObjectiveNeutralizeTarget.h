@@ -78,7 +78,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	TArray<class AJ_MissionPlayerController*> allPC;
 	
-
+	// FIXME
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool isSubEnd = false;
+	bool debugCheck = true;
 public:
 
 protected:
@@ -86,6 +89,8 @@ protected:
     virtual void BeginPlay() override;
     // 스폰 지점 계산
     bool CalcSpawnTransform(FTransform& outSpawnTR);
+	// obj 설정
+    virtual void SetObjectiveActive(bool value) override;
     // 지상 타겟 스폰
 	UFUNCTION(BlueprintCallable)
     void SpawnGroundTarget();

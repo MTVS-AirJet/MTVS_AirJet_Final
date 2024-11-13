@@ -686,6 +686,7 @@ enum class EEngineProgress : uint8
     ,MIC_SWITCH_ON = 1
     ,ENGINE_GEN_SWITCH_ON = 2
     ,ENGINE_CONTROL_SWITCH_ON = 3
+    // FIXME 순서 바뀐거 수정해야함
     ,JFS_STARTER_SWITCH_ON = 4
     ,ENGINE_MASTER_SWITCH_ON = 5
     ,JFS_HANDLE_PULL = 6
