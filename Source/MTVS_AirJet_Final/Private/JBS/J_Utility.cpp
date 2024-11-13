@@ -410,22 +410,22 @@ int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
     int result = -1;
     switch (type) {
     case ETacticalOrder::NONE:
-        result = 0;
+        result = 1;
         break;
     case ETacticalOrder::MOVE_THIS_POINT:
-        result = 0;
+        result = 1;
         break;
     case ETacticalOrder::FORMATION_FLIGHT:
-        result = 0;
+        result = 1;
         break;
     case ETacticalOrder::NEUTRALIZE_TARGET:
-        result = 0;
+        result = 1;
         break;
     case ETacticalOrder::ENGINE_START:
-        result = 0;
+        result = 1;
         break;
     case ETacticalOrder::TAKE_OFF:
-        result = 0;
+        result = 1;
         break;
     }
 
