@@ -112,6 +112,14 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice(const FString &voiceBase64);
 
+	// @@ 목표 시작시 지휘관 보이스 라인 재생
+	UFUNCTION(Client, Reliable)
+	void CRPC_PlayCommanderVoice2(const ETacticalOrder &orderType);
+
+	// 보이스 라인 재생
+	UFUNCTION(BlueprintCallable)
+	void PlayCommanderVoice3(const FCommanderVoiceRes &resData);
+
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")
 	TSubclassOf<class UUserWidget> WaitingForStartFac;

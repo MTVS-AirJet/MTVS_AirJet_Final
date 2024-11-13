@@ -215,12 +215,17 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 	// SRPC_StartNewObjUI();
 
 	// 1. 지휘관 보이스 라인 요청
-	auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
-	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_BaseMissionObjective::PlayCommanderVoiceToAll);
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	for(auto* pc : allPC)
+	{
+		pc->CRPC_PlayCommanderVoice2(this->orderType);
+	}
+	// auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	// gi->commanderVoiceResUseDel.BindUObject(this, &AJ_BaseMissionObjective::PlayCommanderVoiceToAll);
 	
-	FCommanderVoiceReq req(this->orderType);
+	// FCommanderVoiceReq req(this->orderType);
 
-	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+	// UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
 }
 
 void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)
@@ -229,11 +234,11 @@ void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &
 	
 	// 2. 요청 한 보이스 라인 crpc로 재생
 	// 모든 pc에게 crpc로 사운드 재생
-	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-	for(auto* pc : allPC)
-	{
-		pc->CRPC_PlayCommanderVoice(resData.voice);
-	}
+	// auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	// for(auto* pc : allPC)
+	// {
+	// 	pc->CRPC_PlayCommanderVoice(resData.voice);
+	// }
 }
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
