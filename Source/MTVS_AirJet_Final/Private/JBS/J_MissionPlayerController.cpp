@@ -194,9 +194,8 @@ void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
 
 void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
 {
-    FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
+        .SetTimer(removeLoadingUITH, [this]() mutable
     {
         //타이머에서 할 거
         if(missionReadyUI)
@@ -204,7 +203,11 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
             missionReadyUI->RemoveFromParent();
             missionReadyUI = nullptr;
         }
-    }, 1.f, false);
+        // ui 제거했으면 타이머 종료
+        else {
+            GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
+        }
+    }, 1.f, true);
 }
 
 void AJ_MissionPlayerController::SRPC_RemoveLoadingUI_Implementation()

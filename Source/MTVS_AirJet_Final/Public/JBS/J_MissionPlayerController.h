@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TSubclassOf<class UK_LoadingWidget> loadingUIPrefab;
 
+	// 로딩 ui 제거용 타이머
+	FTimerHandle removeLoadingUITH;
+
 public:
 	// 목표 UI 관리 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")

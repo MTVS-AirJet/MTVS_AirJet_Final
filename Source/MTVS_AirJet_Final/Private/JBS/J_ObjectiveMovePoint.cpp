@@ -125,9 +125,9 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
     Super::SetObjectiveActive(value);
 
     // 충돌체 활/비활성화
+    checkCapsuleComp->SetActive(value);
     FName profile = value ? FName(TEXT("MovePoint")) : FName(TEXT("NoCollision"));
     checkCapsuleComp->SetCollisionProfileName(profile);
-    checkCapsuleComp->SetActive(value);
 
     if(!value)
     {

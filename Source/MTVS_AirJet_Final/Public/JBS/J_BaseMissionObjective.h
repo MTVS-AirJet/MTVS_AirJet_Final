@@ -173,5 +173,9 @@ protected:
 	// 목표 값 설정 | 하위 전술명령에서 재정의 필요
 	virtual void InitObjective(ETacticalOrder type, bool initActive = false);
 
-	// 
+	// iconworldui visible 설정
+	UFUNCTION(Client, Reliable)
+	void MRPC_SetVisibleIconUI(bool value);
+
+        // 
 };

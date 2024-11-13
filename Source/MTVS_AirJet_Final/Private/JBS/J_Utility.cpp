@@ -267,6 +267,7 @@ void FEngineProgressData::SetNextProgress()
     case EEngineProgress::ENGINE_GEN_SWITCH_ON:
         this->curProgress = EEngineProgress::ENGINE_CONTROL_SWITCH_ON;
         break;
+        // FIXME 순서 바뀐거 수정해야함
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
         this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
         break;

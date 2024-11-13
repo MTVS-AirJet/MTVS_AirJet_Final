@@ -70,6 +70,7 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 
 	iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
 	iconWorldUIComp->SetupAttachment(RootComponent);
+	iconWorldUIComp->SetIsReplicated(true);
 
 	// 위젯 블루프린트를 찾습니다.
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Blueprints/UI/JBS/WBP_Objective3DIconUI"));
@@ -180,10 +181,12 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 	
 	isObjectiveActive = value;
 
-	iconWorldUIComp->SetActive(isObjectiveActive);
-	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
-
 	if(!HasAuthority()) return;
+
+	iconWorldUIComp->SetVisible(isObjectiveActive);
+
+
+	// MRPC_SetVisibleIconUI(isObjectiveActive);
 	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 	{
@@ -198,6 +201,7 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
 {
 	orderType = type;
+	iconWorldUIComp->SetVisible(false);
 	IS_OBJECTIVE_ACTIVE = initActive;
 }
 
@@ -329,8 +333,12 @@ void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 void AJ_BaseMissionObjective::OnRep_ObjActive()
 {
-	iconWorldUIComp->SetActive(isObjectiveActive);
-	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
+	iconWorldUIComp->SetVisible(isObjectiveActive);
+	// iconWorldUIComp->SetActive(false);
+	// iconWorldUIComp->SetHiddenInGame(!false);
 }
-
-
+// XXX
+void AJ_BaseMissionObjective::MRPC_SetVisibleIconUI_Implementation(bool value)
+{
+	iconWorldUIComp->SetVisible(value);
+}
