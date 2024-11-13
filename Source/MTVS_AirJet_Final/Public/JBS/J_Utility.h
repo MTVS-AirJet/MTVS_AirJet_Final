@@ -497,6 +497,7 @@ enum class ETextStyle : uint8
     ,RESULTDEFAULT
     ,OBJDETAILSUCCESS
     ,OBJDETAILFAIL
+    ,RESULTHEADER
     
 };
 

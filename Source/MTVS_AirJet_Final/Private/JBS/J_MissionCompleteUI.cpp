@@ -33,7 +33,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
 {
     // 데이터 가지고 수행도 섹션 값 설정
     FTextUIData successData;
-    successData.headerText = FRichString(TEXT("클리어 지표"), ETextStyle::RESULTDEFAULT).GetFormatString();
+    successData.headerText = FRichString(TEXT("클리어 지표"), ETextStyle::RESULTHEADER).GetFormatString();
     for(const auto& data : resultObjData)
     {
         FString bodyText = "";
@@ -66,7 +66,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
 
     // ai 피드백
     FTextUIData aiComment;
-    aiComment.headerText = FRichString(TEXT("AI 비행 분석"), ETextStyle::RESULTDEFAULT).GetFormatString();
+    aiComment.headerText = FRichString(TEXT("AI 비행 분석"), ETextStyle::RESULTHEADER).GetFormatString();
     aiComment.bodyTextAry = {
         FRichString(TEXT("@@도레미파론도"), ETextStyle::OBJDETAIL).GetFormatString()
     };
@@ -84,7 +84,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
     float avg = UJ_Utility::CalcAverage(spAry);
 
     FTextUIData successAvg;
-    successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTDEFAULT).GetFormatString();
+    successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
 
     MC_SuccessAvgTextUI->SetTextUI(successAvg, true);
 
