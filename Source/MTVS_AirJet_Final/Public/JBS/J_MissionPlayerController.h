@@ -93,7 +93,7 @@ protected:
 	void SRPC_RemoveLoadingUI();
 
         // 로딩 ui 제거
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(BlueprintCallable, Client, Reliable)
 	void CRPC_RemoveLoadingUI();
 
 	// 시작 지점 텔레포트
