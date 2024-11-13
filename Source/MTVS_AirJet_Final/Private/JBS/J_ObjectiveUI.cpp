@@ -51,6 +51,10 @@ void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)
 
 void UJ_ObjectiveUI::StartObjUI()
 {
+    // 비활성 상태시 활성화
+	if(this->GetVisibility() == ESlateVisibility::Hidden)
+		this->SetVisibility(ESlateVisibility::Visible);
+    
     // 시작 UMG 애니메이션 바인드 | settextui 이후 실행
     objectiveTextUI->startAnimDel.BindUObject(this, &UJ_ObjectiveUI::PlayObjStartAnim);
 }

@@ -345,7 +345,7 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
 
     
 
-    return isTPReady;
+    return false;
 }
 
 
@@ -403,6 +403,6 @@ void AJ_MissionGamemode::StartTacticalOrder()
             // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음 | 나중엔 로딩 뽕맛 보여줘야지
             this->objectiveManagerComp->ActiveNextObjective();
             
-        }, 1.5, false);
-    }, 1.5f, false);
+        }, 3, false);
+    }, 3.f, false);
 }

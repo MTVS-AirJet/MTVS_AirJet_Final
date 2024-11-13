@@ -99,11 +99,11 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
 
 
     float avg = UJ_Utility::CalcAverage(successPercentAry);
-
+ 
     FTextUIData successAvg;
     successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
     successAvg.bodyTextAry = {
-        FRichString(FString::Printf(TEXT("총점 : %d"), avg*100), ETextStyle::RESULTDEFAULT).GetFormatString()
+        FRichString(FString::Printf(TEXT("총점 : %d %%"), static_cast<int>(avg*100)), ETextStyle::RESULTDEFAULT).GetFormatString()
     };
 
     MC_SuccessAvgTextUI->SetTextUI(successAvg, true);

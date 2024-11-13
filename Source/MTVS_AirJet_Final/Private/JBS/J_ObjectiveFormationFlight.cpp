@@ -9,6 +9,7 @@
 #include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_ObjectiveUIComp.h"
+#include "TimerManager.h"
 #include "UObject/Class.h"
 #include <algorithm>
 
@@ -104,8 +105,11 @@ bool AJ_ObjectiveFormationFlight::CheckAlign()
 {
     bool isPass = true;
 
-    // FIXME 나중에 체크 컴포넌트 붙여서 플레이어 각각 계산한 것을 취합하도록
+    // solved 나중에 체크 컴포넌트 붙여서 플레이어 각각 계산한 것을 취합하도록
     TArray<bool> passList;
+    
+    allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
+
     for(auto* pawn : allPawns)
     {
         // pc 가져오기
@@ -198,15 +202,80 @@ void AJ_ObjectiveFormationFlight::SRPC_EndObjUI()
     Super::SRPC_EndObjUI();
 }
 
-void AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI()
-{
-    Super::SRPC_UpdateObjUI();
-}
-
 void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
 {
-    Super::SRPC_StartNewObjUI();
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 모든 pc 가져오기
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 crpc
+    for(auto* pc : allPC)
+    {
+		// 보낼 목표 데이터 구성
+		auto orderData = SetFormationUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUIFormation(orderData);
+    }
+
+    // FIXME
+    PlayCommander(12);
+    FTimerHandle timerHandle3;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle3, [this]() mutable
+    {
+        //타이머에서 할 거
+        PlayCommander(13);
+    }, 3.f, false);
+
+    FTimerHandle timerHandle2;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle2, [this]() mutable
+    {
+        //타이머에서 할 거
+        PlayCommander(14);
+
+    }, 7.f, false);
 }
+
+void AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+		auto orderData = SetFormationUIData(pc);
+    
+        FTacticalOrderData tempData(this->orderType, orderData);
+
+		
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUIFormation(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, tempData);
+		}
+    }
+}
+
+FFormationFlightUIData AJ_ObjectiveFormationFlight::SetFormationUIData(class AJ_MissionPlayerController *pc)
+{
+    return FFormationFlightUIData(
+        isFormation
+        , this->checkHeight
+        , pc->GetPawn()->GetActorLocation().Z
+        , pc->pilotRole
+        , checklistValue >= static_cast<int>(EFormationChecklist::ALIGN_FORMATION));
+}
+
+
 // 최초에 설정만
 FTacticalOrderData AJ_ObjectiveFormationFlight::SetObjUIData(AJ_MissionPlayerController* pc)
 {
@@ -244,3 +313,4 @@ void AJ_ObjectiveFormationFlight::ObjectiveActive()
     // 목표 ui 신규 갱신
     SRPC_StartNewObjUI();
 }
+

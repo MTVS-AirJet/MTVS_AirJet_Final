@@ -208,18 +208,18 @@ void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive
 
 void AJ_BaseMissionObjective::ObjectiveActive()
 {
-	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE || IS_OBJ_ENDED) return;
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
 
 	// 목표 UI 신규 갱신 | movepoint에서 안써서 각자 하기로
 	// SRPC_StartNewObjUI();
 
 	// 1. 지휘관 보이스 라인 요청
-	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-	for(auto* pc : allPC)
-	{
-		pc->CRPC_PlayCommanderVoice2(this->orderType);
-	}
+	// auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	// for(auto* pc : allPC)
+	// {
+	// 	pc->CRPC_PlayCommanderVoice2(this->orderType);
+	// }
 }
 
 void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)
@@ -343,4 +343,13 @@ void AJ_BaseMissionObjective::OnRep_ObjActive()
 void AJ_BaseMissionObjective::MRPC_SetVisibleIconUI_Implementation(bool value)
 {
 	iconWorldUIComp->SetVisible(value);
+}
+
+void AJ_BaseMissionObjective::PlayCommander(int idx)
+{
+	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+	for(auto* pc : allPC2)
+	{
+		pc->CRPC_PlayCommanderVoice3(idx);
+	}
 }

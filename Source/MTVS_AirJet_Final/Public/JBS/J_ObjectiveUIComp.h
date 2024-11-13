@@ -55,9 +55,55 @@ public:
     void CRPC_StartObjUI(const FTacticalOrderData& orderData);
 
     // 목표 UI 갱신
-	// 지상 타겟 무력화
 	UFUNCTION(Client, Unreliable)
     void CRPC_UpdateObjUI(const FTacticalOrderData& orderData, bool isInit = false);
+
+	// 목표 UI 시작 및 갱신
+	UFUNCTION(Client, Unreliable)
+    void CRPC_StartObjUIEngine(const FEngineProgressData& orderData);
+
+	// 목표별 rpc 오버로딩 함수
+	UFUNCTION(Client, Unreliable)
+	void CRPC_UpdateObjUIEngine(const FEngineProgressData &orderData, bool isInit = false);
+
+	// 목표 UI 시작 및 갱신
+	UFUNCTION(Client, Unreliable)
+	void CRPC_StartObjUITakeOff(const FTakeOffData &orderData);
+
+        // 목표별 rpc 오버로딩 함수
+	UFUNCTION(Client, Unreliable)
+	void CRPC_UpdateObjUITakeOff(const FTakeOffData &orderData, bool isInit = false);
+
+	// 목표 UI 시작 및 갱신
+	UFUNCTION(Client, Unreliable)
+	void CRPC_StartObjUIFormation(const FFormationFlightUIData &orderData);
+
+        // 목표별 rpc 오버로딩 함수
+	UFUNCTION(Client, Unreliable)
+	void CRPC_UpdateObjUIFormation(const FFormationFlightUIData &orderData, bool isInit = false);
+
+	// 목표 UI 시작 및 갱신
+	UFUNCTION(Client, Unreliable)
+	void CRPC_StartObjUINeut(const FNeutralizeTargetUIData &orderData);
+
+        // 목표별 rpc 오버로딩 함수
+	UFUNCTION(Client, Unreliable)
+	void CRPC_UpdateObjUINeut(const FNeutralizeTargetUIData &orderData, bool isInit = false);
+
+        // UFUNCTION(Client, Unreliable)
+	// void CRPC_UpdateObjUI(const FFormationFlightUIData& orderData, bool isInit = false) {}
+
+
+
+
+
+
+
+
+
+
+
+
 
 	// 서브 조건 완료 처리
 	UFUNCTION(Client, Reliable)

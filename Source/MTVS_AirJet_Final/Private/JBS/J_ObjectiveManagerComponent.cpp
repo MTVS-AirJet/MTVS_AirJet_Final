@@ -46,6 +46,7 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 
 void UJ_ObjectiveManagerComponent::InitDefaultObj()
 {
+	if(!GetOwner()->HasAuthority()) return;
 	// solved 전술명령 목표와는 별개로 동작하면서 비슷한 로직으로 구성
 	
 	for(auto& dmData : defaultObjDataAry)

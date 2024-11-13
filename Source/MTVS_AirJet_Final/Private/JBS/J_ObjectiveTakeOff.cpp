@@ -12,6 +12,7 @@
 #include "KHS/K_CesiumTeleportBox.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "TimerManager.h"
+#include "JBS/J_ObjectiveUIComp.h"
 
 
 void AJ_ObjectiveTakeOff::BeginPlay()
@@ -27,6 +28,11 @@ void AJ_ObjectiveTakeOff::BeginPlay()
 void AJ_ObjectiveTakeOff::ObjectiveActive()
 {
     Super::ObjectiveActive();
+
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE || IS_OBJ_ENDED)
+    {
+        return;
+    }
 
     // 이미 이륙 했으면 ( 디버그) 그냥 넘어가기
     if(UJ_Utility::GetMissionGamemode(GetWorld())->isTPReady)
@@ -69,11 +75,13 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
 
 
     // 실패 체크 타이머 실행
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, failCheckInterval, true);
+    // GetWorld()->GetTimerManager()
+    //     .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, failCheckInterval, true);
 
     SRPC_StartNewObjUI();
+
+    // ai
+    PlayCommander(10);
 }
 
 void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool isSuccess)
@@ -146,8 +154,10 @@ void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
 void AJ_ObjectiveTakeOff::CheckFail()
 {
     if(!HasAuthority()) return;
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
     // 모든 폰 검사
-    for(auto* pc : allPC)
+    for(auto* pc : allPC2)
     {
         // pc 없으면 통과
         if(!pc) continue;
@@ -189,3 +199,59 @@ void AJ_ObjectiveTakeOff::ObjectiveEnd(bool isSuccess)
     // 타이머 핸들 해제
     GetWorld()->GetTimerManager().ClearTimer(checkTimeHandle);
 }
+
+void AJ_ObjectiveTakeOff::SRPC_StartNewObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 모든 pc 가져오기
+	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 crpc
+    for(auto* pc : allPC2)
+    {
+		// 보낼 목표 데이터 구성
+		auto orderData = SetTakeOffUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUITakeOff(orderData);
+    }
+}
+
+void AJ_ObjectiveTakeOff::SRPC_UpdateObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC2)
+    {
+		auto orderData = SetTakeOffUIData(pc);
+		
+        FTacticalOrderData tempData(this->orderType, orderData);
+
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUITakeOff(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, tempData);
+		}
+    }
+}
+
+FTakeOffData AJ_ObjectiveTakeOff::SetTakeOffUIData(class AJ_MissionPlayerController *pc)
+{
+    if(!HasAuthority()) return FTakeOffData();
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    int maxCnt = allPC2.Num();
+    int curCnt = FMath::RoundToInt(curFlightPercent);
+
+    return FTakeOffData(curCnt, maxCnt);
+}
+
+

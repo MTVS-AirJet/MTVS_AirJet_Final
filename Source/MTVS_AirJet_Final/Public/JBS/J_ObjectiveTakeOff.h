@@ -53,12 +53,21 @@ protected:
 
     virtual void ObjectiveEnd(bool isSuccess = true) override;
 
+    // 목표 UI 시작 | 목표 활성화 시 호출
+    virtual void SRPC_StartNewObjUI() override;
+
+    // 목표 UI 값 갱신 | 수행도 갱신 시 호출
+    virtual void SRPC_UpdateObjUI() override;
+
     // 목표 성공시 수행도 계산
     UFUNCTION(BlueprintCallable)
     void CalcSuccessPercent();
 
     // 목표 ui에 표시할 데이터 설정
     virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
+
+    // 목표 ui에 표시할 데이터 설정
+    virtual FTakeOffData SetTakeOffUIData(class AJ_MissionPlayerController *pc = nullptr);
 
     // 실패 체크
     void CheckFail();

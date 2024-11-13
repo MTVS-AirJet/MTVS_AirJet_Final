@@ -39,8 +39,14 @@ protected:
 	// 시동 목표 활성화
     virtual void ObjectiveActive() override;
 
-	// 수행 절차 성공 체크
-	UFUNCTION(BlueprintCallable)
+	// 목표 UI 시작 | 목표 활성화 시 호출
+    virtual void SRPC_StartNewObjUI() override;
+
+	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
+    virtual void SRPC_UpdateObjUI() override;
+
+    // 수행 절차 성공 체크
+    UFUNCTION(BlueprintCallable)
     void CheckProgress(class AJ_MissionPlayerController *pc, EEngineProgress type);
 
 	// 전체 시동 완료 체크
@@ -55,6 +61,8 @@ protected:
 
 	// 목표 ui에 표시할 데이터 설정
     virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
+
+    FEngineProgressData SetEngineUIData(class AJ_MissionPlayerController *pc = nullptr);
 
 public:
     virtual void Tick(float deltaTime) override;

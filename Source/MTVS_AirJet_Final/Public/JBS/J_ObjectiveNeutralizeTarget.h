@@ -101,6 +101,9 @@ protected:
 	// 목표 UI에 표시할 데이터 구성
 	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
 
+	// 목표 UI에 표시할 데이터 구성
+	virtual FNeutralizeTargetUIData SetNeutUIData(class AJ_MissionPlayerController *pc = nullptr);
+
         // 목표 UI 시작 | 목표 활성화 시 호출
 	virtual void SRPC_StartNewObjUI() override;
 	// 목표 UI 값 갱신 | 수행도 갱신 시 호출

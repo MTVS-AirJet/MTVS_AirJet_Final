@@ -145,13 +145,15 @@ protected:
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_StartNewObjUI();
 
+	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
+	UFUNCTION(Server, Reliable)
+	virtual void SRPC_UpdateObjUI();
+
 	// 개인 목표 ui에 표시할 데이터 만들기 | 상속하면 재정의
 	UFUNCTION(BlueprintCallable)
 	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController* pc = nullptr);
 
-	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
-	UFUNCTION(Server, Reliable)
-	virtual void SRPC_UpdateObjUI();
+	
 	// 목표 UI 완료 | 목표 완료시 호출
 	UFUNCTION(Server, Reliable)
 	virtual void SRPC_EndObjUI();
@@ -177,6 +179,9 @@ protected:
 	// iconworldui visible 설정
 	UFUNCTION(Client, Reliable)
 	void MRPC_SetVisibleIconUI(bool value);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void PlayCommander(int idx);
 
         // 
 };

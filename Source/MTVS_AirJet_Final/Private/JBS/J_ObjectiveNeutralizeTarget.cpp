@@ -119,7 +119,7 @@ void AJ_ObjectiveNeutralizeTarget::ActiveNextObjective()
 
 }
 
-void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(volatile int mIdx, bool isFirst)
+void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 {
     if(mIdx >= subMPArray.Num())
 	{
@@ -136,6 +136,22 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(volatile int mIdx, bool 
 	// 목표 액터 가져오기
 	auto* obj = subMPArray[mIdx];
 	if(!obj) return;
+
+    // FIXME
+    switch (mIdx) {
+        case 0:
+            PlayCommander(16);
+            break;
+        case 1:
+            PlayCommander(17);
+            break;
+        case 2:
+            PlayCommander(18);
+            break;
+        case 3:
+            PlayCommander(20);
+            break;
+    }
 	
 	// @@ 딜레이 여부 | 애니 끝나는걸 애초에 알면 좋을듯
 	float delayTime = isFirst ? 0.01f : 1.5f;
@@ -281,6 +297,8 @@ void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
     if(debugCheck)
     {
         MRPC_SetVisibleIconUI(isSubEnd);
+        PlayCommander(21);
+
         debugCheck = false;
     }
 }
@@ -288,21 +306,70 @@ void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
 
 void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
 {
-    Super::SRPC_StartNewObjUI();
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 
-    // 보낼 데이터 
-    auto orderData = SetObjUIData();
+	// 모든 pc 가져오기
+	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
+    // pc에게 새 전술명령 UI 시작 crpc
+    for(auto* pc : allPC2)
     {
-        pc->objUIComp->CRPC_StartObjUI(orderData);
+		// 보낼 목표 데이터 구성
+		FNeutralizeTargetUIData orderData = SetNeutUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUINeut(orderData);
     }
 }
 
 void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
 {
-    Super::SRPC_UpdateObjUI();
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC2)
+    {
+		auto orderData = SetNeutUIData(pc);
+		
+        FTacticalOrderData tempData(this->orderType, orderData);
+		
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUINeut(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, tempData);
+		}
+    }
+}
+
+FNeutralizeTargetUIData AJ_ObjectiveNeutralizeTarget::SetNeutUIData(class AJ_MissionPlayerController *pc)
+{
+    // 서브 이동 목표 수행 여부 데이터
+    TArray<FObjSucceedData> subObjData;
+    for(auto* subMP : subMPArray)
+    {
+        subObjData.Add(FObjSucceedData(subMP->IS_OBJ_ENDED, subMP->SUCCESS_PERCENT > 0));
+    }
+
+    // 모든 pc 가 타격시 목표 종료
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    int all = allPC2.Num();
+    int cnt = 0;
+
+    
+    for(auto* onePC : allPC2)
+    {
+        if(targetScoreMap[onePC] != 0.f) 
+            cnt++;
+    }
+
+    return FNeutralizeTargetUIData(all, cnt, subObjData);
 }
 
 void AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI()
@@ -385,3 +452,4 @@ void AJ_ObjectiveNeutralizeTarget::SetObjectiveActive(bool value)
 
     iconWorldUIComp->SetVisible(false);
 }
+

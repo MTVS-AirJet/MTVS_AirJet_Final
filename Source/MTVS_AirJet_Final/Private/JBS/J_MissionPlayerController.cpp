@@ -279,3 +279,13 @@ void AJ_MissionPlayerController::PlayCommanderVoice3(const FCommanderVoiceRes &r
     // 재생
     commanderAudioComp->Play();
 }
+
+void AJ_MissionPlayerController::CRPC_PlayCommanderVoice3_Implementation(int idx)
+{
+    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::PlayCommanderVoice3);
+	
+	FCommanderVoiceReq req(idx);
+
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+}

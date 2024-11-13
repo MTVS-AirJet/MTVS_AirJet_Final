@@ -808,6 +808,9 @@ public:
     FTacticalOrderData(ETacticalOrder orderType, FTakeOffData toData)
         : orderType(orderType), toData(toData) {}
 
+    FTacticalOrderData(ETacticalOrder orderType, FNeutralizeTargetUIData ntData)
+        : orderType(orderType), ntData(ntData) {}
+
     // 명령 종류
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     ETacticalOrder orderType;

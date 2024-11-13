@@ -7,6 +7,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
+#include "JBS/J_ObjectiveUIComp.h"
 
 void AJ_ObjectiveEngineStart::BeginPlay()
 {
@@ -130,6 +131,19 @@ void AJ_ObjectiveEngineStart::ActiveNextProgress(FEngineProgressData& data, bool
     // 성공시 수행도 추가
     if(isSuccess)
         data.AddSuccessValue(data.curProgress);
+
+    // ai 보이스
+    int idx = static_cast<int>(data.curProgress);
+
+    if(idx <= 8)
+    {
+        PlayCommander(idx);
+    }
+    else if(idx == 10)
+    {
+        idx = 9;
+        PlayCommander(idx);
+    }
     
     // 다음 수행도로 변경
     data.SetNextProgress();
@@ -162,4 +176,53 @@ FTacticalOrderData AJ_ObjectiveEngineStart::SetObjUIData(AJ_MissionPlayerControl
     FEngineProgressData& data = allData.dataMap[pc];
 
     return FTacticalOrderData(this->orderType, data);
+}
+
+void AJ_ObjectiveEngineStart::SRPC_StartNewObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 모든 pc 가져오기
+	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 crpc
+    for(auto* pc : allPC2)
+    {
+		// 보낼 목표 데이터 구성
+		FEngineProgressData orderData = SetEngineUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUIEngine(orderData);
+    }
+}
+
+FEngineProgressData AJ_ObjectiveEngineStart::SetEngineUIData(class AJ_MissionPlayerController *pc)
+{
+    // 각자 현재 절차 값
+    return allData.dataMap[pc];
+}
+
+void AJ_ObjectiveEngineStart::SRPC_UpdateObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC2)
+    {
+		auto orderData = SetEngineUIData(pc);
+        // @@
+        FTacticalOrderData tempData(this->orderType, orderData);
+
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUIEngine(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, tempData);
+		}
+    }
 }

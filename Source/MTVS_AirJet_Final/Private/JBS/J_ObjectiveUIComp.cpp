@@ -84,6 +84,128 @@ void UJ_ObjectiveUIComp::CRPC_StartObjUI_Implementation(const FTacticalOrderData
 	CRPC_UpdateObjUI(orderData, true);
 }
 
+void UJ_ObjectiveUIComp::CRPC_StartObjUIEngine_Implementation(const FEngineProgressData& orderData)
+{
+	// 비활성 상태시 활성화
+	if(objUI->GetVisibility() == ESlateVisibility::Hidden)
+		objUI->SetVisibility(ESlateVisibility::Visible);
+
+	// 시작 처리
+	objUI->StartObjUI();
+	// 값 설정
+	CRPC_UpdateObjUIEngine(orderData, true);
+}
+
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUIEngine_Implementation(const FEngineProgressData &orderData, bool isInit)
+{
+	TArray<FTextUIData> textUIData;
+
+	CreateUIData(orderData, textUIData, isInit);
+
+	// ui 데이터 확인
+	if(!(textUIData.Num() > 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+
+		return;
+	}
+
+	// ui에 값 전달
+	if(isInit)
+		objUI->SetObjUI(textUIData, isInit);
+	else
+	 	objUI->SetObjUI(textUIData[0], isInit);
+}
+
+void UJ_ObjectiveUIComp::CRPC_StartObjUITakeOff_Implementation(const FTakeOffData &orderData)
+{
+	// 시작 처리
+	objUI->StartObjUI();
+	// 값 설정
+	CRPC_UpdateObjUITakeOff(orderData, true);
+}
+
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUITakeOff_Implementation(const FTakeOffData &orderData, bool isInit)
+{
+	TArray<FTextUIData> textUIData;
+
+	CreateUIData(orderData, textUIData, isInit);
+
+	// ui 데이터 확인
+	if(!(textUIData.Num() > 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+
+		return;
+	}
+
+	// ui에 값 전달
+	if(isInit)
+		objUI->SetObjUI(textUIData, isInit);
+	else
+	 	objUI->SetObjUI(textUIData[0], isInit);
+}
+
+void UJ_ObjectiveUIComp::CRPC_StartObjUIFormation_Implementation(const FFormationFlightUIData &orderData)
+{
+	// 시작 처리
+	objUI->StartObjUI();
+	// 값 설정
+	CRPC_UpdateObjUIFormation(orderData, true);
+}
+
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUIFormation_Implementation(const FFormationFlightUIData &orderData, bool isInit)
+{
+	TArray<FTextUIData> textUIData;
+
+	CreateUIData(orderData, textUIData, isInit);
+
+	// ui 데이터 확인
+	if(!(textUIData.Num() > 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+
+		return;
+	}
+
+	// ui에 값 전달
+	if(isInit)
+		objUI->SetObjUI(textUIData, isInit);
+	else
+	 	objUI->SetObjUI(textUIData[0], isInit);
+}
+
+void UJ_ObjectiveUIComp::CRPC_StartObjUINeut_Implementation(const FNeutralizeTargetUIData &orderData)
+{
+	// 시작 처리
+	objUI->StartObjUI();
+	// 값 설정
+	CRPC_UpdateObjUINeut(orderData, true);
+}
+
+void UJ_ObjectiveUIComp::CRPC_UpdateObjUINeut_Implementation(const FNeutralizeTargetUIData &orderData, bool isInit)
+{
+	TArray<FTextUIData> textUIData;
+
+	CreateUIData(orderData, textUIData, isInit);
+
+	// ui 데이터 확인
+	if(!(textUIData.Num() > 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+
+		return;
+	}
+
+	// ui에 값 전달
+	if(isInit)
+		objUI->SetObjUI(textUIData, isInit);
+	else
+	 	objUI->SetObjUI(textUIData[0], isInit);
+}
+
+
+
 void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderData& orderData, bool isInit)
 {
 	TArray<FTextUIData> textUIData;
@@ -492,3 +614,5 @@ void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIDa
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
+
+
