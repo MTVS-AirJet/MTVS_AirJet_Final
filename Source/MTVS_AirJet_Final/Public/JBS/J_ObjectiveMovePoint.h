@@ -42,6 +42,8 @@ protected:
 	float failDis = 10000.f;
 
 public:
+	class AJ_BaseMissionPawn* getp = nullptr;
+	class AJ_BaseMissionPawn* getworldPawn = nullptr;
 
 protected:
 	virtual void BeginPlay();

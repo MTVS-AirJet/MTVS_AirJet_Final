@@ -206,12 +206,8 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
     // 모든 플레이어의 폰 가져오기
     auto allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
 
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("폰 개수 : %d"), allPawns.Num()));
-
-    // 로딩 ui 제거
-    // auto* gs = UJ_Utility::GetMissionGameState(GetWorld());
-    // gs->RemoveAllLoadingUI();
-    removeLUIDel.Broadcast();
+    // XXX 로딩 ui 제거 비활성
+    // removeLUIDel.Broadcast();
 
 
     // 시작 지점으로 위치 이동
@@ -230,10 +226,13 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         // 스케일 조정되지 않도록 변경
         newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
         pc->MRPC_TeleportStartPoint(newTR);
-
-        // UE_LOG(LogTemp, Warning, TEXT("type : tr계산단, 나는 누구인가 : %s, tr : %s"), *pc->GetName(), *newTR.ToString());
-        // UE_LOG(LogTemp, Warning, TEXT("type : pawn적용단, 나는 누구인가 : %s, tr : %s"), *pc->GetName(), *pawn->GetActorTransform().ToString());
     }
+
+    if(auto* aaa = UJ_Utility::GetBaseMissionPawn(GetWorld()))
+    {
+
+    }
+
 }
 
 AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
@@ -260,6 +259,8 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
 {
     // 시작 지점 트랜스폼
     FTransform baseTR = START_POINT_ACTOR->GetActorTransform();
+    if(baseTR.Equals(FTransform::Identity))
+        return baseTR;
 
     FVector forV = START_POINT_ACTOR->GetActorForwardVector();
     FVector rtV = START_POINT_ACTOR->GetActorRightVector();

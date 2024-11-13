@@ -11,6 +11,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_Utility.h"
 #include "Math/MathFwd.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TimerManager.h"
 
@@ -124,9 +125,9 @@ void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
     Super::SetObjectiveActive(value);
 
     // 충돌체 활/비활성화
-    checkCapsuleComp->SetActive(value);
     FName profile = value ? FName(TEXT("MovePoint")) : FName(TEXT("NoCollision"));
     checkCapsuleComp->SetCollisionProfileName(profile);
+    checkCapsuleComp->SetActive(value);
 
     if(!value)
     {
@@ -153,7 +154,18 @@ void AJ_ObjectiveMovePoint::Tick(float deltaTime)
 void AJ_ObjectiveMovePoint::ObjectiveActive()
 {
     Super::ObjectiveActive();
+    AJ_MissionPlayerController* localPC;
+    UJ_Utility::GetLocalPlayerController(GetWorld(), localPC);
+    
+    getp = localPC->GetPawn<AJ_BaseMissionPawn>();
 
+    getworldPawn = Cast<AJ_BaseMissionPawn>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), AJ_BaseMissionPawn::StaticClass()));
+    if(getworldPawn)
+    {
+        //해당 액터로 뭔가 하기
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *getworldPawn->GetName()));
+    }
     // 편대장 위치 가져오기
     auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
     const auto& leaderLoc = localPawn->GetActorLocation();

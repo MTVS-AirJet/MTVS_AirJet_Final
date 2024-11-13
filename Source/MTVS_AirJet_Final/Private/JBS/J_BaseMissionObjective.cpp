@@ -128,6 +128,10 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 		if(iconWorldUI)
 			iconWorldUI->SetObjDisText(dis);
 	}
+	else if(!localPawn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("폰 없음"));
+	}
 	
 	// init 되기 전까지 무시
 	if(orderType == ETacticalOrder::NONE || !HasAuthority()) return;
