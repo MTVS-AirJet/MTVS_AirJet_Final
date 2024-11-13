@@ -139,11 +139,16 @@ void AJ_ObjectiveTakeOff::CheckFail()
     // 모든 폰 검사
     for(auto* pc : allPC)
     {
+        // pc 없으면 통과
+        if(!pc) continue;
+
         // 이륙 아직 아닐때 체크
         if(takeOffCheckMap[pc].Key) continue;
 
         // 목표를 넘어섰는데 true가 아닌거니깐 실패 처리
         auto* pilot = pc->GetPawn();
+
+        if(!pilot) continue;
 
         // 현재 방향
         const auto& curDir = (this->GetActorLocation() - pilot->GetActorLocation()).GetSafeNormal();
