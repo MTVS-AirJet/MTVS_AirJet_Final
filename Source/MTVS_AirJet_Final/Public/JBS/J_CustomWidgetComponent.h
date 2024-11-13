@@ -56,4 +56,6 @@ public:
 	{
 		targetActor = actor;
 	}
+	UFUNCTION(BlueprintCallable)
+	void SetVisible(bool value);
 };

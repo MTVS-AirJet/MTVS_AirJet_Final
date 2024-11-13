@@ -267,6 +267,7 @@ void FEngineProgressData::SetNextProgress()
     case EEngineProgress::ENGINE_GEN_SWITCH_ON:
         this->curProgress = EEngineProgress::ENGINE_CONTROL_SWITCH_ON;
         break;
+        // FIXME 순서 바뀐거 수정해야함
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
         this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
         break;
@@ -402,4 +403,32 @@ bool FEngineProgressData::CheckProgressSuccess(EEngineProgress type) const
 FString FAIFeedbackRes::ToString() const
 {
     return FString::Printf(TEXT("결과 등급 : %d, 코멘트 : %s"), rank,*comment);
+}
+
+int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
+{
+    // FIXME 정의서 확인 후 수정 필요
+    int result = -1;
+    switch (type) {
+    case ETacticalOrder::NONE:
+        result = 1;
+        break;
+    case ETacticalOrder::MOVE_THIS_POINT:
+        result = 1;
+        break;
+    case ETacticalOrder::FORMATION_FLIGHT:
+        result = 1;
+        break;
+    case ETacticalOrder::NEUTRALIZE_TARGET:
+        result = 1;
+        break;
+    case ETacticalOrder::ENGINE_START:
+        result = 1;
+        break;
+    case ETacticalOrder::TAKE_OFF:
+        result = 1;
+        break;
+    }
+
+    return result;
 }

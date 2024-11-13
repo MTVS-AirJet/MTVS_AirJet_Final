@@ -28,6 +28,7 @@ void UJ_BaseTextUI::SetBodyText(const TArray<FString>& strAry, bool isInit, UVer
     if(isInit)
     {
         // 본문 vbox 초기화
+        clearChildDel.ExecuteIfBound();
         bodyTextVBox->ClearChildren();
         // strAry 개수 만큼 richtext 생성
         for(auto str : strAry)

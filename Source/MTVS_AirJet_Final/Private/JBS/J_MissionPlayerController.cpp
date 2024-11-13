@@ -3,12 +3,14 @@
 
 #include "JBS/J_MissionPlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/AudioComponent.h"
 #include "Components/SlateWrapperTypes.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GenericPlatform/ICursor.h"
 #include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_JsonUtility.h"
 #include "JBS/J_ObjectiveUIComp.h"
 #include "KHS/K_LoadingWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -19,6 +21,9 @@
 #include <JBS/J_MissionGamemode.h>
 #include "KHS/K_StreamingUI.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundBase.h"
+#include "Sound/SoundWave.h"
+#include "Sound/SoundWaveProcedural.h"
 #include "Templates/Casts.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
@@ -29,6 +34,10 @@ AJ_MissionPlayerController::AJ_MissionPlayerController()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryActorTick.bCanEverTick = true;
+
+
+    commanderAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("commanderAudioComp"));
+    commanderAudioComp->SetupAttachment(RootComponent);
 }
 
 void AJ_MissionPlayerController::BeginPlay()
@@ -185,9 +194,8 @@ void AJ_MissionPlayerController::CRPC_AddLoadingUI_Implementation()
 
 void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
 {
-    FTimerHandle timerHandle;
     GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
+        .SetTimer(removeLoadingUITH, [this]() mutable
     {
         //타이머에서 할 거
         if(missionReadyUI)
@@ -195,7 +203,11 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
             missionReadyUI->RemoveFromParent();
             missionReadyUI = nullptr;
         }
-    }, 1.f, false);
+        // ui 제거했으면 타이머 종료
+        else {
+            GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
+        }
+    }, 1.f, true);
 }
 
 void AJ_MissionPlayerController::SRPC_RemoveLoadingUI_Implementation()
@@ -228,3 +240,15 @@ void AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess_Implementation(E
     sendEngineProgDel.ExecuteIfBound(this, type);
 }
 
+void AJ_MissionPlayerController::CRPC_PlayCommanderVoice_Implementation(const FString &voiceBase64)
+{
+    // 디코딩
+    auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(voiceBase64);
+    if(!voice) return;
+    // 정지
+    commanderAudioComp->Stop();
+    // 소리 설정
+    commanderAudioComp->SetSound(voice);
+    // 재생
+    commanderAudioComp->Play();
+}

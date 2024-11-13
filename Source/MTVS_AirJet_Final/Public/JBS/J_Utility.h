@@ -95,6 +95,18 @@ public:
     // 보이스 enum
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int id;
+
+    FCommanderVoiceReq() : id(-1) {}
+
+    FCommanderVoiceReq(int id) : id(id) {}
+    
+    FCommanderVoiceReq(ETacticalOrder type)
+    {
+        id = ConvertOrderTypeToId(type);
+    }
+
+    // 명령 enum에 따라 다른 id 값 가져오기
+    int ConvertOrderTypeToId(ETacticalOrder type);
 };
 
 USTRUCT(BlueprintType)
@@ -328,6 +340,8 @@ public:
     // 보이스 파일 base64 인코딩
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString voice;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FString description;
 };
 
 USTRUCT(BlueprintType)
@@ -458,13 +472,13 @@ struct FObjectiveData
     GENERATED_BODY()
 public:
     // 목표 액터
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AJ_BaseMissionObjective* objectiveActor = nullptr;
     // 목표 종류
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     ETacticalOrder objType = ETacticalOrder::NONE;
     // 목표 수행도 | 목표 완료시 갱신됨
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     float successPercent = 0.f;
 
     FObjectiveData() {}
@@ -672,6 +686,7 @@ enum class EEngineProgress : uint8
     ,MIC_SWITCH_ON = 1
     ,ENGINE_GEN_SWITCH_ON = 2
     ,ENGINE_CONTROL_SWITCH_ON = 3
+    // FIXME 순서 바뀐거 수정해야함
     ,JFS_STARTER_SWITCH_ON = 4
     ,ENGINE_MASTER_SWITCH_ON = 5
     ,JFS_HANDLE_PULL = 6

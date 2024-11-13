@@ -11,6 +11,8 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "JBS/J_BaseMissionPawn.h"
+#include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveIconUI.h"
 #include "JBS/J_ObjectiveUIComp.h"
@@ -68,6 +70,7 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 
 	iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
 	iconWorldUIComp->SetupAttachment(RootComponent);
+	iconWorldUIComp->SetIsReplicated(true);
 
 	// 위젯 블루프린트를 찾습니다.
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClassFinder(TEXT("/Game/Blueprints/UI/JBS/WBP_Objective3DIconUI"));
@@ -102,7 +105,7 @@ void AJ_BaseMissionObjective::BeginPlay()
 
 
 	// 로컬 pc 가져와서 pawn 넣기
-	auto* pc =GetWorld()->GetFirstPlayerController();
+	auto* pc = GetWorld()->GetFirstPlayerController();
 	check(pc);
 	if(pc->IsLocalPlayerController() || !pc->IsLocalPlayerController() && HasAuthority())
 	{
@@ -117,14 +120,18 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 로컬 폰 과의 거리 설정
-	AJ_MissionPlayerController* localPC;
-	if(!UJ_Utility::GetLocalPlayerController(GetWorld(), localPC)) return;
-	
-	if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
+	auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
+	// if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
+	if(localPawn && localPawn->IsLocallyControlled())
 	{
-		auto* localPawn = localPC->GetPawn();
+		// auto* localPawn = localPC->GetPawn();
 		float dis = FVector::Dist(this->GetActorLocation(), localPawn->GetActorLocation());
-		iconWorldUI->SetObjDisText(dis);
+		if(iconWorldUI)
+			iconWorldUI->SetObjDisText(dis);
+	}
+	else if(!localPawn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("폰 없음"));
 	}
 	
 	// init 되기 전까지 무시
@@ -174,10 +181,12 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 	
 	isObjectiveActive = value;
 
-	iconWorldUIComp->SetActive(isObjectiveActive);
-	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
-
 	if(!HasAuthority()) return;
+
+	iconWorldUIComp->SetVisible(isObjectiveActive);
+
+
+	// MRPC_SetVisibleIconUI(isObjectiveActive);
 	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 	{
@@ -192,6 +201,7 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
 {
 	orderType = type;
+	iconWorldUIComp->SetVisible(false);
 	IS_OBJECTIVE_ACTIVE = initActive;
 }
 
@@ -202,6 +212,25 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 
 	// 목표 UI 신규 갱신 | movepoint에서 안써서 각자 하기로
 	// SRPC_StartNewObjUI();
+
+	// 1. 지휘관 보이스 라인 요청
+	auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_BaseMissionObjective::PlayCommanderVoiceToAll);
+	
+	FCommanderVoiceReq req(this->orderType);
+
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+}
+
+void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)
+{
+	// 2. 요청 한 보이스 라인 crpc로 재생
+	// 모든 pc에게 crpc로 사운드 재생
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	for(auto* pc : allPC)
+	{
+		pc->CRPC_PlayCommanderVoice(resData.voice);
+	}
 }
 
 void AJ_BaseMissionObjective::ObjectiveDeactive()
@@ -304,7 +333,12 @@ void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 void AJ_BaseMissionObjective::OnRep_ObjActive()
 {
-	iconWorldUIComp->SetActive(isObjectiveActive);
-	iconWorldUIComp->SetHiddenInGame(!isObjectiveActive);
+	iconWorldUIComp->SetVisible(isObjectiveActive);
+	// iconWorldUIComp->SetActive(false);
+	// iconWorldUIComp->SetHiddenInGame(!false);
 }
-
+// XXX
+void AJ_BaseMissionObjective::MRPC_SetVisibleIconUI_Implementation(bool value)
+{
+	iconWorldUIComp->SetVisible(value);
+}

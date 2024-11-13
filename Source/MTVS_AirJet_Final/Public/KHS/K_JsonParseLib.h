@@ -179,6 +179,12 @@ struct FMapInfoResponse
     int startPointX; // 시작점 X값
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Response | Members")
     int startPointY; // 시작점 Y값
+
+    // 시작 지점
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FMissionStartPos startPoint;
+
+    
     // 목표 데이터 배열
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     TArray<FMissionObject> mission; //미션정보 구조체 배열

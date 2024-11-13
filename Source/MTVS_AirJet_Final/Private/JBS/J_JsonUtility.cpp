@@ -7,12 +7,15 @@
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "JBS/J_Utility.h"
+#include "Misc/Base64.h"
 #include "Json.h"
 #include "JsonObjectConverter.h"
+#include "Sound/SoundWave.h"
 #include "JsonUtilities.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+#include "Sound/SoundWaveProcedural.h"
 #include "Templates/SharedPointer.h"
 #include "Kismet/GameplayStatics.h"
 #include <JBS/J_GameInstance.h>
@@ -97,4 +100,38 @@ void UJ_JsonUtility::RequestExecute(const UWorld *world, EJsonType type, const F
     
     // 2. 요청 시작
     gameInstance->RequestToServerByType(type, sendJsonData);
+}
+
+USoundWaveProcedural *UJ_JsonUtility::ConvertBase64WavToSound(const FString& base64Wav)
+{
+    // 비어있으면 예외처리
+    if(base64Wav.IsEmpty()) return nullptr;
+    // 반환할 사운드 객체
+    auto* voice = NewObject<USoundWaveProcedural>(USoundWaveProcedural::StaticClass());
+    // 사운드 데이터
+	TArray<uint8> voiceData;
+	if(FBase64::Decode(base64Wav, voiceData))
+	{
+        // 채널, 샘플, 길이
+		int16 chl = 0;
+		int32 sampleRate = 0;
+		int32 dataSize = 0;
+		
+        // wav 파일 구성 설정
+		FMemory::Memcpy(&chl, &voiceData[22], sizeof(int16));   // 채널 수
+		FMemory::Memcpy(&sampleRate, &voiceData[24], sizeof(int32));    // 샘플 속도
+		FMemory::Memcpy(&dataSize, &voiceData[40], sizeof(int32)); 
+
+		voice->SetSampleRate(sampleRate);
+		voice->NumChannels = chl;
+		voice->Duration = static_cast<float>(dataSize) / (sampleRate * chl * sizeof(int16));
+		voice->bLooping = false;
+
+        // 실제 사운드 데이터 삽입 | wav 헤더 44 이후
+		TArray<uint8> pcmData(voiceData.GetData() + 44, voiceData.Num() - 44);
+		if(pcmData.Num() > 0)
+			voice->QueueAudio(pcmData.GetData(), pcmData.Num());
+	}
+
+    return voice;
 }

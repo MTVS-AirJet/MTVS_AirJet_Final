@@ -230,6 +230,9 @@ void UK_ServerWidget::ServerListUpdateChildren()
 {
 	// //ButtonClickSound를 재생하고싶다.
 	// UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+
+	// if (WidgetInterface)
+	// 	WidgetInterface->RefreshServerList();
 	
 	for (int32 i = 0; i < ServerMenu_ServerList->GetChildrenCount(); ++i)
 	{
@@ -395,8 +398,7 @@ void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 	md.longitude = resData.longitude;
 	md.mapName = resData.mapName;
 	md.mapImage = resData.mapImage;
-	md.startPoint.x = resData.startPointX;
-	md.startPoint.y = resData.startPointY;
+	md.startPoint = resData.startPoint;
 	md.mission = resData.mission;
 
 	GameInstance->InitializeMission(md);

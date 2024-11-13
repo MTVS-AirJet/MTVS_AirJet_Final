@@ -75,8 +75,9 @@ void UK_GameInstance::Init()
 
 void UK_GameInstance::OnStart()
 {
-	// 처음에는 로비 사운드 재생
-	PlayLobbySound();
+	// 처음에는 로그인 사운드 재생
+	PlayLoginSound();
+	//PlayLobbySound();
 }
 
 // 세션 생성 완료 시 호출될 함수
@@ -333,6 +334,7 @@ void UK_GameInstance::Join(uint32 Index)
 	{
 		ServerWidget->RemoveUI(); //서버 UI제거
 	}
+	
 	auto s = SessionSearch->SearchResults[Index].Session.SessionSettings.Settings[SERVER_DATA_SETTINGS_KEY].Data;
 	FString Value;
 	s.GetValue(Value);
@@ -436,15 +438,16 @@ void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
 	AK_PlayerController* pc = Cast<AK_PlayerController>(GetFirstLocalPlayerController());
 	if (pc && pc->IsLocalController()) // 컨트롤러가 있으면,
 	{
-		if (false == bKeepCurrentSound) // false 인자인 경우 기존 사운드를 유지하지 않으면서 이동
-		{
-			StopCurrentSound();
-		}
-		else
-		{
-			ContinueCurrentSound();
-		}
-
+		// if (true == bKeepCurrentSound) // false 인자인 경우 기존 사운드를 유지하지 않으면서 이동
+		// {
+		// 	StopCurrentSound();
+		// }
+		// else
+		// {
+		// 	ContinueCurrentSound();
+		// }
+		PlayLobbySound();
+		
 		// PlayerController를 통해 LobbyMap으로 이동시킨다.
 		pc->ClientTravel("/Game/Maps/SSM/MAP_Lobby" , ETravelType::TRAVEL_Absolute);
 		//pc->ClientTravel("/Game/Maps/KHS/K_LobbyMap" , ETravelType::TRAVEL_Absolute);
@@ -456,9 +459,28 @@ void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
 	}
 }
 
+
 // 5) 사운드 관련 함수 --------------------------------------------------------------------------------------
 #pragma region Sound Setting
 
+//로그인 사운드 재생함수
+void UK_GameInstance::PlayLoginSound()
+{
+	if (LoginSound)
+	{
+		if (CurrentPlayingSound)
+		{
+			CurrentPlayingSound->Stop();
+		}
+		CurrentPlayingSound = UGameplayStatics::SpawnSound2D(this , LoginSound , 1.0f , 1.0f , 0.0f , nullptr , true ,
+															 false);
+		UE_LOG(LogTemp , Warning , TEXT("Started playing Login sound"));
+	}
+	else
+	{
+		UE_LOG(LogTemp , Error , TEXT("LoginSound is not set"));
+	}
+}
 // 로비 사운드 재생 함수
 void UK_GameInstance::PlayLobbySound()
 {

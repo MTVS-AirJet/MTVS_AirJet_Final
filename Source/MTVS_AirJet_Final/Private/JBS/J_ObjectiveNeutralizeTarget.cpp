@@ -86,7 +86,9 @@ void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
     }
 
     // 자기 위치 아이콘 비활성화
-    this->iconWorldUIComp->bHiddenInGame = true;
+    // this->iconWorldUIComp->bHiddenInGame = true;
+    // MRPC_SetVisibleIconUI(false);
+
 
     // 서브 목표 시작
     ActiveNextObjective();
@@ -124,10 +126,13 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(volatile int mIdx, bool 
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("objAry out of range"));
 
         // 서브 이동 목표 전부 끝난거 타격 목표로 전환
-        this->iconWorldUIComp->bHiddenInGame = false;
-
+        iconWorldUIComp->SetVisible(true);
+        // FIXME 
+        isSubEnd = true;
+        debugCheck = true;
 		return;
 	}
+    
 	// 목표 액터 가져오기
 	auto* obj = subMPArray[mIdx];
 	if(!obj) return;
@@ -271,7 +276,15 @@ void AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed()
 void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
+
+    // FIXME 이거 대체 왜 클라에서 안 꺼지는 거임
+    if(debugCheck)
+    {
+        MRPC_SetVisibleIconUI(isSubEnd);
+        debugCheck = false;
+    }
 }
+
 
 void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
 {
@@ -355,4 +368,11 @@ float AJ_ObjectiveNeutralizeTarget::CalcSuccessPercent()
 
     // 과녁 점수의 평균
     return UJ_Utility::CalcAverage({subMPResult, targetScoreResult});
+}
+
+void AJ_ObjectiveNeutralizeTarget::SetObjectiveActive(bool value)
+{
+    Super::SetObjectiveActive(value);
+
+    iconWorldUIComp->SetVisible(false);
 }

@@ -39,6 +39,9 @@ bool UK_LoginRegisterWidget::Initialize()
 	if ( RegisterMenu_txt_Failed ) {
 		RegisterMenu_txt_Failed->SetVisibility(ESlateVisibility::Hidden); //Register 실패 Txtbox 숨김
 	}
+	if(	RegisterMenu_txt_Success){
+		RegisterMenu_txt_Success->SetVisibility(ESlateVisibility::Hidden); //Register 성공 TextBox 숨김
+	}
 	if ( LoginMenu_txt_FailedMSG ) {
 		LoginMenu_txt_FailedMSG->SetVisibility(ESlateVisibility::Hidden); //Login 실패 Txtbox 숨김
 	}
@@ -219,7 +222,7 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 					GameInstance->SetUserId(UserId);
 				}
 
-				GameInstance->ContinueCurrentSound(); // 로그인 성공 시에도 현재 사운드 계속 재생
+				GameInstance->PlayLobbySound(); // 로비사운드 재생
 				GameInstance->TravelMainLobbyMap(true); // true 인자를 통해 현재 사운드를 유지하며 이동
 			}
 			else {
@@ -233,6 +236,7 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 			if ( JsonObject->TryGetStringField(TEXT("response") , errorMessage) )
 			{
 				UE_LOG(LogTemp , Warning , TEXT("Login Failed: %s") , *errorMessage);
+				LoginMenu_txt_FailedMSG->SetText(FText::FromString(errorMessage));
 			}
 			ShowLoginFailure();
 		}
@@ -430,6 +434,8 @@ void UK_LoginRegisterWidget::ShowRegisterSuccess()
 		RegisterMenu_img_Success->SetVisibility(ESlateVisibility::Visible);
 	if ( RegisterMenu_btn_Success ) // 확인 버튼 보이게
 		RegisterMenu_btn_Success->SetVisibility(ESlateVisibility::Visible);
+	if(RegisterMenu_txt_Success)
+		RegisterMenu_txt_Success->SetVisibility(ESlateVisibility::Visible);
 }
 
 //계정생성 실패 UI보여주기 함수

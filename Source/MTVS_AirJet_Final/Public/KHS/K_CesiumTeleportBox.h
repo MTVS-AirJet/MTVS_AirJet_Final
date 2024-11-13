@@ -53,8 +53,12 @@ public:
 	//저장된 변수를 입력받아서 플레이어와 월드폴리곤위치를 옮기는 함수
 	void MovePlayerandPolygonToDestination(double Longitude, double Latitude);
 
-
-	// JBS 추가 PC에게 이륙했음을 알려주는 함수
+#pragma region JBS 수정 영역
+	// PC에게 이륙했음을 알려주는 함수
 	UFUNCTION(BlueprintCallable)
 	void NotifyFlight(class APawn* flightPawn);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void ChangeMissionArea();
+#pragma endregion
 };

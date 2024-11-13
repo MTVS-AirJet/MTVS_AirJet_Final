@@ -49,8 +49,11 @@ protected:
 	}
 		protected:
 
-	// obj ui 서브 완료 타이머 맵
-	TMap<TWeakObjectPtr<UWidget>, FTimerHandle> subObjTimerHandleMap;
+	// obj ui 서브 완료 타이머 관리 배열
+	TArray<FTimerHandle> subObjTimerAry;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float subObjEndTimerInterval = 0.025f;
 
 public:
 	// 결산 UI
@@ -74,8 +77,16 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	float PlaySubObjEndAnimLerp(class UVerticalBoxSlot *subSlot, float alpha);
 
+	// 서브 목표 완료 size 줄이기 애니메이션 실행
+	void RunSubObjTimer(UWidget* subObjUI);
+	// size 줄이기 단위 실행
+	void RunAlphaSubObjTimer(UWidget *subObjUI);
+
 	// 서브 목표 완료 애니메이션 타이머 종료
-	void ClearSubObjTimer(class UWidget *subObj);
+	void ClearSubObjTimer();
+
+	
+	
 
     public:
 	// 전술명령 텍스트 설정
@@ -91,6 +102,7 @@ protected:
     // void ResetTextColor();
 
     // 결산 UI 표시
+	UFUNCTION(BlueprintCallable)
     void ActiveResultUI(const TArray<FObjectiveData>& resultObjData);
 
 };

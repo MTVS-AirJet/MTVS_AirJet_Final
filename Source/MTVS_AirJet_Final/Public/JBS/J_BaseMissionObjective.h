@@ -95,10 +95,16 @@ protected:
 	}
 		protected:
 
-    public:
+public:
 	// 명령 종류
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	ETacticalOrder orderType = ETacticalOrder::NONE;
+
+	// 명령에 따른 지휘관 보이스라인
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString commanderVoiceBase64;
+
+
 
 	/*
 	미션 비활성화(생성) -> 미션 활성화(시작) -> 미션 수행도 갱신 -> 미션 완료(성공/실패) -> 미션 비활성화(종료) 순 호출됨
@@ -156,6 +162,9 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
 
+	// 지휘관 보이스 데이터 받고 플레이어에게 재생 호출
+	void PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData);
+
     public:
 	// 미션 종료 처리
 	UFUNCTION(BlueprintCallable)
@@ -163,4 +172,10 @@ protected:
 
 	// 목표 값 설정 | 하위 전술명령에서 재정의 필요
 	virtual void InitObjective(ETacticalOrder type, bool initActive = false);
+
+	// iconworldui visible 설정
+	UFUNCTION(Client, Reliable)
+	void MRPC_SetVisibleIconUI(bool value);
+
+        // 
 };

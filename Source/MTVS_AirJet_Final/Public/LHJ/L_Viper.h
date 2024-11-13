@@ -209,7 +209,7 @@ public: // Input
 	void F_ViperBreakStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperBreakCompleted(const struct FInputActionValue& value);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void F_ViperShootStarted(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperFpsStarted(const struct FInputActionValue& value);
@@ -251,15 +251,6 @@ public:
 	FRotator RotateRollValue = FRotator(0 , 0 , 1.0f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
-
-	// Rotate Value
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// FRotator ForceUnitRot;
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	// FVector ChangeMoveVector = FVector(0 , .5f , 0);
-	// // Add Rotate Value ( ForceUnitRot To NewVector )
-	// UFUNCTION(BlueprintCallable)
-	// FRotator CombineRotate(FVector NewVector);
 	
 private:
 	// For Engine Using
@@ -286,7 +277,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
-	float MaxValueOfMoveForce = 305580000.f;
+	float MaxValueOfMoveForce = 244464000.f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
 	float ValueOfMoveForce = 0.0f;
 	UPROPERTY(EditDefaultsOnly , Category="Movements")
@@ -402,16 +393,15 @@ private:
 	void ClientRPCSetLockOnUI(AL_Viper* CurrentViper, AActor* target);
 
 	void PlayLockOnSound();
-
-	UFUNCTION(Server , Reliable)
+	
+public:
+	UFUNCTION(Server , Reliable, BlueprintCallable)
 	void ServerRPCMissile(AActor* newOwner);
-
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Reliable, BlueprintCallable)
 	void ServerRPCFlare(AActor* newOwner);
-
-private:
-	UPROPERTY(replicated)
+	UPROPERTY(replicated, BlueprintReadOnly)
 	EWeapon CurrentWeapon = EWeapon::Missile;
+private:
 	UPROPERTY(replicated , EditDefaultsOnly)
 	float FlareCurCnt = 60;
 
@@ -742,13 +732,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
 	float VRStickMinThreshold=-0.6f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickBankRollDiv=5.f;
+	float VRStickBankRollDiv=16.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickBankPitchDiv=6.f;
+	float VRStickBankPitchDiv=22.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickkRollDiv=4.f;
+	float VRStickkRollDiv=20.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|Move")
-	float VRStickPitchDiv=8.f;
+	float VRStickPitchDiv=36.f;
 	UFUNCTION(BlueprintCallable)
 	void VRSticAxis(const FVector2D& value);
 
