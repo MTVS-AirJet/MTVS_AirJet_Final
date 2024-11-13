@@ -220,12 +220,6 @@ void AJ_BaseMissionObjective::ObjectiveActive()
 	{
 		pc->CRPC_PlayCommanderVoice2(this->orderType);
 	}
-	// auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
-	// gi->commanderVoiceResUseDel.BindUObject(this, &AJ_BaseMissionObjective::PlayCommanderVoiceToAll);
-	
-	// FCommanderVoiceReq req(this->orderType);
-
-	// UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
 }
 
 void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)

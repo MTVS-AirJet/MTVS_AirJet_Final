@@ -51,12 +51,12 @@ protected:
 
 public:
 	// 목표 UI 시작 및 갱신
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client, Unreliable)
     void CRPC_StartObjUI(const FTacticalOrderData& orderData);
 
     // 목표 UI 갱신
 	// 지상 타겟 무력화
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client, Unreliable)
     void CRPC_UpdateObjUI(const FTacticalOrderData& orderData, bool isInit = false);
 
 	// 서브 조건 완료 처리

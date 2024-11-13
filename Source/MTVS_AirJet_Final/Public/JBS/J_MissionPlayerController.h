@@ -116,6 +116,9 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice2(const ETacticalOrder &orderType);
 
+	// UFUNCTION(Client)
+	// void CRPC_PlayCo
+
 	// 보이스 라인 재생
 	UFUNCTION(BlueprintCallable)
 	void PlayCommanderVoice3(const FCommanderVoiceRes &resData);
