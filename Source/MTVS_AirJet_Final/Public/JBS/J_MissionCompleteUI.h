@@ -36,6 +36,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UJ_ObjectiveTextUI* MC_SuccessAvgTextUI;
 
+	// 수행 등급 이미지
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	class UImage* MC_SuccessGradeImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FSlateBrush asd;
+	// 
 
 	// // 수행 결과 요소 프리팹
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")

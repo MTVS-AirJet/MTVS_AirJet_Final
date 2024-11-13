@@ -4,11 +4,13 @@
 #include "JBS/J_MissionCompleteUI.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "JBS/J_MissionCompleteObjElement.h"
 #include "JBS/J_Utility.h"
 #include "Layout/Margin.h"
+#include "Styling/SlateBrush.h"
 #include "UObject/Class.h"
 #include "JBS/J_ObjectiveTextUI.h"
 
@@ -68,7 +70,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
     FTextUIData aiComment;
     aiComment.headerText = FRichString(TEXT("AI 비행 분석"), ETextStyle::RESULTHEADER).GetFormatString();
     aiComment.bodyTextAry = {
-        FRichString(TEXT("@@도레미파론도"), ETextStyle::OBJDETAIL).GetFormatString()
+        FRichString(TEXT("AI 피드백 입력중..."), ETextStyle::RESULTDEFAULT).GetFormatString()
     };
 
     // FIXME 내부 내용 AI와 통신
@@ -89,4 +91,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
     MC_SuccessAvgTextUI->SetTextUI(successAvg, true);
 
     // FIXME 결과 등급 AI 계산
+
+
+    // MC_SuccessGradeImage->SetBrush(FSlateBrush asd)
 }
