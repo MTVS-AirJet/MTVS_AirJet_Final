@@ -105,7 +105,7 @@ void UJ_JsonUtility::RequestExecute(const UWorld *world, EJsonType type, const F
 USoundWaveProcedural *UJ_JsonUtility::ConvertBase64WavToSound(const FString& base64Wav)
 {
     // 비어있으면 예외처리
-    if(base64Wav.IsEmpty()) return;
+    if(base64Wav.IsEmpty()) return nullptr;
     // 반환할 사운드 객체
     auto* voice = NewObject<USoundWaveProcedural>(USoundWaveProcedural::StaticClass());
     // 사운드 데이터
