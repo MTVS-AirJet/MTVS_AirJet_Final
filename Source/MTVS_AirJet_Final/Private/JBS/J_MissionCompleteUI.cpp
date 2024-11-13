@@ -5,8 +5,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/SlateWrapperTypes.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "JBS/J_GameInstance.h"
+#include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionCompleteObjElement.h"
 #include "JBS/J_Utility.h"
 #include "Layout/Margin.h"
@@ -23,6 +26,8 @@ void UJ_MissionCompleteUI::NativeConstruct()
     MC_BackToLobbyBtn->OnClicked.AddDynamic( this, &UJ_MissionCompleteUI::OnClickReturnLobby);
 
     UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(ETextStyle::DEFAULT));
+
+    // MC_SuccessGradeImage->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UJ_MissionCompleteUI::OnClickReturnLobby()
@@ -33,6 +38,21 @@ void UJ_MissionCompleteUI::OnClickReturnLobby()
 
 void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resultObjData)
 {
+    // AI 피드백 함수 바인드
+    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+    gi->aiFeedbackResUseDel.BindUObject(this, &UJ_MissionCompleteUI::SetAIFeedback);
+
+    TArray<float> successPercentAry;
+    Algo::Transform(resultObjData, successPercentAry, [](FObjectiveData temp){
+        return temp.successPercent;
+    });
+    //캐스트 후
+    
+    FAIFeedbackReq feedbackReq(successPercentAry);
+    // 서버에 피드백 요청
+    UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, feedbackReq);
+
+
     // 데이터 가지고 수행도 섹션 값 설정
     FTextUIData successData;
     successData.headerText = FRichString(TEXT("클리어 지표"), ETextStyle::RESULTHEADER).GetFormatString();
@@ -73,25 +93,46 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
         FRichString(TEXT("AI 피드백 입력중..."), ETextStyle::RESULTDEFAULT).GetFormatString()
     };
 
-    // FIXME 내부 내용 AI와 통신
-
     MC_AICommentTextUI->SetTextUI(aiComment, true);
 
-    // @@ 수행도 | 나중엔 그냥 구조체에 포함시키기
-    TArray<float> spAry;
-    Algo::Transform(resultObjData, spAry, [](FObjectiveData temp){
-        return temp.successPercent;
-    });
-    //캐스트 후
-    float avg = UJ_Utility::CalcAverage(spAry);
+    
+
+
+    float avg = UJ_Utility::CalcAverage(successPercentAry);
 
     FTextUIData successAvg;
     successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
+    successAvg.bodyTextAry = {
+        FRichString(FString::Printf(TEXT("총점 : %d"), avg*100), ETextStyle::RESULTDEFAULT).GetFormatString()
+    };
 
     MC_SuccessAvgTextUI->SetTextUI(successAvg, true);
+}
 
-    // FIXME 결과 등급 AI 계산
+void UJ_MissionCompleteUI::SetAIFeedback(const FAIFeedbackRes &resData)
+{
+    // ai 피드백
+    FTextUIData aiComment;
+    aiComment.headerText = FRichString(TEXT("AI 비행 분석"), ETextStyle::RESULTHEADER).GetFormatString();
+    aiComment.bodyTextAry = {
+        FRichString(resData.comment, ETextStyle::RESULTDEFAULT).GetFormatString()
+    };
 
+    MC_AICommentTextUI->SetTextUI(aiComment, true);
 
-    // MC_SuccessGradeImage->SetBrush(FSlateBrush asd)
+    PlayResultGrade(resData.rank);
+}
+
+void UJ_MissionCompleteUI::PlayResultGrade(int rank)
+{
+    // ai 랭크
+    if(rank >= 0 && rank < gradeImgAry.Num())
+    {
+        MC_SuccessGradeImage->SetBrush(gradeImgAry[rank]);
+        MC_SuccessGradeImage->SetVisibility(ESlateVisibility::Visible);
+        
+    }
+    else {
+        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("등급 값이 이상해요 : %d"), rank));
+    }
 }
