@@ -40,8 +40,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UImage* MC_SuccessGradeImage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FSlateBrush asd;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TArray<FSlateBrush> gradeImgAry;
 	// 
 
 	// // 수행 결과 요소 프리팹
@@ -59,6 +59,13 @@ protected:
 	// 로비로 돌아가기 이벤트
 	UFUNCTION(BlueprintCallable)
 	void OnClickReturnLobby();
+
+	UFUNCTION(BlueprintCallable)
+	void SetAIFeedback(const FAIFeedbackRes &resData);
+
+	// 결과 등급 등장
+	UFUNCTION(BlueprintCallable)
+	void PlayResultGrade(int rank);
 
     public:
 	// 결과 값 받기
