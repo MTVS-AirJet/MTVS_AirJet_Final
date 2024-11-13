@@ -112,6 +112,7 @@ USoundWaveProcedural *UJ_JsonUtility::ConvertBase64WavToSound(const FString& bas
 	TArray<uint8> voiceData;
 	if(FBase64::Decode(base64Wav, voiceData))
 	{
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("4. 디코딩 완료"));
         // 채널, 샘플, 길이
 		int16 chl = 0;
 		int32 sampleRate = 0;

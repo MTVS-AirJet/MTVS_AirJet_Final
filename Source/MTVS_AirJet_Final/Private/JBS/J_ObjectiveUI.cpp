@@ -15,6 +15,7 @@
 #include "JBS/J_ObjectiveSubElementUI.h"
 #include "JBS/J_ObjectiveTextUI.h"
 #include "JBS/J_Utility.h"
+#include "Layout/Margin.h"
 #include "Math/UnrealMathUtility.h"
 #include "Styling/SlateColor.h"
 #include "JBS/J_MissionCompleteUI.h"
@@ -127,6 +128,7 @@ void UJ_ObjectiveUI::RunAlphaSubObjTimer(UWidget *subObjUI)
     // 사이즈 0 이됨
     if(size.Value <= .1f)
     {
+        slot->SetPadding(FMargin(0,0,0,0));
         subObjUI->SetVisibility(ESlateVisibility::Hidden);
         // 타이머 종료
         ClearSubObjTimer();
