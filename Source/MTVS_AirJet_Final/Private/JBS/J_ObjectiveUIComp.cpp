@@ -485,7 +485,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIDa
 	ETextStyle style = data.curTakeOffCnt <= data.maxTakeOffCnt ? ETextStyle::DEFAULT : ETextStyle::SUCCESS;
 
 	FDefaultTextUIData subObj;
-	subObj.headerText = FRichString(FString::Printf(TEXT("@@ 이륙 수행도 : %d / %d"), data.curTakeOffCnt, data.maxTakeOffCnt), style).GetFormatString();
+	subObj.headerText = FRichString(FString::Printf(TEXT("이륙 수행도 : %d / %d"), data.curTakeOffCnt, data.maxTakeOffCnt), style).GetFormatString();
 	subObj.bodyTextAry.Add(FRichString(TEXT("엔진 출력을 80%로 높여 활주로를 따라 이륙을 시작합니다."), ETextStyle::OBJDETAIL).GetFormatString());
 
 	objUIData.bodyObjAry.Add(subObj);

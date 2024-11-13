@@ -31,6 +31,8 @@ void UJ_ObjectiveUI::SetObjUI(FTextUIData data, bool isInit)
     // ui 설정
     objectiveTextUI->clearChildDel.BindUObject(this, &UJ_ObjectiveUI::ClearSubObjTimer);
     objectiveTextUI->SetTextUI(data, isInit);
+
+    DETAIL_TEXT_UI->SetVisibility(ESlateVisibility::Hidden);
     
 }
 
@@ -41,6 +43,8 @@ void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)
     
     // 상세 ui 설정
     DETAIL_TEXT_UI->SetTextUI(data[1], isInit);
+
+    DETAIL_TEXT_UI->SetVisibility(ESlateVisibility::Hidden);
 }
 
 
