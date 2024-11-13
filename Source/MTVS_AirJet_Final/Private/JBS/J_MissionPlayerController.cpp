@@ -256,3 +256,26 @@ void AJ_MissionPlayerController::CRPC_PlayCommanderVoice_Implementation(const FS
     // 재생
     commanderAudioComp->Play();
 }
+
+void AJ_MissionPlayerController::CRPC_PlayCommanderVoice2_Implementation(const ETacticalOrder &orderType)
+{
+    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::PlayCommanderVoice3);
+	
+	FCommanderVoiceReq req(orderType);
+
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+}
+
+void AJ_MissionPlayerController::PlayCommanderVoice3(const FCommanderVoiceRes &resData)
+{
+    // 디코딩
+    auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(resData.voice);
+    if(!voice) return;
+    // 정지
+    commanderAudioComp->Stop();
+    // 소리 설정
+    commanderAudioComp->SetSound(voice);
+    // 재생
+    commanderAudioComp->Play();
+}
