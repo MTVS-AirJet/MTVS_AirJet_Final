@@ -174,12 +174,63 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	FString curHeightStr = FString::FormatAsNumber(data.curHeight * 3.281 / 100);
 
 	objUIData.headerText = FRichString(TEXT("편대 비행")).GetFormatString();
-	objUIData.bodyTextAry = {
-		FRichString(FString::Printf(TEXT("편대 비행 중 : %s"), *UJ_Utility::ToStringBool(data.checkFormation))).GetFormatString()
-		,FRichString(FString::Printf(TEXT("목표 고도 %s ft: \n현재 %s ft"), *checkHeightStr, *curHeightStr)).GetFormatString()
-		,FRichString(FString::Printf(TEXT("올바른 위치 : %s"), *UJ_Utility::ToStringBool(data.isCorrectPosition))).GetFormatString()
-		,FRichString(FString::Printf(TEXT("당신의 역할 : %s"), *UJ_Utility::PilotRoleToString(data.pilotRole))).GetFormatString()
+	// 고도 체크 서브
+	// FIXME 이거 uidata 에서 애초에 받는걸로 변경하기
+	float checkHeightAdj = 60000;
+	bool isPass = UJ_Utility::CheckValueRange(data.curHeight, data.checkHeight - checkHeightAdj, data.checkHeight + checkHeightAdj);
+	ETextStyle heightStyle = isPass ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+	// 포매팅
+	FString formCurHeightStr = FRichString(curHeightStr, heightStyle).GetFormatString();
+
+	FString rCHS1 = FRichString(FString::Printf(TEXT("지정된 고도 %s 피트를 유지합니다."), *checkHeightStr), ETextStyle::OBJDETAIL).GetFormatString();
+	
+	FString rCHS2 = FRichString(TEXT("- 현재 "), ETextStyle::OBJDETAIL).GetFormatString()
+		+ formCurHeightStr
+		+ FRichString(TEXT(" ft"), ETextStyle::OBJDETAIL).GetFormatString();
+
+	FDefaultTextUIData checkHeightData;
+	checkHeightData.headerText = FRichString(TEXT("고도 유지")).GetFormatString();
+	checkHeightData.bodyTextAry = {
+		rCHS1 + "\n" + rCHS2
 	};
+
+	objUIData.bodyObjAry.Add(checkHeightData);
+
+	// /
+
+	// 위치 서브
+	FDefaultTextUIData checkPosData;
+	checkPosData.headerText = FRichString(TEXT("편대 거리 유지")).GetFormatString();
+
+	// 나의 역할 : %s
+	// |편대장은 ""
+	// 편대장의 우측 후미에 붙어서 10 ft 간격을 유지한채로 비행해야합니다.
+	
+	FString cpStr = data.isCorrectPosition ? TEXT("@@올바른 위치에 있음") : TEXT("@@올바른 위치에 있지 않음");
+	ETextStyle cpStyle = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+	FRichString formCPStr(cpStr, cpStyle);
+
+	checkPosData.bodyTextAry = {
+		formCPStr.GetFormatString()
+	};
+
+	objUIData.bodyObjAry.Add(checkPosData);
+
+	// /
+
+	// 전체 체크
+	FDefaultTextUIData checkFormationData;
+	checkFormationData.headerText = FRichString(TEXT("@@현재 진형 체크")).GetFormatString();
+	
+	FString cfStr = UJ_Utility::ToStringBool(data.isCorrectPosition) ;
+	ETextStyle cfStyle = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+	FRichString formcfStr(cfStr, cfStyle);
+
+	checkFormationData.bodyTextAry = {
+		formcfStr.GetFormatString()
+	};
+
+	objUIData.bodyObjAry.Add(checkFormationData);
 
 	if(isInit)
 	{
@@ -321,10 +372,10 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 				break;
 			// FIXME 이거 순서 바뀐거 수정해야함
 			case EEngineProgress::JFS_STARTER_SWITCH_ON:
-				textStr = TEXT("JFS(보조 동력 장치)는 엔진 시동을 위한 필수 장치입니다. 이 장치를 켜서 주 엔진을 시작할 준비를 합니다.");
+				textStr = TEXT("엔진의 모든 주요 시스템을 활성화합니다.");
 				break;
 			case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
-				textStr = TEXT("엔진의 모든 주요 시스템을 활성화합니다.");
+				textStr = TEXT("JFS(보조 동력 장치)는 엔진 시동을 위한 필수 장치입니다. 이 장치를 켜서 주 엔진을 시작할 준비를 합니다.");
 				break;
 			case EEngineProgress::JFS_HANDLE_PULL:
 				textStr = TEXT("JFS(보조 동력 장치) 을 당기면, 주 엔진이 실제로 회전하기 시작합니다.");
@@ -336,7 +387,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 				textStr = TEXT("조종석 덮개를 닫습니다. 충분히 닫히면, 캐노피를 고정하여 외부와 격리된 비행 준비가 완료됩니다.");
 				break;
 			case EEngineProgress::STANDBY_OTHER_PLAYER:
-				textStr = TEXT("@@다른 파일럿 대기");
+				textStr = TEXT("다른 플레이어의 시동 절차가 완료될때까지 기다려주세요.");
 				break;
 			case EEngineProgress::RELEASE_SIDE_BREAK:
 				textStr = TEXT("이륙 전 브레이크를 풀어 기체를 이륙시킬 준비를 합니다.");
@@ -373,11 +424,16 @@ void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIDa
 	FTextUIData detailUIData;
 	check(this);
 	// 목표 단
-	objUIData.headerText = FRichString(TEXT("이륙 절차")).GetFormatString();
+	objUIData.headerText = FRichString(TEXT("이륙 시작")).GetFormatString();
 
-	FString str = FString::Printf(TEXT("@@ 임시 이륙 텍스트 : %d / %d"), data.curTakeOffCnt, data.maxTakeOffCnt);
+	// 서브 목표 단
 	ETextStyle style = data.curTakeOffCnt <= data.maxTakeOffCnt ? ETextStyle::DEFAULT : ETextStyle::SUCCESS;
-	objUIData.bodyTextAry.Add(FRichString(str,style).GetFormatString());
+
+	FDefaultTextUIData subObj;
+	subObj.headerText = FRichString(FString::Printf(TEXT("@@ 이륙 수행도 : %d / %d"), data.curTakeOffCnt, data.maxTakeOffCnt), style).GetFormatString();
+	subObj.bodyTextAry.Add(FRichString(TEXT("엔진 출력을 80%로 높여 활주로를 따라 이륙을 시작합니다."), ETextStyle::OBJDETAIL).GetFormatString());
+
+	objUIData.bodyObjAry.Add(subObj);
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }

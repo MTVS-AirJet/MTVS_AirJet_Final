@@ -331,11 +331,12 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
         str = TEXT("엔진 제어 장치 가동");
         break;
+    // FIXME 순서 바뀐거 수정해야함 | 설명도!
     case EEngineProgress::JFS_STARTER_SWITCH_ON:
-        str = TEXT("JFS 스타트 준비");
+        str = TEXT("엔진 마스터 켜기");
         break;
     case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
-        str = TEXT("엔진 마스터 켜기");
+        str = TEXT("JFS 스타트 준비");
         break;
     case EEngineProgress::JFS_HANDLE_PULL:
         str = TEXT("JFS 작동 시작");
@@ -347,10 +348,10 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
         str = TEXT("조종석 밀폐");
         break;
     case EEngineProgress::STANDBY_OTHER_PLAYER:
-        str = TEXT("@@다른 파일럿 대기");
+        str = TEXT("다른 파일럿 대기");
         break;
     case EEngineProgress::RELEASE_SIDE_BREAK:
-        str = TEXT("@@사이드 브레이드 해제");
+        str = TEXT("기체 정지 상태 해제");
         break;
     }
 
@@ -411,22 +412,20 @@ int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
     int result = -1;
     switch (type) {
     case ETacticalOrder::NONE:
-        result = 1;
         break;
     case ETacticalOrder::MOVE_THIS_POINT:
-        result = 1;
         break;
     case ETacticalOrder::FORMATION_FLIGHT:
-        result = 1;
+        result = 12;
         break;
     case ETacticalOrder::NEUTRALIZE_TARGET:
-        result = 1;
+        result = 15;
         break;
     case ETacticalOrder::ENGINE_START:
         result = 1;
         break;
     case ETacticalOrder::TAKE_OFF:
-        result = 1;
+        result = 10;
         break;
     }
 
