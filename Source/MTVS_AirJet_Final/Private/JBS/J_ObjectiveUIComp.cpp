@@ -177,8 +177,8 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	// 고도 체크 서브
 	// FIXME 이거 uidata 에서 애초에 받는걸로 변경하기
 	float checkHeightAdj = 60000;
-	bool isPass = UJ_Utility::CheckValueRange(data.curHeight, data.checkHeight - checkHeightAdj, data.checkHeight + checkHeightAdj);
-	ETextStyle heightStyle = isPass ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+	bool isHeightPass = UJ_Utility::CheckValueRange(data.curHeight, data.checkHeight - checkHeightAdj, data.checkHeight + checkHeightAdj);
+	ETextStyle heightStyle = isHeightPass ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
 	// 포매팅
 	FString formCurHeightStr = FRichString(curHeightStr, heightStyle).GetFormatString();
 
@@ -198,39 +198,94 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 
 	// /
 
-	// 위치 서브
-	FDefaultTextUIData checkPosData;
-	checkPosData.headerText = FRichString(TEXT("편대 거리 유지")).GetFormatString();
+	// // 위치 서브
+	// FDefaultTextUIData checkPosData;
+	// checkPosData.headerText = FRichString(TEXT("편대 거리 유지")).GetFormatString();
 
-	// 나의 역할 : %s
-	// |편대장은 ""
-	// 편대장의 우측 후미에 붙어서 10 ft 간격을 유지한채로 비행해야합니다.
+	// objUIData.bodyObjAry.Add(checkPosData);
 	
-	FString cpStr = data.isCorrectPosition ? TEXT("@@올바른 위치에 있음") : TEXT("@@올바른 위치에 있지 않음");
-	ETextStyle cpStyle = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
-	FRichString formCPStr(cpStr, cpStyle);
-
-	checkPosData.bodyTextAry = {
-		formCPStr.GetFormatString()
-	};
-
-	objUIData.bodyObjAry.Add(checkPosData);
-
 	// /
 
-	// 전체 체크
-	FDefaultTextUIData checkFormationData;
-	checkFormationData.headerText = FRichString(TEXT("@@현재 진형 체크")).GetFormatString();
 	
-	FString cfStr = UJ_Utility::ToStringBool(data.isCorrectPosition) ;
-	ETextStyle cfStyle = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
-	FRichString formcfStr(cfStr, cfStyle);
 
-	checkFormationData.bodyTextAry = {
-		formcfStr.GetFormatString()
-	};
+	// 나의 역할 : %s
+	FDefaultTextUIData roleData;
+	FString roleStr = data.pilotRole == EPilotRole::WING_COMMANDER ? TEXT("편대장") : TEXT("좌측 윙맨");
+	FRichString formRoleStr(FString::Printf(TEXT("나의 역할 : %s"), *roleStr), ETextStyle::DEFAULT);
 
-	objUIData.bodyObjAry.Add(checkFormationData);
+	roleData.headerText = formRoleStr.GetFormatString();
+
+		// 역할 설명
+	// |편대장은 빈칸
+	// 편대장의 우측 후미에 붙어서 10 ft 간격을 유지한채로 비행해야합니다.
+	FString roleDetail = data.pilotRole == EPilotRole::WING_COMMANDER ? TEXT("") : TEXT("윙맨은 편대장의 우측 후미에 붙어서 10 피트의 간격을 유지한채로 비행해야합니다.");
+	FRichString formRoleDetail(roleDetail, ETextStyle::OBJDETAIL);
+
+	// \n
+
+		// 팀의 대형 유지 여부 :
+	FRichString tf1(TEXT("팀의 대형 유지 여부 : "), ETextStyle::OBJDETAIL);
+	// +
+	FString isFormationstr = UJ_Utility::ToStringBool(data.isCorrectPosition);
+	ETextStyle tf2Style = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+
+	FRichString tf2(UJ_Utility::ToStringBool(data.isCorrectPosition), tf2Style);
+
+	FString teamFormationStr = FString::Printf(
+		TEXT("%s %s")
+		, *tf1.GetFormatString(), *tf2.GetFormatString());
+
+	FString totalRoleStr = teamFormationStr + "\n" + formRoleDetail.GetFormatString();
+
+	roleData.bodyTextAry.Add(totalRoleStr);
+
+	objUIData.bodyObjAry.Add(roleData);
+
+	// 현재 편대 비행 중 | 편대 비행 조건 미충족 : 원인
+	FDefaultTextUIData formationData;
+	FRichString formHeader;
+	if(data.checkFormation && isHeightPass)
+	{
+		formHeader.value = TEXT("현재 편대 비행 중");
+		formHeader.styleType = ETextStyle::SUCCESS;
+
+		formationData.bodyTextAry.Add(" ");
+
+	}
+	else {
+		formHeader.value = TEXT("편대 비행 조건 미충족");
+		formHeader.styleType = ETextStyle::FAIL;
+
+		// 원인
+		// isHeightPass, data.isCorrectPosition
+		TArray<FString> formAry;
+		if(!isHeightPass)
+		{
+			formAry.Add(FRichString (TEXT("고도 유지"), ETextStyle::OBJDETAILFAIL).GetFormatString());
+		}
+		if(!data.isCorrectPosition)
+		{
+			formAry.Add(FRichString (TEXT("진형 유지"), ETextStyle::OBJDETAILFAIL).GetFormatString());
+		}
+		FString resultFromStr = "";
+		for(const FString& str : formAry)
+		{
+			resultFromStr += str + ", ";
+		}
+		if(!resultFromStr.IsEmpty())
+			resultFromStr.RemoveAt(resultFromStr.Len() - 2, 2);
+		
+		formationData.bodyTextAry = {
+			resultFromStr
+		};
+	}
+
+	formationData.headerText = formHeader.GetFormatString();
+
+	objUIData.bodyObjAry.Add(formationData);
+
+
+
 
 	if(isInit)
 	{
@@ -273,9 +328,6 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 					: ETextStyle::FAIL
 				: ETextStyle::DEFAULT;
 
-		// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, FString::Printf(TEXT("%s"), ));
-		UE_LOG(LogTemp, Warning, TEXT("%d : %s"), i,*UEnum::GetValueAsString(style));
-
 		subObjUI.headerText = FRichString(text, style).GetFormatString(); 
 
 		// 설명 텍스트
@@ -284,17 +336,17 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 			// 첫 번째 이동 목표
 			case 0:
 			{
-				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@이동 목표 눈으로 확인하기"), ETextStyle::OBJDETAIL).GetFormatString());
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("지정된 목표를 눈으로 확인합니다."), ETextStyle::OBJDETAIL).GetFormatString());
 			}
 				break;
 			case 1:
 			{
-				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@3번 웨이포인트로 이동하는 동안 자신의 위치를 보고하는 임무를 수행하십시오."), ETextStyle::OBJDETAIL).GetFormatString());
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("3번 웨이포인트로 가는 길에 두 번 위치를 보고합니다."), ETextStyle::OBJDETAIL).GetFormatString());
 			}
 				break;
 			case 3:
 			{
-				subObjUI.bodyTextAry.Add(FRichString(TEXT("@@미사일 발사 알림."), ETextStyle::OBJDETAIL).GetFormatString());
+				subObjUI.bodyTextAry.Add(FRichString(TEXT("4번 웨이포인트 도달 직전에 미사일을 발사할 것을 알립니다."), ETextStyle::OBJDETAIL).GetFormatString());
 			}
 				break;
 		}
@@ -305,8 +357,11 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 	// 타격 목표 텍스트
 	FDefaultTextUIData neutTarget;
 
-	neutTarget.headerText = FRichString(TEXT("과녁 조준 및 미사일 발사")).GetFormatString();
-	neutTarget.bodyTextAry.Add(FRichString(TEXT("목표물을 향해 미사일 발사"), ETextStyle::OBJDETAIL).GetFormatString());
+	FString cnt = FString::Printf(TEXT("과녁 조준 및 미사일 발사 ( %d / %d )"), data.curTargetAmt, data.allTargetAmt);
+
+
+	neutTarget.headerText = FRichString(cnt).GetFormatString();
+	neutTarget.bodyTextAry.Add(FRichString(TEXT("목표물을 향해 미사일을 발사합니다."), ETextStyle::OBJDETAIL).GetFormatString());
 
 	objUIData.bodyObjAry.Add(neutTarget);
 

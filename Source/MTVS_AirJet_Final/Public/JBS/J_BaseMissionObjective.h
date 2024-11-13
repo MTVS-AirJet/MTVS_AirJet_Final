@@ -163,6 +163,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
 
 	// 지휘관 보이스 데이터 받고 플레이어에게 재생 호출
+	UFUNCTION(BlueprintCallable)
 	void PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData);
 
     public:

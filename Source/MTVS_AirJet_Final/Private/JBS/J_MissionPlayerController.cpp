@@ -197,15 +197,19 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
     GetWorld()->GetTimerManager()
         .SetTimer(removeLoadingUITH, [this]() mutable
     {
+        if(wasRemovedUI)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("로딩 ui 제거"));
+            GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
+        }
+
+
         //타이머에서 할 거
         if(missionReadyUI)
         {
             missionReadyUI->RemoveFromParent();
+            wasRemovedUI = true;
             missionReadyUI = nullptr;
-        }
-        // ui 제거했으면 타이머 종료
-        else {
-            GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
         }
     }, 1.f, true);
 }

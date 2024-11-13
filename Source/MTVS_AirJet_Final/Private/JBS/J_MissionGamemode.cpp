@@ -209,15 +209,17 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
     // XXX 로딩 ui 제거 비활성
     // removeLUIDel.Broadcast();
 
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // 시작 지점으로 위치 이동
-    for(int i = 0; i < allPawns.Num(); i++)
+    for(int i = 0; i < allPC.Num(); i++)
     {
+
         auto* pawn = allPawns[i];
         // 역할 설정
-        auto* pc = pawn->GetController<AJ_MissionPlayerController>();
-        // FIXME 로딩 ui 할 꺼면 추가 // pc 로딩 ui 잇으면 제거
-        pc->SRPC_RemoveLoadingUI();
+        auto* pc = allPC[i];
+        // pc 로딩 ui 잇으면 제거
+        pc->CRPC_RemoveLoadingUI();
         // idx 0,1,2 를 각각 리더, lt 윙맨, rt 윙맨으로 설정
         pc->pilotRole = static_cast<EPilotRole>(i % 3);
 
