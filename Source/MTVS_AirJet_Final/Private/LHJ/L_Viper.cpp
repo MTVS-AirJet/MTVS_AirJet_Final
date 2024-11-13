@@ -1777,7 +1777,7 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 		Diametr *= 2.f;
 		Start += (ForwardVector * Diametr / 4) + (DownVector * Diametr / 2);
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
+		                                           false , Overlaps , EDrawDebugTrace::None , OutHit , true))
 		{
 			for (auto hit : OutHit)
 			{
