@@ -11,6 +11,7 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveIconUI.h"
@@ -120,12 +121,15 @@ void AJ_BaseMissionObjective::Tick(float DeltaTime)
 	// 로컬 폰 과의 거리 설정
 	AJ_MissionPlayerController* localPC;
 	if(!UJ_Utility::GetLocalPlayerController(GetWorld(), localPC)) return;
-	
-	if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
+
+	auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
+	// if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
+	if(localPawn && localPawn->IsLocallyControlled())
 	{
-		auto* localPawn = localPC->GetPawn();
+		// auto* localPawn = localPC->GetPawn();
 		float dis = FVector::Dist(this->GetActorLocation(), localPawn->GetActorLocation());
-		iconWorldUI->SetObjDisText(dis);
+		if(iconWorldUI)
+			iconWorldUI->SetObjDisText(dis);
 	}
 	
 	// init 되기 전까지 무시
