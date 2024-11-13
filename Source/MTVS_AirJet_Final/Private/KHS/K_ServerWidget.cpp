@@ -5,8 +5,6 @@
 #include "KHS/K_GameInstance.h"
 #include "KHS/K_WidgetBase.h"
 #include "KHS/K_ServerList.h"
-#include "KHS/K_PlayerList.h"
-#include "KHS/K_PlayerController.h"
 #include "KHS/K_JsonParseLib.h"
 #include <MTVS_AirJet_Final.h>
 
@@ -200,8 +198,9 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 		//팩토리를 통해 ServerListUI버튼 생성
 		ServerList = CreateWidget<UK_ServerList>(this , ServerListFactory);
 
+		int32 tempidx = ServerData.sessionIdx + 1;
 		//ServerList SetText
-		ServerList->sessionIdx->SetText(FText::FromString(FString::Printf(TEXT("%d") , ServerData.sessionIdx)));
+		ServerList->sessionIdx->SetText(FText::FromString(FString::Printf(TEXT("%d") , tempidx)));
 		ServerList->SessionName->SetText(FText::FromString(ServerData.sessionName));
 		ServerList->HostName->SetText(FText::FromString(ServerData.hostUserName));
 		ServerList->ConnectedPlayer->SetText(
@@ -209,8 +208,6 @@ void UK_ServerWidget::SetServerList(TArray<FServerData> ServerNames)
 
 		//ServerListUI 인덱스 부여
 		ServerList->Setup(this , ServerData.sessionIdx);
-		//ServerList->Setup(this , i);
-		//i++;
 
 		//ServerListUI버튼추가
 		ServerMenu_ServerList->AddChild(ServerList);
