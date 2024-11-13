@@ -24,8 +24,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* PlayerNickName; // PlayerNickName
 
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	class UCheckBox* IsCommander; // 지휘관여부
+	//UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	//class UCheckBox* IsCommander; // 지휘관여부
 	
 	// Variables    ================================================
 
