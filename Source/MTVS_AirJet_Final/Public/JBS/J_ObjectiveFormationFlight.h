@@ -80,8 +80,10 @@ protected:
 
     // 목표 UI 시작 | 목표 활성화 시 호출
     virtual void SRPC_StartNewObjUI() override;
+    virtual void StartNewObjUI() override;
     // 목표 UI 값 갱신 | 수행도 갱신 시 호출
     virtual void SRPC_UpdateObjUI() override;
+    virtual void UpdateObjUI() override;
     // 목표 UI 완료 | 목표 완료시 호출
     virtual void SRPC_EndObjUI() override;
     // 목표 서브 조건 UI 완료

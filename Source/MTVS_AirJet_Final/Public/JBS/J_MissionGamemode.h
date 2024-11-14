@@ -50,6 +50,8 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
     bool enableUseOldSpawnSystem = false;
 
+    bool isStartTO = false;
+
     // 시작 지점 액터 프리팹
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
     TSubclassOf<class AJ_MissionStartPointActor> startPointActorPrefab;
@@ -86,6 +88,18 @@ protected:
     // 활주로 엔드 포인트 및 위경도 위치 이동 담당
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AK_CesiumTeleportBox* cesiumTPBox;
+        public:
+    __declspec(property(get = GetTPBox, put = SetTPBox)) class AK_CesiumTeleportBox* TP_BOX;
+    class AK_CesiumTeleportBox* GetTPBox()
+    {
+        return cesiumTPBox;
+    }
+    void SetTPBox(class AK_CesiumTeleportBox* value)
+    {
+        cesiumTPBox = value;
+    }
+        protected:
+
     // 미션의 정점 (0,0,0) 을 나타내는 액터 | 실제 0,0,0은 세슘으로 인해 내핵이 됨.
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
     class AK_CesiumManager* cesiumZeroPos;

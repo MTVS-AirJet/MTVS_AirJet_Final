@@ -327,17 +327,18 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     // 이륙 딜리게이트 실행
     onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
 
-    // FTimerHandle timerHandle;
-    // GetWorld()->GetTimerManager()
-    //     .SetTimer(timerHandle, [this,pc]() mutable
-    // {
-    //     //타이머에서 할 거
-    //     // 해당 pc에게 로딩 UI 추가
-    //     pc->CRPC_AddLoadingUI();    
-    // }, 1.5f, false);
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this,pc]() mutable
+    {
+        if(isStartTO) return;
+        //타이머에서 할 거
+        // 해당 pc에게 로딩 UI 추가
+        pc->CRPC_AddLoadingUI();
+    }, 1.5f, false);
 
     
-
+    
     // 배열 크기가 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
     isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
     if(isTPReady)
@@ -378,6 +379,7 @@ void AJ_MissionGamemode::StartTacticalOrder()
 {
     // solved 기본 목표 종료 처리
     startTODel.Broadcast(true);
+    isStartTO = true;
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
     
@@ -404,5 +406,5 @@ void AJ_MissionGamemode::StartTacticalOrder()
             this->objectiveManagerComp->ActiveNextObjective();
             
         }, 3, false);
-    }, 3.f, false);
+    }, 5.f, false);
 }

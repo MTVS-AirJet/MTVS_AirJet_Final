@@ -52,10 +52,11 @@ protected:
 public:
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void SetTargetActor(AActor* actor)
-	{
-		targetActor = actor;
-	}
+	virtual void SetTargetActor(AActor* actor) {targetActor = actor;}
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MRPC_SetVisible(bool value);
+	// 활성화 설정
 	UFUNCTION(BlueprintCallable)
 	void SetVisible(bool value);
 };

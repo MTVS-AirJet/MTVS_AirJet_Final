@@ -33,6 +33,9 @@ void UJ_ObjectiveManagerComponent::BeginPlay()
 	// ...
 	// 주인 게임모드 설정
 	ownerGM = this->GetOwner<AJ_MissionGamemode>();
+
+	// 이륙 시 기본 목표 스킵 바인드
+	ownerGM->startTODel.AddUObject(this, &UJ_ObjectiveManagerComponent::SkipDefaultObj);
 }
 
 
@@ -68,7 +71,10 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 				if(CUR_ACTIVE_MISSION_IDX >= 0) return;
 
 				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
-				check(takeOffObj);
+				
+				if(!takeOffObj) return;
+				if(takeOffObj->IS_OBJ_ENDED) return;
+
 				// 활성화
 				DelayedObjectiveActive(takeOffObj, objSwitchInterval);
 			});
@@ -259,4 +265,18 @@ void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 		CUR_ACTIVE_MISSION = obj;		
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
 	}, delayTime, false);
+}
+
+void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
+{
+	for(const FObjectiveData& objData : defaultObjDataAry)
+	{
+		auto* objActor = objData.objectiveActor;
+		if(!objActor) continue;
+
+		// 수행도는 0으로
+		objActor->SUCCESS_PERCENT = 0.f;
+		// 종료
+		objActor->ObjectiveEnd(isSuccess);
+	}
 }

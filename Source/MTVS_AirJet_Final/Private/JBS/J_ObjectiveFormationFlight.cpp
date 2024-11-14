@@ -204,6 +204,11 @@ void AJ_ObjectiveFormationFlight::SRPC_EndObjUI()
 
 void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
 {
+    Super::SRPC_StartNewObjUI();
+}
+
+void AJ_ObjectiveFormationFlight::StartNewObjUI()
+{
     if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
 
 	// 모든 pc 가져오기
@@ -219,50 +224,32 @@ void AJ_ObjectiveFormationFlight::SRPC_StartNewObjUI()
     }
 
     // FIXME
-    PlayCommander(12);
+    ReqPlayCommVoice(12, allPC);
     FTimerHandle timerHandle3;
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle3, [this]() mutable
     {
+        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
         //타이머에서 할 거
-        PlayCommander(13);
+        ReqPlayCommVoice(13, allPC);
     }, 3.f, false);
 
     FTimerHandle timerHandle2;
     GetWorld()->GetTimerManager()
         .SetTimer(timerHandle2, [this]() mutable
     {
+        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
         //타이머에서 할 거
-        PlayCommander(14);
+        ReqPlayCommVoice(14, allPC);
 
     }, 7.f, false);
 }
 
 void AJ_ObjectiveFormationFlight::SRPC_UpdateObjUI()
 {
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+    Super::SRPC_UpdateObjUI();
 
-	// 보낼 데이터
-    // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC)
-    {
-		auto orderData = SetFormationUIData(pc);
     
-        FTacticalOrderData tempData(this->orderType, orderData);
-
-		
-		// 과도한 crpc 방지 처리
-		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
-		{
-			// 데이터 보내기
-			pc->objUIComp->CRPC_UpdateObjUIFormation(orderData);
-			// objui데이터 맵에 저장
-			prevObjUIDataMap.Add(pc, tempData);
-		}
-    }
 }
 
 FFormationFlightUIData AJ_ObjectiveFormationFlight::SetFormationUIData(class AJ_MissionPlayerController *pc)
@@ -311,6 +298,33 @@ void AJ_ObjectiveFormationFlight::ObjectiveActive()
     Super::ObjectiveActive();
 
     // 목표 ui 신규 갱신
-    SRPC_StartNewObjUI();
+    // SRPC_StartNewObjUI();
+    StartNewObjUI();
 }
 
+void AJ_ObjectiveFormationFlight::UpdateObjUI()
+{
+    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+
+	// 보낼 데이터
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+		auto orderData = SetFormationUIData(pc);
+    
+        FTacticalOrderData tempData(this->orderType, orderData);
+
+		
+		// 과도한 crpc 방지 처리
+		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUIFormation(orderData);
+			// objui데이터 맵에 저장
+			prevObjUIDataMap.Add(pc, tempData);
+		}
+    }
+}

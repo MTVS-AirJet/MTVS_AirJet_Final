@@ -11,13 +11,11 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
-#include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveIconUI.h"
 #include "JBS/J_ObjectiveUIComp.h"
-#include "JBS/J_Utility.h"
-#include "Materials/Material.h"
 #include "JBS/J_CustomWidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Templates/Casts.h"
@@ -25,10 +23,11 @@
 #include "UObject/UObjectGlobals.h"
 
 // Sets default values
+// 생성자
 AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	// 리플리케이트 | 클라에도 보여야함
 	bReplicates = true;
 	bAlwaysRelevant = true;
 
@@ -36,7 +35,6 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 	SetRootComponent(rootComp);
 
 	sphereComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sphereComp"));
-
 	// 메시 및 머티리얼 로드
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempSphere(
 		TEXT("/Script/Engine.StaticMesh'/Engine/EngineMeshes/Sphere.Sphere'"));
@@ -64,10 +62,7 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 	forWComp->SetArrowSize(15.f);
 	forWComp->SetArrowLength(75.f);
 
-
-
-	// iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
-
+	// 3d icon
 	iconWorldUIComp = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("iconWorldUIComp"));
 	iconWorldUIComp->SetupAttachment(RootComponent);
 	iconWorldUIComp->SetIsReplicated(true);
@@ -78,90 +73,137 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 	// 위젯 클래스를 설정합니다.
 	if (WidgetClassFinder.Succeeded())
 		iconWorldUIComp->SetWidgetClass(WidgetClassFinder.Class);
-
-   
 }
 
 // Called when the game starts or when spawned
+#pragma region 시작 설정 단
+/* icon UI 캐시 -> (서버단) 딜리게이트 바인드 -> init 목표 초기 설정 -> set active(false)*/
 void AJ_BaseMissionObjective::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 아이콘 ui 설정
+	// 아이콘 ui 캐시
 	auto* tempUI = CastChecked<UJ_ObjectiveIconUI>(iconWorldUIComp->GetWidget());
 	if(tempUI)
 		iconWorldUI = tempUI;
 
-	objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
-	objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
+	// 로컬 pc의 전투기 바라보도록 설정
+	SetTargetIconUI();
 
-	// 목표 ui 관련 딜리게이트 바인드
-	// 활성화시 목표 UI 생성 바인드
-    // objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_StartNewObjUI);
-    // FIXME 수행도 갱신시 목표 UI 값 갱신 바인드
-    objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_UpdateObjUI);
-    // 목표 완료시 목표 UI 완료 바인드
-    // objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_EndObjUI);
-    // objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::SRPC_EndSubObjUI);
+#pragma region begin 딜리게이트 바인드 단
+	if(HasAuthority())
+	{
+		// 활/비활성화 함수 바인드
+		objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
+		objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
 
+		// 수행도 갱신시 목표 UI 값 갱신 바인드
+		objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::UpdateObjUI);
+		// 목표 완료시 목표 UI 완료 바인드
+		objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::EndObjUI);
+	}
+#pragma endregion
+	
+}
 
-	// 로컬 pc 가져와서 pawn 넣기
+void AJ_BaseMissionObjective::SetTargetIconUI()
+{
 	auto* pc = GetWorld()->GetFirstPlayerController();
-	check(pc);
-	if(pc->IsLocalPlayerController() || !pc->IsLocalPlayerController() && HasAuthority())
+	if(!pc) return;
+
+	if(pc->IsLocalPlayerController() 
+	|| !pc->IsLocalPlayerController() && HasAuthority())
 	{
 		APawn* localPawn = pc->GetPawn();
+		if(!localPawn) return;
+		
 		iconWorldUIComp->SetTargetActor(Cast<AActor>(localPawn));
 	}
 }
 
-// Called every frame
+// 목표 타입, 초기 활성 여부 (false 만 사용) 설정
+void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
+{
+	orderType = type;
+	IS_OBJECTIVE_ACTIVE = initActive;
+}
+
+// 활성 유무 설정
+void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
+{
+	if(!HasAuthority() || IS_OBJ_ENDED) return;
+	// 값 설정
+	isObjectiveActive = value;
+	// iconui 활/비
+	iconWorldUIComp->MRPC_SetVisible(value);
+	// 활/비 딜리게이트 실행
+	if(isObjectiveActive)
+		objectiveActiveDel.Broadcast();
+	else
+		objectiveDeactiveDel.Broadcast();
+}
+
+void AJ_BaseMissionObjective::ObjectiveActive()
+{
+	if(!HasAuthority() || IS_OBJ_ENDED) return;
+}
+
+void AJ_BaseMissionObjective::ObjectiveDeactive()
+{
+	if(!HasAuthority() || IS_OBJ_ENDED) return;
+}
+
+#pragma endregion
+
+#pragma region tick 반복 단
+/* 로컬 폰과의 거리 icon UI 설정 -> (서버단) tick 시작
+   수행도 갱신시 갱신된 수행도를 목표 매니저에게 보냄*/
 void AJ_BaseMissionObjective::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 로컬 폰 과의 거리 설정
-	auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
-	// if(localPC->IsLocalPlayerController() || !localPC->IsLocalPlayerController() && HasAuthority())
-	if(localPawn && localPawn->IsLocallyControlled())
-	{
-		// auto* localPawn = localPC->GetPawn();
-		float dis = FVector::Dist(this->GetActorLocation(), localPawn->GetActorLocation());
-		if(iconWorldUI)
-			iconWorldUI->SetObjDisText(dis);
-	}
-	else if(!localPawn)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("폰 없음"));
-	}
+	// icon ui 로컬 폰 과의 거리 설정
+	UpdateObjDisIconUI();
 	
 	// init 되기 전까지 무시
-	if(orderType == ETacticalOrder::NONE || !HasAuthority()) return;
+	if(!HasAuthority() || orderType == ETacticalOrder::NONE) return;
 }
 
-void AJ_BaseMissionObjective::ObjectiveSuccess()
+void AJ_BaseMissionObjective::UpdateObjDisIconUI()
+{
+	if(!iconWorldUI) return;
+
+	auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
+	if(localPawn && localPawn->IsLocallyControlled())
+	{
+		// 거리 | 나 - 로컬
+		float dis = FVector::Dist(this->GetActorLocation(), localPawn->GetActorLocation());
+
+		iconWorldUI->SetObjDisText(dis);
+	}
+	else if(!localPawn)
+		UE_LOG(LogTemp, Warning, TEXT("목표 액터 : 로컬 폰 없음"));
+}
+
+void AJ_BaseMissionObjective::SetSuccessPercent(float value)
 {
 	if(!HasAuthority()) return;
-	// 미션 성공 딜리게이트 실행
-	if(objectiveSuccessDel.IsBound())
-	{
-		objectiveSuccessDel.Broadcast();
-	}
+
+	successPercent = value;
+	// 수행도 갱신 딜리게이트 실행
+	objSuccessUpdateDel.Broadcast();
+	// 점수 갱신 딜리게이트 실행 -> 목표 매니저에게 보냄
+	sendObjSuccessDel.Broadcast(this, SUCCESS_PERCENT);
 }
 
-void AJ_BaseMissionObjective::ObjectiveFail()
-{
-	if(!HasAuthority()) return;
-	// 미션 실패 딜리게이트 실행
-	if(objectiveFailDel.IsBound())
-	{
-		objectiveFailDel.Broadcast();
-	}
-}
+#pragma endregion
 
+#pragma region 목표 종료 단
+/* (서버단 && 활성화중) 목표 종료 -> 딜리게이트 -> 성공/실패 처리 */
 void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 {
-	if(!HasAuthority() && !this->IS_OBJECTIVE_ACTIVE) return;
+	if(!HasAuthority() || !this->IS_OBJECTIVE_ACTIVE || IS_OBJ_ENDED) return;
+
 	// 미션 비활성화
 	IS_OBJECTIVE_ACTIVE = false;
 	// 완료 체크
@@ -174,136 +216,117 @@ void AJ_BaseMissionObjective::ObjectiveEnd(bool isSuccess)
 	// 성공 여부에 따라 함수 실행
 	isSuccess ? ObjectiveSuccess() : ObjectiveFail();
 
-	// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("??? actor : %s"), *this->GetName()));
+	// FString debugStr = FString::Printf(TEXT("완료된 목표 : %s"), *this->GetName());
+	// UJ_Utility::PrintFullLog(debugStr, 10, FColor::White);
 }
 
-void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
-{
-	
-	isObjectiveActive = value;
-
-	if(!HasAuthority()) return;
-
-	iconWorldUIComp->SetVisible(isObjectiveActive);
-
-
-	// MRPC_SetVisibleIconUI(isObjectiveActive);
-	// 활/비 딜리게이트 실행
-	if(isObjectiveActive)
-	{
-		objectiveActiveDel.Broadcast();
-	}
-	else
-	{
-		objectiveDeactiveDel.Broadcast();
-	}
-}
-
-void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
-{
-	orderType = type;
-	iconWorldUIComp->SetVisible(false);
-	IS_OBJECTIVE_ACTIVE = initActive;
-}
-
-void AJ_BaseMissionObjective::ObjectiveActive()
-{
-	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE || IS_OBJ_ENDED) return;
-	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s 전술 명령 활성화"), *UEnum::GetValueAsString(orderType)));
-
-	// 목표 UI 신규 갱신 | movepoint에서 안써서 각자 하기로
-	// SRPC_StartNewObjUI();
-
-	// 1. 지휘관 보이스 라인 요청
-	// auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-	// for(auto* pc : allPC)
-	// {
-	// 	pc->CRPC_PlayCommanderVoice2(this->orderType);
-	// }
-}
-
-void AJ_BaseMissionObjective::PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData)
+void AJ_BaseMissionObjective::ObjectiveSuccess()
 {
 	if(!HasAuthority()) return;
-	
-	// 2. 요청 한 보이스 라인 crpc로 재생
-	// 모든 pc에게 crpc로 사운드 재생
-	// auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-	// for(auto* pc : allPC)
-	// {
-	// 	pc->CRPC_PlayCommanderVoice(resData.voice);
-	// }
+
+	// 미션 성공 딜리게이트 실행
+	if(objectiveSuccessDel.IsBound())
+		objectiveSuccessDel.Broadcast();
 }
 
-void AJ_BaseMissionObjective::ObjectiveDeactive()
-{
-	if(!HasAuthority() || IS_OBJECTIVE_ACTIVE) return;
-	
-}
-
-void AJ_BaseMissionObjective::SetSuccessPercent(float value)
+void AJ_BaseMissionObjective::ObjectiveFail()
 {
 	if(!HasAuthority()) return;
-	successPercent = value;
-	// 수행도 갱신 딜리게이트 실행
-	objSuccessUpdateDel.Broadcast();
-	// 점수 갱신 딜리게이트 실행
-	sendObjSuccessDel.Broadcast(this, SUCCESS_PERCENT);
+
+	// 미션 실패 딜리게이트 실행
+	if(objectiveFailDel.IsBound())
+		objectiveFailDel.Broadcast();
 }
 
-void AJ_BaseMissionObjective::SRPC_StartNewObjUI_Implementation()
+#pragma endregion
+
+#pragma region 목표 UI 적용 단
+/* 특정 타이밍에 목표 UI 시작 | StartNewObjUI
+-> 각 pc마다 목표 ui 데이터 설정 | SendObjUIData
+-> 특정 갱신 타이밍 마다 업데이트 UI | UpdateObjUI -> 이전에 보냈는지 체크후 업데이트 | CheckSendSameData
+-> 목표 종료 나 서브 목표 종료시 ui 애니메이션 실행 요청 | EndObjUI , EndSubObjUI
+-> 목표 종료시 비작동*/
+void AJ_BaseMissionObjective::StartNewObjUI() 
 {
-	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+	if(!HasAuthority() || IS_OBJ_ENDED) return;
 
 	// 모든 pc 가져오기
-	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // pc에게 새 전술명령 UI 시작 crpc
     for(auto* pc : allPC)
     {
-		// 보낼 목표 데이터 구성
-		FTacticalOrderData orderData = SetObjUIData(pc);
-		// ui 생성 시작
-        pc->objUIComp->CRPC_StartObjUI(orderData);
+		// 시작 ui 설정
+		SendObjUIData(pc, true);
     }
 }
 
-FTacticalOrderData AJ_BaseMissionObjective::SetObjUIData(AJ_MissionPlayerController* pc)
+void AJ_BaseMissionObjective::SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit)
 {
-	return FTacticalOrderData();
+	if(!HasAuthority()) return;
+
+	// 재정의 필수
+	// 데이터 구성
+	// pc->objuicomp->crpc ui 적용
+	// start 유무에 따라 다른 함수 적용
+	// 
+	// @@ 템플릿 쓸 수 있을지 고민
+	/*// 보낼 목표 데이터 구성
+		FTacticalOrderData orderData = SetObjUIData(pc);
+		// ui 생성 시작
+        pc->objUIComp->CRPC_StartObjUI(orderData);
+		*/
 }
 
-void AJ_BaseMissionObjective::SRPC_UpdateObjUI_Implementation()
+void AJ_BaseMissionObjective::UpdateObjUI()
 {
-	if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+	if(!HasAuthority()) return;
 
-	// 보낼 데이터
     // 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
+    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
     {
-		auto orderData = SetObjUIData(pc);
-		
-		
 		// 과도한 crpc 방지 처리
-		if(!prevObjUIDataMap.Contains(pc) || orderData != prevObjUIDataMap[pc])
+		// 이전에 보낸 ui 데이터와 동일한지 검증
+		// setobjuidata
+		// 다르면 업데이트
+		// @@ 템플릿 쓸 수 있을지 고민
+		FTacticalOrderData temp;
+		bool canUpdate = CheckSendSameData(pc, temp);
+		if(canUpdate)
 		{
 			// 데이터 보내기
-			pc->objUIComp->CRPC_UpdateObjUI(orderData);
-			// objui데이터 맵에 저장
-			prevObjUIDataMap.Add(pc, orderData);
+			// pc->objUIComp->CRPC_UpdateObjUI(orderData);
 		}
     }
 }
 
-void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
+bool AJ_BaseMissionObjective::CheckSendSameData(class AJ_MissionPlayerController* pc, const FTacticalOrderData& uiData)
+{	
+	// 동일 ui 체크
+	if(!prevObjUIDataMap.Contains(pc)) return false;
+	if(uiData != prevObjUIDataMap[pc]) return false;
+
+	// objui데이터 맵에 저장
+	prevObjUIDataMap.Add(pc, uiData);
+
+	return true;
+}
+
+void AJ_BaseMissionObjective::EndSubObjUI(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
+{
+	if(!HasAuthority()) return;
+
+	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
+}
+
+void AJ_BaseMissionObjective::EndObjUI()
 {
 	if(!HasAuthority()) return;
 
 	// 모든 pc 가져오기
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
@@ -311,44 +334,19 @@ void AJ_BaseMissionObjective::SRPC_EndObjUI_Implementation()
         pc->objUIComp->CRPC_EndObjUI();
     }
 }
-void AJ_BaseMissionObjective::SRPC_EndSubObjUI_Implementation(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
-{
-	if(!HasAuthority()) return;
-	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%s"), *pc->GetName()));
-	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
-
-	// // 모든 pc 가져오기
-    // auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // // pc에게 새 전술명령 UI 시작 srpc
-    // for(auto* pc : allPC)
-    // {
-    // }
-}
+#pragma endregion
 
 void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AJ_BaseMissionObjective, isObjectiveActive);
+	// DOREPLIFETIME(AJ_BaseMissionObjective, isObjectiveActive);
 }
 
-void AJ_BaseMissionObjective::OnRep_ObjActive()
+// ai 지휘관 보이스 재생 요청 | 배열로 해서 세밀하게 조절 가능
+void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<class AJ_MissionPlayerController*>& pcs)
 {
-	iconWorldUIComp->SetVisible(isObjectiveActive);
-	// iconWorldUIComp->SetActive(false);
-	// iconWorldUIComp->SetHiddenInGame(!false);
-}
-// XXX
-void AJ_BaseMissionObjective::MRPC_SetVisibleIconUI_Implementation(bool value)
-{
-	iconWorldUIComp->SetVisible(value);
-}
-
-void AJ_BaseMissionObjective::PlayCommander(int idx)
-{
-	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
-	for(auto* pc : allPC2)
+	for(auto* pc : pcs)
 	{
 		pc->CRPC_PlayCommanderVoice3(idx);
 	}

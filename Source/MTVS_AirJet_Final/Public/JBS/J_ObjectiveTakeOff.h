@@ -15,13 +15,8 @@ class MTVS_AIRJET_FINAL_API AJ_ObjectiveTakeOff : public AJ_BaseMissionObjective
 	GENERATED_BODY()
 protected:
 	// 파일럿 이륙 수행 여부 배열 | pc , 이륙 여부, 이륙 성공 여부
-	TMap<class AJ_MissionPlayerController*, TPair<bool, bool>> takeOffCheckMap;
+    TMap<class AJ_MissionPlayerController*, FTakeOffCheckData> takeOffCheckMap;
 	
-	// 활성화 당시 모든 pc
-	TArray<class AJ_MissionPlayerController*> allPC;
-	// 활성화 당시 모든 폰
-	TArray<class APawn*> allPawn;
-
     // 실패 판정 기준 방향
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     FVector baseDirection;
@@ -51,13 +46,20 @@ protected:
 	// 위치 설정 | 텔포 박스위치, 편대장 바라보기
     void SetPosition(class AK_CesiumTeleportBox *tpBox);
 
+    // 기준 방향 설정 | 편대장 기준
+    FVector CalcBaseDirection();
+
     virtual void ObjectiveEnd(bool isSuccess = true) override;
 
     // 목표 UI 시작 | 목표 활성화 시 호출
     virtual void SRPC_StartNewObjUI() override;
 
+    virtual void StartNewObjUI() override;
+
     // 목표 UI 값 갱신 | 수행도 갱신 시 호출
     virtual void SRPC_UpdateObjUI() override;
+
+    virtual void UpdateObjUI() override;
 
     // 목표 성공시 수행도 계산
     UFUNCTION(BlueprintCallable)
