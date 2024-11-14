@@ -46,6 +46,8 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
 
     // 목표 ui 신규 갱신
     SRPC_StartNewObjUI();
+
+    PlayCommander(1);
 }
 
 void AJ_ObjectiveEngineStart::Tick(float deltaTime)
@@ -132,21 +134,12 @@ void AJ_ObjectiveEngineStart::ActiveNextProgress(FEngineProgressData& data, bool
     if(isSuccess)
         data.AddSuccessValue(data.curProgress);
 
-    // ai 보이스
-    int idx = static_cast<int>(data.curProgress);
-
-    if(idx <= 8)
-    {
-        PlayCommander(idx);
-    }
-    else if(idx == 10)
-    {
-        idx = 9;
-        PlayCommander(idx);
-    }
+    
     
     // 다음 수행도로 변경
     data.SetNextProgress();
+
+    
 }
 
 void AJ_ObjectiveEngineStart::CalcSuccessPercent()
@@ -192,6 +185,8 @@ void AJ_ObjectiveEngineStart::SRPC_StartNewObjUI()
 		FEngineProgressData orderData = SetEngineUIData(pc);
 		// ui 생성 시작
         pc->objUIComp->CRPC_StartObjUIEngine(orderData);
+
+        
     }
 }
 
@@ -223,6 +218,19 @@ void AJ_ObjectiveEngineStart::SRPC_UpdateObjUI()
 			pc->objUIComp->CRPC_UpdateObjUIEngine(orderData);
 			// objui데이터 맵에 저장
 			prevObjUIDataMap.Add(pc, tempData);
+
+            // ai 보이스
+            int idx = static_cast<int>(orderData.curProgress);
+
+            if(idx <= 8)
+            {
+                PlayCommander(idx);
+            }
+            else if(idx == 10)
+            {
+                idx = 9;
+                PlayCommander(idx);
+            }
 		}
     }
 }

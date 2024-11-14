@@ -147,3 +147,8 @@ void AK_CesiumTeleportBox::NotifyFlight(APawn* flightPawn)
     
     pc->SRPC_AddFlightArySelf();
 }
+
+void AK_CesiumTeleportBox::MRPC_ChangeMissionArea_Implementation()
+{
+    ChangeMissionArea();
+}

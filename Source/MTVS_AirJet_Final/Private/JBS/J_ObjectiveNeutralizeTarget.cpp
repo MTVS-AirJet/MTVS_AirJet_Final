@@ -297,7 +297,8 @@ void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
     if(debugCheck)
     {
         MRPC_SetVisibleIconUI(isSubEnd);
-        PlayCommander(21);
+        if(isSubEnd)
+            PlayCommander(21);
 
         debugCheck = false;
     }

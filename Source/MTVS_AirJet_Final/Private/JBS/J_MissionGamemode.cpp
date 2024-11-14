@@ -327,14 +327,14 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     // 이륙 딜리게이트 실행
     onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
 
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this,pc]() mutable
-    {
-        //타이머에서 할 거
-        // 해당 pc에게 로딩 UI 추가
-        pc->CRPC_AddLoadingUI();    
-    }, 1.5f, false);
+    // FTimerHandle timerHandle;
+    // GetWorld()->GetTimerManager()
+    //     .SetTimer(timerHandle, [this,pc]() mutable
+    // {
+    //     //타이머에서 할 거
+    //     // 해당 pc에게 로딩 UI 추가
+    //     pc->CRPC_AddLoadingUI();    
+    // }, 1.5f, false);
 
     
 
@@ -389,7 +389,7 @@ void AJ_MissionGamemode::StartTacticalOrder()
     {
         // 미션 영역 변경
         cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
-        cesiumTPBox->ChangeMissionArea();
+        cesiumTPBox->MRPC_ChangeMissionArea();
 
         //타이머에서 할 거
         TeleportAllStartPoint(startPointActor);
