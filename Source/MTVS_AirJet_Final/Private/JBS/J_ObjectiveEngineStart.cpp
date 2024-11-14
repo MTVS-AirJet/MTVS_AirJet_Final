@@ -84,13 +84,16 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     // 수행도 점수 처리
     CalcSuccessPercent();
 
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+
     // 모두가 스탠 바이 상태 이상 다음 으로 진행 처리
-    if(!isReadyTakeOff && CheckAllRunEngine(allPC, EEngineProgress::STANDBY_OTHER_PLAYER))
+    if(!isReadyTakeOff && CheckAllRunEngine(allPC2, EEngineProgress::STANDBY_OTHER_PLAYER))
     {
         isReadyTakeOff = true;
         // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("전부 대기중"));
         
-        for(auto* onePC : allPC)
+        for(auto* onePC : allPC2)
         {
             auto& oneData = allData.dataMap[onePC];
             if(oneData.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
@@ -103,7 +106,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     }
 
     // 모든 pc가 이륙 대기 상태가 되면 종료 처리
-    if(CheckAllRunEngine(allPC, EEngineProgress::TAKE_OFF))
+    if(CheckAllRunEngine(allPC2, EEngineProgress::TAKE_OFF))
     {
         // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("이륙 준비 완료"));
 
@@ -146,7 +149,9 @@ void AJ_ObjectiveEngineStart::CalcSuccessPercent()
 {
     // 모든 pc 데이터를 계산
     float totalRate = 0.f;
-    for(auto* pc : allPC)
+    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    for(auto* pc : allPC2)
     {
         auto& data = allData.dataMap[pc];
         // 성공 비율 계산
@@ -156,7 +161,7 @@ void AJ_ObjectiveEngineStart::CalcSuccessPercent()
     }
 
     // 평균 계산
-    float avg = totalRate / allPC.Num();
+    float avg = totalRate / allPC2.Num();
     // 수행도에 적용
     this->SUCCESS_PERCENT = avg;
 
