@@ -224,12 +224,12 @@ void AJ_ObjectiveEngineStart::SRPC_UpdateObjUI()
 
             if(idx <= 8)
             {
-                PlayCommander(idx);
+                pc->CRPC_PlayCommanderVoice3(idx);
             }
             else if(idx == 10)
             {
                 idx = 9;
-                PlayCommander(idx);
+                pc->CRPC_PlayCommanderVoice3(idx);
             }
 		}
     }
