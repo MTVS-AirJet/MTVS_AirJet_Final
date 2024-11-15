@@ -128,9 +128,7 @@ protected:
 	virtual void StartNewObjUI();
 	
 
-	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
-	UFUNCTION(BlueprintCallable)
-	virtual void UpdateObjUI();
+	
 	// 동일한 UI data 보내는지 체크 | 과도한 crpc 방지책
 	UFUNCTION(BlueprintCallable)
 	virtual bool CheckSendSameData(class AJ_MissionPlayerController* pc, const FTacticalOrderData& uiData);
@@ -167,12 +165,17 @@ public:
 
 #pragma region 상속시 재정의 필수 함수 단
 protected:
-	// 한 pc에게 목표 UI 데이터 보내기 crpc | 상속하면 재정의
 	UFUNCTION(BlueprintCallable)
+	// 한 pc에게 목표 UI 데이터 보내기 | 상속하면 재정의
 	virtual void SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit = false);
-public:
+	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
+	UFUNCTION(BlueprintCallable)
+	virtual void UpdateObjUI();
+	// 생성할 때 딜리게이트 바인드 공간
+	virtual void InitBindDel();
+
+    public:
 
 #pragma endregion
 };
-
 

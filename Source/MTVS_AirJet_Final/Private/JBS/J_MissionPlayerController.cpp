@@ -239,7 +239,7 @@ void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransfo
 
 void AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess_Implementation(EEngineProgress type)
 {
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("시동 절차 진행"));
+    //GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("시동 절차 진행"));
     
     sendEngineProgDel.ExecuteIfBound(this, type);
 }

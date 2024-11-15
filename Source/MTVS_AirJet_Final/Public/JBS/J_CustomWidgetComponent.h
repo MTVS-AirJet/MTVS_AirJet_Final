@@ -54,8 +54,6 @@ public:
 
 	virtual void SetTargetActor(AActor* actor) {targetActor = actor;}
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MRPC_SetVisible(bool value);
 	// 활성화 설정
 	UFUNCTION(BlueprintCallable)
 	void SetVisible(bool value);

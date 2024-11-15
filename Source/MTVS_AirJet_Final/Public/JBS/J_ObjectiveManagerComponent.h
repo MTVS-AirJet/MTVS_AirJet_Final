@@ -79,6 +79,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<ETacticalOrder, TSubclassOf<class AJ_BaseMissionObjective>> objectiveActorPrefabMap;
 
+	// 현재 활성화된 미션 액터 디버그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enablePrintCurActiveMissionActor = false;
+
 public:
 	// @@ 목표 전환 대기 시간 | 잘 처리 할 방법 궁리 필요
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")

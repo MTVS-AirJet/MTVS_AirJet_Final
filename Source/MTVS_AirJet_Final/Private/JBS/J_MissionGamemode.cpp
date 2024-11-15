@@ -2,6 +2,8 @@
 
 
 #include "JBS/J_MissionGamemode.h"
+#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LatentActionManager.h"
 #include "GameFramework/PlayerController.h"
@@ -322,6 +324,7 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
 {
     // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("이륙 추가 : %s"), *pc->GetName()));
     // 이륙 배열에 추가
+    if(flightedPCAry.Contains(pc)) return false;
     flightedPCAry.Add(pc);
 
     // 이륙 딜리게이트 실행
@@ -377,6 +380,8 @@ FMissionDataRes AJ_MissionGamemode::LoadMissionData()
 
 void AJ_MissionGamemode::StartTacticalOrder()
 {
+    if(isStartTO) return;
+
     // solved 기본 목표 종료 처리
     startTODel.Broadcast(true);
     isStartTO = true;
@@ -392,6 +397,13 @@ void AJ_MissionGamemode::StartTacticalOrder()
         // 미션 영역 변경
         cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
         cesiumTPBox->MRPC_ChangeMissionArea();
+        //@@ 비활성화
+        auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
+        if(boxComp)
+        {
+            boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+        }
+        
 
         //타이머에서 할 거
         TeleportAllStartPoint(startPointActor);

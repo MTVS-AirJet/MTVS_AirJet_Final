@@ -25,7 +25,7 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
     Super::ObjectiveActive();
 
     // 현재 존재하는 모든 pc 가져오기
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
  
     // 수행 데이터 맵 초기화
     allEngineProgData.InitDataMap(allPC);
@@ -98,7 +98,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     CalcSuccessPercent();
 
     // 전체 플레이어 체크 ( 대기, 종료 )
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
 
     // 모두가 스탠 바이 상태 이상 다음 으로 진행 처리
@@ -106,7 +106,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     {
         isReadyTakeOff = true;
         
-        for(const auto* onePC : allPC)
+        for(auto* onePC : allPC)
         {
             auto& oneData = allEngineProgData.dataMap[onePC];
             if(oneData.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
@@ -136,7 +136,7 @@ void AJ_ObjectiveEngineStart::CalcSuccessPercent()
 {
     // 모든 pc 데이터를 계산
     float totalRate = 0.f;
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     for(const auto* pc : allPC)
     {
@@ -178,12 +178,8 @@ void AJ_ObjectiveEngineStart::SendObjUIData(class AJ_MissionPlayerController *pc
 {
     Super::SendObjUIData(pc, isInit);
 
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-    for(AJ_MissionPlayerController* onePC : allPC)
-    {
-        auto data = SetEngineUIData(onePC);
-        onePC->objUIComp->CRPC_StartObjUIEngine(data);
-    }
+    auto data = SetEngineUIData(pc);
+    pc->objUIComp->CRPC_StartObjUIEngine(data);
 }
 
 void AJ_ObjectiveEngineStart::UpdateObjUI()
@@ -191,7 +187,7 @@ void AJ_ObjectiveEngineStart::UpdateObjUI()
     if(!HasAuthority()) return;
 
     // 모든 pc 가져오기
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
     {
@@ -201,12 +197,12 @@ void AJ_ObjectiveEngineStart::UpdateObjUI()
 
 		// 다르면 업데이트
 		// @@ 템플릿 쓸 수 있을지 고민
-		FTacticalOrderData temp(orderData);
+		FTacticalOrderData temp(this->orderType, orderData);
 		bool canUpdate = CheckSendSameData(pc, temp);
 		if(canUpdate)
 		{
 			// 데이터 보내기
-			pc->objUIComp->CRPC_UpdateObjUI(orderData);
+			pc->objUIComp->CRPC_UpdateObjUIEngine(orderData);
 		}
     }
 }

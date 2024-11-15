@@ -77,7 +77,10 @@ AJ_BaseMissionObjective::AJ_BaseMissionObjective()
 
 // Called when the game starts or when spawned
 #pragma region 시작 설정 단
-/* icon UI 캐시 -> (서버단) 딜리게이트 바인드 -> init 목표 초기 설정 -> set active(false)*/
+/* icon UI 캐시 | SetTargetIconUI
+-> (서버단) 딜리게이트 바인드 | InitBindDel 
+-> init 목표 초기 설정 | InitObjective
+-> set active(false)*/
 void AJ_BaseMissionObjective::BeginPlay()
 {
 	Super::BeginPlay();
@@ -90,20 +93,8 @@ void AJ_BaseMissionObjective::BeginPlay()
 	// 로컬 pc의 전투기 바라보도록 설정
 	SetTargetIconUI();
 
-#pragma region begin 딜리게이트 바인드 단
-	if(HasAuthority())
-	{
-		// 활/비활성화 함수 바인드
-		objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
-		objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
-
-		// 수행도 갱신시 목표 UI 값 갱신 바인드
-		objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::UpdateObjUI);
-		// 목표 완료시 목표 UI 완료 바인드
-		objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::EndObjUI);
-	}
-#pragma endregion
-	
+	// 딜리게이트 바인드
+	InitBindDel();
 }
 
 void AJ_BaseMissionObjective::SetTargetIconUI()
@@ -121,12 +112,30 @@ void AJ_BaseMissionObjective::SetTargetIconUI()
 	}
 }
 
+void AJ_BaseMissionObjective::InitBindDel()
+{
+	if(!HasAuthority()) return;
+
+	// 활/비활성화 함수 바인드
+	objectiveActiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveActive);
+	objectiveDeactiveDel.AddUObject(this, &AJ_BaseMissionObjective::ObjectiveDeactive);
+
+	// 이동 목표는 ui 갱신 안함 주의
+
+	// 수행도 갱신시 목표 UI 값 갱신 바인드
+	objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::UpdateObjUI);
+	// 목표 완료시 목표 UI 완료 바인드
+	objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::EndObjUI);
+}
+
 // 목표 타입, 초기 활성 여부 (false 만 사용) 설정
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
 {
 	orderType = type;
 	IS_OBJECTIVE_ACTIVE = initActive;
 }
+
+
 
 // 활성 유무 설정
 void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
@@ -135,7 +144,7 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 	// 값 설정
 	isObjectiveActive = value;
 	// iconui 활/비
-	iconWorldUIComp->MRPC_SetVisible(value);
+	iconWorldUIComp->SetVisible(value);
 	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 		objectiveActiveDel.Broadcast();
@@ -242,7 +251,7 @@ void AJ_BaseMissionObjective::ObjectiveFail()
 
 #pragma region 목표 UI 적용 단
 /* 특정 타이밍에 목표 UI 시작 | StartNewObjUI
--> 각 pc마다 목표 ui 데이터 설정 | SendObjUIData
+-> 각 pc마다 목표 ui 데이터 설정 | SendObjUIData, (ui data 설정) , pc->crpc 보내기
 -> 특정 갱신 타이밍 마다 업데이트 UI | UpdateObjUI -> 이전에 보냈는지 체크후 업데이트 | CheckSendSameData
 -> 목표 종료 나 서브 목표 종료시 ui 애니메이션 실행 요청 | EndObjUI , EndSubObjUI
 -> 목표 종료시 비작동*/
@@ -251,7 +260,7 @@ void AJ_BaseMissionObjective::StartNewObjUI()
 	if(!HasAuthority() || IS_OBJ_ENDED) return;
 
 	// 모든 pc 가져오기
-	const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // pc에게 새 전술명령 UI 시작 crpc
     for(auto* pc : allPC)
@@ -264,6 +273,7 @@ void AJ_BaseMissionObjective::StartNewObjUI()
 void AJ_BaseMissionObjective::SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit)
 {
 	if(!HasAuthority()) return;
+	if(!pc) return;
 
 	// 재정의 필수
 	// 데이터 구성
@@ -283,7 +293,7 @@ void AJ_BaseMissionObjective::UpdateObjUI()
 	if(!HasAuthority()) return;
 
     // 모든 pc 가져오기
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
     {
@@ -317,6 +327,7 @@ bool AJ_BaseMissionObjective::CheckSendSameData(class AJ_MissionPlayerController
 void AJ_BaseMissionObjective::EndSubObjUI(AJ_MissionPlayerController* pc, int idx, bool isSuccess)
 {
 	if(!HasAuthority()) return;
+	if(!pc) return;
 
 	pc->objUIComp->CRPC_EndSubObjUI(idx, isSuccess);
 }
@@ -326,7 +337,7 @@ void AJ_BaseMissionObjective::EndObjUI()
 	if(!HasAuthority()) return;
 
 	// 모든 pc 가져오기
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // pc에게 새 전술명령 UI 시작 srpc
     for(auto* pc : allPC)
@@ -336,6 +347,7 @@ void AJ_BaseMissionObjective::EndObjUI()
 }
 #pragma endregion
 
+#pragma region 기타
 void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -351,3 +363,6 @@ void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<class AJ_Mi
 		pc->CRPC_PlayCommanderVoice3(idx);
 	}
 }
+
+#pragma endregion
+

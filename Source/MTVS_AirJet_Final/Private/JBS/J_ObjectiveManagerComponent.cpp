@@ -45,6 +45,12 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	if(enablePrintCurActiveMissionActor)
+	{
+		if(!CUR_ACTIVE_MISSION) return;
+		
+		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
+	}
 }
 
 void UJ_ObjectiveManagerComponent::InitDefaultObj()
@@ -71,7 +77,7 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 				if(CUR_ACTIVE_MISSION_IDX >= 0) return;
 
 				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
-				
+				if(ownerGM->isTPReady) return;
 				if(!takeOffObj) return;
 				if(takeOffObj->IS_OBJ_ENDED) return;
 
@@ -104,6 +110,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 	{
 		// 스폰 지점 계산
 		FTransform spawnTR = mData.GetTransform();
+		spawnTR.SetRotation(FQuat(FRotator::ZeroRotator));
 
 		// 목표 액터 스폰
 		auto* objectiveActor = SpawnObjActor(mData.GetOrderType(), spawnTR);

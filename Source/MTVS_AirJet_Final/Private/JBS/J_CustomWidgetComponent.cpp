@@ -95,8 +95,3 @@ void UJ_CustomWidgetComponent::SetVisible(bool value)
     this->SetActive(value);
 	this->SetHiddenInGame(!value);
 }
-
-void UJ_CustomWidgetComponent::MRPC_SetVisible(bool value)
-{
-    SetVisible(value);
-}

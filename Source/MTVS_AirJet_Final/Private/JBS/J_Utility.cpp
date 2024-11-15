@@ -64,9 +64,10 @@ AJ_MissionGameState* UJ_Utility::GetMissionGameState(const UWorld* world)
 AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 playerIdx)
 {
     auto* pc = UGameplayStatics::GetPlayerController(world, playerIdx);
-    check(pc);
+    if(!pc) return nullptr;
+
     auto* player = pc->GetPawn<AJ_BaseMissionPawn>();
-    check(player);
+    if(!player) return nullptr;
 
     return player;
 }
@@ -177,7 +178,7 @@ FString UJ_Utility::ToStringPercent(float percent)
 
 void UJ_Utility::PrintFullLog(const FString &str, const float &time, const FColor &color)
 {
-    GEngine->AddOnScreenDebugMessage(-1, time, color, FString::Printf(TEXT("%s"), str));
+    GEngine->AddOnScreenDebugMessage(-1, time, color, FString::Printf(TEXT("%s"), *str));
     UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
 }
 

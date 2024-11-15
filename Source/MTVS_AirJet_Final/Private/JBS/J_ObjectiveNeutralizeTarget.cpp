@@ -18,199 +18,63 @@
 #include "Math/UnrealMathUtility.h"
 #include "TimerManager.h"
 
+
+#pragma region 시작 설정 단
+/* 
+// base 시작 단
+icon UI 캐시 | SetTargetIconUI
+-> (서버단) 딜리게이트 바인드 | InitBindDel 
+-> init 목표 초기 설정 | InitObjective
+-> set active(false) 
+
+
+-> 목표 활성화시 과녁 생성 | SpawnGroundTarget
+   스폰위치 계산 | CalcSpawnTransform
+
+-> 목표 활성화시 서브 목표 생성 | InitSubMovePoints
+-> 모든 pc 가져와서 점수 맵 초기화 | InitTargetScoreMap
+-> 편대장 기준 서브 이동 목표 생성
+   생성 위치 계산 | CalcSubMPTransform
+   하위 이동 목표 생성(4회 반복) | SpawnSubMovePoint * 4 ==> 이후 첫 이동 목표 활성화 ActiveNextObjective
+*/
+
 void AJ_ObjectiveNeutralizeTarget::BeginPlay()
 {
     Super::BeginPlay();
+}
+
+void AJ_ObjectiveNeutralizeTarget::InitBindDel()
+{
+    Super::InitBindDel();
 
     // 활성화시 서브 이동 목표 생성 바인드
     objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::InitSubMovePoints);
     // 활성화시 지상 목표 생성 바인드
     objectiveActiveDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget);
-    // 목표 완료시 목표 UI 완료 바인드
-    objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI);
 }
 
-void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
+// 과녁 생성
+void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
 {
-    // 현 시점 모든 pc 저장
-    allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-    // 점수 맵 init
-    for(auto* pc : allPC)
+    // 스폰 위치 계산
+    bool getSpawnTR = CalcSpawnTransform(spawnTR);
+    if(!getSpawnTR)
     {
-        targetScoreMap.Add(pc, 0.f);
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("지상 목표 위치 대체 생성"));
     }
 
-
-    // 편대장 위치 가져오기 | 호스트 가져옴
-    AJ_MissionPlayerController* hostPC;
-    UJ_Utility::GetLocalPlayerController(GetWorld(), hostPC);
-    const auto& hostLocation = hostPC->GetPawn()->GetActorLocation();
-
-    
-    // 하위 목표 생성 및 배치
-    // 항상 스폰 처리
-	FActorSpawnParameters params;
-	params.bNoFail = true;
-	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    for(int i = 0; i < subMovePointAmt; i++)
+    // 스폰 | 사실상 1개만 스폰
+    for(int i = 0; i < spawnTargetAmt; i++)
     {
-        // 기준 위치 설정 | 처음엔 과녁, 이후는 이전 이동 목표 위치 기준
-        FTransform baseTR;
-        if(i == 0)
-        {
-            // host -> this 방향 구하기
-            FVector dir = (this->GetActorLocation() - hostLocation).GetSafeNormal();
-            // 해당 방향을 forv로 변경
-            baseTR = this->GetActorTransform();
-            baseTR.SetRotation(dir.ToOrientationQuat());
-        }
-        else {
-            baseTR = subMPArray[i - 1]->GetActorTransform();
-        }
+        auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
 
-        // 스폰 위치 계산
-        auto newSpawnTR = CalcSubMPTransform(baseTR, i);
-        // 이동 목표 생성
-        auto* subMP = GetWorld()->SpawnActor<AJ_ObjectiveMovePoint>(movePointPrefab, newSpawnTR, params);
-        // 목표 액터 설정
-        subMP->InitObjective(ETacticalOrder::MOVE_THIS_POINT, false);
-
-        // 딜리게이트 바인드
-        // 목표 완료시 다음 목표 활성화 바인드
-		subMP->objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
-		// // 목표 수행도 갱신함수 바인드
-		// objectiveActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
-
-        // 배열에 추가
-        subMPArray.Add(subMP);
+        // 점수 받기 함수 바인드
+        groundTarget->sendScoreDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::UpdateTargetScore);
+        
+        // XXX 파괴 미사용
+        // groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
     }
-
-    // 자기 위치 아이콘 비활성화
-    // this->iconWorldUIComp->bHiddenInGame = true;
-    // MRPC_SetVisibleIconUI(false);
-
-
-    // 서브 목표 시작
-    ActiveNextObjective();
-
-    // SRPC_StartNewObjUI();
-    StartNewObjUI();
 }
-
-void AJ_ObjectiveNeutralizeTarget::ActiveNextObjective()
-{
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d 번째 서브 목표 종료"), CUR_ACTIVE_SUBMP_IDX));
-
-    // 최초 이후 서브 목표 종료
-    if(CUR_ACTIVE_SUBMP_IDX > -1 && CUR_ACTIVE_SUBMP_IDX < subMPArray.Num())
-    {
-        // 성공 여부
-        bool isSuccess = subMPArray[CUR_ACTIVE_SUBMP_IDX]->SUCCESS_PERCENT > 0;
-        for(auto* pc : allPC)
-        {
-            SRPC_EndSubObjUI(pc, CUR_ACTIVE_SUBMP_IDX, isSuccess);
-        }
-    }
-
-    // 인덱스 증가
-	CUR_ACTIVE_SUBMP_IDX++;
-
-	// 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
-	ActiveObjectiveByIdx(CUR_ACTIVE_SUBMP_IDX, CUR_ACTIVE_SUBMP_IDX == 0);
-
-}
-
-void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
-{
-    if(mIdx >= subMPArray.Num())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("objAry out of range"));
-
-        // 서브 이동 목표 전부 끝난거 타격 목표로 전환
-        iconWorldUIComp->SetVisible(true);
-        // FIXME 
-        isSubEnd = true;
-        debugCheck = true;
-		return;
-	}
-    
-	// 목표 액터 가져오기
-    auto allPC4 = UJ_Utility::GetAllMissionPC(GetWorld());
-
-	auto* obj = subMPArray[mIdx];
-	if(!obj) return;
-
-    // FIXME
-    switch (mIdx) {
-        case 0:
-            ReqPlayCommVoice(16, allPC4);
-            break;
-        case 1:
-            ReqPlayCommVoice(17, allPC4);
-            break;
-        case 2:
-            ReqPlayCommVoice(18, allPC4);
-            break;
-        case 3:
-            ReqPlayCommVoice(20, allPC4);
-            break;
-    }
-	
-	// @@ 딜레이 여부 | 애니 끝나는걸 애초에 알면 좋을듯
-	float delayTime = isFirst ? 0.01f : 1.5f;
-
-	// 활성화
-	DelayedObjectiveActive(obj, delayTime);
-}
-
-void AJ_ObjectiveNeutralizeTarget::DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime)
-{
-    check(obj);
-	FTimerHandle timerHandle2;
-	
-	GetWorld()->GetTimerManager()
-		.SetTimer(timerHandle2, [this, obj]() mutable
-	{
-		obj->IS_OBJECTIVE_ACTIVE = true;
-		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("asdasd %s"), *obj->GetName()));
-	}, delayTime, false);
-}
-
-FTransform AJ_ObjectiveNeutralizeTarget::CalcSubMPTransform(const FTransform &baseTR, const int &idx)
-{
-    FTransform newTR = baseTR;
-    // 처음 말고는 왼쪽으로 회전하기
-    if(idx != 0)
-    {   
-        // 왼쪽을 전방벡터로 변환
-        FQuat leftRotation = FQuat(FVector::UpVector, FMath::DegreesToRadians(-90.0f));
-        newTR.SetRotation(leftRotation * newTR.GetRotation()); // 왼쪽으로 90도 회전
-
-        // GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Red, FString::Printf(TEXT("새 tr : %s"), *newTR.ToString()));
-    }
-
-    // idx에 따라 다른 길이 만큼 forv 방향으로 이동
-    float addForv = 0;
-    // 순서에 따라 다른거 적용
-    switch (idx) {
-        case 0:
-            addForv = firstMPDis;
-            break;
-        case 2:
-            addForv = xMPDis;
-            break;
-        case 1:
-        case 3:
-            addForv = yMPDis;
-            break;
-    }
-    // tr의 forv 방향 만큼 이동
-    newTR.SetLocation(newTR.GetLocation() + newTR.GetRotation().GetForwardVector() * addForv);
-
-    return newTR;
-}
-
-
 
 bool AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform(FTransform& outSpawnTR)
 {
@@ -234,112 +98,331 @@ bool AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform(FTransform& outSpawnTR)
     {
         // 위치
         FVector spLoc = outHit.ImpactPoint;
-        // 회전
-        // FRotator spRot = outHit.ImpactNormal.Rotation();
+        // 회전 | 위를 바라보도록
         FQuat spRot = FQuat::FindBetween(FVector::UpVector, outHit.ImpactNormal);
         
         // 스폰 트랜스폼 설정
         outSpawnTR = FTransform(spRot, spLoc, FVector::OneVector);
     }
-    // @@ 그냥 지면 = -4km이라 가정
-    else {
-        FVector spLoc = this->GetActorLocation() + FVector::DownVector * UJ_Utility::defaultMissionObjectHeight;
+    // 아래에 충돌이 없으면 그냥 지면 = -4km이라 가정
+    else 
+    {
+        FVector spLoc = this->GetActorLocation();;
+        spLoc.Z = 0;
+
         outSpawnTR = FTransform(FRotator::ZeroRotator, spLoc, FVector::OneVector);
     }
 
     return isHit;
 }
 
-// 활성화 딜리게이트에서 실행됨
-void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
+
+#pragma region 하위 이동 목표 초기화 단
+void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
 {
+    if(!HasAuthority() || IS_OBJ_ENDED) return;
+
+    // icon 비활성화
+    iconWorldUIComp->SetVisible(false);
+
+    // 현 시점 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    if(allPC.Num() == 0) return;
+
+    // 점수 맵 init
+    InitTargetScoreMap(allPC);
+
+    // 편대장 위치 가져오기
+    auto* hostPC = allPC[0];
+    const auto& baseLocation = hostPC->GetPawn()->GetActorLocation();
+
+    // 해당 위치와 내 위치를 기반으로 사각형으로 도는 트랙으로 하위 이동 목표 스폰
+
+    // 항상 스폰 처리
+	FActorSpawnParameters params;
+	params.bNoFail = true;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    // 하위 이동 목표 생성
+    for(int i = 0; i < subMovePointAmt; i++)
+    {
+        // 기준 위치 설정 | 처음엔 과녁, 이후는 이전 이동 목표 위치를 기준
+        FTransform baseTR;
+        if(i == 0)
+        {
+            // host -> this 방향 구하기
+            FVector dir = (this->GetActorLocation() - baseLocation).GetSafeNormal();
+            // 해당 방향을 forv로 변경
+            baseTR = this->GetActorTransform();
+            baseTR.SetRotation(dir.ToOrientationQuat());
+        }
+        else 
+            baseTR = subMPArray[i - 1]->GetActorTransform();
+
+        // 스폰 위치 계산
+        auto newSpawnTR = CalcSubMPTransform(baseTR, i);
+        
+        // 이동 목표 생성
+        auto* subMP = SpawnSubMovePoint(newSpawnTR, params);
+        if(!subMP) continue;
+
+        // 배열에 추가
+        subMPArray.Add(subMP);
+    }
+
+    // 서브 목표 시작
+    ActiveNextObjective();
+
+    StartNewObjUI();
+}
+
+void AJ_ObjectiveNeutralizeTarget::InitTargetScoreMap(const TArray<class AJ_MissionPlayerController*>& allPC)
+{
+    // 점수 맵 init
+    targetScoreMap.Empty();
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        // 과녁 점수 맵 초기화
+        targetScoreMap.Add(pc, 0.f);
+    }
+}
+
+FTransform AJ_ObjectiveNeutralizeTarget::CalcSubMPTransform(const FTransform &baseTR, const int &idx)
+{
+    FTransform newTR = baseTR;
+    // 처음 말고는 왼쪽으로 회전하기
+    if(idx != 0)
+    {   
+        // 왼쪽을 전방벡터로 변환
+        FQuat leftRotation = FQuat(FVector::UpVector, FMath::DegreesToRadians(-90.0f));
+        newTR.SetRotation(leftRotation * newTR.GetRotation()); // 왼쪽으로 90도 회전
+    }
+
+    // idx에 따라 다른 길이 만큼 forv 방향으로 이동
+    float addForv = 0;
+    // 순서에 따라 다른거 적용
+    switch (idx) {
+        case 0:
+            addForv = firstMPDis;
+            break;
+        case 2:
+            addForv = xMPDis;
+            break;
+        case 1:
+        case 3:
+            addForv = yMPDis;
+            break;
+    }
+    // tr의 forv 방향 만큼 이동
+    newTR.SetLocation(newTR.GetLocation() + newTR.GetRotation().GetForwardVector() * addForv);
+
+    return newTR;
+}
+
+AJ_ObjectiveMovePoint* AJ_ObjectiveNeutralizeTarget::SpawnSubMovePoint(const FTransform &subMPTR, const FActorSpawnParameters &params)
+{
+    // 이동 목표 생성
+    auto* subMP = GetWorld()->SpawnActor<AJ_ObjectiveMovePoint>(movePointPrefab, subMPTR, params);
+    if(!subMP) return nullptr;
+
+    // 목표 액터 설정
+    subMP->InitObjective(ETacticalOrder::MOVE_THIS_POINT, false);
+
+    // 딜리게이트 바인드
+    // 완료시 서브 목표 ui 완료 처리
+    subMP->objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::EndSubMPUI);
+    // 목표 완료시 다음 목표 활성화 바인드
+    subMP->objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
     
 
-
-    // 스폰 위치 계산
-    bool getSpawnTR = CalcSpawnTransform(spawnTR);
-    if(!getSpawnTR)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("지상 목표 위치 대체 생성"));
-    }
-
-    // solved gt 캐시 해야 하려나?
-    // XXX 여러개 소환하려면 분산시켜야 할 듯
-    for(int i = 0; i < spawnTargetAmt; i++)
-    {
-        auto* groundTarget = GetWorld()->SpawnActor<AJ_GroundTarget>(groundTargetPrefab, spawnTR);
-        // GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Green, FString::Printf(TEXT("스폰 위치 %s"), *spawnTR.ToString()));
-        // 파괴 딜리게이트에 함수 넣기
-        groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
-        // 점수 받기 함수 넣기
-        groundTarget->sendScoreDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::UpdateTargetScore);
-    }
+    return subMP;
 }
 
-// XXX 이제 사용 안함
-void AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed()
-{
-    destroyedTargetAmt++;
+#pragma endregion
+#pragma endregion
 
-    // 수행도 갱신
-    SUCCESS_PERCENT = static_cast<float>(destroyedTargetAmt) / spawnTargetAmt;
-
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("현재 파괴된 수 : %d, 남은 수 : %d"), destroyedTargetAmt, (spawnTargetAmt - destroyedTargetAmt)));
-
-    if(destroyedTargetAmt == spawnTargetAmt)
-    {
-        this->ObjectiveEnd(true);
-    }
-}
-
+#pragma region 미션 진행 단
+/* 
+// base 작동
+    로컬 폰과의 거리 icon UI 설정 -> (서버단) tick 시작
+    수행도 갱신시 갱신된 수행도를 목표 매니저에게 보냄
+*/
 void AJ_ObjectiveNeutralizeTarget::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
+}
 
-    // FIXME 이거 대체 왜 클라에서 안 꺼지는 거임
-    if(debugCheck)
+#pragma region 하위 이동 목표 진행 단
+/*
+-> 하위 이동 목표 종료시 현재 진행 인덱스 증가 | ActiveNextObjective
+   하위 이동 목표 전부 종료했는지 체크 | CheckEndAllSubMP
+   아직 남아있으면 다음 이동 목표 활성화 | ActiveObjectiveByIdx, DelayedObjectiveActive
+-> 종료시 과녁 파괴 목표 활성화 | StartHitTarget
+*/
+
+void AJ_ObjectiveNeutralizeTarget::ActiveNextObjective()
+{
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("%d 번째 서브 목표 종료"), CUR_ACTIVE_SUBMP_IDX));
+
+    // 인덱스 증가
+	CUR_ACTIVE_SUBMP_IDX++;
+
+    // 하위 이동 목표 전부 완료 체크
+    bool isEnd = CheckEndAllSubMP(CUR_ACTIVE_SUBMP_IDX);
+    // 서브 이동 목표 전부 끝난거 타격 목표로 전환
+    if(isEnd)
+        StartHitTarget();
+    // 최초가 아니면 종료 애니메이션 대기 (delay 애니메이션에 맞게 수정 필요)
+    else
+        ActiveObjectiveByIdx(CUR_ACTIVE_SUBMP_IDX, CUR_ACTIVE_SUBMP_IDX == 0);
+}
+
+bool AJ_ObjectiveNeutralizeTarget::CheckEndAllSubMP(int idx)
+{
+    return idx >= subMPArray.Num();
+}
+
+void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
+{
+	// 목표 액터 가져오기
+	auto* obj = subMPArray[mIdx];
+	if(!obj) return;
+
+    // @@ 임시 ai 보이스 재생
+    // switch (mIdx) {
+    //     case 0:
+    //         ReqPlayCommVoice(16, allPC4);
+    //         break;
+    //     case 1:
+    //         ReqPlayCommVoice(17, allPC4);
+    //         break;
+    //     case 2:
+    //         ReqPlayCommVoice(18, allPC4);
+    //         break;
+    //     case 3:
+    //         ReqPlayCommVoice(20, allPC4);
+    //         break;
+    // }
+	
+	// @@ 딜레이 여부 | 애니 끝나는걸 애초에 알면 좋을듯
+	float delayTime = isFirst ? 0.01f : 1.5f;
+
+	// 활성화
+	DelayedObjectiveActive(obj, delayTime);
+}
+
+void AJ_ObjectiveNeutralizeTarget::DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime)
+{
+    if(!obj) return;
+
+    // 딜레이 이후 활성화
+	FTimerHandle timerHandle2;
+	
+	GetWorld()->GetTimerManager()
+		.SetTimer(timerHandle2, [this, obj]() mutable
+	{
+		obj->IS_OBJECTIVE_ACTIVE = true;
+	}, delayTime, false);
+}
+
+
+void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
+{
+    // icon 활성화
+    iconWorldUIComp->SetVisible(true);
+    // voice 재생
+}
+
+#pragma endregion
+
+#pragma region 과녁 타격 목표 진행 단
+/*
+-> 과녁에서 GetDamage 받을때 점수 계산 | @@ 베타 구현
+-> 계산된 점수 갱신 | UpdateTargetScore
+   현재 모든 플레이어가 타격시(== 점수가 0이아님) 인지 체크 | CheckAllTargetHit
+   모두 타격 했으면 점수 계산 후 목표 종료 | CalcSuccessPercent
+*/
+void AJ_ObjectiveNeutralizeTarget::UpdateTargetScore(class AJ_MissionPlayerController *pc, float score)
+{
+    targetScoreMap[pc] = score;
+
+    bool isEnd = CheckAllTargetHit();
+    if(isEnd)
     {
-        MRPC_SetVisibleIconUI(isSubEnd);
-        if(isSubEnd)
-        {
-            auto allPC4 = UJ_Utility::GetAllMissionPC(GetWorld());
-
-            ReqPlayCommVoice(21, allPC4);
-        }
-
-        debugCheck = false;
+        // 수행도 산정
+        SUCCESS_PERCENT = CalcSuccessPercent();
+        // 모두 타격했으니 종료
+        ObjectiveEnd(true);
     }
 }
 
-
-void AJ_ObjectiveNeutralizeTarget::SRPC_StartNewObjUI()
+// 모든 pc 가 과녁 타격했는지 체크
+bool AJ_ObjectiveNeutralizeTarget::CheckAllTargetHit()
 {
-    Super::SRPC_StartNewObjUI();   
-}
-
-void AJ_ObjectiveNeutralizeTarget::StartNewObjUI()
-{
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
-
-	// 모든 pc 가져오기
-	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 crpc
-    for(auto* pc : allPC2)
-    {
-		// 보낼 목표 데이터 구성
-		FNeutralizeTargetUIData orderData = SetNeutUIData(pc);
-		// ui 생성 시작
-        pc->objUIComp->CRPC_StartObjUINeut(orderData);
-    }
-}
-
-void AJ_ObjectiveNeutralizeTarget::SRPC_UpdateObjUI()
-{
-    Super::SRPC_UpdateObjUI();
-
+    bool isEnd = true;
     
+    // 모든 플레이어 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+        if(!targetScoreMap.Contains(pc))
+            targetScoreMap.Add(pc, 0.f);
+
+        // 점수가 0 (== 타격 안함)
+        if(targetScoreMap[pc] == 0.f) 
+        {
+            isEnd = false;
+            break;
+        }
+    }
+
+    return isEnd;
 }
+
+float AJ_ObjectiveNeutralizeTarget::CalcSuccessPercent()
+{
+    // @@ 필요하면 베타때 직접적인 값을 반환할 지도
+    // 1. 이동 목표 수행 데이터
+    // 수행도 배열
+    TArray<float> subMPSPAry;
+    Algo::Transform(subMPArray, subMPSPAry, [](AJ_ObjectiveMovePoint* temp){
+        if(!temp) return 0.0f;
+
+        return temp->SUCCESS_PERCENT;
+    });
+
+    // 2. 과녁 점수 데이터 | 일단 1로 가정 
+    TArray<float> targetScoreAry;
+
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    Algo::Transform(allPC, targetScoreAry, [this](AJ_MissionPlayerController* temp){
+        if(!temp) return 0.0f;
+
+        return targetScoreMap[temp];
+    });
+
+    // 이동 목표 수행도의 평균
+    float subMPResult = UJ_Utility::CalcAverage(subMPSPAry);
+    // 과녁 점수 평균 구하기
+    float targetScoreResult = UJ_Utility::CalcAverage(targetScoreAry);
+
+    // 전체 점수의 평균
+    return UJ_Utility::CalcAverage({subMPResult, targetScoreResult});
+}
+
+#pragma endregion
+#pragma endregion
+
+#pragma region 목표 UI 적용 단
+/* 특정 타이밍에 목표 UI 시작 | StartNewObjUI
+-> 각 pc마다 목표 ui 데이터 설정 | SendObjUIData, SetNeutUIData , pc->crpc 보내기
+-> 특정 갱신 타이밍 마다 업데이트 UI | UpdateObjUI -> 이전에 보냈는지 체크후 업데이트 | CheckSendSameData
+-> 목표 종료 나 서브 목표 종료시 ui 애니메이션 실행 요청 | EndObjUI , EndSubObjUI, 
+-> 목표 종료시 비작동*/
 
 FNeutralizeTargetUIData AJ_ObjectiveNeutralizeTarget::SetNeutUIData(class AJ_MissionPlayerController *pc)
 {
@@ -350,15 +433,17 @@ FNeutralizeTargetUIData AJ_ObjectiveNeutralizeTarget::SetNeutUIData(class AJ_Mis
         subObjData.Add(FObjSucceedData(subMP->IS_OBJ_ENDED, subMP->SUCCESS_PERCENT > 0));
     }
 
-    // 모든 pc 가 타격시 목표 종료
-    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+    // 현재 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    int all = allPC2.Num();
+    int all = allPC.Num();
     int cnt = 0;
 
-    
-    for(auto* onePC : allPC2)
+    for(auto* onePC : allPC)
     {
+        if(!onePC) continue;
+        if(!targetScoreMap.Contains(onePC)) continue;
+
         if(targetScoreMap[onePC] != 0.f) 
             cnt++;
     }
@@ -366,109 +451,58 @@ FNeutralizeTargetUIData AJ_ObjectiveNeutralizeTarget::SetNeutUIData(class AJ_Mis
     return FNeutralizeTargetUIData(all, cnt, subObjData);
 }
 
-void AJ_ObjectiveNeutralizeTarget::SRPC_EndObjUI()
+void AJ_ObjectiveNeutralizeTarget::SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit)
 {
-    Super::SRPC_EndObjUI();
-}
+    Super::SendObjUIData(pc, isInit);
 
-// void AJ_ObjectiveNeutralizeTarget::SRPC_EndSubObjUI()
-// {
-//     Super::SRPC_EndSubObjUI();
-// }
-
-FTacticalOrderData AJ_ObjectiveNeutralizeTarget::SetObjUIData(class AJ_MissionPlayerController *pc)
-{
-    // 서브 이동 목표 수행 여부 데이터
-    TArray<FObjSucceedData> subObjData;
-    for(auto* subMP : subMPArray)
-    {
-        subObjData.Add(FObjSucceedData(subMP->IS_OBJ_ENDED, subMP->SUCCESS_PERCENT > 0));
-    }
-
-    // 모든 pc 가 타격시 목표 종료
-    int all = allPC.Num();
-    int cnt = 0;
-    for(auto* onePC : allPC)
-    {
-        if(targetScoreMap[onePC] != 0.f) 
-            cnt++;
-    }
-
-    FNeutralizeTargetUIData data(all, cnt, subObjData);
-
-    return FTacticalOrderData(this->orderType, FFormationFlightUIData(), data);
-}
-
-void AJ_ObjectiveNeutralizeTarget::UpdateTargetScore(class AJ_MissionPlayerController *pc, float score)
-{
-    targetScoreMap[pc] = score;
-
-    // 모든 pc 가 타격시 목표 종료
-    for(auto* onePC : allPC)
-    {
-        if(targetScoreMap[onePC] == 0.f) 
-            return;
-    }
-    // 수행도 산정
-    SUCCESS_PERCENT = CalcSuccessPercent();
-    // 모두 타격했으니 종료
-    ObjectiveEnd(true);
-}
-
-float AJ_ObjectiveNeutralizeTarget::CalcSuccessPercent()
-{
-    // @@ 필요하면 베타때 직접적인 값을 반환할 지도
-    // 1. 이동 목표 수행 데이터
-    // 수행도 배열
-    TArray<float> subMPSPAry;
-    Algo::Transform(subMPArray, subMPSPAry, [](AJ_ObjectiveMovePoint* temp){
-        return temp->SUCCESS_PERCENT;
-    });
-    //캐스트 후
-    // 수행도의 평균
-    float subMPResult = UJ_Utility::CalcAverage(subMPSPAry);
-
-    // 2. 과녁 점수 데이터 | 일단 1로 가정 
-    TArray<float> targetScoreAry;
-    Algo::Transform(allPC, targetScoreAry, [this](AJ_MissionPlayerController* temp){
-        return targetScoreMap[temp];
-    });
-    //캐스트 후
-    float targetScoreResult = UJ_Utility::CalcAverage(targetScoreAry);
-
-    // 과녁 점수의 평균
-    return UJ_Utility::CalcAverage({subMPResult, targetScoreResult});
-}
-
-void AJ_ObjectiveNeutralizeTarget::SetObjectiveActive(bool value)
-{
-    Super::SetObjectiveActive(value);
-
-    iconWorldUIComp->SetVisible(false);
+    // 보낼 목표 데이터 구성
+    FNeutralizeTargetUIData orderData = SetNeutUIData(pc);
+    // ui 생성 시작
+    pc->objUIComp->CRPC_StartObjUINeut(orderData);
 }
 
 void AJ_ObjectiveNeutralizeTarget::UpdateObjUI()
 {
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
+    if(!HasAuthority()) return;
 
-	// 보낼 데이터
     // 모든 pc 가져오기
-    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
-
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC2)
+    for(auto* pc : allPC)
     {
-		auto orderData = SetNeutUIData(pc);
-		
-        FTacticalOrderData tempData(this->orderType, orderData);
-		
 		// 과도한 crpc 방지 처리
-		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
-		{
-			// 데이터 보내기
+		// 이전에 보낸 ui 데이터와 동일한지 검증
+        auto orderData = SetNeutUIData(pc);
+
+		// 다르면 업데이트
+		// @@ 템플릿 쓸 수 있을지 고민
+		FTacticalOrderData temp(this->orderType, orderData);
+		bool canUpdate = CheckSendSameData(pc, temp);
+        // 데이터 보내기
+		if(canUpdate)
 			pc->objUIComp->CRPC_UpdateObjUINeut(orderData);
-			// objui데이터 맵에 저장
-			prevObjUIDataMap.Add(pc, tempData);
-		}
     }
 }
+
+// -> 하위 이동 목표 완료시 서브 목표 ui 완료 처리 | EndSubMPUI
+void AJ_ObjectiveNeutralizeTarget::EndSubMPUI()
+{
+    // 해당 서브 목표 종료
+    if(CUR_ACTIVE_SUBMP_IDX >= subMPArray.Num()) return;
+
+    auto* subMP = subMPArray[CUR_ACTIVE_SUBMP_IDX];
+    if(!subMP) return;
+
+    // 성공 여부 계산
+    bool isSuccess = subMP->SUCCESS_PERCENT > 0;
+
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        EndSubObjUI(pc, CUR_ACTIVE_SUBMP_IDX, isSuccess);
+    }
+}
+
+#pragma endregion

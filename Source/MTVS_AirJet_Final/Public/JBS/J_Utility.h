@@ -820,8 +820,6 @@ public:
     // 지대공 무력화
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FNeutralizeTargetUIData ntData;
-    // 이동
-
     // 시동 절차
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FEngineProgressData epData;
