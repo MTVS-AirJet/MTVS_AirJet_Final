@@ -547,11 +547,10 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 			case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
 				textStr = TEXT("엔진의 작동을 조절할 수 있도록 제어 장치를 켭니다.");
 				break;
-			// FIXME 이거 순서 바뀐거 수정해야함
-			case EEngineProgress::JFS_STARTER_SWITCH_ON:
+			case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
 				textStr = TEXT("엔진의 모든 주요 시스템을 활성화합니다.");
 				break;
-			case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+			case EEngineProgress::JFS_STARTER_SWITCH_ON:
 				textStr = TEXT("JFS(보조 동력 장치)는 엔진 시동을 위한 필수 장치입니다. 이 장치를 켜서 주 엔진을 시작할 준비를 합니다.");
 				break;
 			case EEngineProgress::JFS_HANDLE_PULL:

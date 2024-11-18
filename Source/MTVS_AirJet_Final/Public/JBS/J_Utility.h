@@ -218,8 +218,16 @@ USTRUCT(BlueprintType)
 struct FMissionStartPos : public FJVector2D
 {
     GENERATED_BODY()
-
+public:
     // fjvector2d 상속 받아서 x, y 값 있음
+    
+    virtual FTransform GetTransform() const override
+    {
+        return Super::GetTransform();
+    }
+
+    // 첫 미션을 바라보는 회전 값 받아서 gettransform
+    virtual FTransform GetTransform(const FVector &targetLoc) const;
 };
 
 USTRUCT(BlueprintType)
@@ -257,6 +265,11 @@ struct FMissionObject : public FJVector2D
     operator FJVector2D() const
     {
         return FJVector2D(x,y);
+    }
+
+    virtual FTransform GetTransform() const
+    {
+        return Super::GetTransform();
     }
 };
 

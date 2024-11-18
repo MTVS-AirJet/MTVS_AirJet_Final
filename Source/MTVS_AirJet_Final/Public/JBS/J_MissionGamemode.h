@@ -73,9 +73,6 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FFormationValue formationData;
 
-    // 제거좀 하자
-    FRemoveLoadingUIDel removeLUIDel;
-
     // @@ 임시 스폰 횟수 기록
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int tempSpawnCnt = 0;
@@ -170,8 +167,8 @@ protected:
     UFUNCTION(BlueprintCallable)
     void StartMissionLevel();
 
-    // 1. 미션 시작지점 액터 추가
-    void InitMissionStartPoint(const FMissionStartPos &startPointData);
+    // 1. 미션 시작지점 액터 추가 | 첫 미션 바라보게
+    void InitMissionStartPoint(const FMissionStartPos &startPointData, const FMissionObject& firstMission = FMissionObject());
 
     // 2. 미션 시작지점으로 전이
     UFUNCTION(BlueprintCallable)
