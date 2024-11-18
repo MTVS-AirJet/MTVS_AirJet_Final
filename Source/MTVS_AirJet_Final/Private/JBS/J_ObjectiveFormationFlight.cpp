@@ -30,9 +30,7 @@ void AJ_ObjectiveFormationFlight::InitBindDel()
     AJ_BaseMissionObjective::InitBindDel();    
 
     // 목표 완료시 수행도 갱신 바인드
-    this->objectiveEndDel.AddLambda([this]{
-        this->SetSuccessPercent(formationTime / progressTime)        ;
-    });
+    this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::SendEndSuccessData);
 }
 
 void AJ_ObjectiveFormationFlight::ObjectiveActive()
@@ -42,6 +40,30 @@ void AJ_ObjectiveFormationFlight::ObjectiveActive()
 
     // 목표 ui 신규 갱신
     StartNewObjUI();
+
+    // @@ 지휘관 보이스 12~14 순차적으로
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    ReqPlayCommVoice(12, allPC);
+
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+    {
+        //타이머에서 할 거
+        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+        ReqPlayCommVoice(13, allPC);
+        
+        FTimerHandle timerHandle2;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle2, [this]() mutable
+        {
+            //타이머에서 할 거
+            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+            ReqPlayCommVoice(14, allPC);
+            
+        }, 3.f, false);
+    }, 3.f, false);    
 }
 
 
@@ -306,4 +328,7 @@ void AJ_ObjectiveFormationFlight::UpdateObjUI()
 
 #pragma endregion
 
-
+void AJ_ObjectiveFormationFlight::SendEndSuccessData() 
+{
+    this->SetSuccessPercent(formationTime / progressTime);
+}

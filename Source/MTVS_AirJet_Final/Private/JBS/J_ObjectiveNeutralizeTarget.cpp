@@ -231,10 +231,11 @@ AJ_ObjectiveMovePoint* AJ_ObjectiveNeutralizeTarget::SpawnSubMovePoint(const FTr
     subMP->InitObjective(ETacticalOrder::MOVE_THIS_POINT, false);
 
     // 딜리게이트 바인드
+    
     // 완료시 서브 목표 ui 완료 처리
-    subMP->objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::EndSubMPUI);
+    subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::EndSubMPUI);
     // 목표 완료시 다음 목표 활성화 바인드
-    subMP->objectiveEndDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
+    subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
     
 
     return subMP;
@@ -291,20 +292,22 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 	if(!obj) return;
 
     // @@ 임시 ai 보이스 재생
-    // switch (mIdx) {
-    //     case 0:
-    //         ReqPlayCommVoice(16, allPC4);
-    //         break;
-    //     case 1:
-    //         ReqPlayCommVoice(17, allPC4);
-    //         break;
-    //     case 2:
-    //         ReqPlayCommVoice(18, allPC4);
-    //         break;
-    //     case 3:
-    //         ReqPlayCommVoice(20, allPC4);
-    //         break;
-    // }
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    switch (mIdx) {
+        case 0:
+            ReqPlayCommVoice(16, allPC);
+            break;
+        case 1:
+            ReqPlayCommVoice(17, allPC);
+            break;
+        case 2:
+            ReqPlayCommVoice(18, allPC);
+            break;
+        case 3:
+            ReqPlayCommVoice(20, allPC);
+            break;
+    }
 	
 	// @@ 딜레이 여부 | 애니 끝나는걸 애초에 알면 좋을듯
 	float delayTime = isFirst ? 0.01f : 1.5f;
@@ -333,6 +336,9 @@ void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
     // icon 활성화
     iconWorldUIComp->SetVisible(true);
     // voice 재생
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    ReqPlayCommVoice(22, allPC);
 }
 
 #pragma endregion

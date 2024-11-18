@@ -417,6 +417,6 @@ void AJ_MissionGamemode::StartTacticalOrder()
             // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음 | 나중엔 로딩 뽕맛 보여줘야지
             this->objectiveManagerComp->ActiveNextObjective();
             
-        }, 3, false);
-    }, 5.f, false);
+        }, 1.5, false);
+    }, 1.5f, false);
 }

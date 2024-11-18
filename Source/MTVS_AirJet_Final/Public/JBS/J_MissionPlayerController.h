@@ -112,11 +112,10 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice(const FString &voiceBase64);
 
-	// @@ 목표 시작시 지휘관 보이스 라인 재생
+	// 목표 시작시 지휘관 보이스 라인 재생
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice2(const ETacticalOrder &orderType);
 
-	// @@ int로 받게 처리
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice3(int idx);
 

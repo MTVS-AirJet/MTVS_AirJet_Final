@@ -95,6 +95,10 @@ protected:
 		UPrimitiveComponent *OverlappedComponent, AActor *OtherActor,
 		UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult &SweepResult) override;
+
+	// 목표 종료시 수행도 반환
+	UFUNCTION(BlueprintCallable)
+	virtual void SendEndSuccessData();
 #pragma endregion
 
 #pragma region 목표 UI 적용 단

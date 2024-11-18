@@ -39,7 +39,7 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
     }
 
     // 목표 종료시 수행도 결과 계산 바인드
-    objectiveEndDel.AddUObject(this, &AJ_ObjectiveEngineStart::CalcSuccessPercent);
+    objectiveEndDel.AddDynamic(this, &AJ_ObjectiveEngineStart::CalcSuccessPercent);
 
     // 목표 ui 신규 갱신
     StartNewObjUI();    
@@ -78,9 +78,13 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     //     , *UJ_Utility::ToStringEnumPure(type)
     //     , *UJ_Utility::ToStringBool(isSuccess));
     // UJ_Utility::PrintFullLog(debugStr, 3.f, FColor::White);
+
     
     // 다음 수행으로 넘어가기
     ActiveNextProgress(data, isSuccess);
+
+    // 다음 지휘관 보이스 실행
+    ReqPlayCommVoice(static_cast<int>(data.curProgress), {pc});
 
     // 사이드 브레이크 수행이 들어왔을때 현재 진행이 그거 이전일때 takeoff로 설정 | 대기 무시하고 다 켜버리는 경우
     if(!isSuccess && type == EEngineProgress::RELEASE_SIDE_BREAK && data.curProgress <= type)
@@ -128,6 +132,9 @@ void AJ_ObjectiveEngineStart::ActiveNextProgress(FEngineProgressData& data, bool
     // 성공시 수행도 추가
     if(isSuccess)
         data.AddSuccessValue(data.curProgress);
+
+    
+
     // 다음 수행도로 변경
     data.SetNextProgress();
 }

@@ -100,7 +100,11 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SkipDefaultObj(bool isSuccess);
 
-public:
+	// 시동 절차 끝날때 이륙 절차 시작
+	UFUNCTION(BlueprintCallable)
+	void StartTakeOffObj();
+
+    public:
 	// 레벨 시작 시 시동/이륙 목표 설정
     void InitDefaultObj();
     // 미션 시작 시 목표 리스트 설정
@@ -113,6 +117,7 @@ public:
     void DelayedObjectiveActive(class AJ_BaseMissionObjective *obj, float delayTime);
 
     // 다음 목표 활성화 | 목표에 바인드
+	UFUNCTION(BlueprintCallable)
     void ActiveNextObjective();
 
 	// 목표 수행도 갱신
