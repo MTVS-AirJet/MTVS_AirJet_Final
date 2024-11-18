@@ -19,6 +19,7 @@ enum class EWeapon : uint8
 	Max
 };
 
+DECLARE_MULTICAST_DELEGATE(FStartMissionViper);
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AL_Viper : public AJ_BaseMissionPawn
@@ -382,9 +383,12 @@ private:
 	void ServerRPCBoost(bool isOn);
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCBoost(bool isOn);
+	bool bCurrBoostState;
 
+	UFUNCTION(Client, Reliable)
+	void ClientRPCLockOn();
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLockOn();
+	void ServerRPCLockOn(AActor* target);
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCLockOn(AActor* target);
 	UFUNCTION(Client,Reliable)
@@ -748,4 +752,9 @@ private:
 	bool bCanopyCloseSound;
 	bool bCanopyNormalSound;
 	bool bCanopyOpenSound;
+
+public:
+	// 미션 시작 시 사용할 델리게이트
+	bool bStartMission;
+	FStartMissionViper StartMissionViper_Del;
 };

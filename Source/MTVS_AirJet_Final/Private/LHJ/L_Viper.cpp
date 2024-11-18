@@ -228,6 +228,10 @@ AL_Viper::AL_Viper()
 	if (LeftVFX.Succeeded())
 	{
 		BoosterLeftVFX->SetAsset(LeftVFX.Object);
+		BoosterLeftVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+		BoosterLeftVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+		BoosterLeftVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+		BoosterLeftVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
 	}
 
 	BoosterRightVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterRightVFX"));
@@ -238,6 +242,10 @@ AL_Viper::AL_Viper()
 	if (RightVFX.Succeeded())
 	{
 		BoosterRightVFX->SetAsset(RightVFX.Object);
+		BoosterRightVFX->SetVariableFloat(FName("EnergyCore_Life") , 0.f);
+		BoosterRightVFX->SetVariableFloat(FName("HeatHaze_Lifetime") , 0.f);
+		BoosterRightVFX->SetVariableFloat(FName("Particulate_Life") , 0.f);
+		BoosterRightVFX->SetVariableFloat(FName("Thrusters_Life") , 0.f);
 	}
 
 	JetTailVFXLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("JetTailVFXLeft"));
@@ -800,6 +808,12 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 		JetCamera->SetActive(false);
 	if (JetCameraFPS)
 	{
+		if (!bStartMission && StartMissionViper_Del.IsBound())
+		{
+			StartMissionViper_Del.Broadcast();
+			bStartMission = true;
+		}
+
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
 		JetCameraFPS->SetActive(true);
@@ -1417,8 +1431,11 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 #pragma endregion
 
+#pragma region Lock On
 		if (IsLocallyControlled())
-			IsLockOn();
+			// 	IsLockOn();
+			ClientRPCLockOn();
+#pragma endregion
 
 #pragma region Flare Arrow Rotation Change
 		if (CurrentWeapon == EWeapon::Flare)
@@ -1572,21 +1589,27 @@ float AL_Viper::GetAddTickSpeed()
 
 void AL_Viper::IsLockOn()
 {
-	ServerRPCLockOn();
+	//ServerRPCLockOn();
 }
 #pragma endregion
 
 #pragma region Booster VFX
 void AL_Viper::ChangeBooster()
 {
-	if (IsEngineOn && AccelGear == 3)
+	FNiagaraVariable vfxParam(FNiagaraTypeDefinition::GetFloatDef() , FName("EnergyCore_Life"));
+	if(IsEngineOn)
 	{
-		ServerRPCBoost(true);
-	}
-	else
-	{
-		ServerRPCBoost(false);
-	}
+		if (AccelGear == 3)
+		{	
+			if (!bCurrBoostState)
+				ServerRPCBoost(true);
+		}
+		else
+		{
+			if (bCurrBoostState)
+				ServerRPCBoost(false);
+		}
+	}	
 }
 
 
@@ -1597,6 +1620,7 @@ void AL_Viper::ServerRPCBoost_Implementation(bool isOn)
 
 void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 {
+	bCurrBoostState = isOn;
 	if (isOn)
 	{
 		if (BoosterLeftVFX)
@@ -1763,8 +1787,9 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 	}
 }
 
-void AL_Viper::ServerRPCLockOn_Implementation()
+void AL_Viper::ClientRPCLockOn_Implementation()
 {
+#pragma region Lock On
 	AActor* searchTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
 	FVector ForwardVector = JetMesh->GetForwardVector();
@@ -1777,28 +1802,90 @@ void AL_Viper::ServerRPCLockOn_Implementation()
 		Diametr *= 2.f;
 		Start += (ForwardVector * Diametr / 4) + (DownVector * Diametr / 2);
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::None , OutHit , true))
+		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
 		{
 			for (auto hit : OutHit)
 			{
 				if (auto mai = Cast<IJ_MissionActorInterface>(hit.GetActor()))
 				{
 					if (!LockOnTarget)
-						ClientRPCLockOnSound(this);
+						PlayLockOnSound();
 					searchTarget = hit.GetActor();
 				}
-				// if (hit.GetActor()->ActorHasTag("target"))
-				// {
-				// 	
-				// }
 			}
 		}
 	}
+#pragma endregion
 
-	MulticastRPCLockOn(searchTarget);
-	ClientRPCSetLockOnUI(this , searchTarget);
+	if ((LockOnTarget && !searchTarget) || (!LockOnTarget && searchTarget))
+	{
+		ServerRPCLockOn(searchTarget);
+	}
+
+#pragma region Show Lock On UI
+	if (searchTarget && TargetUIActorFac)
+	{
+		if (TargetUIActorFac)
+		{
+			if (!TargetActor)
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this;
+				SpawnParams.Instigator = GetInstigator();
+
+				FVector TargetLocation = searchTarget->GetActorLocation() + FVector(0 , 0 , 100);
+				FRotator TargetRotation = (GetActorLocation() - TargetLocation).Rotation();
+
+				TargetActor = GetWorld()->SpawnActor<AL_Target>(TargetUIActorFac , TargetLocation , TargetRotation ,
+				                                                SpawnParams);
+			}
+		}
+	}
+	else
+	{
+		if (TargetActor)
+		{
+			TargetActor->Destroy();
+			TargetActor = nullptr;
+		}
+	}
+#pragma endregion
 
 	Diametr = 30.f;
+}
+
+void AL_Viper::ServerRPCLockOn_Implementation(AActor* target)
+{
+	// AActor* searchTarget = nullptr;
+	// FVector Start = JetMesh->GetComponentLocation();
+	// FVector ForwardVector = JetMesh->GetForwardVector();
+	// FVector DownVector = JetMesh->GetUpVector() * -1;
+	//
+	// TArray<AActor*> Overlaps;
+	// TArray<FHitResult> OutHit;
+	// for (int i = 0; i < RangeCnt; i++)
+	// {
+	// 	Diametr *= 2.f;
+	// 	Start += (ForwardVector * Diametr / 4) + (DownVector * Diametr / 2);
+	// 	if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
+	// 											   false , Overlaps , EDrawDebugTrace::None , OutHit , true))
+	// 	{
+	// 		for (auto hit : OutHit)
+	// 		{
+	// 			if (auto mai = Cast<IJ_MissionActorInterface>(hit.GetActor()))
+	// 			{
+	// 				if (!LockOnTarget)
+	// 					ClientRPCLockOnSound(this);
+	// 				searchTarget = hit.GetActor();
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	MulticastRPCLockOn(target);
+	// ClientRPCSetLockOnUI(this , searchTarget);
+
+	// Diametr = 30.f;
 }
 
 void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
