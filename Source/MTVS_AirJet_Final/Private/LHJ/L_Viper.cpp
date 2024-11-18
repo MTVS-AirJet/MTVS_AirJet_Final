@@ -1130,7 +1130,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bMIC)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::MIC_SWITCH_ON);
+						engineProgSuccessDel.Broadcast(EEngineProgress::MIC_SWITCH_ON);
 						DummyMICMesh->SetRenderCustomDepth(false);
 						DummyMICMesh->CustomDepthStencilValue = 0;
 					}
@@ -1148,7 +1148,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineGen1 && bEngineGen2)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_GEN_SWITCH_ON);
+						engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_GEN_SWITCH_ON);
 						DummyEngineGenerMesh1->SetRenderCustomDepth(false);
 						DummyEngineGenerMesh1->CustomDepthStencilValue = 0;
 						DummyEngineGenerMesh2->SetRenderCustomDepth(false);
@@ -1168,7 +1168,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineControl1 && bEngineControl2)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_CONTROL_SWITCH_ON);
+						engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_CONTROL_SWITCH_ON);
 						DummyEngineControlMesh1->SetRenderCustomDepth(false);
 						DummyEngineControlMesh1->CustomDepthStencilValue = 0;
 						DummyEngineControlMesh2->SetRenderCustomDepth(false);
@@ -1186,7 +1186,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFS)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_STARTER_SWITCH_ON);
+						engineProgSuccessDel.Broadcast(EEngineProgress::JFS_STARTER_SWITCH_ON);
 						DummyJFSMesh->SetRenderCustomDepth(false);
 						DummyJFSMesh->CustomDepthStencilValue = 0;
 					}
@@ -1204,7 +1204,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bEngineMaster1 && bEngineMaster2)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_MASTER_SWITCH_ON);
+						engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_MASTER_SWITCH_ON);
 						DummyEngineMasterMesh1->SetRenderCustomDepth(false);
 						DummyEngineMasterMesh1->CustomDepthStencilValue = 0;
 						DummyEngineMasterMesh2->SetRenderCustomDepth(false);
@@ -1222,7 +1222,7 @@ void AL_Viper::Tick(float DeltaTime)
 					if (bJFSHandle)
 					{
 						StartScenario.pop();
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::JFS_HANDLE_PULL);
+						engineProgSuccessDel.Broadcast(EEngineProgress::JFS_HANDLE_PULL);
 						DummyJFSHandleMesh->SetRenderCustomDepth(false);
 						DummyJFSHandleMesh->CustomDepthStencilValue = 0;
 					}
@@ -1236,7 +1236,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (bFirstEngine)
 				{
 					StartScenario.pop();
-					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_THROTTLE_IDLE);
+					engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_THROTTLE_IDLE);
 					DummyThrottleMesh->SetRenderCustomDepth(false);
 					DummyThrottleMesh->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 0);
@@ -1278,7 +1278,7 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
 						CRPC_AudioControl(true , 0);
-						engineProgSuccessDel.ExecuteIfBound(EEngineProgress::CLOSE_CANOPY);
+						engineProgSuccessDel.Broadcast(EEngineProgress::CLOSE_CANOPY);
 					}
 				}
 			}
@@ -1299,7 +1299,7 @@ void AL_Viper::Tick(float DeltaTime)
 				if (!bReadyTimeEndFlag && bBreakHold)
 				{
 					StartScenario.pop();
-					engineProgSuccessDel.ExecuteIfBound(EEngineProgress::RELEASE_SIDE_BREAK);
+					engineProgSuccessDel.Broadcast(EEngineProgress::RELEASE_SIDE_BREAK);
 					DummyJFSBreakHold->SetRenderCustomDepth(false);
 					DummyJFSBreakHold->CustomDepthStencilValue = 0;
 					CRPC_AudioControl(true , 1);
@@ -2293,7 +2293,7 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 			StartScenario.pop();
 			DummyThrottleMesh->SetRenderCustomDepth(false);
 			DummyThrottleMesh->CustomDepthStencilValue = 0;
-			engineProgSuccessDel.ExecuteIfBound(EEngineProgress::ENGINE_THROTTLE_IDLE);
+			engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_THROTTLE_IDLE);
 		}
 
 		// 스로틀 up

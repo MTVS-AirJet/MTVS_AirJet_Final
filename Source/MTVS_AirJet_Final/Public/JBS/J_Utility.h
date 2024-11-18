@@ -786,8 +786,7 @@ public:
 };
 
 // 시동 절차 수행 알림 딜리게이트 선언
-DECLARE_DELEGATE_OneParam(FSuccessProgress, EEngineProgress);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSuccessProgress, EEngineProgress, curProgress);
 // 전술명령 데이터 전달 용 최상위 구조체 | 전술 명령 개수 만큼 추가
 USTRUCT(BlueprintType)
 struct FTacticalOrderData

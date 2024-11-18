@@ -144,7 +144,7 @@ void AJ_MissionPlayerController::CRPC_OnPossess_Implementation()
     // 폰 가져오기
     auto* pilot = GetPawn<AL_Viper>();
     // 포제스 시 시동 절차 수행 딜리게이트 바인드
-    pilot->engineProgSuccessDel.BindUObject(this, &AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess);
+    pilot->engineProgSuccessDel.AddDynamic(this, &AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess);
     
     // UE_LOG(LogTemp, Warning, TEXT("아기 바인드 pc : %s, 폰 있음 : %s"), *this->GetName(), *UJ_Utility::ToStringBool(pilot != nullptr));
 }

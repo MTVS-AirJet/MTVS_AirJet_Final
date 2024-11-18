@@ -701,6 +701,7 @@ private:
 	float DeviceThrottleCurrentValue = 0.f;
 #pragma region JBS 추가 부분
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Values")
 	FSuccessProgress engineProgSuccessDel;
 #pragma endregion
 
