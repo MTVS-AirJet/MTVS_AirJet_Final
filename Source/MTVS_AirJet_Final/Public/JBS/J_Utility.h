@@ -689,9 +689,8 @@ enum class EEngineProgress : uint8
     ,MIC_SWITCH_ON = 1
     ,ENGINE_GEN_SWITCH_ON = 2
     ,ENGINE_CONTROL_SWITCH_ON = 3
-    // FIXME 순서 바뀐거 수정해야함
-    ,JFS_STARTER_SWITCH_ON = 4
-    ,ENGINE_MASTER_SWITCH_ON = 5
+    ,ENGINE_MASTER_SWITCH_ON = 4
+    ,JFS_STARTER_SWITCH_ON = 5
     ,JFS_HANDLE_PULL = 6
     ,ENGINE_THROTTLE_IDLE = 7
     ,CLOSE_CANOPY = 8
@@ -821,8 +820,6 @@ public:
     // 지대공 무력화
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FNeutralizeTargetUIData ntData;
-    // 이동
-
     // 시동 절차
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FEngineProgressData epData;
@@ -848,7 +845,21 @@ public:
     }
 };
 
+// 이륙 수행 데이터
+USTRUCT(BlueprintType)
+struct FTakeOffCheckData    
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isTakeOff;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    bool isSuccess;
 
+    FTakeOffCheckData() {}
+
+    FTakeOffCheckData(bool isTakeOff, bool isSuccess) : isTakeOff(isTakeOff), isSuccess(isSuccess) {}
+};
 
 
 
@@ -932,6 +943,8 @@ public:
     // 0~1 float 값 백분율 string으로 반환
     static FString ToStringPercent(float percent);
 
+    // 디버그용 printf && log 찍기
+    static void PrintFullLog(const FString &str, const float &time = 3.f, const FColor &color = FColor::Green);
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1000000.f;
     // 기본 목표 지점 고도

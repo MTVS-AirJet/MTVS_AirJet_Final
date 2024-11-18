@@ -9,10 +9,10 @@
 #include "J_BaseMissionObjective.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float)
-DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate)
-DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate)
-DECLARE_MULTICAST_DELEGATE(FObjectiveSuccessUpdateDelegate)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float);
+DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate);
+DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate);
+DECLARE_MULTICAST_DELEGATE(FObjectiveSuccessUpdateDelegate);
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
@@ -20,13 +20,8 @@ class MTVS_AIRJET_FINAL_API AJ_BaseMissionObjective : public AActor
 	GENERATED_BODY()
 public:	
 	AJ_BaseMissionObjective();
-
 protected:
-	virtual void BeginPlay() override;
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-protected:
+#pragma region 컴포넌트
 	// 미션 액터 루트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class USceneComponent* rootComp;
@@ -43,57 +38,43 @@ protected:
 	// 아이콘 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
 	class UJ_ObjectiveIconUI* iconWorldUI;
+#pragma endregion
+
+#pragma region 값
+	// 개별 pc 이전 UI 정보 맵 | 중복 ui update 방지용
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TMap<class AJ_MissionPlayerController*, FTacticalOrderData> prevObjUIDataMap;
 
 	// 전술명령 활성화 여부
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", ReplicatedUsing=OnRep_ObjActive)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool isObjectiveActive = false;
 		public:
+	// getset
 	__declspec(property(get = GetObjectiveActive, put = SetObjectiveActive)) bool IS_OBJECTIVE_ACTIVE;
 	UFUNCTION(BlueprintCallable)
-	virtual bool GetObjectiveActive()
-	{
-		return isObjectiveActive;
-	}
+	virtual bool GetObjectiveActive() {return isObjectiveActive;}
 	UFUNCTION(BlueprintCallable)
 	virtual void SetObjectiveActive(bool value);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void OnRep_ObjActive();
-
-    protected:
+		protected:
 
 	// 수행 성공도 0~1 값
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float successPercent = 0.f;
 		public:
 	__declspec(property(get = GetSuccessPercent, put = SetSuccessPercent)) float SUCCESS_PERCENT;
-	float GetSuccessPercent()
-	{
-		return successPercent;
-	}
+	float GetSuccessPercent() {return successPercent;}
 	void SetSuccessPercent(float value);
-
 		protected:
-
-	// 모든 pc에 대한 ui 정보 배열
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
-	TMap<class AJ_MissionPlayerController*, FTacticalOrderData> prevObjUIDataMap;
-
 
 	// 목표 완료했는지 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool isObjEnded = false;
 		public:
 	__declspec(property(get = GetObjEnded, put = SetObjEnded)) bool IS_OBJ_ENDED;
-	bool GetObjEnded()
-	{
-		return isObjEnded;
-	}
-	void SetObjEnded(bool value)
-	{
-		isObjEnded = value;
-	}
+	bool GetObjEnded() {return isObjEnded;}
+	void SetObjEnded(bool value) {isObjEnded = value;}
 		protected:
+#pragma endregion
 
 public:
 	// 명령 종류
@@ -104,84 +85,97 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FString commanderVoiceBase64;
 
-
-
+#pragma region 미션 진행 딜리게이트 단
 	/*
 	미션 비활성화(생성) -> 미션 활성화(시작) -> 미션 수행도 갱신 -> 미션 완료(성공/실패) -> 미션 비활성화(종료) 순 호출됨
 	*/
-
+	// 미션 활성화 시 실행 딜리게이트
+	FObjectiveActiveDelegate objectiveActiveDel;
+	// 미션 비활성화 시 실행 딜리게이트
+	FObjectiveActiveDelegate objectiveDeactiveDel;
 	// 미션 완료 시 실행 딜리게이트
 	FObjectiveEndDelegate objectiveEndDel;
 	// 미션 성공 시 실행 딜리게이트
 	FObjectiveEndDelegate objectiveSuccessDel;
 	// 미션 실패 시 실행 딜리게이트
 	FObjectiveEndDelegate objectiveFailDel;
-
-	// 미션 활성화 시 실행 딜리게이트
-	FObjectiveActiveDelegate objectiveActiveDel;
-
-	// 미션 비활성화 시 실행 딜리게이트
-	FObjectiveActiveDelegate objectiveDeactiveDel;
-
 	// 미션 수행도 갱신 딜리게이트
 	FObjectiveSuccessUpdateDelegate objSuccessUpdateDel;
+	// 미션 수행도 전송 딜리게이트
 	FSendSuccessDelegate sendObjSuccessDel;
-protected:
-	// 목표 성공/실패
-	UFUNCTION(BlueprintCallable)
-    virtual void ObjectiveSuccess();
-	UFUNCTION(BlueprintCallable)
-    virtual void ObjectiveFail();
+#pragma endregion
 
+#pragma region 함수단
+protected:
+	virtual void BeginPlay() override;
 	// 목표 활성화/비활성화
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveActive();
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveDeactive();
 
-	// 목표 시점에 따라 모든 PC 에게 호출
-	// 서버에서 실행
-	// 목표 UI 시작 | 목표 활성화 시 호출
-	UFUNCTION(Server, Reliable)
-	virtual void SRPC_StartNewObjUI();
-
-	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
-	UFUNCTION(Server, Reliable)
-	virtual void SRPC_UpdateObjUI();
-
-	// 개인 목표 ui에 표시할 데이터 만들기 | 상속하면 재정의
+	// 목표 성공/실패
 	UFUNCTION(BlueprintCallable)
-	virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController* pc = nullptr);
+    virtual void ObjectiveSuccess();
+	UFUNCTION(BlueprintCallable)
+    virtual void ObjectiveFail();
+
+#pragma region UI 적용 요청 단
+/* 목표 활성화 시 */
+	
+	// 목표 UI 시작 | 목표 활성화 시 호출
+	UFUNCTION(BlueprintCallable)
+	virtual void StartNewObjUI();
+	
 
 	
-	// 목표 UI 완료 | 목표 완료시 호출
-	UFUNCTION(Server, Reliable)
-	virtual void SRPC_EndObjUI();
-	// 개인 목표 서브 조건 UI 완료 
-	UFUNCTION(Server, Reliable)
-	virtual void SRPC_EndSubObjUI(class AJ_MissionPlayerController* pc, int idx = 0, bool isSuccess = true);
-	// @@ 모든 pc에서 서브 조건 완료 처리
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
-
-	// 지휘관 보이스 데이터 받고 플레이어에게 재생 호출
+	// 동일한 UI data 보내는지 체크 | 과도한 crpc 방지책
 	UFUNCTION(BlueprintCallable)
-	void PlayCommanderVoiceToAll(const FCommanderVoiceRes &resData);
+	virtual bool CheckSendSameData(class AJ_MissionPlayerController* pc, const FTacticalOrderData& uiData);
 
-    public:
+	// 목표 UI 완료 | 목표 완료시 호출
+	UFUNCTION(BlueprintCallable)
+	virtual void EndObjUI();
+	// 개인 목표 서브 조건 UI 완료 
+	UFUNCTION(BlueprintCallable)
+	virtual void EndSubObjUI(class AJ_MissionPlayerController* pc, int idx = 0, bool isSuccess = true);
+#pragma endregion
+	// 배열내 pc 전부에게 해당 idx ai 지휘관 보이스 재생 요청
+	UFUNCTION(BlueprintCallable)
+	virtual void ReqPlayCommVoice(int idx, const TArray<class AJ_MissionPlayerController*>& pcs);
+
+	// 아이콘 3d ui에 로컬 폰 설정
+	void SetTargetIconUI();
+
+	// 아이콘 ui에 거리 텍스트 설정
+	void UpdateObjDisIconUI();
+
+        // 리플리케이트
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const;
+public:	
+	virtual void Tick(float DeltaTime) override;
 	// 미션 종료 처리
 	UFUNCTION(BlueprintCallable)
 	virtual void ObjectiveEnd(bool isSuccess = true);
-
-	// 목표 값 설정 | 하위 전술명령에서 재정의 필요
+	// 목표 값 설정
 	virtual void InitObjective(ETacticalOrder type, bool initActive = false);
 
-	// iconworldui visible 설정
-	UFUNCTION(Client, Reliable)
-	void MRPC_SetVisibleIconUI(bool value);
+	
+#pragma endregion
 
+#pragma region 상속시 재정의 필수 함수 단
+protected:
 	UFUNCTION(BlueprintCallable)
-	virtual void PlayCommander(int idx);
+	// 한 pc에게 목표 UI 데이터 보내기 | 상속하면 재정의
+	virtual void SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit = false);
+	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
+	UFUNCTION(BlueprintCallable)
+	virtual void UpdateObjUI();
+	// 생성할 때 딜리게이트 바인드 공간
+	virtual void InitBindDel();
 
-        // 
+    public:
+
+#pragma endregion
 };
+

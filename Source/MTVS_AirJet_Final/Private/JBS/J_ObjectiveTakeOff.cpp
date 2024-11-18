@@ -14,83 +14,104 @@
 #include "TimerManager.h"
 #include "JBS/J_ObjectiveUIComp.h"
 
-
+#pragma region 시작 단
+/* active -> 게임모드 이륙시 딜리게이트에 이륙 체크 함수 바인드 | AddFlightedPC -> SuccessTakeOff
+-> 목표 위치 텔포 박스로 설정 | SetPosition
+-> 실패 체크 기준 방향 설정 | CalcBaseDirection*/
 void AJ_ObjectiveTakeOff::BeginPlay()
 {
     Super::BeginPlay();
 
     if(!HasAuthority()) return;
-
-    // 목표 완료시 목표 UI 완료 바인드
-    objectiveEndDel.AddUObject(this, &AJ_ObjectiveTakeOff::SRPC_EndObjUI);
 }
 
 void AJ_ObjectiveTakeOff::ObjectiveActive()
 {
     Super::ObjectiveActive();
 
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE || IS_OBJ_ENDED)
-    {
-        return;
-    }
-
-    // 이미 이륙 했으면 ( 디버그) 그냥 넘어가기
-    if(UJ_Utility::GetMissionGamemode(GetWorld())->isTPReady)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("이미 이륙해서 넘어감"));
-        this->ObjectiveEnd(false);
-        return;
-    }
-
-
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 이륙 시작"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("1. 이륙 시작"));
     
     // 모든 pc 가져오기
-    allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-    allPawn = UJ_Utility::GetAllMissionPawn(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPawn = UJ_Utility::GetAllMissionPawn(GetWorld());
 
     // 맵 초기화
+    takeOffCheckMap.Empty();
     for(auto* pc : allPC)
     {
-        takeOffCheckMap.Add(pc, {false, false});
+        takeOffCheckMap.Add(pc, FTakeOffCheckData(false, false));
     }
 
     // 게임모드 이륙 딜리게이트에 바인드
-    auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
+    AJ_MissionGamemode* gm = UJ_Utility::GetMissionGamemode(GetWorld());
     gm->onePilotTakeOffDel.BindUObject(this, &AJ_ObjectiveTakeOff::SuccessTakeOff);
-    // 미션 시작 딜리게이트 바인드
-    gm->startTODel.AddUObject(this, &AJ_ObjectiveTakeOff::ObjectiveEnd);
-
+    
     // 위치 텔포 박스로 설정
-    auto* tpBox = Cast<AK_CesiumTeleportBox>(
-        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumTeleportBox::StaticClass()));
-    if(tpBox)
-        SetPosition(tpBox);
+    if(gm->TP_BOX)
+        SetPosition(gm->TP_BOX);
 
-    // 편대장 위치 가져오기
-    auto* localPawn = UJ_Utility::GetBaseMissionPawn(GetWorld());
-    const auto& leaderLoc = localPawn->GetActorLocation();
-    // 기준 방향 구하기
-    baseDirection = (this->GetActorLocation() - leaderLoc).GetSafeNormal();
+    // 실패 체크 기준 방향 설정
+    baseDirection = CalcBaseDirection();
 
-
+    // FIXME 살리기
     // 실패 체크 타이머 실행
     // GetWorld()->GetTimerManager()
     //     .SetTimer(checkTimeHandle, this, &AJ_ObjectiveTakeOff::CheckFail, failCheckInterval, true);
 
-    SRPC_StartNewObjUI();
+    StartNewObjUI();
 
     // ai
-    PlayCommander(10);
+    ReqPlayCommVoice(10, allPC);
 }
 
+void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
+{
+    if(!HasAuthority()) return;
+    if(!tpBox) return;
+
+    auto* localPC = GetWorld()->GetFirstPlayerController();
+    if(!localPC) return;
+    
+    auto* localPawn = localPC->GetPawn();
+    if(!localPawn) return;
+    
+    // 위치 텔포 박스로
+    this->SetActorLocation(tpBox->GetActorLocation());
+    // 편대장 바라보게 회전
+    FVector direction = localPawn->GetActorLocation() - this->GetActorLocation();
+    direction.Normalize(); // 방향 벡터를 정규화
+
+    FRotator newRotation = FRotationMatrix::MakeFromX(direction).Rotator(); // 방향 벡터로부터 로테이션 생성
+    this->SetActorRotation(newRotation); // 액터의 로테이션 설정
+}
+
+FVector AJ_ObjectiveTakeOff::CalcBaseDirection()
+{   
+    auto* localPC = GetWorld()->GetFirstPlayerController();
+    if(!localPC) return this->GetActorForwardVector();
+
+    auto* localPawn = localPC->GetPawn();
+    if(!localPawn) return this->GetActorForwardVector();
+
+    const auto& leaderLoc = localPawn->GetActorLocation();
+    // 기준 방향 구하기
+    return (this->GetActorLocation() - leaderLoc).GetSafeNormal();
+}
+
+#pragma endregion
+
+#pragma region 이륙 단
+/* 한 명 이륙 시 이륙 성공 딜리게이트 실행 | SuccessTakeOff
+-> 이륙 점수 갱신 | CalcSuccessPercent
+-> 전부 이륙시 매니저 쪽에서 완료 처리 | ObjectiveEnd*/
 void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool isSuccess)
 {
     if(!HasAuthority()) return;
 
     if(!takeOffCheckMap.Contains(pc)) return;
     // 이륙 성공 처리
-    takeOffCheckMap[pc] = {true, isSuccess};
+    takeOffCheckMap[pc] = FTakeOffCheckData(true, isSuccess);
+    
     // 현재 이륙 점수 정보 갱신
     CalcSuccessPercent();
 }
@@ -98,18 +119,23 @@ void AJ_ObjectiveTakeOff::SuccessTakeOff(AJ_MissionPlayerController *pc, bool is
 void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 {
     if(!HasAuthority()) return;
+
     // 모든 pc 데이터를 계산
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    
     int maxCnt = allPC.Num();
     int cnt = 0;
     int curFlightCnt = 0;
     for(auto* pc : allPC)
     {
-        // 성공 비율 계산
+        if(!pc) continue;
         if(!takeOffCheckMap.Contains(pc)) continue;
-        // 이륙 성공 처리
-        if(takeOffCheckMap[pc].Value)
+
+
+        // 성공 비율 계산
+        if(takeOffCheckMap[pc].isSuccess)
             cnt++;
-        if(takeOffCheckMap[pc].Key)
+        if(takeOffCheckMap[pc].isTakeOff)
             curFlightCnt++;
     }
 
@@ -120,17 +146,20 @@ void AJ_ObjectiveTakeOff::CalcSuccessPercent()
     this->SUCCESS_PERCENT = rate;
 }
 
-FTacticalOrderData AJ_ObjectiveTakeOff::SetObjUIData(class AJ_MissionPlayerController *pc)
+void AJ_ObjectiveTakeOff::ObjectiveEnd(bool isSuccess)
 {
-    if(!HasAuthority()) return FTacticalOrderData();
-    int maxCnt = allPC.Num();
-    int curCnt = FMath::RoundToInt(curFlightPercent);
+    Super::ObjectiveEnd(isSuccess);
 
-    FTakeOffData data(curCnt, maxCnt);
-    
-    return FTacticalOrderData(this->orderType, data);
+    // 타이머 핸들 해제
+    GetWorld()->GetTimerManager().ClearTimer(checkTimeHandle);
 }
 
+#pragma endregion
+
+#pragma region 반복 단
+/* begin에서 실패 판정 타이머 반복 | CheckFail
+->
+*/
 void AJ_ObjectiveTakeOff::Tick(float deltaTime)
 {
     Super::Tick(deltaTime);
@@ -138,120 +167,95 @@ void AJ_ObjectiveTakeOff::Tick(float deltaTime)
     if(!HasAuthority()) return;
 }
 
-void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
-{
-    if(!HasAuthority()) return;
-    // 위치 텔포 박스로
-    this->SetActorLocation(tpBox->GetActorLocation());
-    // 편대장 바라보게 회전
-    auto* host = allPC[0]->GetPawn();
-    FVector direction = host->GetActorLocation() - this->GetActorLocation();
-    direction.Normalize(); // 방향 벡터를 정규화
-    FRotator newRotation = FRotationMatrix::MakeFromX(direction).Rotator(); // 방향 벡터로부터 로테이션 생성
-    this->SetActorRotation(newRotation); // 액터의 로테이션 설정
-}
-
 void AJ_ObjectiveTakeOff::CheckFail()
 {
     if(!HasAuthority()) return;
-    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     // 모든 폰 검사
-    for(auto* pc : allPC2)
+    for(auto* pc : allPC)
     {
         // pc 없으면 통과
         if(!pc) continue;
-
+        if(!takeOffCheckMap.Contains(pc)) continue;
         // 이륙 아직 아닐때 체크
-        if(takeOffCheckMap[pc].Key) continue;
+        if(takeOffCheckMap[pc].isTakeOff) continue;
 
-        // 목표를 넘어섰는데 true가 아닌거니깐 실패 처리
         auto* pilot = pc->GetPawn();
-
         if(!pilot) continue;
+
 
         // 현재 방향
         const auto& curDir = (this->GetActorLocation() - pilot->GetActorLocation()).GetSafeNormal();
-
         // 내적
         float check = FVector::DotProduct(baseDirection, curDir);
         // 거리
         float dis = FVector::Dist(this->GetActorLocation(), pilot->GetActorLocation());
-        // GEngine->AddOnScreenDebugMessage(-1, .5f, FColor::Green, FString::Printf(TEXT("actor : %s\n내적 중  : %.2f, 거리 : %.2f")
-        // , *this->GetName()
-        // , check
-        // , dis));
+
+        // 목표를 넘어섰는데 true가 아닌거니깐 실패 처리
         if(check < 0 && dis > failDis)
         {
             auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
             gm->AddFlightedPC(pc, false);
-
-            continue;
         }
     }
 }
 
-void AJ_ObjectiveTakeOff::ObjectiveEnd(bool isSuccess)
+#pragma endregion
+
+#pragma region 목표 UI 설정 단
+/* 특정 타이밍에 목표 UI 시작 | StartNewObjUI
+-> 각 pc마다 목표 ui 데이터 설정 | SendObjUIData, SetTakeOffUIData
+-> 특정 갱신 타이밍 마다 업데이트 UI | UpdateObjUI -> 이전에 보냈는지 체크후 업데이트 | CheckSendSameData
+-> 목표 종료 나 서브 목표 종료시 ui 애니메이션 실행 요청 | EndObjUI , EndSubObjUI
+-> 목표 종료시 비작동*/
+void AJ_ObjectiveTakeOff::SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit)
 {
-    Super::ObjectiveEnd(isSuccess);
+    Super::SendObjUIData(pc, isInit);
 
-    if(!HasAuthority()) return;
-    // 타이머 핸들 해제
-    GetWorld()->GetTimerManager().ClearTimer(checkTimeHandle);
-}
-
-void AJ_ObjectiveTakeOff::SRPC_StartNewObjUI()
-{
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
-
-	// 모든 pc 가져오기
-	auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 crpc
-    for(auto* pc : allPC2)
-    {
-		// 보낼 목표 데이터 구성
-		auto orderData = SetTakeOffUIData(pc);
-		// ui 생성 시작
-        pc->objUIComp->CRPC_StartObjUITakeOff(orderData);
-    }
-}
-
-void AJ_ObjectiveTakeOff::SRPC_UpdateObjUI()
-{
-    if(!HasAuthority() || !IS_OBJECTIVE_ACTIVE) return;
-
-	// 보낼 데이터
-    // 모든 pc 가져오기
-    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    // pc에게 새 전술명령 UI 시작 srpc
-    for(auto* pc : allPC2)
-    {
-		auto orderData = SetTakeOffUIData(pc);
-		
-        FTacticalOrderData tempData(this->orderType, orderData);
-
-		// 과도한 crpc 방지 처리
-		if(!prevObjUIDataMap.Contains(pc) || tempData != prevObjUIDataMap[pc])
-		{
-			// 데이터 보내기
-			pc->objUIComp->CRPC_UpdateObjUITakeOff(orderData);
-			// objui데이터 맵에 저장
-			prevObjUIDataMap.Add(pc, tempData);
-		}
-    }
+    auto data = SetTakeOffUIData(pc);
+    pc->objUIComp->CRPC_StartObjUITakeOff(data);
 }
 
 FTakeOffData AJ_ObjectiveTakeOff::SetTakeOffUIData(class AJ_MissionPlayerController *pc)
 {
     if(!HasAuthority()) return FTakeOffData();
-    auto allPC2 = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    int maxCnt = allPC2.Num();
+    int maxCnt = allPC.Num();
     int curCnt = FMath::RoundToInt(curFlightPercent);
 
     return FTakeOffData(curCnt, maxCnt);
 }
+
+void AJ_ObjectiveTakeOff::UpdateObjUI()
+{
+    if(!HasAuthority()) return;
+
+    // 모든 pc 가져오기
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    // pc에게 새 전술명령 UI 시작 srpc
+    for(auto* pc : allPC)
+    {
+		// 과도한 crpc 방지 처리
+		// 이전에 보낸 ui 데이터와 동일한지 검증
+        auto orderData = SetTakeOffUIData(pc);
+
+		// 다르면 업데이트
+		// @@ 템플릿 쓸 수 있을지 고민
+		FTacticalOrderData temp(this->orderType, orderData);
+		bool canUpdate = CheckSendSameData(pc, temp);
+		if(canUpdate)
+		{
+			// 데이터 보내기
+			pc->objUIComp->CRPC_UpdateObjUITakeOff(orderData);
+		}
+    }
+}
+
+#pragma endregion
+
+
+
 
 

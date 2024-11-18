@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void ChangeMissionArea();
 	
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void MRPC_ChangeMissionArea();
 #pragma endregion
 };

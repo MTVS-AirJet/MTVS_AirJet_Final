@@ -92,7 +92,6 @@ void UJ_CustomWidgetComponent::FixHeight(APlayerController * pc)
 
 void UJ_CustomWidgetComponent::SetVisible(bool value)
 {
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("doremi"));
     this->SetActive(value);
 	this->SetHiddenInGame(!value);
 }

@@ -4,6 +4,7 @@
 #include "JBS/J_Utility.h"
 #include "Algo/Accumulate.h"
 #include "Containers/UnrealString.h"
+#include "Engine/Engine.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_MissionGameState.h"
 #include "KHS/K_GameState.h"
@@ -63,9 +64,10 @@ AJ_MissionGameState* UJ_Utility::GetMissionGameState(const UWorld* world)
 AJ_BaseMissionPawn *UJ_Utility::GetBaseMissionPawn(const UWorld *world, int32 playerIdx)
 {
     auto* pc = UGameplayStatics::GetPlayerController(world, playerIdx);
-    check(pc);
+    if(!pc) return nullptr;
+
     auto* player = pc->GetPawn<AJ_BaseMissionPawn>();
-    check(player);
+    if(!player) return nullptr;
 
     return player;
 }
@@ -174,14 +176,11 @@ FString UJ_Utility::ToStringPercent(float percent)
     return FString::Printf(TEXT("%d%%"), static_cast<int>(percent * 100));
 }
 
-
-// FQuat UJ_Utility::ConvertForwardToTarget(const FQuat &rotation, const FVector &targetVector)
-// {
-//     FVector forwardVector = rotation.GetForwardVector(); // 앞 방향 벡터
-
-//     // 타겟 벡터를 앞 방향 벡터로 변환하기 위한 회전 각도 계산
-//     return FQuat::FindBetweenVectors(forwardVector ,targetVector );
-// }
+void UJ_Utility::PrintFullLog(const FString &str, const float &time, const FColor &color)
+{
+    GEngine->AddOnScreenDebugMessage(-1, time, color, FString::Printf(TEXT("%s"), *str));
+    UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
+}
 
 // === 구조체 함수 구현
 
@@ -431,3 +430,4 @@ int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
 
     return result;
 }
+

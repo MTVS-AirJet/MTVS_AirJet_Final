@@ -79,6 +79,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<ETacticalOrder, TSubclassOf<class AJ_BaseMissionObjective>> objectiveActorPrefabMap;
 
+	// 현재 활성화된 미션 액터 디버그
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enablePrintCurActiveMissionActor = false;
+
 public:
 	// @@ 목표 전환 대기 시간 | 잘 처리 할 방법 궁리 필요
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -92,7 +96,11 @@ protected:
 	// 목표 액터 생성 및 설정
 	class AJ_BaseMissionObjective* SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR = FTransform());
 
-    public:
+	// 미션 시작시 기본 목표(시동/이륙) 종료 처리
+	UFUNCTION(BlueprintCallable)
+	void SkipDefaultObj(bool isSuccess);
+
+public:
 	// 레벨 시작 시 시동/이륙 목표 설정
     void InitDefaultObj();
     // 미션 시작 시 목표 리스트 설정

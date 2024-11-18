@@ -21,11 +21,7 @@ class MTVS_AIRJET_FINAL_API AJ_ObjectiveEngineStart : public AJ_BaseMissionObjec
 protected:
 	// 시동 수행 전체 데이터
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FEngineProgressAllData allData;
-
-	// 활성화 당시 모든 pc
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
-	TArray<class AJ_MissionPlayerController*> allPC;
+	FEngineProgressAllData allEngineProgData;
 
 	// 이륙 준비 완료 체크
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -34,23 +30,21 @@ protected:
 public:
 
 protected:
+#pragma region 시작 단
+/* begin -> active 엔진 수행 데이터 초기화, 수행 딜리게이트 바인드
+-> 목표 종료시 수행도 계산 -> */
     virtual void BeginPlay() override;
 
-	// 시동 목표 활성화
     virtual void ObjectiveActive() override;
 
-	// 목표 UI 시작 | 목표 활성화 시 호출
-    virtual void SRPC_StartNewObjUI() override;
-
-	// 목표 UI 값 갱신 | 수행도 갱신 시 호출
-    virtual void SRPC_UpdateObjUI() override;
-
+#pragma endregion
+#pragma region 반복 단
+/* viper 쪽에서 시동 절차 수행하면 딜리게이트 실행 | CheckProgress
+-> 다음 수행으로 넘어가기 및 점수 추가 | ActiveNextProgress, CalcSuccessPercent
+-> 모두 대기 절차 면 넘어가기 & 이륙 절차면 목표 종료 | CheckAllRunEngine*/
     // 수행 절차 성공 체크
     UFUNCTION(BlueprintCallable)
     void CheckProgress(class AJ_MissionPlayerController *pc, EEngineProgress type);
-
-	// 전체 시동 완료 체크
-    bool CheckAllRunEngine(const TArray<class AJ_MissionPlayerController *> pcs, EEngineProgress checkType);
 
     // 해당 pc 수행 절차 성공 처리
     void ActiveNextProgress(FEngineProgressData& data, bool isSuccess = true);
@@ -59,10 +53,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
     void CalcSuccessPercent();
 
-	// 목표 ui에 표시할 데이터 설정
-    virtual FTacticalOrderData SetObjUIData(class AJ_MissionPlayerController *pc = nullptr) override;
+	// 전체 시동 완료 체크
+    bool CheckAllRunEngine(const TArray<class AJ_MissionPlayerController *> pcs, EEngineProgress checkType);
+#pragma endregion
 
-    FEngineProgressData SetEngineUIData(class AJ_MissionPlayerController *pc = nullptr);
+#pragma region obj UI 설정 단
+	FEngineProgressData SetEngineUIData(class AJ_MissionPlayerController *pc = nullptr);
+
+    virtual void SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit = false) override;
+
+    virtual void UpdateObjUI() override;
+#pragma endregion
 
 public:
     virtual void Tick(float deltaTime) override;
