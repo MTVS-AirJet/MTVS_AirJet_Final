@@ -55,7 +55,14 @@ public:
 	TSubclassOf<class UUserWidget> LobbyUIFactory;
 	UPROPERTY(BlueprintReadWrite)
 	class UK_LobbyWidget* LobbyUI;
-	
+
+	//인게임 Mission추가 UI===================================
+    // UPROPERTY(EditDefaultsOnly)
+    // TSubclassOf<class UUserWidget> MissionAddUIFactory;
+    // UPROPERTY(BlueprintReadWrite)
+    // class UK_MissionAddWidget* MissionAddUI;
+
+    //클라이언트 imc 맵핑
     UPROPERTY(EditDefaultsOnly , Category="Defaults|InputMappingContext")
 	class UInputMappingContext* IMC_Viper;
 
