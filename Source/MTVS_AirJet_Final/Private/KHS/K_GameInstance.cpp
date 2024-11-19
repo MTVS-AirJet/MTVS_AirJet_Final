@@ -46,6 +46,15 @@ void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
 	UE_LOG(LogTemp , Warning , TEXT("GameInstance Constructor"));
+
+	// //DataTable 찾기
+	// FString MissionDataPath = TEXT("/Script/Engine.DataTable'/Game/Blueprints/KHS/Server/AirjetTotalMission.AirjetTotalMission'");
+	// static ConstructorHelpers::FObjectFinder<UDataTable> MissionDataObject(*MissionDataPath);
+	// if(MissionDataObject.Succeeded())
+	// {
+	// 	MissionDataTable = MissionDataObject.Object;
+	// }
+	
 }
 
 void UK_GameInstance::Init()
@@ -71,6 +80,9 @@ void UK_GameInstance::Init()
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this , &UK_GameInstance::OnJoinSessionComplete);
 		}
 	}
+
+	//DataTable로드하기
+	LoadProgressDT(FAirjetTotalMissionData::StaticStruct());
 }
 
 void UK_GameInstance::OnStart()
@@ -430,6 +442,31 @@ void UK_GameInstance::InitializeMission(const FMissionDataRes& newMD)
 	auto str = MissionData.ToString();
 	LOG_S(Warning , TEXT("%s") , *str);
 }
+
+//미션에 따른 구조체 데이터 반환
+FAirjetTotalMissionData* UK_GameInstance::GetMyMissionData(int32 MissionProgressIdx)
+{
+	//csv임포트 데이터에서 내가 제작한 구조체의 행 데이터들을 찾아 반환
+	return MissionDataTable->FindRow<FAirjetTotalMissionData>(*FString::FromInt(MissionProgressIdx), TEXT(""));
+}
+
+//csv파일에서 데이터 로드하는 함수
+void UK_GameInstance::LoadProgressDT(UScriptStruct* RowStruct)
+{
+	FString CSVData;
+	FString CSVFilePath = FPaths::ProjectContentDir()/TEXT("BluePrints/KHS/Server/AirjetTotalMission.csv");
+	if(FFileHelper::LoadFileToString(CSVData, *CSVFilePath))
+	{
+		MissionDataTable->RowStruct = RowStruct;
+		//csv데이터를 데이터테이블에 임포트
+		TArray<FString> ImportError = MissionDataTable->CreateTableFromCSVString(CSVData);
+	}
+	else
+	{
+		LOG_S(Warning, TEXT("Failed to load CSV File : %s"), *CSVFilePath);
+	}
+}
+
 
 // 3) Travel 관련 함수 ------------------------------------------------------------------------------------
 void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)

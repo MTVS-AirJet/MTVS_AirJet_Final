@@ -37,25 +37,32 @@ public:
     virtual void SetupInputComponent() override; // 입력 구성 요소 설정 함수 선언
 
 	//화면 공유 UI======================================
-   UPROPERTY(EditDefaultsOnly)
+   UPROPERTY(EditDefaultsOnly, Category = "Defaults|UI")
    TSubclassOf<class UUserWidget> StreamingUIFactory;
-   UPROPERTY(BlueprintReadWrite)
+   UPROPERTY(BlueprintReadWrite, Category = "Defaults|UI")
    class UK_StreamingUI* StreamingUI;
 
    //인게임 StandbyUI===================================
-   UPROPERTY(EditDefaultsOnly)
+   UPROPERTY(EditDefaultsOnly, Category = "Defaults|UI")
    TSubclassOf<class UUserWidget> StandbyUIFactory;
-   UPROPERTY(BlueprintReadWrite)
+   UPROPERTY(BlueprintReadWrite, Category = "Defaults|UI")
    class UK_StandbyWidget* StandbyUI;
 
    FString CurrentMapName; //현재 맵네임
 
 	//인게임 LobbyUI===================================
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Defaults|UI")
 	TSubclassOf<class UUserWidget> LobbyUIFactory;
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category = "Defaults|UI")
 	class UK_LobbyWidget* LobbyUI;
-	
+
+	//인게임 Mission UI===================================
+    UPROPERTY(EditDefaultsOnly, Category = "Defaults|UI")
+	TSubclassOf<class UUserWidget> MissionUIFactory;
+	UPROPERTY(BlueprintReadWrite, Category = "Defaults|UI")
+	class UK_MIssionTextWidget* MissionTextUI;
+
+    //클라이언트 imc 맵핑
     UPROPERTY(EditDefaultsOnly , Category="Defaults|InputMappingContext")
 	class UInputMappingContext* IMC_Viper;
 
@@ -69,6 +76,13 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_StartGame(); // 전체 클라에 게임시작 전달 Client RPC
 
+	//MissionUI 생성 Client RPC함수
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetMissionUI();
+
+	//타클래스 MissionUI 세팅 함수
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetMissionTextUI(int32 MissionIdx);
 
 	// Common Input Widget 관련
 #pragma region Common Input, Widget 관련
