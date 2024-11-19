@@ -32,6 +32,12 @@ public:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* HideMissionUIAnim;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* ShowActingUIAnim;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* HideActingUIAnim;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* MissionText;
@@ -40,7 +46,16 @@ public:
 	class UTextBlock* Mission_txt_helper;
 
 	UPROPERTY(meta = (BindWidget))
+	class UImage* img_txtbackground;
+	
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Mission_txt_acting;
+	
+	FString DisplayedText; //현재까지 표시된 텍스트들
+	FString FullText; //파싱한 전체 텍스트
+	int32 CurrentCharIndex; //표시텍스트 인덱스
+	FTimerHandle TextDisplayTimerHandle; //텍스트 애니메이션 핸들
+	FTimerHandle InvisibleTimerHandle; //UI Invisible 핸들
 
 	//UI Visible끄는 함수
 	void SetInvisible();
@@ -49,9 +64,4 @@ public:
 	//ActingText 애니메이션 함수
 	void UpdateDisplayedText();
 	
-	FString DisplayedText; //현재까지 표시된 텍스트들
-	FString FullText; //파싱한 전체 텍스트
-	int32 CurrentCharIndex; //표시텍스트 인덱스
-	FTimerHandle TextDisplayTimerHandle; //텍스트 애니메이션 핸들
-	FTimerHandle InvisibleTimerHandle;
 };

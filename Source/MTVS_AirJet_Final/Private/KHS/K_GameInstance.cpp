@@ -454,7 +454,9 @@ FAirjetTotalMissionData* UK_GameInstance::GetMyMissionData(int32 MissionProgress
 void UK_GameInstance::LoadProgressDT(UScriptStruct* RowStruct)
 {
 	FString CSVData;
+	//저장해둔 파일 경로
 	FString CSVFilePath = FPaths::ProjectContentDir()/TEXT("BluePrints/KHS/Server/AirjetTotalMission.csv");
+	//CSV파일데이터 로드
 	if(FFileHelper::LoadFileToString(CSVData, *CSVFilePath))
 	{
 		MissionDataTable->RowStruct = RowStruct;

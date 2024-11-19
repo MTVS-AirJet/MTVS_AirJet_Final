@@ -166,7 +166,7 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 				if (MissionTextUI)
 				{
 					//1번 MissionData를 가져와서 SetText.
-					auto MissionData = GI->GetMyMissionData(11);
+					auto MissionData = GI->GetMyMissionData(1);
 					MissionTextUI->SetMissionText(MissionData);
 				}
 			}

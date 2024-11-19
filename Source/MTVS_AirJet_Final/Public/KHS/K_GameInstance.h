@@ -27,7 +27,7 @@ struct FAirjetTotalMissionData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	FAirjetTotalMissionData() : TotalMissionProgress(1), MissionActing("MIC switch ON"), MissionHelper("'+ -키 (+키캡이미지)를 이용해 줌인과 줌아웃. 마우스 오른쪽 클릭 상태로 시점을 전환해보세요.")  {}
+	FAirjetTotalMissionData() : TotalMissionProgress(1), MissionActing(""), MissionHelper("")  {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|TotalMissionData")
 	int32 TotalMissionProgress;
@@ -188,9 +188,9 @@ public:
 	TSubclassOf<class UK_StandbyWidget> StandbyWidgetFactory; // StandbyWidget(UI) 공장
 	class UK_StandbyWidget* StandbyWidget; // StandbyWidget(UI) 참조 선언
 
-	UPROPERTY(EditAnywhere , Category = "Default|UI")
-	TSubclassOf<class UK_MIssionTextWidget> MissionTextWidgetFactory; // MissionTextWidget(UI) 공장
-	class UK_MIssionTextWidget* MissionTextWidget; // MissionTextWidget(UI) 참조 선언
+	// UPROPERTY(EditAnywhere , Category = "Default|UI")
+	// TSubclassOf<class UK_MIssionTextWidget> MissionTextWidgetFactory; // MissionTextWidget(UI) 공장
+	// class UK_MIssionTextWidget* MissionTextWidget; // MissionTextWidget(UI) 참조 선언
 	
 	UPROPERTY(EditAnywhere, Category = "Default|UI")
 	class UDataTable* MissionDataTable; //csv파일 연동하여 데이터 불러오기

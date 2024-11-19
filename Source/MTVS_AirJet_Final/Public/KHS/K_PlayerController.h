@@ -80,7 +80,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_SetMissionUI();
 
-	//타클래스 MissionUI 세팅 함수
+	//타클래스 MissionUI 세팅 Client RPC 함수
 	UFUNCTION(Client, Reliable)
 	void CRPC_SetMissionTextUI(int32 MissionIdx);
 
