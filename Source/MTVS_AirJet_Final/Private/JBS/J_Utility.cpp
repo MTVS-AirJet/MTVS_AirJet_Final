@@ -182,6 +182,17 @@ void UJ_Utility::PrintFullLog(const FString &str, const float &time, const FColo
     UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
 }
 
+int UJ_Utility::ConvertEngineProgressToMissionProcessIdx(const EEngineProgress& value)
+{
+    int result = static_cast<int>(value) + 6;
+    if(value >= EEngineProgress::STANDBY_OTHER_PLAYER)
+    {
+        result++;
+    }
+
+    return result;
+}
+
 // === 구조체 함수 구현
 
 ETacticalOrder FMissionObject::GetOrderType() const
@@ -281,7 +292,6 @@ void FEngineProgressData::SetNextProgress()
     case EEngineProgress::ENGINE_GEN_SWITCH_ON:
         this->curProgress = EEngineProgress::ENGINE_CONTROL_SWITCH_ON;
         break;
-        // FIXME 순서 바뀐거 수정해야함
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
         this->curProgress = EEngineProgress::ENGINE_MASTER_SWITCH_ON;
         break;
@@ -445,4 +455,25 @@ int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
     return result;
 }
 
+FString FFormationFlightUIData::ToStringPilotRolt() const
+{
+    FString result = "";
+
+    switch (pilotRole) {
+    case EPilotRole::WING_COMMANDER:
+        result = TEXT("편대장");
+        break;
+    case EPilotRole::RIGHT_WINGER:
+        result = TEXT("우측 윙맨");
+        break;
+    case EPilotRole::LEFT_WINGER:
+        result = TEXT("좌측 윙맨");
+        break;
+    case EPilotRole::None:
+        result = TEXT("미설정");
+        break;
+    }
+
+    return result;
+}
 

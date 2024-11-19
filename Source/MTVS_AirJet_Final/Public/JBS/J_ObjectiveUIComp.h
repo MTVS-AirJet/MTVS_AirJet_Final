@@ -54,7 +54,7 @@ public:
 	UFUNCTION(Client, Unreliable)
     void CRPC_StartObjUI(const FTacticalOrderData& orderData);
 
-    // 목표 UI 갱신
+    //XXX 목표 UI 갱신
 	UFUNCTION(Client, Unreliable)
     void CRPC_UpdateObjUI(const FTacticalOrderData& orderData, bool isInit = false);
 

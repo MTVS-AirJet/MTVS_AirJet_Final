@@ -205,7 +205,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUINeut_Implementation(const FNeutralizeTa
 }
 
 
-
+// XXX 현재 미사용
 void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderData& orderData, bool isInit)
 {
 	TArray<FTextUIData> textUIData;
@@ -332,8 +332,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 
 	// 나의 역할 : %s
 	FDefaultTextUIData roleData;
-	FString roleStr = data.pilotRole == EPilotRole::WING_COMMANDER ? TEXT("편대장") : TEXT("좌측 윙맨");
-	FRichString formRoleStr(FString::Printf(TEXT("나의 역할 : %s"), *roleStr), ETextStyle::DEFAULT);
+	FRichString formRoleStr(FString::Printf(TEXT("나의 역할 : %s"), *data.ToStringPilotRolt()), ETextStyle::DEFAULT);
 
 	roleData.headerText = formRoleStr.GetFormatString();
 
@@ -533,6 +532,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 		FDefaultTextUIData subObj;
 		subObj.headerText = FRichString(data.ToStringProgressEnum(type), style).GetFormatString();
 		// @@ 좀 효율적으로 바꿀 필요 있음
+		// 엑셀 시트에서 불러오면 좋겠다
 		FString textStr = "";
 		switch (type) {
 			case EEngineProgress::None:
@@ -580,14 +580,8 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 	}
 
 	// 상세 단
-	if(isInit)
-	{
-		detailUIData.headerText = FRichString(TEXT("임시 시동 절차 상세 텍스트")).GetFormatString();
-		detailUIData.bodyTextAry = {
-			FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10))).GetFormatString()
-			,FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10))).GetFormatString()
-		};
-	}
+	// 시동 절차 -> 미션 진행 인덱스로 변환해서 보내기
+	objUIData.detailImgIdx = UJ_Utility::ConvertEngineProgressToMissionProcessIdx(data.curProgress);
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }

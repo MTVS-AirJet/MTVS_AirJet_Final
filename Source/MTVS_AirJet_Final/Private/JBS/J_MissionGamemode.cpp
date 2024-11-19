@@ -23,22 +23,25 @@
 #include <JBS/J_MissionSpawnPointActor.h>
 #include <Engine/World.h>
 
+#pragma region 안쓰는 무덤
+// void AJ_MissionGamemode::LoadMissionMap()
+// {
+//     // 미션 지역 로드
+//     UGameplayStatics::LoadStreamLevelBySoftObjectPtr(GetWorld(), missionMapPrefab, true, true, FLatentActionInfo());
+// }
+
+#pragma endregion
+
 #pragma region 레벨 시작 단
 /*
 레벨 시작 시 목표 매니저 컴포넌트 캐시 | BeginPlay
 -> 미션 시작 | StartMission
 -> 미션 데이터 호스트 게임 인스턴스 에서 가져오기 | LoadMissionData
 -> 미션 시작 지점 포인트 액터 생성 | InitMissionStartPoint
-
-
-
--> 호스트 pc 시작 버튼에 미션 시작 함수 바인드 | PostLogin
--> 미션 시작시 
-
+-> 전술명령 생성 및 초기화 | InitDefaultObj, InitObjectiveList
+-> 플레이어 시작 위치 설정 | SetSpawnPoints // 지휘관 있었을때의 영향으로 역할에 따라 분류되서 가져옴
+-> 다른 액터들이 준비되도록 .1초 타이머 이후 세슘 액터 캐시 | CacheCesiumActors
 */
-
-#pragma endregion
-
 void AJ_MissionGamemode::BeginPlay()
 {
     Super::BeginPlay();
@@ -81,7 +84,7 @@ void AJ_MissionGamemode::StartMission()
     // 전술 명령 목표 추가
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
 
-    // 스폰포인트 가져와서 설정
+    // 플레이어 스폰포인트 가져와서 설정
     SetSpawnPoints(spawnPoints);
 
     // 모든 액터가 준비된 시점에 호출
@@ -93,7 +96,6 @@ void AJ_MissionGamemode::StartMission()
         // 세슘 관련 액터 캐시
         CacheCesiumActors();
     }, .1f, false);
-    
 }
 
 FMissionDataRes AJ_MissionGamemode::LoadMissionData()
@@ -129,10 +131,55 @@ void AJ_MissionGamemode::InitMissionStartPoint(const FMissionStartPos &startPoin
     START_POINT_ACTOR = spActor;
 }
 
+void AJ_MissionGamemode::SetSpawnPoints(FMissionPlayerSpawnPoints& spawnPointsStruct)
+{
+    // 레벨에 이미 배치된 스폰 포인트 찾기
+    TArray<AActor*> outActors;
+    UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AJ_MissionSpawnPointActor::StaticClass(), spawnPointsStruct.spawnPointTag, outActors);
+    // 클래스 변환
+    TArray<AJ_MissionSpawnPointActor*> spPointActors;
+    Algo::Transform(outActors, spPointActors, [](AActor* temp){
+        return Cast<AJ_MissionSpawnPointActor>(temp);
+    });
+    //캐스트 후
+    for(auto* spPoint : spPointActors)
+    {
+        // 맵에 추가
+        spawnPointsStruct.spawnPointMap[spPoint->spawnType] = spPoint;
+    }
+}
 
+void AJ_MissionGamemode::CacheCesiumActors()
+{
+    // 텔포 박스 가져오기
+    cesiumTPBox = Cast<AK_CesiumTeleportBox>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumTeleportBox::StaticClass()));
+    if(!cesiumTPBox) return;
 
+    // 정점 액터 가져오기
+    cesiumZeroPos = Cast<AK_CesiumManager>(
+        UGameplayStatics::GetActorOfClass(GetWorld(),
+         AK_CesiumManager::StaticClass()));
+    if(!cesiumZeroPos) return;
 
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("무사히 세슘 관련 액터 캐시 성공"));
+}
+#pragma endregion
 
+#pragma region 플레이어 접속 단
+/*
+플레이어 접속 | PostLogin
+-> 호스트 pc 시작 버튼에 미션 시작 함수 바인드 | PostLogin
+-> 전투기 생성 요청 | pc->SpawnMyPlayer
+-> 게임 인스턴스에서 자기 역할에 맞는 플레이어 프리팹 가져오기 | pc->gi->GetMissionPlayerPrefab
+-> 자기 역할에 맞는 스폰위치 가져오기 | GetPlayerSpawnTransfrom // 무조건 파일럿
+-> 플레이어 생성 후 포제스 | SpawnActor, Possess
+-> 역할에 따라 마우스 커서 및 입력 처리
+
+// @@ 미션 시작 버튼 누르면 팝업 UI 시작 | ???
+-> 팝업 UI 종료시 미션 시작 | StartMissionLevel
+-> 미션 시작시 시동 절차 목표 활성화 | StartDefualtObj
+*/
 void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
 {
     Super::PostLogin(newPlayer);
@@ -152,9 +199,25 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
     }
 }
 
+// 산개 로직 적용해서 스폰 위치 계산
+FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_MissionPlayerController* pc)
+{
+    // 해당 역할의 스폰 위치 계산
+    auto tr = this->GetSpawnPoint(role)->GetActorTransform();
+    // 몇 번째 pc 인지 받아서 시작 위치에서 뒤로 - * i 만큼 계산
 
+    // 시작 지점의 뒤 벡터 구하기
+    FVector backVector = -1 * tr.GetUnitAxis(EAxis::X);
+    backVector *= spawnInterval * spawnCnt;
 
+    // 위치 결정
+    tr.SetLocation(tr.GetLocation() + backVector);
 
+    // 스폰 카운트
+    spawnCnt++;
+
+    return tr;
+}
 
 void AJ_MissionGamemode::StartMissionLevel()
 {
@@ -164,18 +227,16 @@ void AJ_MissionGamemode::StartMissionLevel()
 
 
 
+
+
+
+
 void AJ_MissionGamemode::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-
-    
 }
 
-void AJ_MissionGamemode::LoadMissionMap()
-{
-    // 미션 지역 로드
-    UGameplayStatics::LoadStreamLevelBySoftObjectPtr(GetWorld(), missionMapPrefab, true, true, FLatentActionInfo());
-}
+
 
 // 있으면 그거 주고 없으면 찾기 
 AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
@@ -194,24 +255,7 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
     return spPos;
 }
 
-void AJ_MissionGamemode::SetSpawnPoints(FMissionPlayerSpawnPoints& spawnPointsStruct)
-{
-    // 스폰 포인트 찾기
-    TArray<AActor*> outActors;
-    
-    UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AJ_MissionSpawnPointActor::StaticClass(), spawnPointsStruct.spawnPointTag, outActors);
 
-    TArray<AJ_MissionSpawnPointActor*> spPointActors;
-    Algo::Transform(outActors, spPointActors, [](AActor* temp){
-        return Cast<AJ_MissionSpawnPointActor>(temp);
-    });
-    //캐스트 후
-    for(auto* spPoint : spPointActors)
-    {
-        // 맵에 추가
-        spawnPointsStruct.spawnPointMap[spPoint->spawnType] = spPoint;
-    }
-}
 
 AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole)
 {
@@ -226,23 +270,7 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawn
     return spPoint;
 }
 
-// XXX 이제 안쓰니깐 산개 로직 미적용
-// 임시 산개 로직 적용
-FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_MissionPlayerController* pc)
-{
-    auto tr = this->GetSpawnPoint(role)->GetActorTransform();
-    // 몇 번째 pc 인지 받아서 시작 위치에서 뒤로 - * i 만큼 계산
-    // 시작 지점의 뒤 벡터 구하기
-    FVector backVector = -1 * tr.GetUnitAxis(EAxis::X);
-    backVector *= spawnInterval * tempSpawnCnt;
 
-    // 위치 결정
-    tr.SetLocation(tr.GetLocation() + backVector);
-
-    tempSpawnCnt++;
-
-    return tr;
-}
 
 
 
@@ -349,22 +377,7 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
     return baseTR;
 }
 
-void AJ_MissionGamemode::CacheCesiumActors()
-{
-    // 텔포 박스 가져오기
-    auto* tempTPBox = Cast<AK_CesiumTeleportBox>(
-        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumTeleportBox::StaticClass()));
-    check(tempTPBox);
-    cesiumTPBox = tempTPBox;
 
-    // 정점 액터 가져오기
-    auto* tempZeroPos = Cast<AK_CesiumManager>(
-        UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumManager::StaticClass()));
-    check(tempZeroPos);
-    cesiumZeroPos = tempZeroPos;
-
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("무사히 세슘 관련 액터 캐시 성공"));
-}
 
 // 이륙 체크 및 미션 시작 단
 bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess)

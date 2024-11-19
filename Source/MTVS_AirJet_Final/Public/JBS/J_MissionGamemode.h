@@ -34,10 +34,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TSoftObjectPtr<UWorld> missionMapPrefab;
 
-    // // 지통실 맵
-    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
-    // TSoftObjectPtr<UWorld> commandMapPrefab;
-
     // 스폰 포인트 정보 구조체
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Objects")
     FMissionPlayerSpawnPoints spawnPoints;
@@ -73,11 +69,11 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FFormationValue formationData;
 
-    // @@ 임시 스폰 횟수 기록
+    // 플레이어 스폰 횟수 기록 | 산개 로직 사용
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    int tempSpawnCnt = 0;
+    int spawnCnt = 0;
 
-    // 임시 스폰 간격 거리
+    // 스폰 간격 거리
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     float spawnInterval = 500.f;
 
