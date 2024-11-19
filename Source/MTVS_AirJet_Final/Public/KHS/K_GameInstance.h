@@ -20,6 +20,27 @@
  * 
  */
 
+//csv파일 기반 미션정보 data table 구조체
+USTRUCT(BlueprintType)
+struct FAirjetTotalMissionData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	FAirjetTotalMissionData() : TotalMissionProgress(1), MissionActing("MIC switch ON"), MissionHelper("'+ -키 (+키캡이미지)를 이용해 줌인과 줌아웃. 마우스 오른쪽 클릭 상태로 시점을 전환해보세요.")  {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|TotalMissionData")
+	int32 TotalMissionProgress;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|TotalMissionData")
+	FString MissionActing;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default|TotalMissionData")
+	FString MissionHelper;
+};
+
+
+
 // Deligate 선언 (델리게이트 - Game Instance용)
 DECLARE_DELEGATE_TwoParams(FServerResponseDel , const FString& , bool);
 
@@ -121,6 +142,10 @@ public:
 	//UFUNCTION(BlueprintCallable, Category = "Create Widget")
 	//void CreateInGameWidget(); // 인게임 UI를 생성하는 함수
 
+	//Mission Text UI 관련 함수
+	FAirjetTotalMissionData* GetMyMissionData(int32 MissionProgressIdx); //미션에 따른 구조체 데이터 반환
+	void LoadProgressDT(UScriptStruct* RowStruct); //csv파일에서 데이터 로드하는 함수
+	
 	// 3) Travel 관련 함수 ------------------------------------------------------------------------------------
 	UFUNCTION(BlueprintCallable , Category = "Load Lobby Map")
 	void TravelMainLobbyMap(bool bKeepCurrentSound); // Lobby 맵으로 트래블시키는 함수
@@ -145,38 +170,39 @@ public:
 
 	// 1) 세션 관련 참조 ------------------------------------------------------------------------------------------
 	FStreamableManager StreamableManager; //Map 비동기함수 관련
-
-
+	
 	// 2) UI 관련 참조 ------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere , Category = "UI")
+	UPROPERTY(EditAnywhere , Category = "Default|UI")
 	TSubclassOf<class UK_LoginRegisterWidget> LoginWidgetFactory; // LoginWidget(UI) 공장
 	class UK_LoginRegisterWidget* LoginWidget; // LoginWidget(UI) 참조 선언
 
-	UPROPERTY(EditAnywhere , Category = "UI")
+	UPROPERTY(EditAnywhere , Category = "Default|UI")
 	TSubclassOf<class UK_ServerWidget> ServerWidgetFactory; // ServerWidget(UI) 공장
 	class UK_ServerWidget* ServerWidget; // ServerWidget(UI) 참조 선언
 
-	UPROPERTY(EditAnywhere , Category = "UI")
+	UPROPERTY(EditAnywhere , Category = "Default|UI")
 	TSubclassOf<class UK_LoadingWidget> LoadingWidgetFactory; // LoadingWidget(UI) 공장
 	class UK_LoadingWidget* LoadingWidget; // LoadingWidget(UI) 참조 선언
 
-	UPROPERTY(EditAnywhere , Category = "UI")
+	UPROPERTY(EditAnywhere , Category = "Default|UI")
 	TSubclassOf<class UK_StandbyWidget> StandbyWidgetFactory; // StandbyWidget(UI) 공장
 	class UK_StandbyWidget* StandbyWidget; // StandbyWidget(UI) 참조 선언
 
-
-	//UPROPERTY(EditAnywhere, Category = "UI")
-	//TSubclassOf<class UK_IngameWidget> IngameWidgetFactory; // IngameWidget(UI) 공장
-	//class UK_IngameWidget* IngmaeWidget; // IngameWidget(UI) 참조 선언
-
-	// 1) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere , Category = "Sound")
+	UPROPERTY(EditAnywhere , Category = "Default|UI")
+	TSubclassOf<class UK_MIssionTextWidget> MissionTextWidgetFactory; // MissionTextWidget(UI) 공장
+	class UK_MIssionTextWidget* MissionTextWidget; // MissionTextWidget(UI) 참조 선언
+	
+	UPROPERTY(EditAnywhere, Category = "Default|UI")
+	class UDataTable* MissionDataTable; //csv파일 연동하여 데이터 불러오기
+	
+	// 3) 사운드 관련 참조 ----------------------------------------------------------------------------------------------
+	UPROPERTY(EditAnywhere , Category = "DefaultSound")
 	class USoundWave* LoginSound; // 로그인 사운드
 
-	UPROPERTY(EditAnywhere , Category = "Sound")
+	UPROPERTY(EditAnywhere , Category = "DefaultSound")
 	class USoundWave* LobbySound; // 로비 사운드
 
-	UPROPERTY(EditAnywhere , Category = "Sound")
+	UPROPERTY(EditAnywhere , Category = "DefaultSound")
 	class USoundWave* StageSound; // 스테이지(맵) 사운드
 
 	UPROPERTY()

@@ -16,6 +16,7 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
+#include "KHS/K_MIssionTextWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 void AK_PlayerController::BeginPlay()
@@ -58,6 +59,8 @@ void AK_PlayerController::BeginPlay()
 			}
 		}
 	}
+
+	
 }
 
 void AK_PlayerController::OnPossess(APawn* InPawn)
@@ -79,7 +82,7 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	if (CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 	{
-		//CRPC로 UI세팅하고 IMC맵핑
+		//CRPC로 StandbyUI세팅하고 IMC맵핑
 		CRPC_SetIMCnCreateStandbyUI();
 		LOG_S(Warning , TEXT("KPlayerzController Call Server_NotifyPawnPossessed!!!!!"));
 	}
@@ -126,6 +129,7 @@ void AK_PlayerController::SRPC_StartGame_Implementation()
 	for(auto localPC : allPC)
 	{
 		localPC->CRPC_StartGame();
+		localPC->CRPC_SetMissionUI();
 	}
 	//Mission용 Del 실행
 	StartGameDel_Mission.Broadcast();
@@ -146,8 +150,46 @@ void AK_PlayerController::CRPC_StartGame_Implementation()
 	StartGameDel_Viper.Broadcast();
 }
 
+//MissionUI 생성 Client RPC함수
+void AK_PlayerController::CRPC_SetMissionUI_Implementation()
+{
+	if (IsLocalController())
+	{
+		MissionTextUI = CreateWidget<UK_MIssionTextWidget>(this , MissionUIFactory);
+		CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+		if (MissionTextUI && CurrentMapName == FString::Printf(TEXT("CesiumTest")))
+		{
+			MissionTextUI->AddToViewport();
 
-
+			if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
+			{
+				if (MissionTextUI)
+				{
+					//1번 MissionData를 가져와서 SetText.
+					auto MissionData = GI->GetMyMissionData(11);
+					MissionTextUI->SetMissionText(MissionData);
+				}
+			}
+		}
+	}
+	else
+		LOG_S(Warning , TEXT("Is Not Local Controller"));
+}
+//타클래스 MissionUI 세팅 함수
+void AK_PlayerController::CRPC_SetMissionTextUI_Implementation(int32 MissionIdx)
+{
+	if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
+	{
+		if (MissionTextUI)
+		{
+			//1번 MissionData를 가져와서 SetText.
+			auto MissionData = GI->GetMyMissionData(MissionIdx);
+			if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
+				return;
+			MissionTextUI->SetMissionText(MissionData);
+		}
+	}
+}
 
 //Common Widget 토글 함수
 void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
