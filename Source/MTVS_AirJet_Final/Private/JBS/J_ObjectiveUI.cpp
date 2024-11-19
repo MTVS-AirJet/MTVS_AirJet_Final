@@ -17,12 +17,10 @@
 #include "JBS/J_Utility.h"
 #include "Layout/Margin.h"
 #include "Math/UnrealMathUtility.h"
-#include "Styling/SlateColor.h"
 #include "JBS/J_MissionCompleteUI.h"
 #include "TimerManager.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectPtr.h"
-#include "UObject/WeakObjectPtrTemplates.h"
 
 
 
@@ -32,7 +30,7 @@ void UJ_ObjectiveUI::SetObjUI(FTextUIData data, bool isInit)
     objectiveTextUI->clearChildDel.BindUObject(this, &UJ_ObjectiveUI::ClearSubObjTimer);
     objectiveTextUI->SetTextUI(data, isInit);
 
-    DETAIL_TEXT_UI->SetVisibility(ESlateVisibility::Hidden);
+    // 상세 ui 설정
     
 }
 
@@ -40,11 +38,6 @@ void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)
 {
     // ui 설정
     SetObjUI(data[0], isInit);
-    
-    // 상세 ui 설정
-    DETAIL_TEXT_UI->SetTextUI(data[1], isInit);
-
-    DETAIL_TEXT_UI->SetVisibility(ESlateVisibility::Hidden);
 }
 
 

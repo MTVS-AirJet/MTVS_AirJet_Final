@@ -67,6 +67,12 @@ void UJ_GameInstance::RequestToServerByType(EJsonType type, const FString &sendJ
             RequestData(aiFeedbackDel, sendJsonData, TEXT("result"));
             break;
         }
+		case EJsonType::ALL_VOICE:
+        {
+            allVoiceDel.BindUObject(this, &UJ_GameInstance::ResAllVoice);
+            RequestData(allVoiceDel, sendJsonData, TEXT("voice/all"));
+            break;
+        }
     }
 }
 
@@ -217,6 +223,14 @@ void UJ_GameInstance::ResAIFeedback(const FString &jsonData, bool isSuccess)
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
 
 	aiFeedbackResUseDel.ExecuteIfBound(resData);
+}
+
+void UJ_GameInstance::ResAllVoice(const FString &jsonData, bool isSuccess)
+{
+	FAllVoiceRes resData;
+	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
+
+	allVoiceResUseDel.ExecuteIfBound(resData);
 }
 
 

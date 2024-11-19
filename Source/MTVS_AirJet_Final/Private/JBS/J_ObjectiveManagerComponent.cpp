@@ -72,18 +72,7 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 		// 시동 절차 끝나고 이륙 절차 시작
 		if(dmData.objType == ETacticalOrder::ENGINE_START)
 		{
-			objActor->objectiveEndDel.AddLambda([this]{
-				// 미션 시작 시 활성화 안함
-				if(CUR_ACTIVE_MISSION_IDX >= 0) return;
-
-				auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
-				if(ownerGM->isTPReady) return;
-				if(!takeOffObj) return;
-				if(takeOffObj->IS_OBJ_ENDED) return;
-
-				// 활성화
-				DelayedObjectiveActive(takeOffObj, objSwitchInterval);
-			});
+			objActor->objectiveEndDel.AddDynamic( this, &UJ_ObjectiveManagerComponent::StartTakeOffObj);
 		}
 	}
 }
@@ -116,7 +105,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 		auto* objectiveActor = SpawnObjActor(mData.GetOrderType(), spawnTR);
 
 		// 목표 완료시 다음 목표 활성화 바인드
-		objectiveActor->objectiveEndDel.AddUObject(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
+		objectiveActor->objectiveEndDel.AddDynamic(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
 		// 목표 수행도 갱신함수 바인드
 		objectiveActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
 	
@@ -286,4 +275,17 @@ void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
 		// 종료
 		objActor->ObjectiveEnd(isSuccess);
 	}
+}
+void UJ_ObjectiveManagerComponent::StartTakeOffObj()
+{
+	// 미션 시작 시 활성화 안함
+	if(CUR_ACTIVE_MISSION_IDX >= 0) return;
+
+	auto* takeOffObj = defaultObjDataAry[1].objectiveActor;
+	if(ownerGM->isTPReady) return;
+	if(!takeOffObj) return;
+	if(takeOffObj->IS_OBJ_ENDED) return;
+
+	// 활성화
+	DelayedObjectiveActive(takeOffObj, objSwitchInterval);
 }

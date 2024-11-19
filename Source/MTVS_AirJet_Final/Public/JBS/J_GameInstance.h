@@ -26,6 +26,8 @@ DECLARE_DELEGATE_OneParam(FCommanderVoiceResDelegate, const FCommanderVoiceRes&)
 
 DECLARE_DELEGATE_OneParam(FAIFeedbackResDelegate, const FAIFeedbackRes&);
 
+DECLARE_DELEGATE_OneParam(FAllVoiceResDelegate, const FAllVoiceRes&);
+
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_GameInstance : public UGameInstance
@@ -48,6 +50,8 @@ protected:
 	FResponseDelegate commanderVoiceDel;
 
 	FResponseDelegate aiFeedbackDel;
+
+	FResponseDelegate allVoiceDel;
 
 #pragma endregion
 	// solved 테스트용 데이터 주고 받기
@@ -77,11 +81,15 @@ protected:
 	UFUNCTION()
 	virtual void ResAIFeedback(const FString &jsonData, bool isSuccess);
 
+	UFUNCTION()
+	virtual void ResAllVoice(const FString &jsonData, bool isSuccess);
+
 #pragma endregion
 
 #pragma region 사용 함수 연결용 딜리게이트 단
 public:
 	// res 구조체 데이터 사용할 함수 연결용 딜리게이트
+	
 	// XXX
 	FResSimpleDelegate tempLoginAuthUseDel;
 
@@ -94,6 +102,8 @@ public:
 	FCommanderVoiceResDelegate commanderVoiceResUseDel;
 
 	FAIFeedbackResDelegate aiFeedbackResUseDel;
+
+	FAllVoiceResDelegate allVoiceResUseDel;
 #pragma endregion
 
 #pragma endregion

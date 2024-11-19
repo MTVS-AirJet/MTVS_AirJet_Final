@@ -222,6 +222,21 @@ FTransform FJVector2D::GetTransform() const
     return tr;
 }
 
+FTransform FMissionStartPos::GetTransform(const FVector &targetLoc) const
+{
+    auto newTR = this->GetTransform();
+    const auto& location = newTR.GetLocation();
+    
+    // 방향 계산 | Z를 동기화해서 2d로 계산되도록
+    FVector targetLocation = FVector(targetLoc.X, targetLoc.Y, location.Z);
+    FVector dir = (targetLocation - location).GetSafeNormal();
+
+    // 방향을 바라보도록 회전
+    newTR.SetRotation(dir.ToOrientationQuat());
+
+    return newTR;
+}
+
 bool UJ_Utility::GetLocalPlayerController(const UWorld *world, class AJ_MissionPlayerController *&outPC)
 {
     // 로컬 플레이어 찾기
@@ -268,12 +283,12 @@ void FEngineProgressData::SetNextProgress()
         break;
         // FIXME 순서 바뀐거 수정해야함
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
-        this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
-        break;
-    case EEngineProgress::JFS_STARTER_SWITCH_ON:
         this->curProgress = EEngineProgress::ENGINE_MASTER_SWITCH_ON;
         break;
     case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+        this->curProgress = EEngineProgress::JFS_STARTER_SWITCH_ON;
+        break;
+    case EEngineProgress::JFS_STARTER_SWITCH_ON:
         this->curProgress = EEngineProgress::JFS_HANDLE_PULL;
         break;
     case EEngineProgress::JFS_HANDLE_PULL:
@@ -330,15 +345,14 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
     case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
         str = TEXT("엔진 제어 장치 가동");
         break;
-    // FIXME 순서 바뀐거 수정해야함 | 설명도!
-    case EEngineProgress::JFS_STARTER_SWITCH_ON:
+    case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
         str = TEXT("엔진 마스터 켜기");
         break;
-    case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+    case EEngineProgress::JFS_STARTER_SWITCH_ON:
         str = TEXT("JFS 스타트 준비");
         break;
     case EEngineProgress::JFS_HANDLE_PULL:
-        str = TEXT("JFS 작동 시작");
+        str = TEXT("JFS 핸들 당기기");
         break;
     case EEngineProgress::ENGINE_THROTTLE_IDLE:
         str = TEXT("엔진 공회전 상태 유지");
@@ -430,4 +444,5 @@ int FCommanderVoiceReq::ConvertOrderTypeToId(ETacticalOrder type)
 
     return result;
 }
+
 

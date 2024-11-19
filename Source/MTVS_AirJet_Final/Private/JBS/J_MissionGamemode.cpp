@@ -23,50 +23,63 @@
 #include <JBS/J_MissionSpawnPointActor.h>
 #include <Engine/World.h>
 
+#pragma region 레벨 시작 단
+/*
+레벨 시작 시 목표 매니저 컴포넌트 캐시 | BeginPlay
+-> 미션 시작 | StartMission
+-> 미션 데이터 호스트 게임 인스턴스 에서 가져오기 | LoadMissionData
+-> 미션 시작 지점 포인트 액터 생성 | InitMissionStartPoint
 
+
+
+-> 호스트 pc 시작 버튼에 미션 시작 함수 바인드 | PostLogin
+-> 미션 시작시 
+
+*/
+
+#pragma endregion
 
 void AJ_MissionGamemode::BeginPlay()
 {
     Super::BeginPlay();
 
-    // FIXME 호스트 시작 버튼에 딜리게이트 바인드 해야함
-    // 임시로 키고 1.5 뒤에 되도록
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
-    {
-        // 호스트 pc 가져와서 시작 함수 바인드
-        AJ_MissionPlayerController* outPC;
-        UJ_Utility::GetLocalPlayerController(GetWorld(), outPC);
-        
-        outPC->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
-    }, .1f, false);
+    // 목표 매니저 컴포넌트 가져오기 | 생성자에서 생성하는게 안되서 블프에 넣음
+    objectiveManagerComp = this->GetComponentByClass<UJ_ObjectiveManagerComponent>();
+    
+    // 미션 시작
+    StartMission();
 }
 
-// 사실상 beginplay
 void AJ_MissionGamemode::StartMission()
 {
+    // 디버그용 더미 미션 데이터 사용 여부
     if(enableUsingDummyMissionData)
     {
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("현재 디버그용 더미 미션 데이터 사용 중"));
         curMissionData = dummyMissionData;
     }
-    else {
+    // GI 미션 데이터 사용
+    else 
+    {
         curMissionData = LoadMissionData();
     }
 
-    // 시작 지점 액터 생성
-    InitMissionStartPoint(curMissionData.startPoint);
+    // 첫 미션 데이터 가져오기
+    const auto& missions = curMissionData.mission;
+    const FMissionObject& firstMission = missions.Num() > 0 ? missions[0] : FMissionObject();
 
-    // 목표 매니저 컴포넌트 설정
+    // 시작 지점 액터 생성 | 첫 미션을 바라보도록 생성
+    InitMissionStartPoint(curMissionData.startPoint, firstMission);
+
+    // 목표 매니저 컴포넌트 존재 확인
     check(objectiveManagerComp);
+
+    // FIXME 여기부터 다시 리팩토링 시작
+
     // 시동 및 이륙 목표 추가
     objectiveManagerComp->InitDefaultObj();
     // 전술 명령 목표 추가
     objectiveManagerComp->InitObjectiveList(curMissionData.mission);
-
-    // XXX 미션 맵 로드
-    // LoadMissionMap();
 
     // 스폰포인트 가져와서 설정
     SetSpawnPoints(spawnPoints);
@@ -83,11 +96,73 @@ void AJ_MissionGamemode::StartMission()
     
 }
 
+FMissionDataRes AJ_MissionGamemode::LoadMissionData()
+{
+    // 호스트 gi의 미션 데이터 가져오기 | 설정은 세션 단에서 함
+    const auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+    const FMissionDataRes& resultData = gi->MissionData;
+
+    // 잘못된 미션 데이터 일 경우 더미 데이터 사용
+    bool isValid = !resultData.mapName.IsEmpty();
+    if(isValid)
+    {
+        FString debugStr = TEXT("잘못된 미션 데이터 | 더미 데이터 사용");
+        UJ_Utility::PrintFullLog(debugStr, 5.f, FColor::Red);
+    }
+    
+    return isValid ? resultData : dummyMissionData;
+}
+
+void AJ_MissionGamemode::InitMissionStartPoint(const FMissionStartPos &startPointData, const FMissionObject& firstMission)
+{
+    // 첫 미션이 존재하면 그걸 바라보게, 아니면 맵 중앙 바라보도록 위치 가져오기
+    const FTransform& spawnTR = firstMission.GetOrderType() != ETacticalOrder::NONE 
+        ? startPointData.GetTransform(firstMission.GetTransform().GetLocation())
+        : startPointData.GetTransform();
+
+    // 액터 생성
+    auto* spActor = GetWorld()->
+        SpawnActor<AJ_MissionStartPointActor>(startPointActorPrefab, spawnTR);
+    if(!spActor) return;
+
+    // 캐시
+    START_POINT_ACTOR = spActor;
+}
+
+
+
+
+
+void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
+{
+    Super::PostLogin(newPlayer);
+
+    // 현재 주요 스폰 시스템
+    if(enableUseOldSpawnSystem)
+    {
+        // 역할 설정후 플레이어 스폰
+        auto* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
+        pc->SpawnMyPlayer();
+
+        
+        // 호스트 시작 버튼에 미션 시작 함수 딜리게이트
+        // @@ 나중엔 챕터 UI 시작으로 변경
+        if(HasAuthority() && newPlayer->IsLocalController())
+            pc->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
+    }
+}
+
+
+
+
+
 void AJ_MissionGamemode::StartMissionLevel()
 {
     // 시동 목표 시작
     objectiveManagerComp->StartDefualtObj();
 }
+
+
 
 void AJ_MissionGamemode::Tick(float DeltaSeconds)
 {
@@ -169,37 +244,9 @@ FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_Miss
     return tr;
 }
 
-void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
-{
-    Super::PostLogin(newPlayer);
 
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("플레이어 id : %d"), pIdx));
-    // solved 임시로 첫 플레이어는 지휘관 이후는 파일럿으로 역할 설정 | 사용 끝
-    // auto* gi = newPlayer->GetGameInstance<UJ_GameInstance>();
-    // gi->SetPlayerRole(pIdx == 0 ? EPlayerRole::COMMANDER : EPlayerRole::PILOT);
-    
-    if(enableUseOldSpawnSystem)
-    {
-        // 역할 설정후 플레이어 스폰
-        auto* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
-        pc->SpawnMyPlayer();
-    }
 
-    // pIdx++;
-}
 
-void AJ_MissionGamemode::InitMissionStartPoint(const FMissionStartPos &startPointData)
-{
-    // 시작 지점 위치
-    FTransform spawnTR = startPointData.GetTransform();
-
-    // 액터 생성
-    auto* spActor = GetWorld()->SpawnActor<AJ_MissionStartPointActor>(startPointActorPrefab, spawnTR);
-    check(spActor);
-    
-    // 캐시
-    START_POINT_ACTOR = spActor;
-}
 
 void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startPoint)
 {
@@ -359,22 +406,7 @@ void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_Missio
     
 }
 
-FMissionDataRes AJ_MissionGamemode::LoadMissionData()
-{
-    auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
 
-    FMissionDataRes& resultData = gi->MissionData;
-
-    // 잘못된 미션 데이터 일 경우 더미 데이터 사용
-    if(resultData.mapName.IsEmpty())
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("잘못된 미션 데이터 | 더미 데이터 사용"));
-
-        resultData = dummyMissionData;
-    }
-    
-    return resultData;
-}
 
 
 
@@ -417,6 +449,6 @@ void AJ_MissionGamemode::StartTacticalOrder()
             // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음 | 나중엔 로딩 뽕맛 보여줘야지
             this->objectiveManagerComp->ActiveNextObjective();
             
-        }, 3, false);
-    }, 5.f, false);
+        }, 1.5, false);
+    }, 1.5f, false);
 }

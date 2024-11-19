@@ -10,7 +10,7 @@
 
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float);
-DECLARE_MULTICAST_DELEGATE(FObjectiveEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FObjectiveEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate);
 DECLARE_MULTICAST_DELEGATE(FObjectiveSuccessUpdateDelegate);
 
@@ -94,10 +94,13 @@ public:
 	// 미션 비활성화 시 실행 딜리게이트
 	FObjectiveActiveDelegate objectiveDeactiveDel;
 	// 미션 완료 시 실행 딜리게이트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
 	FObjectiveEndDelegate objectiveEndDel;
 	// 미션 성공 시 실행 딜리게이트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
 	FObjectiveEndDelegate objectiveSuccessDel;
 	// 미션 실패 시 실행 딜리게이트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
 	FObjectiveEndDelegate objectiveFailDel;
 	// 미션 수행도 갱신 딜리게이트
 	FObjectiveSuccessUpdateDelegate objSuccessUpdateDel;
@@ -143,8 +146,15 @@ protected:
 	// 배열내 pc 전부에게 해당 idx ai 지휘관 보이스 재생 요청
 	UFUNCTION(BlueprintCallable)
 	virtual void ReqPlayCommVoice(int idx, const TArray<class AJ_MissionPlayerController*>& pcs);
+	// XXX 배열내 pc 전부에게 해당 idx 배열 순차적으로 보이스 재생 요청 | 너무 복잡할듯?
+	UFUNCTION(BlueprintCallable)
+	virtual void ReqPlayCommVoiceAry(TArray<int> idxAry, const TArray<class AJ_MissionPlayerController *> &pcs);
 
-	// 아이콘 3d ui에 로컬 폰 설정
+	// 보이스 인덱스 예외처리 보정
+	UFUNCTION(BlueprintCallable)
+	int VoiceIdxAdjust(int idx);
+
+        // 아이콘 3d ui에 로컬 폰 설정
 	void SetTargetIconUI();
 
 	// 아이콘 ui에 거리 텍스트 설정

@@ -125,7 +125,7 @@ void AJ_BaseMissionObjective::InitBindDel()
 	// 수행도 갱신시 목표 UI 값 갱신 바인드
 	objSuccessUpdateDel.AddUObject(this, &AJ_BaseMissionObjective::UpdateObjUI);
 	// 목표 완료시 목표 UI 완료 바인드
-	objectiveEndDel.AddUObject(this, &AJ_BaseMissionObjective::EndObjUI);
+	objectiveEndDel.AddDynamic(this, &AJ_BaseMissionObjective::EndObjUI);
 }
 
 // 목표 타입, 초기 활성 여부 (false 만 사용) 설정
@@ -356,8 +356,12 @@ void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 }
 
 // ai 지휘관 보이스 재생 요청 | 배열로 해서 세밀하게 조절 가능
-void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<class AJ_MissionPlayerController*>& pcs)
+void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<AJ_MissionPlayerController*>& pcs)
 {
+	// 예외처리
+	// 1. 브레이크 idx 보정
+	idx = VoiceIdxAdjust(idx);
+
 	for(auto* pc : pcs)
 	{
 		pc->CRPC_PlayCommanderVoice3(idx);
@@ -366,3 +370,24 @@ void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<class AJ_Mi
 
 #pragma endregion
 
+void AJ_BaseMissionObjective::ReqPlayCommVoiceAry(TArray<int> idxAry,
+                                                  const TArray<AJ_MissionPlayerController *> &pcs)
+{
+	// 예외처리
+	// idx = VoiceIdxAdjust(idx);
+
+	// for(auto* pc : pcs)
+	// {
+	// 	pc->CRPC_PlayCommanderVoice3(idx);
+	// }
+}
+
+int AJ_BaseMissionObjective::VoiceIdxAdjust(int idx)
+{
+	if(idx == 10)
+		idx = 9;
+	else if(idx == 11)
+		idx = 10;
+
+	return idx;
+}

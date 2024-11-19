@@ -138,6 +138,7 @@ icon UI 캐시 | SetTargetIconUI
 */
 
 	// 다음 서브 목표 활성화
+	UFUNCTION(BlueprintCallable)
 	void ActiveNextObjective();
 
 	// 하위 이동 목표 전체 수행 유무 체크

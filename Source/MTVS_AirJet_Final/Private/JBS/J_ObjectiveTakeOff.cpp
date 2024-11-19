@@ -60,8 +60,8 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
 
     StartNewObjUI();
 
-    // ai
-    ReqPlayCommVoice(10, allPC);
+    // XXX ai 시동 마지막에서 하는중
+    // ReqPlayCommVoice(10, allPC);
 }
 
 void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
