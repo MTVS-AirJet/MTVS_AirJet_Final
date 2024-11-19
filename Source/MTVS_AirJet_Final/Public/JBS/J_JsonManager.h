@@ -19,6 +19,27 @@ class MTVS_AIRJET_FINAL_API AJ_JsonManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AJ_JsonManager();
+protected:
+	// 스톱워치
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool bStopWatch = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float stopWatchTime = 0.f;
+
+public:
+
+protected:
+    void ToggleStopWatch()
+	{
+		bStopWatch = !bStopWatch;
+
+		// 활성화 시 초기화
+		if(bStopWatch)
+			stopWatchTime = 0.f;
+		
+	}
+
+public:
 
 protected:
 	// Called when the game starts or when spawned
@@ -46,6 +67,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	FAIFeedbackReq tempAIFBReq;
 
+	// 받는 데이터
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TArray<FCommanderVoiceRes> allVoiceData;
+
 public:
 	// 테스트용 사운드 파일
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -63,14 +88,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ReqLogin();
 
-	// @@ 5. 테스트용 로그인 했을때 반환 데이터 받기
 	UFUNCTION(BlueprintCallable)
 	void OnLoginData(const FLoginRes &resData);
 
 	UFUNCTION(BlueprintCallable)
 	void ReqTempAuth();
 
-	// @@ 테스트용 로그인 인증 데이터 받기
 	UFUNCTION(BlueprintCallable)
 	void OnLoginAuthData(const FResSimple &resData);
 
@@ -88,6 +111,12 @@ protected:
 	void ReqAIFeedback();
 	UFUNCTION(BlueprintCallable)
 	void OnGetAIFeedbackData(const FAIFeedbackRes &resData);
+
+	// 전체 보이스 리스트 받기 테스트
+	UFUNCTION(BlueprintCallable)
+	void ReqAllVoice();
+	UFUNCTION(BlueprintCallable)
+	void OnGetAllVoiceData(const FAllVoiceRes &resData);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void PlayTempVoice();

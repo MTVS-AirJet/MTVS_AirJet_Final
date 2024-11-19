@@ -29,6 +29,7 @@ enum class EJsonType : uint8
     ,MISSION_DATA_RECEIVE
     ,COMMANDER_VOICE
     ,AI_FEEDBACK
+    ,ALL_VOICE
 };
 
 #pragma region 웹 통신 용 구조체
@@ -346,15 +347,21 @@ struct FAllMissionDataRes
 
 
 USTRUCT(BlueprintType)
-struct FCommanderVoiceRes
+struct 
+
+FCommanderVoiceRes
 {
     GENERATED_BODY()
 public:
     // 보이스 파일 base64 인코딩
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString voice;
+    // 설명
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     FString description;
+    // 인덱스
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int idx;
 };
 
 USTRUCT(BlueprintType)
@@ -363,6 +370,7 @@ struct FAIFeedbackRes
     GENERATED_BODY()
 public:
     // 결산 등급
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     int rank;
     // ai 코멘트
@@ -370,6 +378,16 @@ public:
     FString comment;
 
     FString ToString() const;
+};
+
+USTRUCT(BlueprintType)
+struct FAllVoiceRes
+{
+    GENERATED_BODY()
+public:
+    // 보이스 배열
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    TArray<FCommanderVoiceRes> data;
 };
 
 
@@ -872,8 +890,6 @@ public:
 
     FTakeOffCheckData(bool isTakeOff, bool isSuccess) : isTakeOff(isTakeOff), isSuccess(isSuccess) {}
 };
-
-
 
 #pragma endregion
 

@@ -86,8 +86,6 @@ void AJ_MissionPlayerController::SpawnMyPlayer()
                 this->bShowMouseCursor = true;
                 DefaultMouseCursor = EMouseCursor::Crosshairs;
                 SetInputMode(FInputModeGameAndUI());
-                
-                
                 break;
             case EPlayerRole::PILOT:
                 this->bShowMouseCursor = false;

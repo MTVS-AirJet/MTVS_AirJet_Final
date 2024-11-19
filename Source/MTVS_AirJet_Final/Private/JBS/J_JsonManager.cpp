@@ -34,6 +34,13 @@ void AJ_JsonManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bStopWatch)
+		stopWatchTime += DeltaTime;
+	
+	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("스톱워치 : %.2f"), stopWatchTime));
+	
+
+
 }
 void AJ_JsonManager::ReqTemp()
 {
@@ -132,9 +139,32 @@ void AJ_JsonManager::ReqAIFeedback()
 
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
 	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, tempAIFBReq);
+	ToggleStopWatch();
 }
 
 void AJ_JsonManager::OnGetAIFeedbackData(const FAIFeedbackRes &resData)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *resData.ToString()));
+	ToggleStopWatch();
+}
+
+void AJ_JsonManager::ReqAllVoice()
+{
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+	gi->allVoiceResUseDel.BindUObject(this, &AJ_JsonManager::OnGetAllVoiceData);
+
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::ALL_VOICE);
+	ToggleStopWatch();
+}
+
+void AJ_JsonManager::OnGetAllVoiceData(const FAllVoiceRes &resData)
+{
+	FString debugStr = FString::Printf(TEXT("보이스 개수 : %d"), resData.data.Num());
+
+	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *debugStr));
+
+	allVoiceData = resData.data;
+	ToggleStopWatch();
 }

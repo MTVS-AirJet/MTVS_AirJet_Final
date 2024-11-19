@@ -92,7 +92,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void SRPC_RemoveLoadingUI();
 
-        // 로딩 ui 제거
+	// 로딩 ui 제거
 	UFUNCTION(BlueprintCallable, Client, Reliable)
 	void CRPC_RemoveLoadingUI();
 
