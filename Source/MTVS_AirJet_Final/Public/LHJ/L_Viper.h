@@ -45,7 +45,7 @@ public:
 private:
 	UFUNCTION()
 	void PrintNetLog();
-
+	
 public: // Component
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetRoot;
@@ -486,6 +486,7 @@ public:
 	class UStaticMeshComponent* DummyJFSBreakHold;
 	UPROPERTY(BlueprintReadOnly)
 	bool bBreakHold;
+	bool IsFirstBreakHoldClick;
 	
 private:
 	//==================================
@@ -754,6 +755,7 @@ private:
 	bool bCanopyOpenSound;
 
 public:
+	// TODO:  StartMissionViper_Del을 추가한 목적이 기억이 안나서 범서한테 물어봐야함
 	// 미션 시작 시 사용할 델리게이트
 	bool bStartMission;
 	FStartMissionViper StartMissionViper_Del;

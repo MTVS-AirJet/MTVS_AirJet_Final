@@ -429,11 +429,25 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 		if (RT->TriggerIdx == 0)
 		{
 			intTriggerNum = 1;
+			if(IsLocallyControlled())
+			{
+				if (auto pc = Cast<AK_PlayerController>(Controller))
+				{
+					pc->CRPC_SetMissionTextUI(20);					
+				}
+			}
 		}
 		else if (RT->TriggerIdx == 1)
 		{
 			intTriggerNum = 2;
 			IsFlyStart = true;
+			if(IsLocallyControlled())
+			{
+				if (auto pc = Cast<AK_PlayerController>(Controller))
+				{
+					pc->CRPC_SetMissionTextUI(21);					
+				}
+			}
 		}
 	}
 }
@@ -706,6 +720,15 @@ void AL_Viper::OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , stru
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
 	if (!bBreakHold)
 	{
+		if (!IsFirstBreakHoldClick)
+		{
+			if (auto pc = Cast<AK_PlayerController>(Controller))
+			{
+				pc->CRPC_SetMissionTextUI(19);					
+			}
+			//IsFirstBreakHoldClick = true;
+		}
+		
 		bBreakHold = true;
 		DummyJFSBreakHold->SetRelativeRotation(FRotator(-30 , 0 , 0));
 	}
@@ -808,10 +831,19 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 		JetCamera->SetActive(false);
 	if (JetCameraFPS)
 	{
+		// TODO:  StartMissionViper_Del을 추가한 목적이 기억이 안나서 범서한테 물어봐야함
 		if (!bStartMission && StartMissionViper_Del.IsBound())
 		{
 			StartMissionViper_Del.Broadcast();
 			bStartMission = true;
+
+			if(IsLocallyControlled())
+			{
+				if (auto pc = Cast<AK_PlayerController>(Controller))
+				{
+					pc->CRPC_SetMissionTextUI(6);					
+				}
+			}
 		}
 
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)

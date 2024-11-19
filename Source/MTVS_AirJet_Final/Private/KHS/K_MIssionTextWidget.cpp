@@ -38,7 +38,29 @@ void UK_MIssionTextWidget::SetInvisible()
 //FAirjetTotalMissionData 구조체를 전달받아 TextBlock에 SetText하는 함수
 void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 {
-	if(MissionData->MissionHelper.Equals(""))
+	if (!MissionData->MissionHelper.Equals("")&&!MissionData->MissionActing.Equals(""))
+	{
+		// 둘다 있을때
+		//Visibility 켜기
+		MissionText->SetVisibility(ESlateVisibility::Visible);
+		//SetText
+		Mission_txt_acting->SetText(FText::FromString(MissionData->MissionActing));
+		//애니메이션 재생
+		PlayAnimation(ShowActingUIAnim);
+		//애니메이션 재생
+		PlayAnimation(ShowMissionUIAnim);
+		if(Mission_txt_helper)
+		{
+			DisplayedText = "";  // 현재까지 표시된 텍스트를 빈 문자열로 초기화
+			FullText = MissionData->MissionHelper;  // 전체 텍스트 저장
+			CurrentCharIndex = 0;  // 현재 문자 인덱스 초기화
+
+			// 타이머 설정 (0.1초 간격으로 UpdateDisplayedText 함수 호출)
+			GetWorld()->GetTimerManager().SetTimer(TextDisplayTimerHandle, this, &UK_MIssionTextWidget::UpdateDisplayedText, 0.06f, true);
+			UE_LOG(LogTemp, Warning, TEXT("Starting text display animation..."));
+		}
+	}
+	else if(MissionData->MissionHelper.Equals(""))
 	{
 		//Visibility 켜기
 		MissionText->SetVisibility(ESlateVisibility::Visible);

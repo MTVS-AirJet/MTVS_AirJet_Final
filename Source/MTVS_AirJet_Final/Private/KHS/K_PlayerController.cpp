@@ -167,6 +167,8 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 				{
 					//1번 MissionData를 가져와서 SetText.
 					auto MissionData = GI->GetMyMissionData(1);
+					if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
+						return;			
 					MissionTextUI->SetMissionText(MissionData);
 				}
 			}
@@ -178,17 +180,20 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 //타클래스 MissionUI 세팅 함수
 void AK_PlayerController::CRPC_SetMissionTextUI_Implementation(int32 MissionIdx)
 {
-	if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
+	if (IsLocalController())
 	{
-		if (MissionTextUI)
+		if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
 		{
-			//1번 MissionData를 가져와서 SetText.
-			auto MissionData = GI->GetMyMissionData(MissionIdx);
-			if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
-				return;
-			MissionTextUI->SetMissionText(MissionData);
+			if (MissionTextUI)
+			{
+				//1번 MissionData를 가져와서 SetText.
+				auto MissionData = GI->GetMyMissionData(MissionIdx);
+				if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
+					return;
+				MissionTextUI->SetMissionText(MissionData);
+			}
 		}
-	}
+	}	
 }
 
 //Common Widget 토글 함수
