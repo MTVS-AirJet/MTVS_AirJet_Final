@@ -817,6 +817,15 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
 		JetCameraFPS->SetActive(true);
+
+		if (JetAudio)
+		{
+			if (auto attnuation = JetAudio->AttenuationSettings.Get())
+			{
+				if (attnuation->Attenuation.bAttenuate)
+					attnuation->Attenuation.bAttenuate = false;
+			}
+		}		
 	}
 }
 
@@ -829,6 +838,15 @@ void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 		JetCameraFPS->SetActive(false);
+
+		if (JetAudio)
+		{
+			if (auto attnuation = JetAudio->AttenuationSettings.Get())
+			{
+				if (attnuation->Attenuation.bAttenuate)
+					attnuation->Attenuation.bAttenuate = true;
+			}
+		}
 	}
 }
 
@@ -1080,7 +1098,7 @@ void AL_Viper::Tick(float DeltaTime)
 	if (JetAudio)
 	{
 		if (JetCameraFPS->IsActive())
-		{
+		{			
 			if (CanopyPitch == 0)
 			{
 				if (!JetAudio->bAllowSpatialization)
