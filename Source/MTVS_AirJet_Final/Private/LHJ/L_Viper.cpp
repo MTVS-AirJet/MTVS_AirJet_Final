@@ -1453,7 +1453,6 @@ void AL_Viper::Tick(float DeltaTime)
 	{
 		ChangeBooster();
 
-		//<><><>
 #pragma region 고도계
 		float CurrHeight = GetActorLocation().Z; // + HeightOfSea; // 고도 높이
 		float CurrFeet = CurrHeight * 3.281 / 100; // cm to feet
@@ -1498,7 +1497,7 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Recover CameraArm Rotation
-		if (!IsRotateTrigger || !IsRotateStickTrigger)
+		if (!IsRotateTrigger && !IsRotateStickTrigger)
 		{
 			if (JetCamera->IsActive())
 			{
@@ -1597,10 +1596,10 @@ void AL_Viper::IsLockOn()
 void AL_Viper::ChangeBooster()
 {
 	FNiagaraVariable vfxParam(FNiagaraTypeDefinition::GetFloatDef() , FName("EnergyCore_Life"));
-	if(IsEngineOn)
+	if (IsEngineOn)
 	{
 		if (AccelGear == 3)
-		{	
+		{
 			if (!bCurrBoostState)
 				ServerRPCBoost(true);
 		}
@@ -1609,7 +1608,7 @@ void AL_Viper::ChangeBooster()
 			if (bCurrBoostState)
 				ServerRPCBoost(false);
 		}
-	}	
+	}
 }
 
 
@@ -1982,7 +1981,7 @@ void AL_Viper::PerformLineTrace()
 			// 라인 트레이스 수행
 			if (GetWorld()->LineTraceSingleByChannel(HitResult , Start , End , ECC_Visibility , Params))
 			{
-				if (HitResult.GetComponent()->ComponentHasTag("Canopy"))
+				if (HitResult.GetComponent()->ComponentHasTag("JetCanopy"))
 				{
 					BackMoveCanopyHandle();
 					// 디버그용 라인 시각화
@@ -2665,5 +2664,12 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
 #pragma endregion
+}
+#pragma endregion
+
+#pragma region IsEngineOn 변수를 true로 전환
+void AL_Viper::SetEngineOn()
+{
+	IsEngineOn = true;
 }
 #pragma endregion

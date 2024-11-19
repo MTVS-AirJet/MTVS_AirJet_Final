@@ -253,10 +253,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FRotator RotatePitchValue = FRotator(1.2f , 0 , 0);
 	
-private:
 	// For Engine Using
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
+	UPROPERTY(EditAnywhere , Category="Engine", BlueprintReadWrite)
 	bool IsEngineOn;
+private:
 	// For Change Arrow Rotate
 	float CurrentTime;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -757,4 +757,8 @@ public:
 	// 미션 시작 시 사용할 델리게이트
 	bool bStartMission;
 	FStartMissionViper StartMissionViper_Del;
+
+	// isEngineOn 변수를 켜는 함수 (범서가 사용 중)
+	UFUNCTION(BlueprintCallable)
+	void SetEngineOn();
 };
