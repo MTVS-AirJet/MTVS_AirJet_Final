@@ -43,6 +43,10 @@ void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 		// 둘다 있을때
 		//Visibility 켜기
 		MissionText->SetVisibility(ESlateVisibility::Visible);
+		Mission_txt_helper->SetVisibility(ESlateVisibility::Visible);
+		img_txtbackground->SetVisibility(ESlateVisibility::Visible);
+		Mission_txt_acting->SetVisibility(ESlateVisibility::Visible);
+		
 		//SetText
 		Mission_txt_acting->SetText(FText::FromString(MissionData->MissionActing));
 		//애니메이션 재생
