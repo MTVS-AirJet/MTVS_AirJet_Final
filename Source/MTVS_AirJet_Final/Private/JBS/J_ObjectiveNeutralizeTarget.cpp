@@ -172,6 +172,8 @@ void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
 
     // 서브 목표 시작
     ActiveNextObjective();
+    // 시작 보이스 재생
+    ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_START, allPC);
 
     StartNewObjUI();
 }
@@ -236,6 +238,7 @@ AJ_ObjectiveMovePoint* AJ_ObjectiveNeutralizeTarget::SpawnSubMovePoint(const FTr
     subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::EndSubMPUI);
     // 목표 완료시 다음 목표 활성화 바인드
     subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
+    // 목표 완료시 보이스 재생 요청
     
 
     return subMP;
@@ -296,16 +299,16 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 
     switch (mIdx) {
         case 0:
-            ReqPlayCommVoice(16, allPC);
+            // ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_2_END, allPC);
             break;
         case 1:
-            ReqPlayCommVoice(17, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_2_END, allPC);
             break;
         case 2:
-            ReqPlayCommVoice(18, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_3_START, allPC);
             break;
         case 3:
-            ReqPlayCommVoice(20, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_3_END, allPC);
             break;
     }
 	
@@ -337,10 +340,12 @@ void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
 
     // icon 활성화
     iconWorldUIComp->SetVisible(true);
-    // voice 재생
+
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    ReqPlayCommVoice(22, allPC);
+    // voice 재생
+    ReqPlayCommVoice(EMissionProcess::LOCK_ON, allPC);
+
     for(auto* pc : allPC)
     {
         if(!pc) continue;

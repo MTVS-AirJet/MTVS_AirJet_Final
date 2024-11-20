@@ -150,6 +150,7 @@ icon UI 캐시 | SetTargetIconUI
 	// 지연 시간 후 서브 목표 활성화
 	void DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime);
 
+
 	// 과녁 타격 활성화
 	void StartHitTarget();
 /*

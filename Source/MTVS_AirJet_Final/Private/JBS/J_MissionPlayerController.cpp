@@ -283,20 +283,73 @@ void AJ_MissionPlayerController::PlayCommanderVoice3(const FCommanderVoiceRes &r
     // 디코딩
     auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(resData.voice);
     if(!voice) return;
+    
+    PlayAIVoice(voice);
+}
+
+void AJ_MissionPlayerController::PlayAIVoice(USoundWaveProcedural *sound)
+{
+    if(!sound) return;
+
     // 정지
     commanderAudioComp->Stop();
     // 소리 설정
-    commanderAudioComp->SetSound(voice);
+    commanderAudioComp->SetSound(sound);
     // 재생
     commanderAudioComp->Play();
 }
 
 void AJ_MissionPlayerController::CRPC_PlayCommanderVoice3_Implementation(int idx)
 {
-    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
-	gi->commanderVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::PlayCommanderVoice3);
+    // XXX 예전 개별 요청
+    // auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+	// gi->commanderVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::PlayCommanderVoice3);
 	
-	FCommanderVoiceReq req(idx);
+	// FCommanderVoiceReq req(idx);
 
-	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+	// UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
+
+    // 해당 인덱스 재생
+    if(!missionVoiceMap.Contains(idx)) return;
+
+    PlayAIVoice(missionVoiceMap[idx]);
 }
+void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
+{
+    // gi 찾아서 미션 보이스 요청
+    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+    gi->allVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::ResMissionVoiceData);
+
+    UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::ALL_VOICE);
+    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 시작"));
+}
+
+
+void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData)
+{
+    if(resData.data.IsEmpty())
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("보이스 데이터 못 받음"));
+        
+        return;
+    }
+    else {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("미션 전체 보이스 데이터 받음"));
+    }
+
+    // base64 데이터 wav로 변환
+    for(const FCommanderVoiceRes& wavData : resData.data)
+    {
+        // 디코딩
+        auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(wavData.voice);
+        if(!voice)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("%d 번 보이스 데이터 누락됨"), wavData.idx));
+            continue;
+        }
+
+        // 맵에 저장
+        missionVoiceMap.Add(wavData.idx, voice);
+    }
+}
+

@@ -31,6 +31,8 @@ void AJ_ObjectiveFormationFlight::InitBindDel()
 
     // 목표 완료시 수행도 갱신 바인드
     this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::SendEndSuccessData);
+    // 목표 완료시 모든 pc에 종료 보이스 재생 요청
+    this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::ReqEndVoice);
 }
 
 void AJ_ObjectiveFormationFlight::ObjectiveActive()
@@ -38,32 +40,13 @@ void AJ_ObjectiveFormationFlight::ObjectiveActive()
     
     Super::ObjectiveActive();
 
+    // 시작 보이스 재생
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    ReqPlayCommVoice(EMissionProcess::FORMATION_FLIGHT_START, allPC);
+
+
     // 목표 ui 신규 갱신
     StartNewObjUI();
-
-    // @@ 지휘관 보이스 12~14 순차적으로
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-
-    ReqPlayCommVoice(12, allPC);
-
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
-    {
-        //타이머에서 할 거
-        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-        ReqPlayCommVoice(13, allPC);
-        
-        FTimerHandle timerHandle2;
-        GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle2, [this]() mutable
-        {
-            //타이머에서 할 거
-            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-            ReqPlayCommVoice(14, allPC);
-            
-        }, 3.f, false);
-    }, 3.f, false);    
 }
 
 
@@ -270,6 +253,14 @@ void AJ_ObjectiveFormationFlight::OnCheckCapsuleBeginOverlap(
         ObjectiveEnd(true);
 }
 
+void AJ_ObjectiveFormationFlight::ReqEndVoice()
+{
+    // 모든 pc
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    // 보이스 재생 요청
+    ReqPlayCommVoice(EMissionProcess::FORMATION_FLIGHT_END, allPC);
+}
+
 
 
 #pragma endregion
@@ -332,3 +323,4 @@ void AJ_ObjectiveFormationFlight::SendEndSuccessData()
 {
     this->SetSuccessPercent(formationTime / progressTime);
 }
+

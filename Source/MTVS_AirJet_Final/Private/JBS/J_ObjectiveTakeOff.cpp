@@ -60,8 +60,8 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
 
     StartNewObjUI();
 
-    // XXX ai 시동 마지막에서 하는중
-    // ReqPlayCommVoice(10, allPC);
+    // 시작 보이스 재생
+    ReqPlayCommVoice(EMissionProcess::THROTTLE_START, allPC);
 }
 
 void AJ_ObjectiveTakeOff::SetPosition(class AK_CesiumTeleportBox *tpBox)
@@ -149,6 +149,11 @@ void AJ_ObjectiveTakeOff::CalcSuccessPercent()
 void AJ_ObjectiveTakeOff::ObjectiveEnd(bool isSuccess)
 {
     Super::ObjectiveEnd(isSuccess);
+
+    // 종료 보이스 재생
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    ReqPlayCommVoice(EMissionProcess::TAKE_OFF_END, allPC);
+
 
     // 타이머 핸들 해제
     GetWorld()->GetTimerManager().ClearTimer(checkTimeHandle);

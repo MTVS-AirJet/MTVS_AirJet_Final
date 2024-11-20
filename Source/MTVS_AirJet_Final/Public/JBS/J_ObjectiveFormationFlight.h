@@ -99,6 +99,10 @@ protected:
 	// 목표 종료시 수행도 반환
 	UFUNCTION(BlueprintCallable)
 	virtual void SendEndSuccessData();
+
+	// 목표 종료시 종료 보이스 재생 요청
+	UFUNCTION(BlueprintCallable)
+	virtual void ReqEndVoice();
 #pragma endregion
 
 #pragma region 목표 UI 적용 단

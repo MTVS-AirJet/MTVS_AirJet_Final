@@ -144,8 +144,12 @@ protected:
 	virtual void EndSubObjUI(class AJ_MissionPlayerController* pc, int idx = 0, bool isSuccess = true);
 #pragma endregion
 	// 배열내 pc 전부에게 해당 idx ai 지휘관 보이스 재생 요청
+	virtual void ReqPlayCommVoice(const EMissionProcess& type, const TArray<class AJ_MissionPlayerController *> &pcs);
+
 	UFUNCTION(BlueprintCallable)
 	virtual void ReqPlayCommVoice(int idx, const TArray<class AJ_MissionPlayerController*>& pcs);
+
+
 	// XXX 배열내 pc 전부에게 해당 idx 배열 순차적으로 보이스 재생 요청 | 너무 복잡할듯?
 	UFUNCTION(BlueprintCallable)
 	virtual void ReqPlayCommVoiceAry(TArray<int> idxAry, const TArray<class AJ_MissionPlayerController *> &pcs);

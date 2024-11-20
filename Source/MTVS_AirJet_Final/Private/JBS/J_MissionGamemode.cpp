@@ -191,6 +191,8 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
         auto* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
         pc->SpawnMyPlayer();
 
+        // 미션 보이스 로드 하라고 요청
+        pc->CRPC_ReqMissionVoiceData();
         
         // 호스트 시작 버튼에 미션 시작 함수 딜리게이트
         // @@ 나중엔 챕터 UI 시작으로 변경
@@ -221,6 +223,16 @@ FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_Miss
 
 void AJ_MissionGamemode::StartMissionLevel()
 {
+    // FIXME 챕터 UI 활성화할때 재생으로 옮겨야함
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::MISSION_START));
+    }
+    
+
     // 시동 목표 시작
     objectiveManagerComp->StartDefualtObj();
 }
@@ -442,13 +454,10 @@ void AJ_MissionGamemode::StartTacticalOrder()
         // 미션 영역 변경
         cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
         cesiumTPBox->MRPC_ChangeMissionArea();
-        //@@ 비활성화
+        //텔포박스 비활성화
         auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
         if(boxComp)
-        {
             boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
-        }
-        
 
         //타이머에서 할 거
         TeleportAllStartPoint(startPointActor);
@@ -458,10 +467,17 @@ void AJ_MissionGamemode::StartTacticalOrder()
         .SetTimer(timerHandle, [this]() mutable
         {
             //타이머에서 할 거
+            // 이륙 성공 보이스 재생
+            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+            for(auto* pc : allPC)
+            {
+                if(!pc) continue;
+                pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
+            }
+            
             // 미션 시작
-            // @@ 임시로 시작 늦게 | 시작 anim 보여주고 싶음 | 나중엔 로딩 뽕맛 보여줘야지
             this->objectiveManagerComp->ActiveNextObjective();
             
         }, 1.5, false);
-    }, 1.5f, false);
+    }, 3.0f, false);
 }

@@ -41,6 +41,10 @@ protected:
 	// 로딩 ui 제거 햇음
 	bool wasRemovedUI = false;
 
+	// 미션 보이스 데이터 맵
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TMap<int, class USoundWaveProcedural*> missionVoiceMap;
+
 public:
 	// 목표 UI 관리 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
@@ -74,7 +78,7 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 
-    public:
+public:
 	virtual void Tick(float deltaTime);
 
 	UFUNCTION(BlueprintCallable)
@@ -119,9 +123,21 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice3(int idx);
 
-        // 보이스 라인 재생
+	// 보이스 라인 재생
 	UFUNCTION(BlueprintCallable)
 	void PlayCommanderVoice3(const FCommanderVoiceRes &resData);
+
+	// 보이스 받아서 재생
+	UFUNCTION(BlueprintCallable)
+	void PlayAIVoice(class USoundWaveProcedural *sound);
+
+        // 미션 보이스 데이터 요청
+	UFUNCTION(Client, Unreliable)
+        void CRPC_ReqMissionVoiceData();
+
+        // 보이스 데이터 받아서 맵에 저장
+	UFUNCTION(BlueprintCallable)
+	void ResMissionVoiceData(const FAllVoiceRes &resData);
 
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")
