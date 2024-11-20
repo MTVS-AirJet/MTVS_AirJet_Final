@@ -3,7 +3,6 @@
 #pragma once
 
 #include <queue>
-#include <queue>
 
 #include "CoreMinimal.h"
 #include "JBS/J_BaseMissionPawn.h"
@@ -46,14 +45,32 @@ private:
 	UFUNCTION()
 	void PrintNetLog();
 	
-public: // Component
+public:
+#pragma region One Depth Component
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetRoot;
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class USkeletalMeshComponent* JetMesh;
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UArrowComponent* JetArrow;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UArrowComponent* JetFlareArrow3;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class UArrowComponent* JetFlareArrow2;
+#pragma endregion
 
+#pragma region Camera
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class USpringArmComponent* JetSprintArm;
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
+	class UCameraComponent* JetCamera;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class USpringArmComponent* JetSprintArmFPS;
+	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
+	class UCameraComponent* JetCameraFPS;
+#pragma endregion
+
+#pragma region Prop
 	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UBoxComponent* JetFirstEngine;
 	UPROPERTY(EditdefaultsOnly , Category="Components", BlueprintReadOnly)
@@ -84,8 +101,10 @@ public: // Component
 	class UStaticMeshComponent* JetRightPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadOnly)
 	class UStaticMeshComponent* JetJFSPannel;
-
+#pragma endregion
+	
 private:
+#pragma region Widget & Effect
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
 	
@@ -97,16 +116,7 @@ private:
 	class UNiagaraComponent* JetTailVFXLeft;
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* JetTailVFXRight;
-public:
-	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class USpringArmComponent* JetSprintArm;
-	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
-	class UCameraComponent* JetCamera;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class USpringArmComponent* JetSprintArmFPS;
-	UPROPERTY(EditDefaultsOnly , Category="Components", BlueprintReadWrite)
-	class UCameraComponent* JetCameraFPS;
-private:
+
 	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UPostProcessComponent* JetPostProcess;
 
@@ -124,13 +134,10 @@ private:
 	class UNiagaraSystem* DistroyVFX;
 	UPROPERTY(EditDefaultsOnly , category="Defalut|VFX")
 	class UStaticMeshComponent* AirResistanceVFX;
+#pragma endregion
+	
 public:
-	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class UArrowComponent* JetFlareArrow3;
-	UPROPERTY(EditDefaultsOnly , Category="Components")
-	class UArrowComponent* JetFlareArrow2;
-
-public:
+#pragma region Clicked Event
 	UFUNCTION(BlueprintCallable)
 	void OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION(BlueprintCallable)
@@ -155,8 +162,9 @@ public:
 	void OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
 	UFUNCTION(BlueprintCallable)
 	void OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed);
+#pragma endregion
 
-public: // Input
+#pragma region Input Action
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
 	class UInputMappingContext* IMC_Viper;
 	UPROPERTY(EditDefaultsOnly , Category="Inputs")
@@ -230,7 +238,7 @@ public: // Input
 	void F_ViperMoveTrigger(const struct FInputActionValue& value);
 	UFUNCTION()
 	void F_ViperMoveCompleted(const struct FInputActionValue& value);
-
+#pragma endregion
 private:
 	UPROPERTY(EditDefaultsOnly)
 	FRotator TargetArmRotation = FRotator(-10, 0, 0);
@@ -339,8 +347,10 @@ private:
 	class AL_Target* TargetActor;
 	
 private:
-	UFUNCTION()
-	void IsLockOn();
+	bool bLockOnStart;
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_LockOnStart();
 
 	float Diametr = 30.f;
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
@@ -420,6 +430,7 @@ private:
 	float ZoomOutValue = 140;
 
 public:
+#pragma region Prop Collision
 	void CreateDumyComp();
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
@@ -471,11 +482,11 @@ public:
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
 	bool bThrottleBreak;
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
-	FVector ThrottleOffLoc = FVector(515 , -35 , 255);
+	FVector ThrottleOffLoc = FVector(515 , -35 , 250);
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
-	FVector ThrottleMilLoc = FVector(525 , -35 , 255);
+	FVector ThrottleMilLoc = FVector(520 , -35 , 250);
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)
-	FVector ThrottleMaxLoc = FVector(530 , -35 , 255);
+	FVector ThrottleMaxLoc = FVector(530 , -35 , 250);
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
 	float ThrottleMoveSpeed1 = .1f;
 	UPROPERTY(EditDefaultsOnly , Category="ThrottleSpeed", BlueprintReadOnly)
@@ -487,6 +498,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bBreakHold;
 	bool IsFirstBreakHoldClick;
+#pragma endregion
 	
 private:
 	//==================================
@@ -513,10 +525,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BackMoveCanopyHandle();
 private:
-	FVector CanopyOpenLoc = FVector(492 , 37 , 274);
-	FVector CanopyNormalLoc = FVector(497, 37 , 274);
-	FVector CanopyCloseLoc = FVector(502 ,37, 274);
-	FVector CanopyHoldLoc = FVector(507 , 37, 274);
+	FVector CanopyOpenLoc = FVector(-35 , 0 , 5);
+	FVector CanopyNormalLoc = FVector(-30 , 0 , 5);
+	FVector CanopyCloseLoc = FVector(-25 , 0 , 5);
+	FVector CanopyHoldLoc = FVector(-20 , 0 , 5);
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
@@ -755,7 +767,6 @@ private:
 	bool bCanopyOpenSound;
 
 public:
-	// TODO:  StartMissionViper_Del을 추가한 목적이 기억이 안나서 범서한테 물어봐야함
 	// 미션 시작 시 사용할 델리게이트
 	bool bStartMission;
 	FStartMissionViper StartMissionViper_Del;
