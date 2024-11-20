@@ -13,7 +13,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/WidgetComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "JBS/J_MissionPlayerController.h"
@@ -23,12 +22,12 @@
 #include "LHJ/L_HUDWidget.h"
 #include "LHJ/L_Missile.h"
 #include "LHJ/L_RoadTrigger.h"
-#include "LHJ/L_WaitingForStart.h"
 #include "Net/UnrealNetwork.h"
 #include "KHS/K_GameInstance.h"
 #include "KHS/K_GameState.h"
 #include "KHS/K_StandbyWidget.h"
 #include "GameFramework/PlayerState.h"
+#include "JBS/J_GroundTarget.h"
 #include "LHJ/L_Target.h"
 
 FKey lMouse = EKeys::LeftMouseButton;
@@ -180,9 +179,26 @@ AL_Viper::AL_Viper()
 
 	JetAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAudio"));
 	JetAudio->SetupAttachment(RootComponent);
+	JetAudio->SetRelativeLocation(FVector(0 , 0 , 245));
 
 	JetCanopyAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetCanopyAudio"));
 	JetCanopyAudio->SetupAttachment(RootComponent);
+
+	JetMICAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetMICAudio"));
+	JetMICAudio->SetupAttachment(RootComponent);
+	JetMICAudio->SetRelativeLocation(FVector(0 , 0 , 245));
+
+	JetEngineAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetEngineAudio"));
+	JetEngineAudio->SetupAttachment(RootComponent);
+	JetEngineAudio->SetRelativeLocation(FVector(0 , 0 , 245));
+
+	JetAirAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetAirAudio"));
+	JetAirAudio->SetupAttachment(RootComponent);
+	JetAirAudio->SetRelativeLocation(FVector(0 , 0 , 245));
+
+	JetMissileAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("JetMissileAudio"));
+	JetMissileAudio->SetupAttachment(RootComponent);
+	JetMissileAudio->SetRelativeLocation(FVector(0 , 0 , 50));
 
 	//============================================
 	MissileMoveLoc = CreateDefaultSubobject<USceneComponent>(TEXT("MissileMoveLoc"));
@@ -234,13 +250,13 @@ void AL_Viper::CreateDumyComp()
 {
 #pragma region MIC
 	DummyMICMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyMICMesh"));
-	DummyMICMesh->SetRelativeLocationAndRotation(FVector(503.5,-45,250) , FRotator(30 , 0 , 0));
+	DummyMICMesh->SetRelativeLocationAndRotation(FVector(503.5 , -45 , 250) , FRotator(30 , 0 , 0));
 	DummyMICMesh->SetupAttachment(JetMesh);
 	DummyMICMesh->SetRelativeScale3D(FVector(3));
 
 	JetMic = CreateDefaultSubobject<UBoxComponent>(TEXT("JetMic"));
 	JetMic->SetupAttachment(DummyMICMesh);
-	JetMic->SetRelativeLocation(FVector(0,0,.8));
+	JetMic->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetMic->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetMic->SetGenerateOverlapEvents(true);
 	JetMic->OnClicked.AddDynamic(this , &AL_Viper::OnMyMicClicked);
@@ -255,19 +271,19 @@ void AL_Viper::CreateDumyComp()
 	JetEngineGen = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen"));
 	JetEngineGen->SetupAttachment(DummyEngineGenerMesh1);
 	JetEngineGen->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineGen->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineGen->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineGen->SetGenerateOverlapEvents(true);
 	JetEngineGen->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen1Clicked);
-	
+
 	DummyEngineGenerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineGenMesh2"));
 	DummyEngineGenerMesh2->SetupAttachment(JetMesh);
 	DummyEngineGenerMesh2->SetRelativeScale3D(FVector(3));
 	DummyEngineGenerMesh2->SetRelativeLocationAndRotation(FVector(524 , 34 , 250) , FRotator(30 , 0 , 0));
-	
+
 	JetEngineGen2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineGen2"));
 	JetEngineGen2->SetupAttachment(DummyEngineGenerMesh2);
 	JetEngineGen2->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineGen2->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineGen2->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineGen2->SetGenerateOverlapEvents(true);
 	JetEngineGen2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineGen2Clicked);
 #pragma endregion
@@ -281,10 +297,10 @@ void AL_Viper::CreateDumyComp()
 	JetEngineControl = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl"));
 	JetEngineControl->SetupAttachment(DummyEngineControlMesh1);
 	JetEngineControl->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineControl->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineControl->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineControl->SetGenerateOverlapEvents(true);
 	JetEngineControl->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControlClicked);
-	
+
 	DummyEngineControlMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineControlMesh2"));
 	DummyEngineControlMesh2->SetupAttachment(JetMesh);
 	DummyEngineControlMesh2->SetRelativeLocationAndRotation(FVector(524 , 38.5 , 250) , FRotator(30 , 0 , 0));
@@ -293,7 +309,7 @@ void AL_Viper::CreateDumyComp()
 	JetEngineControl2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineControl2"));
 	JetEngineControl2->SetupAttachment(DummyEngineControlMesh2);
 	JetEngineControl2->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineControl2->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineControl2->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineControl2->SetGenerateOverlapEvents(true);
 	JetEngineControl2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineControl2Clicked);
 #pragma endregion
@@ -307,7 +323,7 @@ void AL_Viper::CreateDumyComp()
 	JetFuelStarter = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFuelStarter"));
 	JetFuelStarter->SetupAttachment(DummyJFSMesh);
 	JetFuelStarter->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetFuelStarter->SetRelativeLocation(FVector(0,0,.8));
+	JetFuelStarter->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetFuelStarter->SetGenerateOverlapEvents(true);
 	JetFuelStarter->OnClicked.AddDynamic(this , &AL_Viper::OnMyJetFuelStarterClicked);
 #pragma endregion
@@ -321,10 +337,10 @@ void AL_Viper::CreateDumyComp()
 	JetEngineMaster = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster"));
 	JetEngineMaster->SetupAttachment(DummyEngineMasterMesh1);
 	JetEngineMaster->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineMaster->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineMaster->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineMaster->SetGenerateOverlapEvents(true);
 	JetEngineMaster->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster1Clicked);
-	
+
 	DummyEngineMasterMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyEngineMasterMesh2"));
 	DummyEngineMasterMesh2->SetupAttachment(JetMesh);
 	DummyEngineMasterMesh2->SetRelativeLocationAndRotation(FVector(518 , 38 , 250) , FRotator(30 , 0 , 0));
@@ -333,7 +349,7 @@ void AL_Viper::CreateDumyComp()
 	JetEngineMaster2 = CreateDefaultSubobject<UBoxComponent>(TEXT("JetEngineMaster2"));
 	JetEngineMaster2->SetupAttachment(DummyEngineMasterMesh2);
 	JetEngineMaster2->SetBoxExtent(FVector(.2 , .15 , .8));
-	JetEngineMaster2->SetRelativeLocation(FVector(0,0,.8));
+	JetEngineMaster2->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetEngineMaster2->SetGenerateOverlapEvents(true);
 	JetEngineMaster2->OnClicked.AddDynamic(this , &AL_Viper::OnMyEngineMaster2Clicked);
 #pragma endregion
@@ -357,7 +373,7 @@ void AL_Viper::CreateDumyComp()
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetMesh);
 	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
-	DummyThrottleMesh->SetRelativeLocation(FVector(515, -35, 250));
+	DummyThrottleMesh->SetRelativeLocation(FVector(515 , -35 , 250));
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(DummyThrottleMesh);
@@ -385,10 +401,10 @@ void AL_Viper::CreateDumyComp()
 	DummyJFSBreakHold->SetupAttachment(JetMesh);
 	DummyJFSBreakHold->SetRelativeLocationAndRotation(FVector(551 , 42 , 259.5) , FRotator(120 , 0 , 0));
 	DummyJFSBreakHold->SetRelativeScale3D(FVector(3));
-	
+
 	JetBreakHold = CreateDefaultSubobject<UBoxComponent>(TEXT("JetBreakHold"));
 	JetBreakHold->SetupAttachment(DummyJFSBreakHold);
-	JetBreakHold->SetRelativeLocation(FVector(0,0,.8));
+	JetBreakHold->SetRelativeLocation(FVector(0 , 0 , .8));
 	JetBreakHold->SetBoxExtent(FVector(.2 , .15 , .8));
 	JetBreakHold->SetGenerateOverlapEvents(true);
 	JetBreakHold->OnClicked.AddDynamic(this , &AL_Viper::OnMyBreakHoldClicked);
@@ -433,11 +449,11 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 		if (RT->TriggerIdx == 0)
 		{
 			intTriggerNum = 1;
-			if(IsLocallyControlled())
+			if (IsLocallyControlled())
 			{
 				if (auto pc = Cast<AK_PlayerController>(Controller))
 				{
-					pc->CRPC_SetMissionTextUI(20);					
+					pc->CRPC_SetMissionTextUI(20);
 				}
 			}
 		}
@@ -445,13 +461,14 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 		{
 			intTriggerNum = 2;
 			IsFlyStart = true;
-			if(IsLocallyControlled())
+			if (IsLocallyControlled())
 			{
 				if (auto pc = Cast<AK_PlayerController>(Controller))
 				{
-					pc->CRPC_SetMissionTextUI(21);					
+					pc->CRPC_SetMissionTextUI(21);
 				}
 			}
+			CRPC_AudioControl(false);
 		}
 	}
 }
@@ -548,8 +565,9 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 	{
 		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 		auto per = SizeValue * 25 / 100;
-		DummyThrottleMesh->SetRelativeLocation(FVector(ThrottleOffLoc.X + per , DummyThrottleMesh->GetRelativeLocation().Y ,
-		                                            DummyThrottleMesh->GetRelativeLocation().Z));
+		DummyThrottleMesh->SetRelativeLocation(FVector(ThrottleOffLoc.X + per ,
+		                                               DummyThrottleMesh->GetRelativeLocation().Y ,
+		                                               DummyThrottleMesh->GetRelativeLocation().Z));
 		AccelGear = 1;
 		bFirstEngine = true;
 	}
@@ -562,11 +580,13 @@ void AL_Viper::OnMyMicClicked(UPrimitiveComponent* TouchedComponent , FKey Butto
 	{
 		bMIC = true;
 		DummyMICMesh->SetRelativeRotation(FRotator(-30 , 0 , 0));
+		CRPC_MICAudioControl(true);
 	}
 	else
 	{
 		bMIC = false;
 		DummyMICMesh->SetRelativeRotation(FRotator(30 , 0 , 0));
+		CRPC_MICAudioControl(false);
 	}
 }
 
@@ -687,10 +707,11 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 		{
 			DummyJFSHandleMesh->AddRelativeLocation(FVector(1 , 0 , 0));
 		} , 1.f , false);
+		CRPC_EngineSound(true , 0);
 	}
 	else
 	{
-		bJFSHandle = false;
+		//bJFSHandle = false;
 		DummyJFSHandleMesh->AddRelativeLocation(FVector(-1 , 0 , 0));
 		FTimerHandle timerHandle;
 		GetWorld()->GetTimerManager().SetTimer(timerHandle , [&]()
@@ -734,11 +755,12 @@ void AL_Viper::OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , stru
 		{
 			if (auto pc = Cast<AK_PlayerController>(Controller))
 			{
-				pc->CRPC_SetMissionTextUI(19);					
+				pc->CRPC_SetMissionTextUI(17);
 			}
-			//IsFirstBreakHoldClick = true;
+			IsFirstBreakHoldClick = true;
+			bStartAudio = true;
 		}
-		
+
 		bBreakHold = true;
 		DummyJFSBreakHold->SetRelativeRotation(FRotator(90 , 0 , 0));
 	}
@@ -846,12 +868,13 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 			StartMissionViper_Del.Broadcast();
 			bStartMission = true;
 
-			if(IsLocallyControlled())
+			if (IsLocallyControlled())
 			{
 				if (auto pc = Cast<AK_PlayerController>(Controller))
 				{
-					pc->CRPC_SetMissionTextUI(6);					
+					pc->CRPC_SetMissionTextUI(6);
 				}
+				CRPC_AudioControl(true , 0);
 			}
 		}
 
@@ -866,7 +889,7 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 				if (attnuation->Attenuation.bAttenuate)
 					attnuation->Attenuation.bAttenuate = false;
 			}
-		}		
+		}
 	}
 }
 
@@ -1045,6 +1068,13 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
+	if (bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
+			CRPC_AirSound(true);
+		else
+			CRPC_AirSound(false);
+	}
 #pragma endregion
 }
 
@@ -1060,6 +1090,7 @@ void AL_Viper::BeginPlay()
 
 	CRPC_CanopyAudioControl(false);
 	CRPC_AudioControl(false);
+	CRPC_AirSound(false);
 
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
@@ -1125,13 +1156,39 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region Canopy Open & Close
 	if (iCanopyNum == 2)
 	{
-		// 캐노피를 닫는다.
-		ServerRPC_Canopy(false);
+		if (CanopyPitch > 0)
+		{
+			if (!bPlayCanopyEndSound)
+				bPlayCanopyEndSound = true;
+			// 캐노피를 닫는다.
+			ServerRPC_Canopy(false);
+		}
+		else if (CanopyPitch == 0)
+		{
+			if(bPlayCanopyEndSound)
+			{
+				CRPC_CanopyAudioControl(true , 2);
+				bPlayCanopyEndSound = false;
+			}
+		}
 	}
 	else if (iCanopyNum == 0)
 	{
-		// 캐노피를 연다.
-		ServerRPC_Canopy(true);
+		if (CanopyPitch < 80)
+		{
+			if (!bPlayCanopyEndSound)
+				bPlayCanopyEndSound = true;
+			// 캐노피를 연다.
+			ServerRPC_Canopy(true);
+		}
+		else if (CanopyPitch == 80)
+		{
+			if(bPlayCanopyEndSound)
+			{
+				CRPC_CanopyAudioControl(true , 2);
+				bPlayCanopyEndSound = false;
+			}
+		}
 	}
 #pragma endregion
 
@@ -1139,7 +1196,7 @@ void AL_Viper::Tick(float DeltaTime)
 	if (JetAudio)
 	{
 		if (JetCameraFPS->IsActive())
-		{			
+		{
 			if (CanopyPitch == 0)
 			{
 				if (!JetAudio->bAllowSpatialization)
@@ -1308,11 +1365,11 @@ void AL_Viper::Tick(float DeltaTime)
 
 				if (bFirstEngine)
 				{
-					StartScenario.pop();
+					CRPC_EngineSound(true , 1);
 					engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_THROTTLE_IDLE);
 					DummyThrottleMesh->SetRenderCustomDepth(false);
 					DummyThrottleMesh->CustomDepthStencilValue = 0;
-					CRPC_AudioControl(true , 0);
+					StartScenario.pop();
 				}
 			}
 			else if (ScenarioFront.Equals("Canopy"))
@@ -1350,7 +1407,6 @@ void AL_Viper::Tick(float DeltaTime)
 						DummyCanopyMesh->SetRenderCustomDepth(false);
 						DummyCanopyMesh->CustomDepthStencilValue = 0;
 						StartScenario.pop();
-						CRPC_AudioControl(true , 0);
 						engineProgSuccessDel.Broadcast(EEngineProgress::CLOSE_CANOPY);
 					}
 				}
@@ -1393,6 +1449,19 @@ void AL_Viper::Tick(float DeltaTime)
 	else
 	{
 		CurrentTime += DeltaTime;
+
+		if (bStartAudio)
+		{
+			CurAudioTime+=DeltaTime;
+			if (CurAudioTime>=PlayAudioTime)
+			{
+				if (auto pc = Cast<AK_PlayerController>(Controller))
+				{
+					pc->CRPC_SetMissionTextUI(19);									
+				}
+				bStartAudio = false;
+			}
+		}
 
 		FRotator jetRot = JetArrow->GetRelativeRotation();
 
@@ -1492,7 +1561,38 @@ void AL_Viper::Tick(float DeltaTime)
 
 #pragma region Lock On
 		if (bLockOnStart && IsLocallyControlled())
+		{
+			if (!GroundTarget)
+			{
+				TArray<AActor*> ActorArray;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld() , AJ_GroundTarget::StaticClass() , ActorArray);
+				for (AActor* Actor : ActorArray)
+				{
+					AJ_GroundTarget* MissionActor = Cast<AJ_GroundTarget>(Actor);
+					if (MissionActor)
+					{
+						GroundTarget = MissionActor;
+					}
+				}
+			}		
+			
 			ClientRPCLockOn();
+			
+			if (GroundTarget)
+			{
+				//auto dist = FVector::Distance(GetActorLocation() , GroundTarget->GetActorLocation());
+				auto dist = FMath::Abs(GetActorLocation().X-GroundTarget->GetActorLocation().X);
+				LOG_SCREEN("%lf" , dist);
+				if (dist<=550000)
+				{
+					CRPC_MissilePitch(2.35f);
+				}
+				else
+				{
+					CRPC_MissilePitch(1.f);
+				}
+			}
+		}
 #pragma endregion
 
 #pragma region Flare Arrow Rotation Change
@@ -1840,6 +1940,12 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 
 void AL_Viper::ClientRPCLockOn_Implementation()
 {
+	if (!bStartLockOn)
+	{
+		CRPC_MissileSound(true);
+		bStartLockOn = true;
+	}
+	
 #pragma region Lock On
 	AActor* searchTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
@@ -1871,6 +1977,15 @@ void AL_Viper::ClientRPCLockOn_Implementation()
 	if ((LockOnTarget && !searchTarget) || (!LockOnTarget && searchTarget))
 	{
 		ServerRPCLockOn(searchTarget);
+
+		if (searchTarget)
+		{
+			CRPC_MissileSound(false);
+		}
+		else
+		{
+			CRPC_MissileSound(true);
+		}
 	}
 
 #pragma region Show Lock On UI
@@ -2266,6 +2381,91 @@ void AL_Viper::CRPC_PlaySwitchSound_Implementation(FVector SoundLoc)
 {
 	if (SwitchSound)
 		UGameplayStatics::PlaySoundAtLocation(this , SwitchSound , SoundLoc);
+}
+
+void AL_Viper::CRPC_MICAudioControl_Implementation(bool bStart)
+{
+	if (bStart)
+	{
+		if (JetMICAudio && JetMICAudio->GetSound())
+		{
+			JetMICAudio->SetIntParameter("JetSoundIdx" , 0);
+			JetMICAudio->Play(0.f);
+		}
+	}
+	else
+	{
+		if (JetMICAudio && JetMICAudio->GetSound())
+			JetMICAudio->Stop();
+	}
+}
+
+void AL_Viper::CRPC_EngineSound_Implementation(bool bStart , int32 idx)
+{
+	if (bStart)
+	{
+		if (JetEngineAudio && JetEngineAudio->GetSound())
+		{
+			JetEngineAudio->SetIntParameter("JetSoundIdx" , idx);
+			JetEngineAudio->Play(0.f);
+
+			if (idx==1)
+			{
+				FTimerHandle Thnd;
+				GetWorld()->GetTimerManager().SetTimer(Thnd, [&]()
+				{
+					JetEngineAudio->SetIntParameter("JetSoundIdx" , 2);
+	                JetEngineAudio->Play(0.f);
+				}, 5.f, false);
+			}
+		}
+	}
+	else
+	{
+		if (JetEngineAudio && JetEngineAudio->GetSound())
+			JetEngineAudio->Stop();
+	}
+}
+
+void AL_Viper::CRPC_AirSound_Implementation(bool bStart)
+{
+	if (bStart)
+	{
+		if (JetAirAudio&&JetAirAudio->GetSound())
+		{
+			JetAirAudio->Play(0.f);
+		}
+	}
+	else
+	{
+		if (JetAirAudio && JetAirAudio->GetSound())
+			JetAirAudio->Stop();
+	}
+}
+
+void AL_Viper::CRPC_MissileSound_Implementation(bool bStart)
+{
+	if (bStart)
+	{
+		if (JetMissileAudio&&JetMissileAudio->GetSound())
+		{
+			JetMissileAudio->SetIntParameter("MissileIdx" , 2);
+			JetMissileAudio->Play(0.f);
+		}
+	}
+	else
+	{
+		if (JetMissileAudio && JetMissileAudio->GetSound())
+			JetMissileAudio->Stop();
+	}
+}
+
+void AL_Viper::CRPC_MissilePitch_Implementation(const float& Pitch)
+{
+	if (JetMissileAudio)
+	{
+		JetMissileAudio->SetPitchMultiplier(Pitch);
+	}
 }
 #pragma endregion
 
@@ -2684,6 +2884,13 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
+	if (bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
+			CRPC_AirSound(true);
+		else
+			CRPC_AirSound(false);		
+	}
 #pragma endregion
 }
 #pragma endregion
@@ -2720,6 +2927,13 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
+	if (bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
+			CRPC_AirSound(true);
+		else
+			CRPC_AirSound(false);
+	}	
 #pragma endregion
 }
 #pragma endregion
@@ -2728,5 +2942,14 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 void AL_Viper::SetEngineOn()
 {
 	IsEngineOn = true;
+	bStartLockOn = false;
+	bLockOnStart = true;
 }
 #pragma endregion
+
+void AL_Viper::CRPC_TeleportSetting_Implementation()
+{
+	bJetTailVFXOn = true;
+	bJetAirVFXOn = true;
+	IsEngineOn = false;
+}
