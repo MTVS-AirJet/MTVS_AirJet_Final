@@ -767,7 +767,7 @@ private:
 	bool bCanopyOpenSound;
 
 public:
-	// 미션 시작 시 사용할 델리게이트
+	// 미션 시작 시 사용할 델리게이트 | 6번 나레이션 실행에 쓰임
 	bool bStartMission;
 	FStartMissionViper StartMissionViper_Del;
 

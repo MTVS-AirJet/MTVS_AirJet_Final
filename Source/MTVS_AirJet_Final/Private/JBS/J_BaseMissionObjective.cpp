@@ -315,8 +315,13 @@ void AJ_BaseMissionObjective::UpdateObjUI()
 bool AJ_BaseMissionObjective::CheckSendSameData(class AJ_MissionPlayerController* pc, const FTacticalOrderData& uiData)
 {	
 	// 동일 ui 체크
-	if(!prevObjUIDataMap.Contains(pc)) return false;
-	if(uiData != prevObjUIDataMap[pc]) return false;
+	if(!pc) return false;
+	// 맵에 있으면서 동일하면 방지
+	if(prevObjUIDataMap.Contains(pc))
+	{
+		const auto& prevData = prevObjUIDataMap[pc];
+		if(uiData == prevData) return false;
+	}
 
 	// objui데이터 맵에 저장
 	prevObjUIDataMap.Add(pc, uiData);

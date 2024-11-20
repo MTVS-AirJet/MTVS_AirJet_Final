@@ -31,7 +31,7 @@ void UJ_ObjectiveUI::SetObjUI(FTextUIData data, bool isInit)
     objectiveTextUI->SetTextUI(data, isInit);
 
     // 상세 ui 설정
-    
+    detailTextUI->SetDetailUI(data.detailImgIdx);
 }
 
 void UJ_ObjectiveUI::SetObjUI(TArray<FTextUIData>& data, bool isInit)

@@ -13,6 +13,7 @@
 #include "UObject/Class.h"
 #include "JBS/J_ObjectiveTextUI.h"
 #include "JBS/J_MissionCompleteUI.h"
+#include "JBS/J_DetailUI.h"
 
 
 // Sets default values for this component's properties
@@ -205,7 +206,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUINeut_Implementation(const FNeutralizeTa
 }
 
 
-
+// XXX 현재 미사용
 void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderData& orderData, bool isInit)
 {
 	TArray<FTextUIData> textUIData;
@@ -332,8 +333,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 
 	// 나의 역할 : %s
 	FDefaultTextUIData roleData;
-	FString roleStr = data.pilotRole == EPilotRole::WING_COMMANDER ? TEXT("편대장") : TEXT("좌측 윙맨");
-	FRichString formRoleStr(FString::Printf(TEXT("나의 역할 : %s"), *roleStr), ETextStyle::DEFAULT);
+	FRichString formRoleStr(FString::Printf(TEXT("나의 역할 : %s"), *data.ToStringPilotRolt()), ETextStyle::DEFAULT);
 
 	roleData.headerText = formRoleStr.GetFormatString();
 
@@ -412,12 +412,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	if(isInit)
 	{
 		// 상세 단
-		detailUIData.headerText = FRichString(TEXT("임시 편대 상세 텍스트")).GetFormatString();
-		detailUIData.bodyTextAry = {
-			FRichString(TEXT("임시 상세 1")).GetFormatString()
-			,FRichString(TEXT("doremi 상세 2")).GetFormatString()
-			,FRichString(TEXT("임시 상세 3")).GetFormatString()
-		};
+		objUIData.detailImgIdx = static_cast<int>(EMissionProcess::FORMATION_FLIGHT_START);
 	}
 
 
@@ -488,17 +483,11 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 	objUIData.bodyObjAry.Add(neutTarget);
 
 
-	// objUIData.bodyTextAry.Add(FRichString(FString::Printf(TEXT("남은 지상 목표 %d/%d"), data.curTargetAmt, data.allTargetAmt)));
-
-	// // 상세 단
-	// if(isInit)
-	// {
-	// 	detailUIData.headerText = FRichString(TEXT("임시 지대공 상세 텍스트"));
-	// 	detailUIData.bodyTextAry = {
-	// 		FRichString(TEXT("임시 상세 1"))
-	// 		,FRichString(TEXT("doremi 상세 2"))
-	// 	};
-	// }
+	if(isInit)
+	{
+		// 상세단
+		objUIData.detailImgIdx = static_cast<int>(EMissionProcess::NEUT_TARGET_START);
+	}
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
@@ -533,6 +522,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 		FDefaultTextUIData subObj;
 		subObj.headerText = FRichString(data.ToStringProgressEnum(type), style).GetFormatString();
 		// @@ 좀 효율적으로 바꿀 필요 있음
+		// 엑셀 시트에서 불러오면 좋겠다
 		FString textStr = "";
 		switch (type) {
 			case EEngineProgress::None:
@@ -580,14 +570,8 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 	}
 
 	// 상세 단
-	if(isInit)
-	{
-		detailUIData.headerText = FRichString(TEXT("임시 시동 절차 상세 텍스트")).GetFormatString();
-		detailUIData.bodyTextAry = {
-			FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10))).GetFormatString()
-			,FRichString(FString::Printf(TEXT("임시 텍스트 %d"), FMath::RandRange(1, 10))).GetFormatString()
-		};
-	}
+	// 시동 절차 -> 미션 진행 인덱스로 변환해서 보내기
+	objUIData.detailImgIdx = UJ_Utility::ConvertEngineProgressToMissionProcessIdx(data.curProgress);
 
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
@@ -611,7 +595,17 @@ void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIDa
 
 	objUIData.bodyObjAry.Add(subObj);
 
+	// 최초 설정
+	if(isInit)
+	{
+		objUIData.detailImgIdx = static_cast<int>(EMissionProcess::THROTTLE_START);
+	}
+
 	outData = TArray<FTextUIData> { objUIData , detailUIData};
 }
 
-
+void UJ_ObjectiveUIComp::CRPC_DirectSetDetailImg_Implementation(const EMissionProcess &type)
+{
+	// 직통으로 이미지 설정
+	OBJ_UI->DETAIL_TEXT_UI->SetDetailUI(type);
+}

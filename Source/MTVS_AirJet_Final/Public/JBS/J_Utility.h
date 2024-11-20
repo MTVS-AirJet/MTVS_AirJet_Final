@@ -561,8 +561,8 @@ UENUM(BlueprintType)
 enum class EPilotRole : uint8
 {
     WING_COMMANDER = 0
-    ,LEFT_WINGER = 1
-    ,RIGHT_WINGER = 2
+    ,RIGHT_WINGER = 1
+    ,LEFT_WINGER = 2
     ,None = 3
 };
 
@@ -621,6 +621,10 @@ public:
     // 복잡한 구조용
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     TArray<FDefaultTextUIData> bodyObjAry;
+
+    // 상세 ui 용 인덱스
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int detailImgIdx = 0;
 };
 
 
@@ -668,6 +672,8 @@ public:
     {
         return !(*this == Other); // == 연산자를 재사용
     }
+
+    FString ToStringPilotRolt() const;
 };
 
 // 2. 목표 무력화
@@ -893,6 +899,42 @@ public:
 
 #pragma endregion
 
+UENUM(BlueprintType)
+enum class EMissionProcess : uint8
+{
+    NONE = 0
+    // 시작 직후
+    ,MISSION_START = 2
+    // 시동
+    ,MIC_SWITCH_ON = 7
+    ,ENGINE_GEN_SWITCH_ON = 8
+    ,ENGINE_CONTROL_SWITCH_ON = 9
+    ,ENGINE_MASTER_SWITCH_ON = 10
+    ,JFS_STARTER_SWITCH_ON = 11
+    ,JFS_HANDLE_PULL = 12
+    ,ENGINE_THROTTLE_IDLE = 13
+    ,CLOSE_CANOPY = 14
+    ,STANDBY_OTHER_PLAYER = 16
+    ,RELEASE_SIDE_BREAK = 17
+    // 이륙
+    ,THROTTLE_START = 18
+    ,TAKE_OFF = 21
+    ,TAKE_OFF_END = 22
+    // 편대 비행
+    ,FLIGHT_START = 23
+    ,FORMATION_FLIGHT_START = 24
+    ,FORMATION_FLIGHT_END = 27
+    // 공대지
+    ,NEUT_TARGET_START = 28
+    ,NEUT_TARGET_2_END = 29
+    ,NEUT_TARGET_3_START = 30
+    ,NEUT_TARGET_3_END = 32
+    ,LOCK_ON = 33
+    ,MISSILE_LAUNCH = 34
+    ,NEUT_TARGET_END = 36
+    ,MISSION_END = 255
+};
+
 // solved 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
@@ -973,6 +1015,10 @@ public:
 
     // 디버그용 printf && log 찍기
     static void PrintFullLog(const FString &str, const float &time = 3.f, const FColor &color = FColor::Green);
+
+    // 시동 절차 공동 idx로 변환
+    static int ConvertEngineProgressToMissionProcessIdx(const EEngineProgress& value);
+
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1000000.f;
     // 기본 목표 지점 고도

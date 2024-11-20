@@ -333,12 +333,23 @@ void AJ_ObjectiveNeutralizeTarget::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 
 void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
 {
+    // @@ 과녁 visible 하도록
+
     // icon 활성화
     iconWorldUIComp->SetVisible(true);
     // voice 재생
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
     ReqPlayCommVoice(22, allPC);
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        // @@ 모든 전투기 락온 가능하게 변경
+
+        // 과녁 시작 이미지로 변경
+        pc->objUIComp->CRPC_DirectSetDetailImg(EMissionProcess::LOCK_ON);
+    }
 }
 
 #pragma endregion

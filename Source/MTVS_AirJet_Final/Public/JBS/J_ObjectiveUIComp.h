@@ -29,6 +29,17 @@ protected:
 	// 목표 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI")
 	class UJ_ObjectiveUI* objUI;
+		public:
+	__declspec(property(get = GetObjUI, put = SetObjUI)) class UJ_ObjectiveUI* OBJ_UI;
+	class UJ_ObjectiveUI* GetObjUI()
+	{
+		return objUI;
+	}
+	void SetObjUI(class UJ_ObjectiveUI* value)
+	{
+		objUI = value;
+	}
+		protected:
 
 	// 목표 UI 프리팹
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
@@ -54,7 +65,7 @@ public:
 	UFUNCTION(Client, Unreliable)
     void CRPC_StartObjUI(const FTacticalOrderData& orderData);
 
-    // 목표 UI 갱신
+    //XXX 목표 UI 갱신
 	UFUNCTION(Client, Unreliable)
     void CRPC_UpdateObjUI(const FTacticalOrderData& orderData, bool isInit = false);
 
@@ -93,18 +104,6 @@ public:
         // UFUNCTION(Client, Unreliable)
 	// void CRPC_UpdateObjUI(const FFormationFlightUIData& orderData, bool isInit = false) {}
 
-
-
-
-
-
-
-
-
-
-
-
-
 	// 서브 조건 완료 처리
 	UFUNCTION(Client, Reliable)
     void CRPC_EndSubObjUI(int idx = 0, bool isSuccess = true);
@@ -112,7 +111,11 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_EndObjUI(bool isSuccess = true);
 
-	// 미션 결산 화면 전환 UI
+	// 설명 이미지 직접 변경
+	UFUNCTION(Client, Unreliable)
+	void CRPC_DirectSetDetailImg(const EMissionProcess &type);
+
+        // 미션 결산 화면 전환 UI
 	UFUNCTION(Client, Reliable)
 	void CRPC_SwitchResultUI(const TArray<FObjectiveData>& resultObjData);
 

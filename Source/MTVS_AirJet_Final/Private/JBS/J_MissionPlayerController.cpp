@@ -64,38 +64,51 @@ void AJ_MissionPlayerController::Tick(float deltaTime)
     // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("this -> %s"), *UEnum::GetValueAsString(this->pilotRole)));
 }
 
+/*
+
+*/
+
 // 미션 게임모드에서 역할 설정 후 실행됨.
 void AJ_MissionPlayerController::SpawnMyPlayer()
 {
-    // solved gi에서 내 역할을 가져오고
-    // 해당 역할에 맞는 플레이어 생성 후 포제스
-    // if(this->IsLocalController())
+    // 플레이어 역할 설정 | 무조건 파일럿, 예전의 잔재
+    auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+    playerRole = gi->PLAYER_ROLE;
+
+    // 플레이어 생성
+    auto prefab = gi->GetMissionPlayerPrefab();
+
+    // 자기 역할에 맞는 스폰 위치 가져오기
+    auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
+    FTransform spawnTR = gm->GetPlayerSpawnTransfrom(playerRole, this);
+
+    // 항상 생성
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    auto* player = GetWorld()->SpawnActor<AJ_BaseMissionPawn>(prefab, spawnTR, SpawnParams);
+    if(!player) return;
+    
+    // 포제스
+    this->Possess(player);
+
+    // 지휘관은 커서 보이게 처리
+    switch (playerRole)
     {
-        auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
-        check(gi);
-        playerRole = gi->PLAYER_ROLE;
-
-        // 플레이어 생성
-        auto prefab = gi->GetMissionPlayerPrefab();
-        SRPC_SpawnMyPlayer(prefab);
-
-        // 지휘관은 커서 보이게 처리
-        switch (playerRole)
-        {
-            case EPlayerRole::COMMANDER:
-                this->bShowMouseCursor = true;
-                DefaultMouseCursor = EMouseCursor::Crosshairs;
-                SetInputMode(FInputModeGameAndUI());
-                break;
-            case EPlayerRole::PILOT:
-                this->bShowMouseCursor = false;
-                DefaultMouseCursor = EMouseCursor::Crosshairs;
-                SetInputMode(FInputModeGameOnly());
-                break;
-        }
+        case EPlayerRole::COMMANDER:
+            this->bShowMouseCursor = true;
+            DefaultMouseCursor = EMouseCursor::Crosshairs;
+            SetInputMode(FInputModeGameAndUI());
+            break;
+        case EPlayerRole::PILOT:
+            this->bShowMouseCursor = false;
+            DefaultMouseCursor = EMouseCursor::Crosshairs;
+            SetInputMode(FInputModeGameOnly());
+            break;
     }
 }
 
+// XXX 어차피 서버 로직인데 srpc는 낭비
 void AJ_MissionPlayerController::SRPC_SpawnMyPlayer_Implementation(TSubclassOf<class APawn> playerPrefab)
 {
     // 자기 역할에 맞는 스폰 위치 가져오기
@@ -197,7 +210,7 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
     {
         if(wasRemovedUI)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("로딩 ui 제거"));
+            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("로딩 ui 제거"));
             GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
         }
 
