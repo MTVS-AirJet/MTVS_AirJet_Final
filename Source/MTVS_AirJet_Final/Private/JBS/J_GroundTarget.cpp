@@ -2,6 +2,7 @@
 
 
 #include "JBS/J_GroundTarget.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_MissionPlayerController.h"
@@ -73,4 +74,15 @@ void AJ_GroundTarget::Death()
 
 	// 파괴
 	this->Destroy();
+}
+
+void AJ_GroundTarget::SetTargetActive(bool value)
+{
+	// 안보이게 
+	this->SetActorHiddenInGame(!value);
+
+	// 충돌 판정 처리
+	auto* meshComp = this->GetComponentByClass<UStaticMeshComponent>();
+	FName collisionName = value ? FName(TEXT("GroundTarget")) : FName(TEXT("NoCollision"));
+	meshComp->SetCollisionProfileName(collisionName);
 }

@@ -49,7 +49,12 @@ protected:
 	// 파괴
     void Death();
 
+
 public:
+	// 활성/비활성화
+	UFUNCTION(BlueprintCallable)
+    void SetTargetActive(bool value);
+	
 	// 피격
     virtual void GetDamage(AActor *attacker = nullptr, FVector hitPoint = FVector::ZeroVector,
                            FVector hitNormal = FVector::ZeroVector);

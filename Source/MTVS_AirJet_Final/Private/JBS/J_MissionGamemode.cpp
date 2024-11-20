@@ -16,6 +16,7 @@
 #include "KHS/K_CesiumTeleportBox.h"
 #include "KHS/K_GameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "LHJ/L_Viper.h"
 #include "Math/MathFwd.h"
 #include "JBS/J_ObjectiveManagerComponent.h"
 #include "Templates/Casts.h"
@@ -318,12 +319,6 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
         pc->MRPC_TeleportStartPoint(newTR);
     }
-
-    if(auto* aaa = UJ_Utility::GetBaseMissionPawn(GetWorld()))
-    {
-
-    }
-
 }
 
 AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
@@ -474,7 +469,18 @@ void AJ_MissionGamemode::StartTacticalOrder()
                 if(!pc) continue;
                 pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
             }
-            
+
+            // FIXME 팝업 UI 키는 걸로 대체해야함
+            // @@ 팝업 UI 끝날때
+            // 고정 해제
+            for(auto* pc : allPC)
+            {
+                if(!pc) continue;
+                auto* pawn = pc->GetPawn<AL_Viper>();
+                if(!pawn) continue;
+                // 고정 해제
+                pawn->SetEngineOn();
+            }
             // 미션 시작
             this->objectiveManagerComp->ActiveNextObjective();
             
