@@ -903,6 +903,8 @@ UENUM(BlueprintType)
 enum class EMissionProcess : uint8
 {
     NONE = 0
+    // 시작 직후
+    ,MISSION_START = 2
     // 시동
     ,MIC_SWITCH_ON = 7
     ,ENGINE_GEN_SWITCH_ON = 8
@@ -917,9 +919,19 @@ enum class EMissionProcess : uint8
     // 이륙
     ,THROTTLE_START = 18
     ,TAKE_OFF = 21
-    ,FLIGHT = 24
+    ,TAKE_OFF_END = 22
+    // 편대 비행
+    ,FLIGHT_START = 23
+    ,FORMATION_FLIGHT_START = 24
+    ,FORMATION_FLIGHT_END = 27
+    // 공대지
+    ,NEUT_TARGET_START = 28
+    ,NEUT_TARGET_2_END = 29
+    ,NEUT_TARGET_3_START = 30
+    ,NEUT_TARGET_3_END = 32
     ,LOCK_ON = 33
     ,MISSILE_LAUNCH = 34
+    ,NEUT_TARGET_END = 36
     ,MISSION_END = 255
 };
 

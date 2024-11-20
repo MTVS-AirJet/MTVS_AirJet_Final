@@ -210,7 +210,7 @@ void AJ_MissionPlayerController::CRPC_RemoveLoadingUI_Implementation()
     {
         if(wasRemovedUI)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("로딩 ui 제거"));
+            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("로딩 ui 제거"));
             GetWorld()->GetTimerManager().ClearTimer(removeLoadingUITH);
         }
 

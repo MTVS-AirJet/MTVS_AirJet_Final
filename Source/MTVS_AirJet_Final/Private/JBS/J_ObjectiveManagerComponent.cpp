@@ -144,7 +144,7 @@ void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 {
 	if(mIdx >= objectiveDataAry.Num())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("objAry out of range"));
+		// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("objAry out of range"));
 
 		return;
 	}
@@ -176,14 +176,14 @@ void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
 	
 	if(value < 0 || value > objectiveDataAry.Num())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("idx value 문제"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("idx value 문제"));
 		return;
 	}
 
     curActiveMissionIdx = value;
     if (CUR_ACTIVE_MISSION_IDX >= objectiveDataAry.Num())
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 종료됨"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("목표 종료됨"));
 
         // 미션 결산
 		MissionComplete();
@@ -197,7 +197,7 @@ void UJ_ObjectiveManagerComponent::SetCurActiveMissionIdx(int value)
 
 void UJ_ObjectiveManagerComponent::MissionComplete()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("미션 종료 결산 화면으로"));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("미션 종료 결산 화면으로"));
 
 	isMissionComplete = true;
 

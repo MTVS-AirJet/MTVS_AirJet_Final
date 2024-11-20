@@ -14,7 +14,7 @@
 // 2. 요청 타입에 따라 다른 요청 실행
 void UJ_GameInstance::RequestToServerByType(EJsonType type, const FString &sendJsonData)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("%s 요청 시작"), *UEnum::GetValueAsString(type)));
+	// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("%s 요청 시작"), *UEnum::GetValueAsString(type)));
 
 	// 요청 타입 에 따라 다른 요청 실행
     switch(type)
@@ -92,7 +92,7 @@ void UJ_GameInstance::RequestData(FResponseDelegate resDel, const FString& jsonD
 		// 성공 여부 확인
 		if(isSuccess)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 1단계 성공"));
+			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 1단계 성공"));
 			// 로그인 시에만 작동, 인증 값 저장해두기
 			authorValue = res->GetHeader(TEXT("Authorization"));
 			// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("인증 값 : %s"), *authorValue));
@@ -163,7 +163,7 @@ void UJ_GameInstance::ResTempCallback(const FString& jsonData, bool isSuccess)
 	// {
 	// 	result.Append(r.ToString());
 	// }
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : \n%s"), *rresult.ToString()));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : \n%s"), *rresult.ToString()));
 
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : %s"), *result));
 	// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
@@ -174,7 +174,7 @@ void UJ_GameInstance::ResSignup(const FString &jsonData, bool isSuccess)
 	FResSimple resData;
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
 
-	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
+	// GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
 
 	signupResUseDelegate.ExecuteIfBound(resData);
 }
@@ -186,7 +186,7 @@ void UJ_GameInstance::ResLogin(const FString &jsonData, bool isSuccess)
 	FLoginRes resData;
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData, &resData,0,0);
 
-	GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
+	// GEngine->AddOnScreenDebugMessage(-1, 31.f, FColor::Yellow, FString::Printf(TEXT("%s"), *resData.ToString()));
 
 	// 0.에서 바인드된 함수 실행
 	loginResUseDelegate.ExecuteIfBound(resData);
