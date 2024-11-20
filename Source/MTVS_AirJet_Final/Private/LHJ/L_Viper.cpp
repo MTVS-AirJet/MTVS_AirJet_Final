@@ -1582,7 +1582,6 @@ void AL_Viper::Tick(float DeltaTime)
 			{
 				//auto dist = FVector::Distance(GetActorLocation() , GroundTarget->GetActorLocation());
 				auto dist = FMath::Abs(GetActorLocation().X-GroundTarget->GetActorLocation().X);
-				LOG_SCREEN("%lf" , dist);
 				if (dist<=550000)
 				{
 					CRPC_MissilePitch(2.35f);
@@ -2942,8 +2941,6 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 void AL_Viper::SetEngineOn()
 {
 	IsEngineOn = true;
-	bStartLockOn = false;
-	bLockOnStart = true;
 }
 #pragma endregion
 
