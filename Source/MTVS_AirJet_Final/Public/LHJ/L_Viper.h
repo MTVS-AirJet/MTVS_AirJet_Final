@@ -346,11 +346,12 @@ private:
 	UPROPERTY()
 	class AL_Target* TargetActor;
 	
-private:
-	bool bLockOnStart;
-
+public:
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_LockOnStart();
+	
+private:
+	bool bLockOnStart;	
 
 	float Diametr = 30.f;
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
