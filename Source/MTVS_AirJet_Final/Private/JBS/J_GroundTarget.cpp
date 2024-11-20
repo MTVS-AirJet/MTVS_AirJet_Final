@@ -76,6 +76,11 @@ void AJ_GroundTarget::Death()
 	this->Destroy();
 }
 
+void AJ_GroundTarget::CRPC_SetTargetActive_Implementation(bool value)
+{
+	SetTargetActive(value);
+}
+
 void AJ_GroundTarget::SetTargetActive(bool value)
 {
 	// 안보이게 

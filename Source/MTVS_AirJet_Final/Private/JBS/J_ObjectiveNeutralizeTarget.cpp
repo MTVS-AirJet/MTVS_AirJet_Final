@@ -72,7 +72,7 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
         // 점수 받기 함수 바인드
         groundTarget->sendScoreDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::UpdateTargetScore);
         // 활성 함수 바인드
-        targetActiveDel.AddDynamic( groundTarget, &AJ_GroundTarget::SetTargetActive);
+        targetActiveDel.AddDynamic( groundTarget, &AJ_GroundTarget::CRPC_SetTargetActive);
         // XXX 파괴 미사용
         // groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
     }
