@@ -29,8 +29,10 @@ public:
 
 	class UK_GameInstance* gi;
 
-	FString SignupURL = "http://125.132.216.190:7757/api/auth/signup";
-	FString LoginURL = "http://125.132.216.190:7757/api/auth/login";
+	FString SignupURL = "http://43.202.221.239/api/auth/signup";
+	//FString SignupURL = "http://125.132.216.190:7757/api/auth/signup";
+	//FString LoginURL = "http://125.132.216.190:7757/api/auth/login";
+	FString LoginURL = "http://43.202.221.239/api/auth/login";
 
 	//======================================================
 	// 로그인 Functions, Variables
