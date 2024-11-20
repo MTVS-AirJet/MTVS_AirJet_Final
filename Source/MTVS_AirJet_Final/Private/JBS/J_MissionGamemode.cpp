@@ -453,6 +453,8 @@ void AJ_MissionGamemode::StartTacticalOrder()
         auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
         if(boxComp)
             boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+        // 텔포 박스 제거
+        cesiumTPBox->Destroy();
 
         //타이머에서 할 거
         TeleportAllStartPoint(startPointActor);
