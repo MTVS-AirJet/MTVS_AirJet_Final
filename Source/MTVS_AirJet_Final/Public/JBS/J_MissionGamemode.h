@@ -117,6 +117,10 @@ protected:
         curMissionData = value;
     }
         protected:
+
+    // 이륙 후 미션 시작 딜레이
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float missionStartDelay = 1.5f;
 public:
     // XXX 로드할 미션 맵 이름
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -149,6 +153,9 @@ protected:
 
     // 호스트 GI에서 미션 데이터 로드
     FMissionDataRes LoadMissionData();
+
+    // 미션 지역으로 세슘 이동
+    void ChangeMissionArea();
 
     // 해당하는 역할의 스폰포인트 가져오기
     class AJ_MissionSpawnPointActor* GetSpawnPoint(EPlayerRole role);
@@ -185,7 +192,8 @@ protected:
     // 3. 전술 명령 미션 시작
     void StartTacticalOrder();
 
-    
+    // 지연된 전술 명령 시작
+    void DelayStartTacticalOrder(float delayTime = 0.1f);
 
 public:
     virtual void Tick(float DeltaSeconds) override;

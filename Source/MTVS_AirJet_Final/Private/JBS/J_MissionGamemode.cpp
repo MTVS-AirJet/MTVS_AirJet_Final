@@ -174,11 +174,13 @@ void AJ_MissionGamemode::CacheCesiumActors()
 -> 전투기 생성 요청 | pc->SpawnMyPlayer
 -> 게임 인스턴스에서 자기 역할에 맞는 플레이어 프리팹 가져오기 | pc->gi->GetMissionPlayerPrefab
 -> 자기 역할에 맞는 스폰위치 가져오기 | GetPlayerSpawnTransfrom // 무조건 파일럿
+-> 스폰 포인트 구하기->없으면 월드에서 다시 찾기-> 없으면 생성 | GetSpawnPoint, AddSpawnPoint
 -> 플레이어 생성 후 포제스 | SpawnActor, Possess
 -> 역할에 따라 마우스 커서 및 입력 처리
 
 // @@ 미션 시작 버튼 누르면 팝업 UI 시작 | ???
 -> 팝업 UI 종료시 미션 시작 | StartMissionLevel
+-> 시작 보이스 및 자막 재생 | CRPC_PlayCommanderVoice3 | EMissionProcess::MISSION_START
 -> 미션 시작시 시동 절차 목표 활성화 | StartDefualtObj
 */
 void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
@@ -222,35 +224,6 @@ FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_Miss
     return tr;
 }
 
-void AJ_MissionGamemode::StartMissionLevel()
-{
-    // FIXME 챕터 UI 활성화할때 재생으로 옮겨야함
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-    for(auto* pc : allPC)
-    {
-        if(!pc) continue;
-
-        pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::MISSION_START));
-    }
-    
-
-    // 시동 목표 시작
-    objectiveManagerComp->StartDefualtObj();
-}
-
-
-
-
-
-
-
-void AJ_MissionGamemode::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-}
-
-
-
 // 있으면 그거 주고 없으면 찾기 
 AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
 {
@@ -268,8 +241,6 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
     return spPos;
 }
 
-
-
 AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole)
 {
     // 해당 역할을 가진 스폰 포인트 생성
@@ -283,30 +254,128 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawn
     return spPoint;
 }
 
+void AJ_MissionGamemode::StartMissionLevel()
+{
+    // FIXME 챕터 UI 활성화할때 재생으로 옮겨야함
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::MISSION_START));
+    }
+
+    // 시동 목표 시작
+    objectiveManagerComp->StartDefualtObj();
+}
+
+#pragma endregion
 
 
 
+#pragma region 이륙 단
+/*
+텔포 박스에서 충돌시 해당 pc 이륙 체크 | AddFlightedPC
+-> 한 명 이륙 시 딜리게이트 실행 | onePilotTakeOffDel
+-> 이륙 목표 액터에서 수행도 갱신 처리 | SuccessTakeOff
+-> 로딩 UI 추가 | CRPC_AddLoadingUI
+-> 이륙한 플레이어 수가 전체 플레이어 수와 같아지면 전술명령 단 시작 | StartTacticalOrder
+StartTacticalOrder
+-> 끝내지 않은 기본 목표(시동,이륙) 종료 처리 | startTODel, SkipDefaultObj, ObjectiveEnd
+-> 약간 딜레이 이후 미션 지역으로 변경 | ChangeMissionArea
+-> 미션 시작 지점으로 전투기 위치 이동 | TeleportAllStartPoint
+-> 약간 딜레이 이후 미션 시작 | DelayStartTacticalOrder
+-> 이륙 보이스 재생 요청 | CRPC_PlayCommanderVoice3, FLIGHT_START
+-> 이륙 팝업 UI 활성화 | ???
+-> 첫 번째 전술명령 활성화 | ActiveNextObjective
+*/
+
+// 이륙 체크 및 미션 시작 단
+bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess)
+{
+    // 이미 있으면 무시
+    if(flightedPCAry.Contains(pc)) return false;
+
+    // 이륙 배열에 추가
+    flightedPCAry.Add(pc);
+
+    // 이륙 딜리게이트 실행
+    onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
+
+    // @@ 해당 pc 로딩 UI 추가  | 굳이 타이머 넣을 필요 있나? 테스트 필요
+    pc->CRPC_AddLoadingUI();
+    // FTimerHandle timerHandle;
+    // GetWorld()->GetTimerManager()
+    //     .SetTimer(timerHandle, [this,pc]() mutable
+    // {
+    //     if(isStartTO) return;
+    //     //타이머에서 할 거
+    //     // 해당 pc에게 로딩 UI 추가
+    //     pc->CRPC_AddLoadingUI();
+    // }, 1.5f, false);
+
+    const int curAllPCNum = GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
+    // 배열 크기가 현재 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
+    isTPReady = flightedPCAry.Num() >= curAllPCNum;
+
+    if(isTPReady)
+        StartTacticalOrder();
+
+    // XXX 반환 해도 안쓰긴함
+    return false;
+}
+
+void AJ_MissionGamemode::StartTacticalOrder()
+{
+    // 이미 시작 했으면 무시
+    if(isStartTO) return;
+
+    // solved 기본 목표 종료 처리
+    startTODel.Broadcast(true);
+    isStartTO = true;
+
+    // 약간 늦게 텔포 ( 로딩 스크린 이후 )
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+        .SetTimer(timerHandle, [this]() mutable
+    {
+        // 미션 영역 변경
+        ChangeMissionArea();
+
+        // 모든 플레이어 시작 지점으로 위치 이동
+        TeleportAllStartPoint(startPointActor);
+
+        // 딜레이 이후 미션 시작
+        DelayStartTacticalOrder(missionStartDelay);
+    }, .5f, false);
+}
 
 
+
+void AJ_MissionGamemode::ChangeMissionArea()
+{
+    // 위경도 미션 지역으로 설정
+    cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
+    // 변경 요청
+    cesiumTPBox->MRPC_ChangeMissionArea();
+    //텔포박스 비활성화
+    auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
+    if(boxComp)
+        boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+}
 
 void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startPoint)
 {
     if(!HasAuthority()) return;
 
     // 모든 플레이어의 폰 가져오기
-    auto allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
-
-    // XXX 로딩 ui 제거 비활성
-    // removeLUIDel.Broadcast();
-
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
 
     // 시작 지점으로 위치 이동
     for(int i = 0; i < allPC.Num(); i++)
     {
-
-        auto* pawn = allPawns[i];
-        // 역할 설정
+        const auto* viper = allPawns[i];
         auto* pc = allPC[i];
         // pc 로딩 ui 잇으면 제거
         pc->CRPC_RemoveLoadingUI();
@@ -316,10 +385,52 @@ void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startP
         // 순서에 따른 위치 조정 (산개용)
         FTransform newTR = CalcTeleportTransform(pc->pilotRole);
         // 스케일 조정되지 않도록 변경
-        newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), pawn->GetActorScale());
+        newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), viper->GetActorScale());
         pc->MRPC_TeleportStartPoint(newTR);
     }
 }
+
+void AJ_MissionGamemode::DelayStartTacticalOrder(float delayTime)
+{
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+    .SetTimer(timerHandle, [this]() mutable
+    {
+        // 이륙 성공 보이스 재생
+        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+        for(auto* pc : allPC)
+        {
+            if(!pc) continue;
+            pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
+        }
+
+        // FIXME 팝업 UI 키는 걸로 대체해야함
+        // @@ 팝업 UI 끝날때
+        // 고정 해제
+        for(auto* pc : allPC)
+        {
+            if(!pc) continue;
+            auto* pawn = pc->GetPawn<AL_Viper>();
+            if(!pawn) continue;
+            // 고정 해제
+            pawn->SetEngineOn();
+        }
+        // 미션 시작
+        this->objectiveManagerComp->ActiveNextObjective();
+        
+    }, delayTime, false);
+}
+
+void AJ_MissionGamemode::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+}
+
+
+
+
+
+
 
 AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
 {
@@ -386,38 +497,7 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
 
 
 
-// 이륙 체크 및 미션 시작 단
-bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess)
-{
-    // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("이륙 추가 : %s"), *pc->GetName()));
-    // 이륙 배열에 추가
-    if(flightedPCAry.Contains(pc)) return false;
-    flightedPCAry.Add(pc);
 
-    // 이륙 딜리게이트 실행
-    onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
-
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this,pc]() mutable
-    {
-        if(isStartTO) return;
-        //타이머에서 할 거
-        // 해당 pc에게 로딩 UI 추가
-        pc->CRPC_AddLoadingUI();
-    }, 1.5f, false);
-
-    
-    
-    // 배열 크기가 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
-    isTPReady = flightedPCAry.Num() == GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
-    if(isTPReady)
-        StartTacticalOrder();
-
-    
-
-    return false;
-}
 
 
 
@@ -427,63 +507,3 @@ void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_Missio
 }
 
 
-
-
-
-void AJ_MissionGamemode::StartTacticalOrder()
-{
-    if(isStartTO) return;
-
-    // solved 기본 목표 종료 처리
-    startTODel.Broadcast(true);
-    isStartTO = true;
-
-    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, TEXT("전부 이륙"));
-    
-
-    // @@ 임시로 조금 늦게 텔포
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
-    {
-        // 미션 영역 변경
-        cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
-        cesiumTPBox->MRPC_ChangeMissionArea();
-        //텔포박스 비활성화
-        auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
-        if(boxComp)
-            boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
-
-        //타이머에서 할 거
-        TeleportAllStartPoint(startPointActor);
-
-        FTimerHandle timerHandle;
-        GetWorld()->GetTimerManager()
-        .SetTimer(timerHandle, [this]() mutable
-        {
-            //타이머에서 할 거
-            // 이륙 성공 보이스 재생
-            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-            for(auto* pc : allPC)
-            {
-                if(!pc) continue;
-                pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
-            }
-
-            // FIXME 팝업 UI 키는 걸로 대체해야함
-            // @@ 팝업 UI 끝날때
-            // 고정 해제
-            for(auto* pc : allPC)
-            {
-                if(!pc) continue;
-                auto* pawn = pc->GetPawn<AL_Viper>();
-                if(!pawn) continue;
-                // 고정 해제
-                pawn->SetEngineOn();
-            }
-            // 미션 시작
-            this->objectiveManagerComp->ActiveNextObjective();
-            
-        }, 1.5, false);
-    }, 3.0f, false);
-}
