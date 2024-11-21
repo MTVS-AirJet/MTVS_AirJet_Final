@@ -347,9 +347,7 @@ struct FAllMissionDataRes
 
 
 USTRUCT(BlueprintType)
-struct 
-
-FCommanderVoiceRes
+struct FCommanderVoiceRes
 {
     GENERATED_BODY()
 public:

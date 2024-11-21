@@ -44,7 +44,7 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
     // 목표 ui 신규 갱신
     StartNewObjUI();    
     // 최초 mic 보이스 안내 | 이후는 ActiveNextProgress 에서
-    ReqPlayCommVoice(1, allPC);
+    ReqPlayCommVoice(EMissionProcess::MIC_SWITCH_ON, allPC);
 }
 #pragma endregion
 
@@ -84,7 +84,9 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     ActiveNextProgress(data, isSuccess);
 
     // 다음 지휘관 보이스 실행
-    ReqPlayCommVoice(static_cast<int>(data.curProgress), {pc});
+    // 시동 절차 -> 미션 인덱스로 변환
+    int mpIdx = UJ_Utility::ConvertEngineProgressToMissionProcessIdx(data.curProgress);
+    ReqPlayCommVoice(mpIdx, {pc});
 
     // 사이드 브레이크 수행이 들어왔을때 현재 진행이 그거 이전일때 takeoff로 설정 | 대기 무시하고 다 켜버리는 경우
     if(!isSuccess && type == EEngineProgress::RELEASE_SIDE_BREAK && data.curProgress <= type)

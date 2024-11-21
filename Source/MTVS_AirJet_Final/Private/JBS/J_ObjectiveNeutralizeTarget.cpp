@@ -11,6 +11,7 @@
 #include "JBS/J_GroundTarget.h"
 #include "JBS/J_ObjectiveMovePoint.h"
 #include "JBS/J_Utility.h"
+#include "LHJ/L_Viper.h"
 #include "Math/MathFwd.h"
 #include <cfloat>
 #include "JBS/J_MissionPlayerController.h"
@@ -70,10 +71,14 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
 
         // 점수 받기 함수 바인드
         groundTarget->sendScoreDel.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::UpdateTargetScore);
-        
+        // 활성 함수 바인드
+        targetActiveDel.AddDynamic( groundTarget, &AJ_GroundTarget::CRPC_SetTargetActive);
         // XXX 파괴 미사용
         // groundTarget->destroyedDelegate.AddUObject(this, &AJ_ObjectiveNeutralizeTarget::CountTargetDestroyed);
     }
+
+    // 모든 타겟 비활성화
+    targetActiveDel.Broadcast(false);
 }
 
 bool AJ_ObjectiveNeutralizeTarget::CalcSpawnTransform(FTransform& outSpawnTR)
@@ -172,6 +177,8 @@ void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
 
     // 서브 목표 시작
     ActiveNextObjective();
+    // 시작 보이스 재생
+    ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_START, allPC);
 
     StartNewObjUI();
 }
@@ -236,6 +243,7 @@ AJ_ObjectiveMovePoint* AJ_ObjectiveNeutralizeTarget::SpawnSubMovePoint(const FTr
     subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::EndSubMPUI);
     // 목표 완료시 다음 목표 활성화 바인드
     subMP->objectiveEndDel.AddDynamic(this, &AJ_ObjectiveNeutralizeTarget::ActiveNextObjective);
+    // 목표 완료시 보이스 재생 요청
     
 
     return subMP;
@@ -296,16 +304,16 @@ void AJ_ObjectiveNeutralizeTarget::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 
     switch (mIdx) {
         case 0:
-            ReqPlayCommVoice(16, allPC);
+            // ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_2_END, allPC);
             break;
         case 1:
-            ReqPlayCommVoice(17, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_2_END, allPC);
             break;
         case 2:
-            ReqPlayCommVoice(18, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_3_START, allPC);
             break;
         case 3:
-            ReqPlayCommVoice(20, allPC);
+            ReqPlayCommVoice(EMissionProcess::NEUT_TARGET_3_END, allPC);
             break;
     }
 	
@@ -333,22 +341,26 @@ void AJ_ObjectiveNeutralizeTarget::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 
 void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
 {
-    // @@ 과녁 visible 하도록
-
+    // 모든 타겟 활성화
+    targetActiveDel.Broadcast(true);
     // icon 활성화
     iconWorldUIComp->SetVisible(true);
-    // voice 재생
+
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 
-    ReqPlayCommVoice(22, allPC);
+    // voice 재생
+    ReqPlayCommVoice(EMissionProcess::LOCK_ON, allPC);
+
     for(auto* pc : allPC)
     {
         if(!pc) continue;
-
-        // @@ 모든 전투기 락온 가능하게 변경
-
         // 과녁 시작 이미지로 변경
         pc->objUIComp->CRPC_DirectSetDetailImg(EMissionProcess::LOCK_ON);
+
+        // @@ 모든 전투기 락온 가능하게 변경
+        auto* viper = pc->GetPawn<AL_Viper>();
+        if(!viper) continue;
+        viper->ClientRPC_LockOnStart();
     }
 }
 

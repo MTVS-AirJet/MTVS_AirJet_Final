@@ -7,6 +7,9 @@
 #include "J_MissionPlayerController.h"
 #include "J_ObjectiveNeutralizeTarget.generated.h"
 
+// 타겟 활성 딜리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTargetActiveDelegate, bool, isActive);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_ObjectiveNeutralizeTarget : public AJ_BaseMissionObjective
 {
@@ -66,6 +69,9 @@ protected:
 	// 과녁 점수 맵
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Target|Values")
 	TMap<class AJ_MissionPlayerController*, float> targetScoreMap;
+
+	// 활성화 딜리게이트
+	FTargetActiveDelegate targetActiveDel;
 #pragma endregion
 public:
 
@@ -149,6 +155,7 @@ icon UI 캐시 | SetTargetIconUI
 
 	// 지연 시간 후 서브 목표 활성화
 	void DelayedObjectiveActive(AJ_BaseMissionObjective *obj, float delayTime);
+
 
 	// 과녁 타격 활성화
 	void StartHitTarget();

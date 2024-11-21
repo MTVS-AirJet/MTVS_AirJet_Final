@@ -161,17 +161,17 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 		{
 			MissionTextUI->AddToViewport();
 
-			if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
-			{
-				if (MissionTextUI)
-				{
-					//1번 MissionData를 가져와서 SetText.
-					auto MissionData = GI->GetMyMissionData(1);
-					if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
-						return;			
-					MissionTextUI->SetMissionText(MissionData);
-				}
-			}
+			// if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
+			// {
+			// 	if (MissionTextUI)
+			// 	{
+			// 		//1번 MissionData를 가져와서 SetText.
+			// 		auto MissionData = GI->GetMyMissionData(1);
+			// 		if(MissionData->MissionHelper.Equals("") && MissionData->MissionActing.Equals(""))
+			// 			return;			
+			// 		MissionTextUI->SetMissionText(MissionData);
+			// 	}
+			// }
 		}
 	}
 	else

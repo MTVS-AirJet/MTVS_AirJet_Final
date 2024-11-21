@@ -360,16 +360,24 @@ void AJ_BaseMissionObjective::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	// DOREPLIFETIME(AJ_BaseMissionObjective, isObjectiveActive);
 }
 
+void AJ_BaseMissionObjective::ReqPlayCommVoice(
+	const EMissionProcess& type,
+    const TArray<AJ_MissionPlayerController *> &pcs)
+{
+	//int 변환
+	int mpIdx = static_cast<int>(type);
+
+	ReqPlayCommVoice(mpIdx, pcs);
+}
+
 // ai 지휘관 보이스 재생 요청 | 배열로 해서 세밀하게 조절 가능
 void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<AJ_MissionPlayerController*>& pcs)
 {
-	// 예외처리
-	// 1. 브레이크 idx 보정
-	idx = VoiceIdxAdjust(idx);
-
+	// 모든 pc에 재생 요청
 	for(auto* pc : pcs)
 	{
 		pc->CRPC_PlayCommanderVoice3(idx);
+		pc->CRPC_SetMissionTextUI(idx);
 	}
 }
 
@@ -396,3 +404,4 @@ int AJ_BaseMissionObjective::VoiceIdxAdjust(int idx)
 
 	return idx;
 }
+
