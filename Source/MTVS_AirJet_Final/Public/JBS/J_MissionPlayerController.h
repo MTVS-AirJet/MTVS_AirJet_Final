@@ -45,6 +45,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	TMap<int, class USoundWaveProcedural*> missionVoiceMap;
 
+	// 전체 보이스 요청 허용 | 낭비 방지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
+	bool enableReqAllVoice = true;
+
 public:
 	// 목표 UI 관리 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")

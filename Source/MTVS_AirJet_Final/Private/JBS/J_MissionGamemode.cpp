@@ -23,6 +23,9 @@
 #include "TimerManager.h"
 #include <JBS/J_MissionSpawnPointActor.h>
 #include <Engine/World.h>
+#include "JBS/J_ObjectiveUIComp.h"
+#include "JBS/J_ObjectiveUI.h"
+#include "JBS/J_ChapterPopUPUI.h"
 
 #pragma region 안쓰는 무덤
 // void AJ_MissionGamemode::LoadMissionMap()
@@ -256,15 +259,15 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawn
 
 void AJ_MissionGamemode::StartMissionLevel()
 {
-    // FIXME 챕터 UI 활성화할때 재생으로 옮겨야함
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     for(auto* pc : allPC)
     {
         if(!pc) continue;
-
+        // 미션 시작 보이스 재생
         pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::MISSION_START));
+        
     }
-
+    
     // 시동 목표 시작
     objectiveManagerComp->StartDefualtObj();
 }
@@ -402,21 +405,29 @@ void AJ_MissionGamemode::DelayStartTacticalOrder(float delayTime)
         {
             if(!pc) continue;
             pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
+            // 팝업 UI 활성화
+            pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::TAKE_OFF_END);
         }
 
-        // FIXME 팝업 UI 키는 걸로 대체해야함
-        // @@ 팝업 UI 끝날때
-        // 고정 해제
-        for(auto* pc : allPC)
+        // FIXME 팝업 ui 비활성화 될때 실행으로 바인드 해야함
+        FTimerHandle timerHandle2;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle2, [this]() mutable
         {
-            if(!pc) continue;
-            auto* pawn = pc->GetPawn<AL_Viper>();
-            if(!pawn) continue;
-            // 고정 해제
-            pawn->SetEngineOn();
-        }
-        // 미션 시작
-        this->objectiveManagerComp->ActiveNextObjective();
+            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+            
+            //타이머에서 할 거
+            for(auto* pc : allPC)
+            {
+                if(!pc) continue;
+                auto* pawn = pc->GetPawn<AL_Viper>();
+                if(!pawn) continue;
+                // 고정 해제
+                pawn->SetEngineOn();
+            }
+            // 미션 시작
+            this->objectiveManagerComp->ActiveNextObjective();
+        }, 5.f, false);
         
     }, delayTime, false);
 }

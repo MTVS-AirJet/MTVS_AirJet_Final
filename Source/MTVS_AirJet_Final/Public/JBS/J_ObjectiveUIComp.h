@@ -119,7 +119,15 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_SwitchResultUI(const TArray<FObjectiveData>& resultObjData);
 
-	// 결산 UI 가져오기 | 바로 접근용
+	// 팝업 ui 활성화 및 설정
+	UFUNCTION(Client, Unreliable)
+	void CRPC_ActivePopupUI(const EMissionProcess &mpIdx);
+
+	// 팝업 UI 비활성화
+	// UFUNCTION(Client, Reliable)
+	// void CRPC_DeActivePopupUI() {}
+
+        // 결산 UI 가져오기 | 바로 접근용
 	UFUNCTION(BlueprintCallable)
 	class UJ_MissionCompleteUI *GetMissionCompleteUI();
 };

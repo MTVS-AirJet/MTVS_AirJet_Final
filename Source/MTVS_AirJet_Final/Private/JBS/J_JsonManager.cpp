@@ -166,5 +166,16 @@ void AJ_JsonManager::OnGetAllVoiceData(const FAllVoiceRes &resData)
 	GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Yellow, FString::Printf(TEXT("jsonManager에서 출력됨\n%s"), *debugStr));
 
 	allVoiceData = resData.data;
+
+	// 배열에 저장
+	for(const auto& voiceData : resData.data)
+	{
+		auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(voiceData.voice);
+
+		if(!voice) continue;
+
+		voiceAry.Add(voice);
+	}
+
 	ToggleStopWatch();
 }

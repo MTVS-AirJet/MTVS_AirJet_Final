@@ -202,6 +202,8 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	isMissionComplete = true;
 
 	// 여기부터 결산 단계
+	// 미션 종료 딜리게이트 실행
+	ownerGM->missionEndDel.Broadcast();
 	// 시동,이륙, 목표 데이터를 다 가진 전체 데이터
 	TArray<FObjectiveData> fullObjData;
 	fullObjData.Append(defaultObjDataAry);

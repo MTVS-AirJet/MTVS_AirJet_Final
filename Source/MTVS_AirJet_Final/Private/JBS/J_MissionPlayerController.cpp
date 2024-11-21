@@ -316,6 +316,12 @@ void AJ_MissionPlayerController::CRPC_PlayCommanderVoice3_Implementation(int idx
 }
 void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
 {
+    if(!enableReqAllVoice)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("전체 미션 보이스 요청 안함(낭비 방지)"));
+        return;
+    }
+    
     // gi 찾아서 미션 보이스 요청
     auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
     gi->allVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::ResMissionVoiceData);

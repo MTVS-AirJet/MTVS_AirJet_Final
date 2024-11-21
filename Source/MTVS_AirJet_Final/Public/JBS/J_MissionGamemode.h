@@ -19,6 +19,9 @@ DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool)
 // 미션 시작 딜리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
 
+// 미션 종료 딜리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMissionEndDelegate);
+
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionGamemode : public AGameModeBase
@@ -141,15 +144,15 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     bool isTPReady = false;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FMissionEndDelegate missionEndDel;
+
 protected:
     virtual void BeginPlay() override;
 
     // bp에서 begin에 호출되는 미션 시작
     UFUNCTION(BlueprintCallable)
     virtual void StartMission();
-
-    // XXX 미사용
-    void LoadMissionMap();
 
     // 호스트 GI에서 미션 데이터 로드
     FMissionDataRes LoadMissionData();

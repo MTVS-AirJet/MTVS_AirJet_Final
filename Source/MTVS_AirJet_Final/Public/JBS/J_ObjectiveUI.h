@@ -55,6 +55,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float subObjEndTimerInterval = 0.025f;
 
+	// 팝업 ui
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	class UJ_ChapterPopUPUI* popupUI;
+		public:
+	__declspec(property(get = GetPopupUI, put = SetPopupUI)) class UJ_ChapterPopUPUI* POPUP_UI;
+	class UJ_ChapterPopUPUI* GetPopupUI() {return popupUI;}
+	void SetPopupUI(class UJ_ChapterPopUPUI* value) {popupUI = value;}
+		protected:
+	
+
 public:
 	// 결산 UI
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))

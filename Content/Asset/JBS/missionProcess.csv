@@ -1,0 +1,39 @@
+﻿idx,EMissionProcess,,popupText
+1,,,
+2,MISSION_START,,
+3,,,
+4,,,
+5,,,
+6,,,
+7,MIC_SWITCH_ON,,"파일럿들은 머리에 피가 잘 공급되도록 G슈트를 착용하고 모든 장비를 점검하며 출격 준비를 완료합니다.""파일럿들이 준비 과정을 거칠 때, 모든 것이 정확해야 하기에 신경 써야 할 부분이 많습니다. 이제 여러분도 이 준비 과정을 체험해보세요. 글로만 배우긴 어렵겠죠? 직접 시동을 걸어보세요"""
+8,ENGINE_GEN_SWITCH_ON,,s
+9,ENGINE_CONTROL_SWITCH_ON,,
+10,ENGINE_MASTER_SWITCH_ON,,
+11,JFS_STARTER_SWITCH_ON,,
+12,JFS_HANDLE_PULL,,
+13,ENGINE_THROTTLE_IDLE,,
+14,CLOSE_CANOPY,,
+15,,,
+16,STANDBY_OTHER_PLAYER,,"이륙 전, 파일럿은 계기판을 확인하고 레버를 조작하며 비행기를 최적의 상태로 만듭니다.
+""파일럿들이 이륙 절차를 수행할 때, 바람, 속도, 활주로 상태를 고려해야 하기에 어려움이 많습니다. 이제 직접 체험하며 이륙 준비를 해볼까요?"""
+17,RELEASE_SIDE_BREAK,,
+18,THROTTLE_START,,
+19,,,
+20,,,
+21,TAKE_OFF,,
+22,TAKE_OFF_END,,"이륙 후, 파일럿들은 사선 편대 대형으로 이동하며 리더와 윙맨 역할을 수행합니다. 리더는 Alpha1, 윙맨은 Alpha2로 불리며 서로의 간격을 유지합니다.
+""파일럿들이 편대 비행을 할 때, 정확한 거리와 대형을 유지해야 하므로 많은 훈련이 필요합니다. 지금부터 여러분도 함께 비행하며 팀워크를 체험해보세요!"""
+23,FLIGHT_START,,
+24,FORMATION_FLIGHT_START,,
+25,,,
+26,,,
+27,FORMATION_FLIGHT_END,,
+28,NEUT_TARGET_START,,
+29,NEUT_TARGET_2_END,,
+30,NEUT_TARGET_3_START,,
+31,,,
+32,NEUT_TARGET_3_END,,
+33,LOCK_ON,,
+34,MISSILE_LAUNCH,,
+35,,,
+36,NEUT_TARGET_END,,

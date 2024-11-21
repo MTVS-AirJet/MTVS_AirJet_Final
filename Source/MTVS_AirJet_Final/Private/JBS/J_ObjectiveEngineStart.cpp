@@ -36,6 +36,8 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
         if(!pc) continue;
 
         pc->sendEngineProgDel.BindUObject(this, &AJ_ObjectiveEngineStart::CheckProgress);
+        // 팝업 활성화
+        pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::MIC_SWITCH_ON);
     }
 
     // 목표 종료시 수행도 결과 계산 바인드
@@ -82,6 +84,12 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     
     // 다음 수행으로 넘어가기
     ActiveNextProgress(data, isSuccess);
+
+    // 스탠바이 상태가 되면 팝업 활성화
+    if(data.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
+    {
+        pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::STANDBY_OTHER_PLAYER);
+    }
 
     // 다음 지휘관 보이스 실행
     // 시동 절차 -> 미션 인덱스로 변환

@@ -152,6 +152,9 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	// float missionObjDefaultHeight = 500'000;
 public:
+	// 미션 진행 데이터 테이블
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	class UDataTable* missionProgressDT;
 
 protected:
 	// 3-1. 서버에 요청 : 반응 딜리게이트, 구조체 데이터, url, 기본 url 사용 여부, 전송 타입(POST or GET)

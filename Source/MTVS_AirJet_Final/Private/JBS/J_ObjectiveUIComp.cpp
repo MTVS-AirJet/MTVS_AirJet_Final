@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/SlateWrapperTypes.h"
 #include "Containers/UnrealString.h"
+#include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUI.h"
@@ -14,6 +15,7 @@
 #include "JBS/J_ObjectiveTextUI.h"
 #include "JBS/J_MissionCompleteUI.h"
 #include "JBS/J_DetailUI.h"
+#include "JBS/J_ChapterPopUPUI.h"
 
 
 // Sets default values for this component's properties
@@ -68,7 +70,7 @@ void UJ_ObjectiveUIComp::InitObjUI()
 #pragma endregion
 
 	// 비활성화
-	objUI->SetVisibility(ESlateVisibility::Hidden);
+	// objUI->SetVisibility(ESlateVisibility::Hidden);
 	// 뷰포트에 붙이기
 	objUI->AddToViewport();
 }
@@ -608,4 +610,24 @@ void UJ_ObjectiveUIComp::CRPC_DirectSetDetailImg_Implementation(const EMissionPr
 {
 	// 직통으로 이미지 설정
 	OBJ_UI->DETAIL_TEXT_UI->SetDetailUI(type);
+}
+
+void UJ_ObjectiveUIComp::CRPC_ActivePopupUI_Implementation(const EMissionProcess &mpIdx)
+{
+	// int로 변환하여 row idx 가져오기
+	FName findRow(FString::Printf(TEXT("%d"), static_cast<int>(mpIdx)));
+
+	// 데이터 테이블 가져오기
+	auto* mdt = UJ_Utility::GetMissionProgressDT(GetWorld());
+	// 데이터 가져오기
+	auto row = mdt->FindRow<FMissionProgressDT>(findRow,  TEXT("Find popup ui data"));
+
+	// 팝업 ui 설정
+	OBJ_UI->POPUP_UI->SetPopupText(mpIdx, row->popuptext);
+
+	// FString debugSTR = FString::Printf(TEXT("enum : %s, string : %s"), *UJ_Utility::ToStringEnumPure(row->EMissionProcess), *row->popuptext);
+	// UJ_Utility::PrintFullLog(debugSTR);
+
+	
+	
 }
