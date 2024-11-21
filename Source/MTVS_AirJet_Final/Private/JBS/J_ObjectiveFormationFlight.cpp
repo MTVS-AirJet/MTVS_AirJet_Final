@@ -10,6 +10,7 @@
 #include "JBS/J_Utility.h"
 #include "JBS/J_BaseMissionPawn.h"
 #include "JBS/J_ObjectiveUIComp.h"
+#include "LHJ/L_Viper.h"
 #include "TimerManager.h"
 #include "UObject/Class.h"
 #include <algorithm>
@@ -43,6 +44,16 @@ void AJ_ObjectiveFormationFlight::ObjectiveActive()
     // 시작 보이스 재생
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     ReqPlayCommVoice(EMissionProcess::FORMATION_FLIGHT_START, allPC);
+
+    // FIXME 임시 안전 처리
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+        auto* pawn = pc->GetPawn<AL_Viper>();
+        if(!pawn) continue;
+        // 고정 해제
+        pawn->SetEngineOn();
+    }
 
 
     // 목표 ui 신규 갱신
