@@ -408,9 +408,7 @@ FString FRichString::FormatString(const FString &str, ETextStyle type) const
         for(const auto& sentence : stringAry)
         {
             if(!sentence.IsEmpty())
-            {
                 result.Append(FRichString(sentence, type).FormatString(sentence, type));
-            }
         }
     }
     else {
