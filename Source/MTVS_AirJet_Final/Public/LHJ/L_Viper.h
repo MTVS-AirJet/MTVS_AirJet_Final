@@ -398,10 +398,10 @@ private:
 
 private:
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLocation(const float& MoveForce);
+	void ServerRPCLocation(const FVector& ForceAt, const FVector& NewLoc);
 	UFUNCTION(Client , Reliable)
 	void ClientRPCLocation();
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Unreliable)
 	void ServerRPCRotation(FQuat newQuat);
 	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPCVisibleAirVFX(bool isOn);

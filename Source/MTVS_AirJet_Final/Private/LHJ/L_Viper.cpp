@@ -1089,6 +1089,9 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	PitchAngle = 0.f;
 
 #pragma region Retate Pawn
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
+										   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	SetActorRotation(QuatCurrentRotation.Rotator());
 	ServerRPCRotation(QuatTargetRotation);
 	if (bJetAirVFXOn)
 	{
@@ -1843,18 +1846,9 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 #pragma endregion
 
 #pragma region Set Location & Rotation
-void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
+void AL_Viper::ServerRPCLocation_Implementation(const FVector& ForceAt, const FVector& NewLoc)
 {
-	// Add Force
-	FVector forceVec = JetArrow->GetForwardVector() * MoveForce;
-	FVector forceLoc = JetRoot->GetComponentLocation();
-	if (JetRoot->IsSimulatingPhysics())
-		JetRoot->AddForceAtLocation(forceVec , forceLoc);
-
-	// Move Up & Down
-	auto jetRot = JetArrow->GetRelativeRotation();
-	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+	JetRoot->AddForceAtLocation(NewLoc, ForceAt);
 }
 
 void AL_Viper::ClientRPCLocation_Implementation()
@@ -1864,7 +1858,18 @@ void AL_Viper::ClientRPCLocation_Implementation()
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
 		ValueOfMoveForce = MaxValueOfMoveForce;
-	ServerRPCLocation(ValueOfMoveForce);
+	// Add Force
+	FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+	FVector forceLoc = JetRoot->GetComponentLocation();
+	if (JetRoot->IsSimulatingPhysics())
+		JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+	// Move Up & Down
+	auto jetRot = JetArrow->GetRelativeRotation();
+	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+	
+	ServerRPCLocation(HeightForceLoc, FVector(0 , 0 , zRot));
 }
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
@@ -1878,9 +1883,7 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 	}
 
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
-	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
-	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
-	SetActorRotation(QuatCurrentRotation.Rotator());
+	SetActorRotation(newQuat);
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
 }
 
