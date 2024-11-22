@@ -391,13 +391,34 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
 
 FString FRichString::FormatString(const FString &str, ETextStyle type) const
 {
-    // 줄바꿈 교체
-    FString result = str.Replace(TEXT("\n"), TEXT("<br>"));
-    
-    // 스타일 처리
-    result = FString::Printf(TEXT("<%s>%s</>")
-    , *UJ_Utility::ToStringEnumPure(type)
-    , *result);
+    // 결과 string
+    FString result = "";
+
+    // 줄바꿈을 구분자로 문자열 정리
+    TArray<FString> stringAry;
+
+    FString temp = str;
+    temp.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
+    temp.ReplaceInline(TEXT("\r"), TEXT("\n"));
+    temp.ParseIntoArray(stringAry, TEXT("\n"), true);
+
+    // 한 문장을 리치 텍스트로 묶어서 합치기
+    if(stringAry.Num() > 1)
+    {
+        for(const auto& sentence : stringAry)
+        {
+            if(!sentence.IsEmpty())
+            {
+                result.Append(FRichString(sentence, type).FormatString(sentence, type));
+            }
+        }
+    }
+    else {
+        // 스타일 처리
+        result = FString::Printf(TEXT("<%s>%s</>")
+        , *UJ_Utility::ToStringEnumPure(type)
+        , *temp);
+    }
 
     return result;
 }

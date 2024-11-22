@@ -378,13 +378,13 @@ void AJ_ObjectiveNeutralizeTarget::UpdateTargetScore(class AJ_MissionPlayerContr
     targetScoreMap[pc] = score;
 
     bool isEnd = CheckAllTargetHit();
+
+    // 수행도 산정
+    SUCCESS_PERCENT = CalcSuccessPercent();
+
+    // 모두 타격했으니 종료
     if(isEnd)
-    {
-        // 수행도 산정
-        SUCCESS_PERCENT = CalcSuccessPercent();
-        // 모두 타격했으니 종료
         ObjectiveEnd(true);
-    }
 }
 
 // 모든 pc 가 과녁 타격했는지 체크
