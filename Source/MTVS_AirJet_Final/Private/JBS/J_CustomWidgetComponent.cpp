@@ -42,17 +42,13 @@ void UJ_CustomWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
         if(enableFixHeight)
             FixHeight(localPC);
     }
-
-
-
-    
 }
 
 
 void UJ_CustomWidgetComponent::Billboard(APlayerController * pc)
 {
     if(!pc) return;
-    // GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("awodijwad: %s"), *pc->GetName()));
+
     FVector targetLoc = pc->PlayerCameraManager->GetCameraLocation();
     FVector worldUILoc = this->GetComponentLocation();
     
@@ -90,8 +86,14 @@ void UJ_CustomWidgetComponent::FixHeight(APlayerController * pc)
     this->SetWorldLocation(temp);
 }
 
+void UJ_CustomWidgetComponent::MRPC_SetVisible_Implementation(bool value)
+{
+    SetVisible(value);
+}
+
 void UJ_CustomWidgetComponent::SetVisible(bool value)
 {
     this->SetActive(value);
 	this->SetHiddenInGame(!value);
 }
+

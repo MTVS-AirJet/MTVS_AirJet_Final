@@ -29,6 +29,12 @@ protected:
 	void SetIsFormation(bool value) {isFormation = value;}
 		protected:
 
+	// ui 업데이트 주기
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float uiUpdateInterval = .1f;
+	// ui 업데이트 타이머
+	FTimerHandle uiUpdateTimer;
+
 #pragma region 조건 체크용 값 변수들
 	// 조건 충족 값
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Check|Values")
@@ -121,6 +127,10 @@ protected:
 
     // 목표 UI 값 갱신 | 수행도 갱신 시 호출
     virtual void UpdateObjUI() override;
+
+	// ui 업데이트 타이머 종료
+	UFUNCTION(BlueprintCallable)
+    virtual void ClearUIUpdateTimer();
 #pragma endregion
 
     public:

@@ -13,6 +13,7 @@
 #include "CesiumGeoreference.h"
 //#include "CesiumCartographicPolygon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Cesium3DTileset.h"
 
 // Sets default values
 AK_CesiumTeleportBox::AK_CesiumTeleportBox()
@@ -148,7 +149,18 @@ void AK_CesiumTeleportBox::NotifyFlight(APawn* flightPawn)
     pc->SRPC_AddFlightArySelf();
 }
 
-void AK_CesiumTeleportBox::MRPC_ChangeMissionArea_Implementation()
+void AK_CesiumTeleportBox::SRPC_ChangeMissionArea_Implementation()
 {
-    ChangeMissionArea();
+    const FVector targetVec(DestLatitude, DestLongitude, 0);
+
+    MRPC_ChangeMissionArea(targetVec);
+}
+
+void AK_CesiumTeleportBox::MRPC_ChangeMissionArea_Implementation(const FVector& location)
+{
+    // 지구
+    auto* geoRef = ACesiumGeoreference::GetDefaultGeoreference(this);
+    
+    // 좌표 이동
+    geoRef->SetOriginLongitudeLatitudeHeight(location);
 }

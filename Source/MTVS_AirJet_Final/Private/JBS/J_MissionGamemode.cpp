@@ -374,7 +374,7 @@ void AJ_MissionGamemode::ChangeMissionArea()
     // 위경도 미션 지역으로 설정
     cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
     // 변경 요청
-    cesiumTPBox->MRPC_ChangeMissionArea();
+    cesiumTPBox->SRPC_ChangeMissionArea();
     //텔포박스 비활성화
     auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
     // if(boxComp)
