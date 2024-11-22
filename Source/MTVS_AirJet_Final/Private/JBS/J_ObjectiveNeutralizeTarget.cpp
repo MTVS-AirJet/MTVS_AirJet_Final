@@ -128,7 +128,7 @@ void AJ_ObjectiveNeutralizeTarget::InitSubMovePoints()
     if(!HasAuthority() || IS_OBJ_ENDED) return;
 
     // icon 비활성화
-    iconWorldUIComp->SetVisible(false);
+    iconWorldUIComp->MRPC_SetVisible(false);
 
     // 현 시점 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
@@ -344,7 +344,7 @@ void AJ_ObjectiveNeutralizeTarget::StartHitTarget()
     // 모든 타겟 활성화
     targetActiveDel.Broadcast(true);
     // icon 활성화
-    iconWorldUIComp->SetVisible(true);
+    iconWorldUIComp->MRPC_SetVisible(true);
 
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
 

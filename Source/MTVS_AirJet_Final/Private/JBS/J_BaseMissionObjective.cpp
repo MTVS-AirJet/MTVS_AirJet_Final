@@ -144,7 +144,7 @@ void AJ_BaseMissionObjective::SetObjectiveActive(bool value)
 	// 값 설정
 	isObjectiveActive = value;
 	// iconui 활/비
-	iconWorldUIComp->SetVisible(value);
+	iconWorldUIComp->MRPC_SetVisible(value);
 	// 활/비 딜리게이트 실행
 	if(isObjectiveActive)
 		objectiveActiveDel.Broadcast();

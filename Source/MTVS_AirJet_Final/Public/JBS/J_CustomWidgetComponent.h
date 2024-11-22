@@ -57,4 +57,7 @@ public:
 	// 활성화 설정
 	UFUNCTION(BlueprintCallable)
 	void SetVisible(bool value);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MRPC_SetVisible(bool value);
 };

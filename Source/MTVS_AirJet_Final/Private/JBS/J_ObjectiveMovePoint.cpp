@@ -69,12 +69,17 @@ void AJ_ObjectiveMovePoint::InitBindDel()
 void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)
 {
     Super::SetObjectiveActive(value);
+    
+    // 빔 활/비활성화
+    MRPC_SetVisibleBeam(value);
+}
 
+void AJ_ObjectiveMovePoint::MRPC_SetVisibleBeam_Implementation(bool value)
+{
     // 충돌체 활/비활성화
     checkCapsuleComp->SetActive(value);
     FName profile = value ? FName(TEXT("MovePoint")) : FName(TEXT("NoCollision"));
     checkCapsuleComp->SetCollisionProfileName(profile);
-
     // 이펙트 메시 활/비활성화
     beamMeshComp->SetHiddenInGame(!value);
 }
