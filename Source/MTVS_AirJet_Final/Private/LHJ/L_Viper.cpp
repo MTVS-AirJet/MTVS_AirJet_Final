@@ -107,6 +107,7 @@ AL_Viper::AL_Viper()
 	MissileWidget->SetupAttachment(JetMesh);
 	MissileWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
 	MissileWidget->SetDrawSize(FVector2D(200 , 200));
+	MissileWidget->SetVisibility(false);
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -129,7 +130,7 @@ AL_Viper::AL_Viper()
 	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
 	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
 	JetCameraMissileCam->SetRelativeScale3D(FVector(.1 , 1 , .5));
-
+	
 	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
 	BoosterLeftVFX->SetupAttachment(JetMesh);
@@ -1101,7 +1102,7 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 void AL_Viper::F_ViperMoveCompleted(const struct FInputActionValue& value)
 {
-	QuatTargetRotation = QuatCurrentRotation;
+	//QuatTargetRotation = QuatCurrentRotation;
 }
 #pragma endregion
 
@@ -1627,13 +1628,13 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma endregion
 
 #pragma region Flare Arrow Rotation Change
-		if (CurrentWeapon == EWeapon::Flare)
-		{
-			int32 randRot = FMath::RandRange(-150 , -110);
-			FRotator newFlareRot = FRotator(randRot , 0 , 0);
-			JetFlareArrow3->SetRelativeRotation(newFlareRot);
-			JetFlareArrow2->SetRelativeRotation(newFlareRot);
-		}
+		// if (CurrentWeapon == EWeapon::Flare)
+		// {
+		// 	int32 randRot = FMath::RandRange(-150 , -110);
+		// 	FRotator newFlareRot = FRotator(randRot , 0 , 0);
+		// 	JetFlareArrow3->SetRelativeRotation(newFlareRot);
+		// 	JetFlareArrow2->SetRelativeRotation(newFlareRot);
+		// }
 #pragma endregion
 	}
 #pragma endregion
@@ -3006,12 +3007,12 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 void AL_Viper::SetEngineOn()
 {
 	IsEngineOn = true;
-	bStartLockOn = false;
-	bLockOnStart = true;
 }
 #pragma endregion
 
 void AL_Viper::CRPC_TeleportSetting_Implementation()
 {
 	bJetTailVFXOn = true;
+	bJetAirVFXOn = true;
+	IsEngineOn = false;
 }
