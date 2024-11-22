@@ -1063,7 +1063,7 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 {
 	FVector2D moveVector = value.Get<FVector2D>();
-
+	moveVector = moveVector / 4 * 3;
 	// 입력값에 최대 회전 각도 제한 적용
 	float RollAngle = 0.f;
 	float PitchAngle = 0.f;
@@ -1085,8 +1085,6 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
-	// LOG_S(Warning , TEXT("QuatTargetRotation.Rotator() : %f, %f, %f") , QuatTargetRotation.Rotator().Roll ,
-	// 	  QuatTargetRotation.Rotator().Pitch , QuatTargetRotation.Rotator().Yaw);
 
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
