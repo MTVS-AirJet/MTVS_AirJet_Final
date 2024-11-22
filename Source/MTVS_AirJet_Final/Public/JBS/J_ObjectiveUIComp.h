@@ -7,6 +7,7 @@
 #include "JBS/J_Utility.h"
 #include "J_ObjectiveUIComp.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPopupEndDelegate);
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MTVS_AIRJET_FINAL_API UJ_ObjectiveUIComp : public UActorComponent
@@ -46,7 +47,9 @@ protected:
 	TSubclassOf<class UJ_ObjectiveUI> objUIPrefab;
 
 public:
-
+	// 팝업 비활성화 딜리게이트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
+	FPopupEndDelegate popupEndDel;
 protected:
 	// 목표 UI 생성
     void InitObjUI();
@@ -119,7 +122,19 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_SwitchResultUI(const TArray<FObjectiveData>& resultObjData);
 
-	// 결산 UI 가져오기 | 바로 접근용
+	// 팝업 ui 활성화 및 설정
+	UFUNCTION(Client, Unreliable)
+	void CRPC_ActivePopupUI(const EMissionProcess &mpIdx);
+
+	// 팝업 ui 비활성화
+	UFUNCTION(BlueprintCallable)
+	void DeactivatePopupUI();
+
+        // 팝업 ui 비활성화 됨 알림
+	UFUNCTION(Server, Reliable)
+	void SRPC_DeactivatedPopupUI();
+
+        // 결산 UI 가져오기 | 바로 접근용
 	UFUNCTION(BlueprintCallable)
 	class UJ_MissionCompleteUI *GetMissionCompleteUI();
 };

@@ -19,6 +19,9 @@ DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool)
 // 미션 시작 딜리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
 
+// 미션 종료 딜리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMissionEndDelegate);
+
 
 UCLASS()
 class MTVS_AIRJET_FINAL_API AJ_MissionGamemode : public AGameModeBase
@@ -141,6 +144,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     bool isTPReady = false;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    FMissionEndDelegate missionEndDel;
+
 protected:
     virtual void BeginPlay() override;
 
@@ -148,14 +154,19 @@ protected:
     UFUNCTION(BlueprintCallable)
     virtual void StartMission();
 
-    // XXX 미사용
-    void LoadMissionMap();
-
     // 호스트 GI에서 미션 데이터 로드
     FMissionDataRes LoadMissionData();
 
     // 미션 지역으로 세슘 이동
     void ChangeMissionArea();
+
+    // 첫 번째 전술명령 시작
+    UFUNCTION(BlueprintCallable)
+    void StartFirstTacticalOrder();
+
+    // 기본 목표 시작
+    UFUNCTION(BlueprintCallable)
+    void StartDefaultObjective();
 
     // 해당하는 역할의 스폰포인트 가져오기
     class AJ_MissionSpawnPointActor* GetSpawnPoint(EPlayerRole role);

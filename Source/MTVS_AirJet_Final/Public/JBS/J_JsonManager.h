@@ -27,6 +27,7 @@ protected:
 	float stopWatchTime = 0.f;
 
 public:
+	
 
 protected:
     void ToggleStopWatch()
@@ -36,6 +37,11 @@ protected:
 		// 활성화 시 초기화
 		if(bStopWatch)
 			stopWatchTime = 0.f;
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 999.f, FColor::Yellow, FString::Printf(TEXT("스톱워치 : %.2f"), stopWatchTime));
+		}
+		 
 		
 	}
 
@@ -71,10 +77,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	TArray<FCommanderVoiceRes> allVoiceData;
 
+
 public:
 	// 테스트용 사운드 파일
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	class USoundWaveProcedural* tempVoice;
+
+	// ai 전체 보이스 배열
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TArray<class USoundWaveProcedural*> voiceAry;
 
 protected:
 #pragma region 웹 통신 테스트

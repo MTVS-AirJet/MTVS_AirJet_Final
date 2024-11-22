@@ -193,6 +193,14 @@ int UJ_Utility::ConvertEngineProgressToMissionProcessIdx(const EEngineProgress& 
     return result;
 }
 
+UDataTable *UJ_Utility::GetMissionProgressDT(const UWorld *world)
+{
+    // gi 가져오기
+    auto* gi = GetJGameInstance(world);
+
+    return gi->missionProgressDT;
+}
+
 // === 구조체 함수 구현
 
 ETacticalOrder FMissionObject::GetOrderType() const
@@ -383,31 +391,13 @@ FString FEngineProgressData::ToStringProgressEnum(EEngineProgress type) const
 
 FString FRichString::FormatString(const FString &str, ETextStyle type) const
 {
-
-    // XXX 동적으로 하려고 enum 값대로 변경
-    // FString result = "";
-    // switch(type)
-    // {
-    // case ETextStyle::DEFAULT:
-    //     result = FString::Printf(TEXT("<Default>%s</>"), *str);
-    //     break;
-    // case ETextStyle::SUCCESS:
-    //     result = FString::Printf(TEXT("<Success>%s</>"), *str);
-    //     break;
-    // case ETextStyle::FAIL:
-    //     result = FString::Printf(TEXT("<Fail>%s</>"), *str);
-    //     break;
-    // case ETextStyle::OBJDETAIL:
-    //     result = FString::Printf(TEXT("<ObjDetail>%s</>"), *str);
-    //     break;
-    // case ETextStyle::RESULTDEFAULT:
-    //     result = FString::Printf(TEXT("<ResultDefault>%s</>"), *str);
-    //     break;
-    // }
-
-    FString result = FString::Printf(TEXT("<%s>%s</>")
+    // 줄바꿈 교체
+    FString result = str.Replace(TEXT("\n"), TEXT("<br>"));
+    
+    // 스타일 처리
+    result = FString::Printf(TEXT("<%s>%s</>")
     , *UJ_Utility::ToStringEnumPure(type)
-    , *str);
+    , *result);
 
     return result;
 }
@@ -476,4 +466,5 @@ FString FFormationFlightUIData::ToStringPilotRolt() const
 
     return result;
 }
+
 

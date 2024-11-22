@@ -527,6 +527,7 @@ enum class ETextStyle : uint8
     ,OBJDETAILSUCCESS
     ,OBJDETAILFAIL
     ,RESULTHEADER
+    ,HEADER
     
 };
 
@@ -933,6 +934,22 @@ enum class EMissionProcess : uint8
     ,MISSION_END = 255
 };
 
+// 미션 진행 엑셀 시트 정보
+USTRUCT(BlueprintType)
+struct FMissionProgressDT : public FTableRowBase
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    int idx;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    EMissionProcess EMissionProcess;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values", meta = (MultiLine = false))
+    FString popupText;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float popupDelay;
+};
+
 // solved 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
@@ -1016,6 +1033,9 @@ public:
 
     // 시동 절차 공동 idx로 변환
     static int ConvertEngineProgressToMissionProcessIdx(const EEngineProgress& value);
+
+    // 미션 절차 데이터 테이블 주기
+    static class UDataTable *GetMissionProgressDT(const UWorld *world);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1000000.f;

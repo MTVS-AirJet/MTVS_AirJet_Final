@@ -83,6 +83,12 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     // 다음 수행으로 넘어가기
     ActiveNextProgress(data, isSuccess);
 
+    // 스탠바이 상태가 되면 팝업 활성화
+    if(data.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
+    {
+        pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::STANDBY_OTHER_PLAYER);
+    }
+
     // 다음 지휘관 보이스 실행
     // 시동 절차 -> 미션 인덱스로 변환
     int mpIdx = UJ_Utility::ConvertEngineProgressToMissionProcessIdx(data.curProgress);
