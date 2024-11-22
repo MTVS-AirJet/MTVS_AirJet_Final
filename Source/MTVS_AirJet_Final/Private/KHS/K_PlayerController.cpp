@@ -270,7 +270,7 @@ void AK_PlayerController::RemoveStandbyWidget(const struct FInputActionValue& va
 	GEngine->AddOnScreenDebugMessage(-1 , 1.0f , FColor::Red , TEXT("Remove UI"));
 	if (StandbyUI)
 	{
-		StandbyUI->RemoveUI();
+		StandbyUI->StartMission();
 	}
 }
 
