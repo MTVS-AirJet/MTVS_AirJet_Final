@@ -527,6 +527,7 @@ enum class ETextStyle : uint8
     ,OBJDETAILSUCCESS
     ,OBJDETAILFAIL
     ,RESULTHEADER
+    ,HEADER
     
 };
 
@@ -933,6 +934,7 @@ enum class EMissionProcess : uint8
     ,MISSION_END = 255
 };
 
+// 미션 진행 엑셀 시트 정보
 USTRUCT(BlueprintType)
 struct FMissionProgressDT : public FTableRowBase
 {
@@ -943,7 +945,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     EMissionProcess EMissionProcess;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values", meta = (MultiLine = false))
-    FString popuptext;
+    FString popupText;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float popupDelay;
 };
 
 // solved 테스트 용

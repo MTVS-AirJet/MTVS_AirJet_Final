@@ -265,9 +265,23 @@ void AJ_MissionGamemode::StartMissionLevel()
         if(!pc) continue;
         // 미션 시작 보이스 재생
         pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::MISSION_START));
-        
+
+        // 호스트면 팝업 비활성화시 시동 시작 바인드
+        if(pc->IsLocalPlayerController())
+            pc->objUIComp->popupEndDel.AddDynamic( this, &AJ_MissionGamemode::StartDefaultObjective);
+
+        // 팝업 활성화
+        pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::MIC_SWITCH_ON);
     }
-    
+}
+
+void AJ_MissionGamemode::StartDefaultObjective()
+{
+    AJ_MissionPlayerController* outHost;
+    // 바인드 제거
+    UJ_Utility::GetLocalPlayerController(GetWorld(), outHost);
+    outHost->objUIComp->popupEndDel.RemoveDynamic( this, &AJ_MissionGamemode::StartDefaultObjective);
+
     // 시동 목표 시작
     objectiveManagerComp->StartDefualtObj();
 }
@@ -363,8 +377,10 @@ void AJ_MissionGamemode::ChangeMissionArea()
     cesiumTPBox->MRPC_ChangeMissionArea();
     //텔포박스 비활성화
     auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
-    if(boxComp)
-        boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+    // if(boxComp)
+    //     boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+    // 충돌의 원인을 제거
+    boxComp->DestroyComponent();
 }
 
 void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startPoint)
@@ -405,31 +421,36 @@ void AJ_MissionGamemode::DelayStartTacticalOrder(float delayTime)
         {
             if(!pc) continue;
             pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
+            // 비활성화 될때 전술 명령 시작 | 호스트만
+            if(pc->IsLocalPlayerController())
+                pc->objUIComp->popupEndDel.AddDynamic( this, &AJ_MissionGamemode::StartFirstTacticalOrder);
             // 팝업 UI 활성화
             pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::TAKE_OFF_END);
         }
-
-        // FIXME 팝업 ui 비활성화 될때 실행으로 바인드 해야함
-        FTimerHandle timerHandle2;
-        GetWorld()->GetTimerManager()
-            .SetTimer(timerHandle2, [this]() mutable
-        {
-            auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-            
-            //타이머에서 할 거
-            for(auto* pc : allPC)
-            {
-                if(!pc) continue;
-                auto* pawn = pc->GetPawn<AL_Viper>();
-                if(!pawn) continue;
-                // 고정 해제
-                pawn->SetEngineOn();
-            }
-            // 미션 시작
-            this->objectiveManagerComp->ActiveNextObjective();
-        }, 5.f, false);
-        
     }, delayTime, false);
+}
+
+void AJ_MissionGamemode::StartFirstTacticalOrder()
+{
+    // 팝업 바인드 제거
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+            
+    //타이머에서 할 거
+    for(auto* pc : allPC)
+    {
+        if(!pc) continue;
+
+        // 호스트면 바인드된 함수 제거
+        if(pc->IsLocalPlayerController())
+            pc->objUIComp->popupEndDel.RemoveDynamic(this, &AJ_MissionGamemode::StartFirstTacticalOrder);
+
+        auto* pawn = pc->GetPawn<AL_Viper>();
+        if(!pawn) continue;
+        // 고정 해제
+        pawn->SetEngineOn();
+    }
+    // 미션 시작
+    this->objectiveManagerComp->ActiveNextObjective();
 }
 
 void AJ_MissionGamemode::Tick(float DeltaSeconds)

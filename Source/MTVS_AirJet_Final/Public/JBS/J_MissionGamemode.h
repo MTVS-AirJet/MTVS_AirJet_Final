@@ -160,6 +160,14 @@ protected:
     // 미션 지역으로 세슘 이동
     void ChangeMissionArea();
 
+    // 첫 번째 전술명령 시작
+    UFUNCTION(BlueprintCallable)
+    void StartFirstTacticalOrder();
+
+    // 기본 목표 시작
+    UFUNCTION(BlueprintCallable)
+    void StartDefaultObjective();
+
     // 해당하는 역할의 스폰포인트 가져오기
     class AJ_MissionSpawnPointActor* GetSpawnPoint(EPlayerRole role);
 

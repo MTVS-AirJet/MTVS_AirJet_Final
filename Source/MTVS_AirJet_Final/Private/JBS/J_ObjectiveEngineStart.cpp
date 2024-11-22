@@ -36,8 +36,6 @@ void AJ_ObjectiveEngineStart::ObjectiveActive()
         if(!pc) continue;
 
         pc->sendEngineProgDel.BindUObject(this, &AJ_ObjectiveEngineStart::CheckProgress);
-        // 팝업 활성화
-        pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::MIC_SWITCH_ON);
     }
 
     // 목표 종료시 수행도 결과 계산 바인드

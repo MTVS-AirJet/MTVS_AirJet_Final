@@ -11,6 +11,7 @@
 #include "JBS/J_ObjectiveUI.h"
 #include "JBS/J_Utility.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 #include "UObject/Class.h"
 #include "JBS/J_ObjectiveTextUI.h"
 #include "JBS/J_MissionCompleteUI.h"
@@ -66,6 +67,9 @@ void UJ_ObjectiveUIComp::InitObjUI()
 
 	// 로비 돌아가기 함수 바인드
 	this->GetMissionCompleteUI()->returnLobbyDel.BindUObject(ownerPC, &AJ_MissionPlayerController::TravelToLobbyLevel);
+
+	// 팝업 ui 비활성화 딜리게이트 바인드
+	OBJ_UI->POPUP_UI->deactiveDel.AddDynamic( this, &UJ_ObjectiveUIComp::SRPC_DeactivatedPopupUI);
 
 #pragma endregion
 
@@ -298,7 +302,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	FString checkHeightStr = FString::FormatAsNumber(data.checkHeight * 3.281 / 100);
 	FString curHeightStr = FString::FormatAsNumber(data.curHeight * 3.281 / 100);
 
-	objUIData.headerText = FRichString(TEXT("편대 비행")).GetFormatString();
+	objUIData.headerText = FRichString(TEXT("편대 비행"), ETextStyle::HEADER).GetFormatString();
 	// 고도 체크 서브
 	// FIXME 이거 uidata 에서 애초에 받는걸로 변경하기
 	float checkHeightAdj = 60000;
@@ -429,7 +433,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FNeutralizeTargetUIData &data, TArra
 	FTextUIData detailUIData;
 
 	// 목표 단
-	objUIData.headerText = FRichString(TEXT("공대지 훈련")).GetFormatString();
+	objUIData.headerText = FRichString(TEXT("공대지 훈련"), ETextStyle::HEADER).GetFormatString();
 	objUIData.bodyObjAry;
 
 	// 서브 이동 목표 
@@ -502,7 +506,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 	FTextUIData detailUIData;
 	check(this);
 	// 목표 단
-	objUIData.headerText = FRichString(TEXT("시동 절차")).GetFormatString();
+	objUIData.headerText = FRichString(TEXT("시동 절차"), ETextStyle::HEADER).GetFormatString();
 	// 시동 절차 텍스트 설정
 	for(int i = static_cast<int>(EEngineProgress::MIC_SWITCH_ON); i <= static_cast<int>(EEngineProgress::RELEASE_SIDE_BREAK); i ++)
 	{
@@ -520,7 +524,6 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 		// 리치 텍스트 설정
 		
 		// 본문에 추가
-		// objUIData.bodyTextAry.Add(str);
 		FDefaultTextUIData subObj;
 		subObj.headerText = FRichString(data.ToStringProgressEnum(type), style).GetFormatString();
 		// @@ 좀 효율적으로 바꿀 필요 있음
@@ -586,7 +589,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FTakeOffData &data, TArray<FTextUIDa
 	FTextUIData detailUIData;
 	check(this);
 	// 목표 단
-	objUIData.headerText = FRichString(TEXT("이륙 시작")).GetFormatString();
+	objUIData.headerText = FRichString(TEXT("이륙 시작"), ETextStyle::HEADER).GetFormatString();
 
 	// 서브 목표 단
 	ETextStyle style = data.curTakeOffCnt <= data.maxTakeOffCnt ? ETextStyle::DEFAULT : ETextStyle::SUCCESS;
@@ -623,11 +626,23 @@ void UJ_ObjectiveUIComp::CRPC_ActivePopupUI_Implementation(const EMissionProcess
 	auto row = mdt->FindRow<FMissionProgressDT>(findRow,  TEXT("Find popup ui data"));
 
 	// 팝업 ui 설정
-	OBJ_UI->POPUP_UI->SetPopupText(mpIdx, row->popuptext);
+	OBJ_UI->POPUP_UI->SetPopupText(mpIdx, row->popupText, row->popupDelay);
+
+	
 
 	// FString debugSTR = FString::Printf(TEXT("enum : %s, string : %s"), *UJ_Utility::ToStringEnumPure(row->EMissionProcess), *row->popuptext);
 	// UJ_Utility::PrintFullLog(debugSTR);
-
-	
-	
 }
+
+void UJ_ObjectiveUIComp::DeactivatePopupUI()
+{
+	GetWorld()->GetTimerManager().ClearTimer(OBJ_UI->POPUP_UI->deactiveTimer);
+	OBJ_UI->POPUP_UI->PlayDeactiveAnim();
+}
+
+void UJ_ObjectiveUIComp::SRPC_DeactivatedPopupUI_Implementation()
+{
+	// 비활성화 딜리게이트 실행
+	this->popupEndDel.Broadcast();
+}
+

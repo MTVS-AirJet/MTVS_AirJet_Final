@@ -525,12 +525,16 @@ void AJ_ObjectiveNeutralizeTarget::EndSubMPUI()
     // 성공 여부 계산
     bool isSuccess = subMP->SUCCESS_PERCENT > 0;
 
+    // ui 업데이트
+    UpdateObjUI();
+
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     for(auto* pc : allPC)
     {
         if(!pc) continue;
 
         EndSubObjUI(pc, CUR_ACTIVE_SUBMP_IDX, isSuccess);
+        
     }
 }
 

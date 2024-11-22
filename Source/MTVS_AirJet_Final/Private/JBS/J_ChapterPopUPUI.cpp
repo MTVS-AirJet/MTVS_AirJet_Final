@@ -7,11 +7,15 @@
 #include "JBS/J_Utility.h"
 #include "TimerManager.h"
 
-void UJ_ChapterPopUPUI::SetPopupText(const EMissionProcess& mpIdx, const FString& normalStr)
+void UJ_ChapterPopUPUI::SetPopupText(const EMissionProcess& mpIdx, const FString& normalStr, const float& newDelayTime)
 {
     SetActive(true);
     
     // @@ 초상화 바뀔일이 있을까?
+
+    // 새 딜레이 시간 적용
+    if(newDelayTime > 0.1f)
+        deActiveDelay = newDelayTime;
 
     // 텍스트 스타일대로 포맷해서 설정
     popupText->SetText(FText::FromString(FRichString(normalStr, textStyle).GetFormatString()));
@@ -26,16 +30,18 @@ void UJ_ChapterPopUPUI::SetActive(bool value)
     // 딜리게이트 실행
     if(value)
     {
+        PlayActiveAnim();
+
         activeDel.Broadcast();
 
-        // FIXME 임시로 5초뒤 비활성화
+        // 시트에 정해진 시간 이후에 비활성화
         auto& tm = GetWorld()->GetTimerManager();
-        tm.ClearTimer(tempDeactiveTimer);
+        tm.ClearTimer(deactiveTimer);
 
-        tm.SetTimer(tempDeactiveTimer, [this]() mutable
+        tm.SetTimer(deactiveTimer, [this]() mutable
         {
-            SetActive(false);
-        }, 5.f, false);
+            PlayDeactiveAnim();
+        }, deActiveDelay, false);
     }
     else
         deactiveDel.Broadcast();
