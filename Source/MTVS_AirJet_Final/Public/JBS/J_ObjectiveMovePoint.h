@@ -49,7 +49,7 @@ protected:
 /* MOVEPOINT는 하위 목표나 상속받아 편대비행으로 사용하므로 UI DATA 전송은 하지 않음
    따라서 딜리게이트 바인드 설정 | InitBindDel (편대비행은 따로 처리)
 -> 성공 체크할 캡슐 overlap 함수 바인드
--> 목표 활성 유무에 따라 체크 캡슐 및 빔 이펙트 메시 활성화 동기화 | SetObjectiveActive
+-> 목표 활성 유무에 따라 체크 캡슐 및 빔 이펙트 메시 활성화 동기화 | SetObjectiveActive, MRPC_SetVisibleBeam
 -> 목표 활성화시 실패 판정 방향 설정(편대장 기준) | ObjectiveActive, SetBaseDir
 */
 	virtual void BeginPlay();
@@ -59,7 +59,11 @@ protected:
 
 	virtual void ObjectiveActive();
 
-	// 기준 방향 설정 | 호스트 전투기 기준
+	// 빔 메시 활/비활성화
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MRPC_SetVisibleBeam(bool value);
+
+        // 기준 방향 설정 | 호스트 전투기 기준
 	FVector SetBaseDir();
 #pragma endregion
 
