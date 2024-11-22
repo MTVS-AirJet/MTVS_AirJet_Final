@@ -1085,6 +1085,8 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+	RollAngle = 0.f;
+	PitchAngle = 0.f;
 
 #pragma region Retate Pawn
 	ServerRPCRotation(QuatTargetRotation);
