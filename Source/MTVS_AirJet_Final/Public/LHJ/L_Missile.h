@@ -19,7 +19,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,12 +33,9 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Defalut|Components")
 	class UNiagaraComponent* SmokeVFX;
 
-	
-
 	UPROPERTY(EditDefaultsOnly , Category="Default|Sound")
 	class UAudioComponent* AudioComponent;
-	
-
+		
 private:
 	UPROPERTY(EditDefaultsOnly , Category="Default|Move")
 	class UCurveFloat* MissileCurve;

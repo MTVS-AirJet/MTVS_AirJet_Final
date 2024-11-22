@@ -3,14 +3,11 @@
 
 #include "LHJ/L_Missile.h"
 
-#include "MTVS_AirJet_Final.h"
 #include "Math/MathFwd.h"
 #include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "JBS/J_MissionActorInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "LHJ/L_Viper.h"
 
 // Sets default values
@@ -145,7 +142,7 @@ void AL_Missile::OnMissileBeginOverlap(UPrimitiveComponent* OverlappedComponent 
 
 void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 {
-	LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
+	// LOG_S(Warning , TEXT("%s를 맞추었습니다.") , *HitActor->GetName());
 	// 데미지 처리
 	if (auto mai = Cast<IJ_MissionActorInterface>(HitActor))
 	{
@@ -154,5 +151,6 @@ void AL_Missile::ServerRPCDamage_Implementation(AActor* HitActor)
 		if (auto viper = Cast<AL_Viper>(GetOwner()))
 			viper->Call_CRPC_MissileImpact(HitActor->GetActorLocation());
 	}
+	//bStartDestroy=true;
 	this->Destroy();
 }

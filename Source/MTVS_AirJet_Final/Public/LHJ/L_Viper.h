@@ -68,6 +68,10 @@ public:
 	class USpringArmComponent* JetSprintArmFPS;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
 	class UCameraComponent* JetCameraFPS;
+	UPROPERTY(EditDefaultsOnly , Category="Components")
+	class USpringArmComponent* JetSpringArmMissileCam;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadWrite)
+	class USceneCaptureComponent2D* JetCameraMissileCam;
 #pragma endregion
 
 #pragma region Prop
@@ -107,6 +111,8 @@ private:
 #pragma region Widget & Effect
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UWidgetComponent* JetWidget;
+	UPROPERTY(EditDefaultsOnly , category="Components")
+	class UWidgetComponent* MissileWidget;
 
 	UPROPERTY(EditDefaultsOnly , category="Components")
 	class UNiagaraComponent* BoosterLeftVFX;
@@ -408,6 +414,8 @@ private:
 
 	UFUNCTION(Client , Reliable)
 	void ClientRPCLockOn();
+	UFUNCTION(Client, Reliable)
+	void CRPC_MissileCapture();
 
 	bool bStartLockOn;
 	
@@ -535,8 +543,8 @@ public:
 private:
 	UFUNCTION()
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
-	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
-	                     const FHitResult& SweepResult);
+						 UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+						 const FHitResult& SweepResult);
 	//=====================================
 	// 캐노피
 	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
@@ -601,9 +609,9 @@ private:
 #pragma region KHS Works
 
 	//KHS 작업부분
-public :
-	// 플레이어리스트 업데이트 서버 요청
-	UFUNCTION(Server , Reliable)
+	public :
+		// 플레이어리스트 업데이트 서버 요청
+		UFUNCTION(Server , Reliable)
 	void ServerRPC_SetConnectedPlayerNames(const FString& newName);
 	// 플레이어리스트 Multicast 업데이트
 	UFUNCTION(Client , Reliable)
@@ -813,4 +821,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Client, Reliable)
 	void CRPC_TeleportSetting();
+
+private:
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetMissileCamRotate();
+	UPROPERTY(EditDefaultsOnly)
+	class UMaterialInterface* MissileSceneMat;
 };

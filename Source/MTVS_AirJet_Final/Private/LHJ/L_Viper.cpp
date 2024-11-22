@@ -11,8 +11,11 @@
 #include "Components/ArrowComponent.h"
 #include "Components/AudioComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/Image.h"
 #include "Components/PostProcessComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JBS/J_MissionActorInterface.h"
 #include "JBS/J_MissionPlayerController.h"
@@ -28,6 +31,8 @@
 #include "KHS/K_StandbyWidget.h"
 #include "GameFramework/PlayerState.h"
 #include "JBS/J_GroundTarget.h"
+#include "Kismet/KismetRenderingLibrary.h"
+#include "LHJ/L_MissileCam.h"
 #include "LHJ/L_Target.h"
 
 FKey lMouse = EKeys::LeftMouseButton;
@@ -97,6 +102,11 @@ AL_Viper::AL_Viper()
 	JetWidget->SetupAttachment(JetMesh);
 	JetWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
 	JetWidget->SetDrawSize(FVector2D(200 , 150));
+
+	MissileWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MissileWidget"));
+	MissileWidget->SetupAttachment(JetMesh);
+	MissileWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
+	MissileWidget->SetDrawSize(FVector2D(200 , 200));
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -108,6 +118,17 @@ AL_Viper::AL_Viper()
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
+
+	JetSpringArmMissileCam = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSpringArmMissileCam"));
+	JetSpringArmMissileCam->SetupAttachment(JetMesh);
+	JetSpringArmMissileCam->SetRelativeRotation(FRotator(45 , 0 , 0));
+	JetSpringArmMissileCam->bInheritPitch = false;
+	JetSpringArmMissileCam->bInheritRoll = false;
+	JetSpringArmMissileCam->bInheritYaw = false;
+	JetCameraMissileCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("JetCameraMissileCam"));
+	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
+	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
+	JetCameraMissileCam->SetRelativeScale3D(FVector(.1 , 1 , .5));
 
 	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
@@ -1132,6 +1153,8 @@ void AL_Viper::BeginPlay()
 	AirResistanceVFX->SetVisibility(false);
 
 	QuatCurrentRotation = GetActorRotation().Quaternion();
+
+	JetCameraMissileCam->HideActorComponents(this);
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1165,7 +1188,7 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 		else if (CanopyPitch == 0)
 		{
-			if(bPlayCanopyEndSound)
+			if (bPlayCanopyEndSound)
 			{
 				CRPC_CanopyAudioControl(true , 2);
 				bPlayCanopyEndSound = false;
@@ -1183,7 +1206,7 @@ void AL_Viper::Tick(float DeltaTime)
 		}
 		else if (CanopyPitch == 80)
 		{
-			if(bPlayCanopyEndSound)
+			if (bPlayCanopyEndSound)
 			{
 				CRPC_CanopyAudioControl(true , 2);
 				bPlayCanopyEndSound = false;
@@ -1452,12 +1475,12 @@ void AL_Viper::Tick(float DeltaTime)
 
 		if (bStartAudio)
 		{
-			CurAudioTime+=DeltaTime;
-			if (CurAudioTime>=PlayAudioTime)
+			CurAudioTime += DeltaTime;
+			if (CurAudioTime >= PlayAudioTime)
 			{
 				if (auto pc = Cast<AK_PlayerController>(Controller))
 				{
-					pc->CRPC_SetMissionTextUI(19);									
+					pc->CRPC_SetMissionTextUI(19);
 				}
 				bStartAudio = false;
 			}
@@ -1574,21 +1597,30 @@ void AL_Viper::Tick(float DeltaTime)
 						GroundTarget = MissionActor;
 					}
 				}
-			}		
-			
+			}
+
 			ClientRPCLockOn();
-			
+
 			if (GroundTarget)
 			{
 				//auto dist = FVector::Distance(GetActorLocation() , GroundTarget->GetActorLocation());
-				auto dist = FMath::Abs(GetActorLocation().X-GroundTarget->GetActorLocation().X);
-				if (dist<=550000)
+				auto dist = FMath::Abs(GetActorLocation().X - GroundTarget->GetActorLocation().X);
+				if (dist <= 550000)
 				{
 					CRPC_MissilePitch(2.35f);
 				}
 				else
 				{
 					CRPC_MissilePitch(1.f);
+				}
+
+				if (!MissileWidget->IsVisible())
+				{
+					CRPC_MissileCapture();
+				}
+				else
+				{
+					CRPC_SetMissileCamRotate();
 				}
 			}
 		}
@@ -1875,8 +1907,7 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 				Missile , SpawnLocation , SpawnRotation , SpawnParams);
 			if (SpawnedMissile)
 			{
-				// Optionally add any initialization for the spawned missile here
-				//LOG_S(Warning , TEXT("미사일 발사!! 타겟은 %s") , *LockOnTarget->GetName());
+				
 			}
 		}
 		else
@@ -1944,7 +1975,7 @@ void AL_Viper::ClientRPCLockOn_Implementation()
 		CRPC_MissileSound(true);
 		bStartLockOn = true;
 	}
-	
+
 #pragma region Lock On
 	AActor* searchTarget = nullptr;
 	FVector Start = JetMesh->GetComponentLocation();
@@ -2094,6 +2125,33 @@ void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AAct
 	}
 }
 
+void AL_Viper::CRPC_MissileCapture_Implementation()
+{
+	MissileWidget->SetVisibility(true);
+
+	if (JetCameraMissileCam)
+	{
+		UMaterialInstanceDynamic* DynMaterial = UMaterialInstanceDynamic::Create(MissileSceneMat , this);
+		UTextureRenderTarget2D* MyRenderTarget = UKismetRenderingLibrary::CreateRenderTarget2D(
+			this , 2048 , 2048 , ETextureRenderTargetFormat::RTF_RGBA32f , FLinearColor::White);
+		JetCameraMissileCam->TextureTarget = MyRenderTarget;
+		DynMaterial->SetTextureParameterValue(FName("MissileScene") , JetCameraMissileCam->TextureTarget);
+
+		if (auto camui = Cast<UL_MissileCam>(MissileWidget->GetWidget()))
+		{
+			// UI의 Image 위젯에 설정
+			if (camui->img_cam)
+			{
+				// DynamicMaterial를 UI에 적용시키기 위해 FSlateBrush를 사용해야함
+				FSlateBrush Brush;
+				Brush.SetResourceObject(DynMaterial);
+				// 위잿 내부에 있는 이미지 변경
+				camui->img_cam->SetBrush(Brush);
+			}
+		}	
+	}
+}
+
 void AL_Viper::PlayLockOnSound()
 {
 	if (LockOnSound)
@@ -2103,6 +2161,13 @@ void AL_Viper::PlayLockOnSound()
 void AL_Viper::ClientRPC_LockOnStart_Implementation()
 {
 	bLockOnStart = true;
+}
+
+void AL_Viper::CRPC_SetMissileCamRotate_Implementation()
+{
+	auto distance = GroundTarget->GetActorLocation() - JetCameraMissileCam->GetComponentLocation();
+	auto rot = distance.Rotation();
+	JetCameraMissileCam->SetRelativeRotation(rot.Quaternion());
 }
 #pragma endregion
 
@@ -2408,14 +2473,14 @@ void AL_Viper::CRPC_EngineSound_Implementation(bool bStart , int32 idx)
 			JetEngineAudio->SetIntParameter("JetSoundIdx" , idx);
 			JetEngineAudio->Play(0.f);
 
-			if (idx==1)
+			if (idx == 1)
 			{
 				FTimerHandle Thnd;
-				GetWorld()->GetTimerManager().SetTimer(Thnd, [&]()
+				GetWorld()->GetTimerManager().SetTimer(Thnd , [&]()
 				{
 					JetEngineAudio->SetIntParameter("JetSoundIdx" , 2);
-	                JetEngineAudio->Play(0.f);
-				}, 5.f, false);
+					JetEngineAudio->Play(0.f);
+				} , 5.f , false);
 			}
 		}
 	}
@@ -2430,7 +2495,7 @@ void AL_Viper::CRPC_AirSound_Implementation(bool bStart)
 {
 	if (bStart)
 	{
-		if (JetAirAudio&&JetAirAudio->GetSound())
+		if (JetAirAudio && JetAirAudio->GetSound())
 		{
 			JetAirAudio->Play(0.f);
 		}
@@ -2446,7 +2511,7 @@ void AL_Viper::CRPC_MissileSound_Implementation(bool bStart)
 {
 	if (bStart)
 	{
-		if (JetMissileAudio&&JetMissileAudio->GetSound())
+		if (JetMissileAudio && JetMissileAudio->GetSound())
 		{
 			JetMissileAudio->SetIntParameter("MissileIdx" , 2);
 			JetMissileAudio->Play(0.f);
@@ -2888,7 +2953,7 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
 			CRPC_AirSound(true);
 		else
-			CRPC_AirSound(false);		
+			CRPC_AirSound(false);
 	}
 #pragma endregion
 }
@@ -2932,7 +2997,7 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 			CRPC_AirSound(true);
 		else
 			CRPC_AirSound(false);
-	}	
+	}
 #pragma endregion
 }
 #pragma endregion
@@ -2941,12 +3006,12 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 void AL_Viper::SetEngineOn()
 {
 	IsEngineOn = true;
+	bStartLockOn = false;
+	bLockOnStart = true;
 }
 #pragma endregion
 
 void AL_Viper::CRPC_TeleportSetting_Implementation()
 {
 	bJetTailVFXOn = true;
-	bJetAirVFXOn = true;
-	IsEngineOn = false;
 }
