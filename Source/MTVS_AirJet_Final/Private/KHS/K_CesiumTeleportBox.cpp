@@ -13,7 +13,6 @@
 #include "CesiumGeoreference.h"
 //#include "CesiumCartographicPolygon.h"
 #include "Kismet/GameplayStatics.h"
-#include "Cesium3DTileset.h"
 
 // Sets default values
 AK_CesiumTeleportBox::AK_CesiumTeleportBox()
