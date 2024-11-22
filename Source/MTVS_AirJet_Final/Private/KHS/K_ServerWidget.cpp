@@ -19,6 +19,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/Texture2D.h"
 #include "ImageUtils.h"
+#include "MTVS_AirJet_FinalCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "KHS/K_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
 #pragma region Initialize Settings
@@ -176,6 +179,11 @@ void UK_ServerWidget::OpenLobbyLevel()
 {
 	//ButtonClickSound를 재생하고싶다.
 	UGameplayStatics::PlaySound2D(GetWorld() , ButtonClickSound);
+
+	//플레이어 이동을 다시 재개
+	auto player = Cast<AMTVS_AirJet_FinalCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld() , 0));
+	//플레이어의 캐릭터 움직임 다시 할수있도록 변경
+	player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	
 	this->RemoveUI();
 }
@@ -374,9 +382,9 @@ void UK_ServerWidget::ReqMapInfo()
 //서버요청 콜백 바인딩_해당 맵정보를 받아와 Ready MENU와 Server MENU에 세팅하는 함수
 void UK_ServerWidget::ResMapInfo(const FMapInfoResponse& resData)
 {
-	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
-	                                 FString::Printf(
-		                                 TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+	// GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+	//                                  FString::Printf(
+	// 	                                 TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
 
 	CreatedMapData = resData.ResponseToServerData();
 

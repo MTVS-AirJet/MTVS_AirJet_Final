@@ -267,7 +267,7 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 // (임시) StandbyWidget 제거 함수
 void AK_PlayerController::RemoveStandbyWidget(const struct FInputActionValue& value)
 {
-	GEngine->AddOnScreenDebugMessage(-1 , 1.0f , FColor::Red , TEXT("Remove UI"));
+	//GEngine->AddOnScreenDebugMessage(-1 , 1.0f , FColor::Red , TEXT("Remove UI"));
 	if (StandbyUI)
 	{
 		StandbyUI->StartMission();

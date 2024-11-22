@@ -55,8 +55,7 @@ void UK_WidgetBase::RemoveUI()
 		UE_LOG(LogTemp , Error , TEXT("World is not valid in Teardown."));
 		return; // World가 유효하지 않으면 함수를 종료
 	}
-
-
+	
 	// PlayerController가 유효한지 확인
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if ( !PlayerController )

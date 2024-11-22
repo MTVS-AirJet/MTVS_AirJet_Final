@@ -259,9 +259,9 @@ void UK_StandbyWidget::ReqMapInfo(FString MyRoomName)
 
 void UK_StandbyWidget::ResMapInfo(const FMapInfoResponse& resData)
 {
-    GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
-                                     FString::Printf(
-                                         TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
+    // GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+    //                                  FString::Printf(
+    //                                      TEXT("MapInfo Requset Call Back Data \n%s") , *resData.ResponseToString()));
 
     //인게임에서 사용할 미션데이터를 인스턴스에 저장
     FMissionDataRes md;

@@ -102,7 +102,7 @@ void UK_GameInstance::OnCreateSessionComplete(FName SessionName , bool Success)
 			LoadingWidget->RemoveUI();
 		return;
 	}
-	GEngine->AddOnScreenDebugMessage(0 , 2 , FColor::Green , TEXT("Hosting"));
+	//GEngine->AddOnScreenDebugMessage(0 , 2 , FColor::Green , TEXT("Hosting"));
 	bHost = true;
 	// 세션이 성공적으로 생성 시,
 	if (ServerWidget) // ServerWidget 제거
@@ -611,8 +611,8 @@ void UK_GameInstance::MyServerRequest(const UWorld* world , EEventType type , co
 // 2. 요청 타입에 따라 다른 요청 실행 : 요청 타입, json string 데이터(생략 가능)
 void UK_GameInstance::RequestToServerByType(EEventType type , const FString& sendJsonData)
 {
-	GEngine->AddOnScreenDebugMessage(-1 , 10.f , FColor::Green ,
-	                                 FString::Printf(TEXT("%s 요청 시작") , *UEnum::GetValueAsString(type)));
+	// GEngine->AddOnScreenDebugMessage(-1 , 10.f , FColor::Green ,
+	//                                  FString::Printf(TEXT("%s 요청 시작") , *UEnum::GetValueAsString(type)));
 
 	// 요청 타입 에 따라 다른 요청 실행
 	switch (type)
@@ -694,8 +694,7 @@ void UK_GameInstance::MyResRegister(const FString& jsonData , bool isSuccess)
 	FRegisterResponse resData;
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData , &resData , 0 , 0);
 
-	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
-	                                 FString::Printf(TEXT("%s") , *resData.ResponseToString()));
+	//GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,FString::Printf(TEXT("%s") , *resData.ResponseToString()));
 
 	// 바인드된 함수 실행(BroadCast)
 	RegisterResUseDel.ExecuteIfBound(resData);
@@ -708,8 +707,8 @@ void UK_GameInstance::MyResLogin(const FString& jsonData , bool isSuccess)
 	FLoginResponse resData;
 	FJsonObjectConverter::JsonObjectStringToUStruct(jsonData , &resData , 0 , 0);
 
-	GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
-	                                 FString::Printf(TEXT("%s") , *resData.ResponseToString()));
+	// GEngine->AddOnScreenDebugMessage(-1 , 31.f , FColor::Yellow ,
+	//                                  FString::Printf(TEXT("%s") , *resData.ResponseToString()));
 
 	// 바인드된 함수 실행(BroadCast)
 	LoginResUseDel.ExecuteIfBound(resData);

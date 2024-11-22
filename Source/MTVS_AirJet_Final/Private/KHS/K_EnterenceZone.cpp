@@ -52,7 +52,7 @@ void AK_EnterenceZone::Tick(float DeltaTime)
 
 void AK_EnterenceZone::OnMySphereBeginOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult)
 {
-	if ( !bIsEntered && OtherActor->IsA<AMTVS_AirJet_FinalCharacter>() )
+	if (OtherActor->IsA<AMTVS_AirJet_FinalCharacter>() )
 	{
 		//플레이어의 인풋을 제어하고
 
@@ -77,9 +77,6 @@ void AK_EnterenceZone::OnMySphereBeginOverlap(UPrimitiveComponent* OverlappedCom
 		}
 		gi->CreateServerWidget(); //ServerWidget생성
 		UE_LOG(LogTemp , Warning , TEXT("Create ServerWidget"));
-
-		bIsEntered = true;//플래그 체크
-		//-> 나중에 플레이어쪽에서 tick으로 충돌감지하다가 벗어나면 false값 다시 전달하도록 세팅해야함.
 	}
 }
 
