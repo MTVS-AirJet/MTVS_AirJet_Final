@@ -34,6 +34,16 @@ void AJ_ObjectiveFormationFlight::InitBindDel()
     this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::SendEndSuccessData);
     // 목표 완료시 모든 pc에 종료 보이스 재생 요청
     this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::ReqEndVoice);
+    // 목표 활성화시 주기적으로 ui 업데이트 타이머 설정
+    this->objectiveActiveDel.AddLambda([this](){
+        GetWorld()->GetTimerManager()
+            .SetTimer(uiUpdateTimer, [this]() mutable
+        {
+            UpdateObjUI();
+        }, uiUpdateInterval, true);
+    });
+    // 목표 완료시 ui 업데이트 타이머 종료
+    this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::ClearUIUpdateTimer);
 }
 
 void AJ_ObjectiveFormationFlight::ObjectiveActive()
@@ -328,10 +338,16 @@ void AJ_ObjectiveFormationFlight::UpdateObjUI()
     }
 }
 
+void AJ_ObjectiveFormationFlight::ClearUIUpdateTimer() 
+{
+    GetWorld()->GetTimerManager().ClearTimer(uiUpdateTimer);
+}
+
 #pragma endregion
 
 void AJ_ObjectiveFormationFlight::SendEndSuccessData() 
 {
     this->SetSuccessPercent(formationTime / progressTime);
 }
+
 
