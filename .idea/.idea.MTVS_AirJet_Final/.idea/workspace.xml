@@ -14,9 +14,13 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Asset/JBS/DT_MissionProgress.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Asset/JBS/DT_MissionProgress.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/Input/IMC_VRDefault.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/Input/IMC_VRDefault.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/Input/IMC_VRHands.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/Input/IMC_VRHands.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Input/LHJ/IA/IA_VRCameraSwitch.uasset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Input/LHJ/IMC_Viper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Input/LHJ/IMC_Viper.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_PlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_PlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MTVS_AirJet_Final/Public/KHS/K_PlayerController.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

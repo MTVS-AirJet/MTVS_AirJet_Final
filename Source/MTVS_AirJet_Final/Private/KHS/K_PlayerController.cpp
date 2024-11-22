@@ -273,6 +273,11 @@ void AK_PlayerController::RemoveStandbyWidget(const struct FInputActionValue& va
 		StandbyUI->StartMission();
 	}
 }
+// (임시) StandbyWidget 제거 함수 BP호출함수
+void AK_PlayerController::CallRemoveStandbyWidget()
+{
+	RemoveStandbyWidget(1);
+}
 
 //클라이언트 UI생성 및 IMC맵핑 RPC함수
 void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()

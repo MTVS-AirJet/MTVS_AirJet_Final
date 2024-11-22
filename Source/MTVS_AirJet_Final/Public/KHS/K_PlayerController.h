@@ -117,7 +117,11 @@ public:
     void ToggleMouseCursor(const struct FInputActionValue& value);
 
 	// (임시) StandbyWidget 제거 함수
+	
 	void RemoveStandbyWidget(const struct FInputActionValue& value);
+	// (임시) StandbyWidget 제거 함수 BP호출함수
+	UFUNCTION(BlueprintCallable)
+	void CallRemoveStandbyWidget();
 	
     // 클라이언트를 로비 레벨로 트래블시키는 함수
     UFUNCTION(BlueprintCallable)
