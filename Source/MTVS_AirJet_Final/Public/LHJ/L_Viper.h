@@ -398,7 +398,7 @@ private:
 
 private:
 	UFUNCTION(Server , Reliable)
-	void ServerRPCLocation(const FVector& ForceAt, const FVector& NewLoc);
+	void ServerRPCLocation(const float& MoveForce);
 	UFUNCTION(Client , Reliable)
 	void ClientRPCLocation();
 	UFUNCTION(Server , Unreliable)

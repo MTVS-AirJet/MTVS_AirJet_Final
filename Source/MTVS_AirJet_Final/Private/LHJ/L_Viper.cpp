@@ -1846,9 +1846,18 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 #pragma endregion
 
 #pragma region Set Location & Rotation
-void AL_Viper::ServerRPCLocation_Implementation(const FVector& ForceAt, const FVector& NewLoc)
+void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
 {
-	JetRoot->AddForceAtLocation(NewLoc, ForceAt);
+	// Add Force
+	FVector forceVec = JetArrow->GetForwardVector() * MoveForce;
+	FVector forceLoc = JetRoot->GetComponentLocation();
+	if (JetRoot->IsSimulatingPhysics())
+		JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+	// Move Up & Down
+	auto jetRot = JetArrow->GetRelativeRotation();
+	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
 }
 
 void AL_Viper::ClientRPCLocation_Implementation()
@@ -1858,18 +1867,7 @@ void AL_Viper::ClientRPCLocation_Implementation()
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
 		ValueOfMoveForce = MaxValueOfMoveForce;
-	// Add Force
-	FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
-	FVector forceLoc = JetRoot->GetComponentLocation();
-	if (JetRoot->IsSimulatingPhysics())
-		JetRoot->AddForceAtLocation(forceVec , forceLoc);
-
-	// Move Up & Down
-	auto jetRot = JetArrow->GetRelativeRotation();
-	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
-	
-	ServerRPCLocation(HeightForceLoc, FVector(0 , 0 , zRot));
+	ServerRPCLocation(ValueOfMoveForce);
 }
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
@@ -1883,7 +1881,9 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 	}
 
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
-	SetActorRotation(newQuat);
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
+									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	SetActorRotation(QuatCurrentRotation.Rotator());
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
 }
 
