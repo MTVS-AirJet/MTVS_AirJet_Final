@@ -87,16 +87,20 @@ AL_Viper::AL_Viper()
 	JetLeftPannel->SetRelativeLocation(FVector(-271 , -2 , 0));
 	JetLeftPannel->SetRelativeScale3D(FVector(1.5 , 1 , 1));
 	JetLeftPannel->SetupAttachment(JetMesh);
+	JetLeftPannel->PrimaryComponentTick.bCanEverTick = false;
+	JetLeftPannel->SetComponentTickEnabled(false);
 
 	JetRightPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetRightPannel"));
 	JetRightPannel->SetRelativeLocation(FVector(-555 , 1 , 0));
 	JetRightPannel->SetRelativeScale3D(FVector(2 , 1 , 1));
 	JetRightPannel->SetupAttachment(JetMesh);
+	JetRightPannel->PrimaryComponentTick.bCanEverTick = false;
 
 	JetJFSPannel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetJFSPannel"));
 	JetJFSPannel->SetRelativeLocation(FVector(-137 , -6 , -17));
 	JetJFSPannel->SetRelativeScale3D(FVector(1));
 	JetJFSPannel->SetupAttachment(JetMesh);
+	JetJFSPannel->PrimaryComponentTick.bCanEverTick = false;
 
 	JetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("JetWidget"));
 	JetWidget->SetupAttachment(JetMesh);
@@ -108,6 +112,7 @@ AL_Viper::AL_Viper()
 	MissileWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
 	MissileWidget->SetDrawSize(FVector2D(200 , 200));
 	MissileWidget->SetVisibility(false);
+	MissileWidget->PrimaryComponentTick.bCanEverTick = false;
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -116,9 +121,12 @@ AL_Viper::AL_Viper()
 	JetSprintArmFPS->TargetArmLength = 0.f;
 	JetSprintArmFPS->bEnableCameraRotationLag = true;
 	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
+	JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
+	
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
+	JetCameraFPS->PrimaryComponentTick.bCanEverTick = false;
 
 	JetSpringArmMissileCam = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSpringArmMissileCam"));
 	JetSpringArmMissileCam->SetupAttachment(JetMesh);
@@ -126,11 +134,15 @@ AL_Viper::AL_Viper()
 	JetSpringArmMissileCam->bInheritPitch = false;
 	JetSpringArmMissileCam->bInheritRoll = false;
 	JetSpringArmMissileCam->bInheritYaw = false;
+	JetSpringArmMissileCam->PrimaryComponentTick.bCanEverTick = false;
+	
 	JetCameraMissileCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("JetCameraMissileCam"));
 	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
 	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
 	JetCameraMissileCam->SetRelativeScale3D(FVector(.1 , 1 , .5));
-	
+	JetCameraMissileCam->PrimaryComponentTick.bCanEverTick = false;
+	JetCameraMissileCam->SetHiddenInGame(true);
+
 	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
 	BoosterLeftVFX->SetupAttachment(JetMesh);
@@ -458,8 +470,8 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
 	DOREPLIFETIME(AL_Viper , RearWheel);
-	DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
-	DOREPLIFETIME(AL_Viper , QuatTargetRotation);
+	// DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
+	// DOREPLIFETIME(AL_Viper , QuatTargetRotation);
 }
 
 void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
@@ -882,7 +894,11 @@ void AL_Viper::F_ViperShootStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 {
 	if (JetCamera)
+	{
 		JetCamera->SetActive(false);
+		JetSprintArm->PrimaryComponentTick.bCanEverTick = false;
+		JetCamera->PrimaryComponentTick.bCanEverTick = false;
+	}
 	if (JetCameraFPS)
 	{
 		if (!bStartMission && StartMissionViper_Del.IsBound())
@@ -903,6 +919,8 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
 		JetCameraFPS->SetActive(true);
+		JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = true;
+		JetCameraFPS->PrimaryComponentTick.bCanEverTick = true;
 
 		if (JetAudio)
 		{
@@ -918,13 +936,19 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 {
 	if (JetCamera)
+	{
 		JetCamera->SetActive(true);
+		JetSprintArm->PrimaryComponentTick.bCanEverTick = true;
+		JetCamera->PrimaryComponentTick.bCanEverTick = true;
+	}
+	
 	if (JetCameraFPS)
 	{
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 			JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 		JetCameraFPS->SetActive(false);
-
+		JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
+		JetCameraFPS->PrimaryComponentTick.bCanEverTick = false;
 		if (JetAudio)
 		{
 			if (auto attnuation = JetAudio->AttenuationSettings.Get())
@@ -1090,7 +1114,7 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 #pragma region Retate Pawn
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
-										   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 	SetActorRotation(QuatCurrentRotation.Rotator());
 	ServerRPCRotation(QuatTargetRotation);
 	if (bJetAirVFXOn)
@@ -1495,94 +1519,100 @@ void AL_Viper::Tick(float DeltaTime)
 #pragma region Move Throttle
 		FVector engineLoc = DummyThrottleMesh->GetRelativeLocation();
 
-		if (bThrottleAccel)
+		if (IsLocallyControlled())
 		{
-			if (intTriggerNum == 0)
+			if (bThrottleAccel)
 			{
-				auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
-				auto per = SizeValue * 25 / 100;
-				FVector VecTrigger0 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
-				if (engineLoc.X < VecTrigger0.X)
+				if (intTriggerNum == 0)
 				{
-					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
-					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
-					if (VecTrigger0.X - newEngineX < 0.2)
-						DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
-					else
-						DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+					auto per = SizeValue * 25 / 100;
+					FVector VecTrigger0 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+					if (engineLoc.X < VecTrigger0.X)
+					{
+						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
+						if (VecTrigger0.X - newEngineX < 0.2)
+							DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+						else
+							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					}
 				}
-			}
-			else if (intTriggerNum == 1)
-			{
-				auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
-				auto per = SizeValue * 80 / 100;
-				FVector VecTrigger1 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+				else if (intTriggerNum == 1)
+				{
+					auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+					auto per = SizeValue * 80 / 100;
+					FVector VecTrigger1 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
 
-				if (engineLoc.X < ThrottleMilLoc.X)
-				{
-					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
-					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-					if (ThrottleMilLoc.X - newEngineX < 0.2)
-						DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
-					else
-						DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					if (engineLoc.X < ThrottleMilLoc.X)
+					{
+						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+						if (ThrottleMilLoc.X - newEngineX < 0.2)
+							DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						else
+							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					}
+					if (engineLoc.X < VecTrigger1.X)
+					{
+						auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
+						if (VecTrigger1.X - newEngineX < 0.2)
+							DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+						else
+							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					}
 				}
-				if (engineLoc.X < VecTrigger1.X)
+				else if (intTriggerNum == 2)
 				{
-					auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
-					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
-					if (VecTrigger1.X - newEngineX < 0.2)
-						DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
-					else
+					if (engineLoc.X < ThrottleMilLoc.X)
+					{
+						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
+						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+						if (ThrottleMilLoc.X - newEngineX < 0.2)
+							DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						else
+							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					}
+					else if (engineLoc.X < ThrottleMaxLoc.X)
+					{
+						auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
+						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
 						DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+					}
 				}
 			}
-			else if (intTriggerNum == 2)
-			{
-				if (engineLoc.X < ThrottleMilLoc.X)
-				{
-					auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
-					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
-					if (ThrottleMilLoc.X - newEngineX < 0.2)
-						DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
-					else
-						DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-				}
-				else if (engineLoc.X < ThrottleMaxLoc.X)
-				{
-					auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
-					newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
-				}
-			}
-		}
 
-		if (bThrottleBreak)
-		{
-			float newEngineX = 0.f;
-			if (engineLoc.X > ThrottleMilLoc.X)
-				newEngineX = engineLoc.X - ThrottleMoveSpeed2;
-			else if (engineLoc.X > ThrottleOffLoc.X)
-				newEngineX = engineLoc.X - ThrottleMoveSpeed1;
-			newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
-			DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			if (bThrottleBreak)
+			{
+				float newEngineX = 0.f;
+				if (engineLoc.X > ThrottleMilLoc.X)
+					newEngineX = engineLoc.X - ThrottleMoveSpeed2;
+				else if (engineLoc.X > ThrottleOffLoc.X)
+					newEngineX = engineLoc.X - ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
+				DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+			}
 		}
 #pragma endregion
 
 #pragma region Get Accel Gear Number
-		SetAccelGear();
+		if (IsLocallyControlled())
+			SetAccelGear();
 #pragma endregion
 
 #pragma region Jet Move
 		if (IsEngineOn)
 		{
 			if (IsLocallyControlled())
+			{
 				ClientRPCLocation();
 
-			// 카메라 쉐이크
-			// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
-			if (intTriggerNum < 2 && ValueOfMoveForce > 0)
-				CRPC_CameraShake();
+				// 카메라 쉐이크
+				// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
+				if (intTriggerNum < 2 && ValueOfMoveForce > 0)
+					CRPC_CameraShake();
+			}			
 		}
 #pragma endregion
 
@@ -1882,7 +1912,7 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
-									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 	SetActorRotation(QuatCurrentRotation.Rotator());
 	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
 }
@@ -1911,7 +1941,6 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 				Missile , SpawnLocation , SpawnRotation , SpawnParams);
 			if (SpawnedMissile)
 			{
-				
 			}
 		}
 		else
@@ -2093,42 +2122,6 @@ void AL_Viper::MulticastRPCLockOn_Implementation(AActor* target)
 	LockOnTarget = target;
 }
 
-void AL_Viper::ClientRPCLockOnSound_Implementation(AL_Viper* CurrentViper)
-{
-	CurrentViper->PlayLockOnSound();
-}
-
-void AL_Viper::ClientRPCSetLockOnUI_Implementation(AL_Viper* CurrentViper , AActor* target)
-{
-	if (target && TargetUIActorFac)
-	{
-		if (TargetUIActorFac)
-		{
-			if (!TargetActor)
-			{
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.Owner = this;
-				SpawnParams.Instigator = GetInstigator();
-
-				FVector TargetLocation = target->GetActorLocation() + FVector(0 , 0 , 100);
-				FRotator TargetRotation = (GetActorLocation() - TargetLocation).Rotation();
-
-				TargetActor = GetWorld()->SpawnActor<AL_Target>(TargetUIActorFac , TargetLocation , TargetRotation ,
-				                                                SpawnParams);
-			}
-		}
-	}
-	else
-	{
-		if (TargetActor)
-		{
-			TargetActor->Destroy();
-			TargetActor = nullptr;
-			//TargetActor->F_Destroy();
-		}
-	}
-}
-
 void AL_Viper::CRPC_MissileCapture_Implementation()
 {
 	MissileWidget->SetVisibility(true);
@@ -2152,7 +2145,7 @@ void AL_Viper::CRPC_MissileCapture_Implementation()
 				// 위잿 내부에 있는 이미지 변경
 				camui->img_cam->SetBrush(Brush);
 			}
-		}	
+		}
 	}
 }
 
@@ -2808,11 +2801,15 @@ void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 	if (JetCamera && JetCamera->IsActive())
 	{
 		JetCamera->SetActive(false);
+		JetSprintArm->PrimaryComponentTick.bCanEverTick = false;
+		JetCamera->PrimaryComponentTick.bCanEverTick = false;
 		if (JetCameraFPS)
 		{
 			if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 				JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 1;
 			JetCameraFPS->SetActive(true);
+			JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = true;
+			JetCameraFPS->PrimaryComponentTick.bCanEverTick = true;
 		}
 	}
 	else
@@ -2820,11 +2817,15 @@ void AL_Viper::F_StickButton5Started(const struct FInputActionValue& value)
 		if (JetCamera)
 		{
 			JetCamera->SetActive(true);
+			JetSprintArm->PrimaryComponentTick.bCanEverTick = true;
+			JetCamera->PrimaryComponentTick.bCanEverTick = true;
 			if (JetCameraFPS)
 			{
 				if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
 					JetPostProcess->Settings.WeightedBlendables.Array[0].Weight = 0;
 				JetCameraFPS->SetActive(false);
+				JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
+				JetCameraFPS->PrimaryComponentTick.bCanEverTick = false;
 			}
 		}
 	}
