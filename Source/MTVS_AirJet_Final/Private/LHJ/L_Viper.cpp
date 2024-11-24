@@ -1,5 +1,7 @@
 ﻿#include "LHJ/L_Viper.h"
 
+#include <thread>
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "JBS/J_Utility.h"
@@ -109,8 +111,9 @@ AL_Viper::AL_Viper()
 
 	MissileWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("MissileWidget"));
 	MissileWidget->SetupAttachment(JetMesh);
-	MissileWidget->SetRelativeLocationAndRotation(FVector(420 , 0 , 295) , FRotator(0 , -180 , 0));
-	MissileWidget->SetDrawSize(FVector2D(200 , 200));
+	MissileWidget->SetRelativeLocationAndRotation(FVector(546.5 , 0.4 , 309.5) , FRotator(-14.5 , -180 , 0));
+	MissileWidget->SetDrawSize(FVector2D(2048 , 2048));
+	MissileWidget->SetRelativeScale3D(FVector(0.01));
 	MissileWidget->SetVisibility(false);
 	MissileWidget->PrimaryComponentTick.bCanEverTick = false;
 	//============================================
@@ -122,7 +125,7 @@ AL_Viper::AL_Viper()
 	JetSprintArmFPS->bEnableCameraRotationLag = true;
 	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
 	JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
-	
+
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
@@ -135,7 +138,7 @@ AL_Viper::AL_Viper()
 	JetSpringArmMissileCam->bInheritRoll = false;
 	JetSpringArmMissileCam->bInheritYaw = false;
 	JetSpringArmMissileCam->PrimaryComponentTick.bCanEverTick = false;
-	
+
 	JetCameraMissileCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("JetCameraMissileCam"));
 	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
 	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
@@ -941,7 +944,7 @@ void AL_Viper::F_ViperTpsStarted(const struct FInputActionValue& value)
 		JetSprintArm->PrimaryComponentTick.bCanEverTick = true;
 		JetCamera->PrimaryComponentTick.bCanEverTick = true;
 	}
-	
+
 	if (JetCameraFPS)
 	{
 		if (JetPostProcess && JetPostProcess->Settings.WeightedBlendables.Array.Num() > 0)
@@ -1115,8 +1118,18 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 #pragma region Retate Pawn
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
-	SetActorRotation(QuatCurrentRotation.Rotator());
-	ServerRPCRotation(QuatTargetRotation);
+	//SetActorRotation(QuatCurrentRotation.Rotator());
+	// std::thread t = std::thread(ServerRPCRotation(QuatTargetRotation));
+	AsyncTask(ENamedThreads::GameThread , [this]()
+	{
+		// 서버 RPC 호출
+		ServerRPCRotation(QuatTargetRotation);
+	});
+	// FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
+	// {
+	// 	ServerRPCRotation(QuatTargetRotation);
+	// } , TStatId() , nullptr , ENamedThreads::AnyBackgroundThreadNormalTask);
+
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
@@ -1612,7 +1625,7 @@ void AL_Viper::Tick(float DeltaTime)
 				// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
 				if (intTriggerNum < 2 && ValueOfMoveForce > 0)
 					CRPC_CameraShake();
-			}			
+			}
 		}
 #pragma endregion
 
