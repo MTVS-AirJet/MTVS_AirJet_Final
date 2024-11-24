@@ -625,6 +625,8 @@ void UJ_ObjectiveUIComp::CRPC_ActivePopupUI_Implementation(const EMissionProcess
 	// 데이터 가져오기
 	auto row = mdt->FindRow<FMissionProgressDT>(findRow,  TEXT("Find popup ui data"));
 
+	if(!row) return;
+
 	// 팝업 ui 설정
 	OBJ_UI->POPUP_UI->SetPopupText(mpIdx, row->popupText, row->popupDelay);
 
