@@ -397,39 +397,37 @@ private:
 	void ChangeBooster();
 
 private:
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Unreliable)
 	void ServerRPCLocation(const float& MoveForce);
-	UFUNCTION(Client , Reliable)
+	UFUNCTION(Client , Unreliable)
 	void ClientRPCLocation();
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Unreliable)
 	void ServerRPCRotation(FQuat newQuat);
 	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPCVisibleAirVFX(bool isOn);
 
+#pragma region Boost VFX(키고 끌때 1번씩만 수행됌)
 	UFUNCTION(Server , Reliable)
 	void ServerRPCBoost(bool isOn);
 	UFUNCTION(NetMulticast , Reliable)
 	void MulticastRPCBoost(bool isOn);
 	bool bCurrBoostState;
-
-	UFUNCTION(Client , Reliable)
+#pragma endregion
+	
+	UFUNCTION(Client , Unreliable)
 	void ClientRPCLockOn();
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client, Unreliable)
 	void CRPC_MissileCapture();
 
 	bool bStartLockOn;
 	
-	UFUNCTION(Server , Reliable)
+	UFUNCTION(Server , Unreliable)
 	void ServerRPCLockOn(AActor* target);
-	UFUNCTION(NetMulticast , Reliable)
+	UFUNCTION(NetMulticast , Unreliable)
 	void MulticastRPCLockOn(AActor* target);
-	UFUNCTION(Client , Reliable)
-	void ClientRPCLockOnSound(AL_Viper* CurrentViper);
-	UFUNCTION(Client , Reliable)
-	void ClientRPCSetLockOnUI(AL_Viper* CurrentViper , AActor* target);
-
 	void PlayLockOnSound();
 
+#pragma region Missile & Flare
 public:
 	UFUNCTION(Server , Reliable , BlueprintCallable)
 	void ServerRPCMissile(AActor* newOwner);
@@ -441,6 +439,7 @@ public:
 private:
 	UPROPERTY(replicated , EditDefaultsOnly)
 	float FlareCurCnt = 60;
+#pragma endregion
 
 private:
 	bool IsRotateTrigger = false;
@@ -524,6 +523,7 @@ public:
 	bool bStartAudio;
 
 	float CurAudioTime=0.f;
+	UPROPERTY(EditDefaultsOnly, Category="Default|MissionTextUI")
 	float PlayAudioTime=3.f;
 #pragma endregion
 
@@ -776,11 +776,11 @@ public:
 	float MaxRotationAngle = 15.f;
 
 	// 현재 회전 상태를 쿼터니언으로 저장
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	FQuat QuatCurrentRotation = FQuat::Identity;
 
 	// 목표 회전 상태를 쿼터니언으로 저장
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	FQuat QuatTargetRotation = FQuat::Identity;
 
 	float StickRollAngle = 0.f;
