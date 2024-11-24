@@ -1619,7 +1619,11 @@ void AL_Viper::Tick(float DeltaTime)
 		{
 			if (IsLocallyControlled())
 			{
-				ClientRPCLocation();
+				//ClientRPCLocation();
+				AsyncTask(ENamedThreads::GameThread , [this]()
+				{
+					ClientRPCLocation();
+				});
 
 				// 카메라 쉐이크
 				// 활주로를 달리고 있을때가 intTriggerNum < 2 이다.
@@ -2965,7 +2969,12 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	StickPitchAngle = 0.f;
 
 #pragma region Retate Pawn
-	ServerRPCRotation(QuatTargetRotation);
+	//ServerRPCRotation(QuatTargetRotation);
+	AsyncTask(ENamedThreads::GameThread , [this]()
+	{
+		// 서버 RPC 호출
+		ServerRPCRotation(QuatTargetRotation);
+	});
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
@@ -3008,7 +3017,12 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 	VRStickCurrentRollValue = 0.f;
 
 #pragma region Retate Pawn
-	ServerRPCRotation(QuatTargetRotation);
+	//ServerRPCRotation(QuatTargetRotation);
+	AsyncTask(ENamedThreads::GameThread , [this]()
+	{
+		// 서버 RPC 호출
+		ServerRPCRotation(QuatTargetRotation);
+	});
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
