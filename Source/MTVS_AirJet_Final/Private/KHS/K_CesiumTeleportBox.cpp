@@ -8,7 +8,6 @@
 #include "JBS/J_Utility.h"
 #include "JBS/J_MissionGamemode.h"
 #include "LHJ/L_Viper.h"
-#include "KHS/K_PlayerController.h"
 #include "KHS/K_GameInstance.h"
 #include "CesiumGeoreference.h"
 //#include "CesiumCartographicPolygon.h"
