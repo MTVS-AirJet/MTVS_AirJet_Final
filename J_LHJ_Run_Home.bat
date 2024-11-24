@@ -1,1 +1,1 @@
-"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Users\hakju\Documents\Unreal Projects\MTVS_AirJet_Final\MTVS_AirJet_Final.uproject" -game -log
+"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Unreal\MTVS_AirJet_Final\MTVS_AirJet_Final.uproject" -game -log
