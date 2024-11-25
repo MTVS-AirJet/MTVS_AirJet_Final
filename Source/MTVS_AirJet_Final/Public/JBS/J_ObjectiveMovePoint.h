@@ -52,12 +52,12 @@ protected:
 -> 목표 활성 유무에 따라 체크 캡슐 및 빔 이펙트 메시 활성화 동기화 | SetObjectiveActive, MRPC_SetVisibleBeam
 -> 목표 활성화시 실패 판정 방향 설정(편대장 기준) | ObjectiveActive, SetBaseDir
 */
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 	// 생성할 때 딜리게이트 바인드 공간
     virtual void InitBindDel() override;
 
-	virtual void ObjectiveActive();
+	virtual void ObjectiveActive() override;
 
 	// 빔 메시 활/비활성화
 	UFUNCTION(NetMulticast, Reliable)

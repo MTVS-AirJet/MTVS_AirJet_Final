@@ -186,6 +186,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void UpdateObjUI();
 	// 생성할 때 딜리게이트 바인드 공간
+	UFUNCTION(BlueprintCallable)
 	virtual void InitBindDel();
 
     public:
