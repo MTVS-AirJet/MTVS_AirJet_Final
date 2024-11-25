@@ -833,4 +833,7 @@ private:
 	void CRPC_SetMissileCamRotate();
 	UPROPERTY(EditDefaultsOnly)
 	class UMaterialInterface* MissileSceneMat;
+
+private:
+	bool bSyncLocation;
 };
