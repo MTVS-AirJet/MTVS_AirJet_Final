@@ -950,6 +950,14 @@ public:
     float popupDelay;
 };
 
+// 목표 소리 enum
+UENUM(BlueprintType)
+enum class EObjSound : uint8
+{
+    NONE = 0
+    ,MOVE_POINT_END = 1
+};
+
 // solved 테스트 용
 USTRUCT(BlueprintType)
 struct FTempJson
@@ -1036,6 +1044,9 @@ public:
 
     // 미션 절차 데이터 테이블 주기
     static class UDataTable *GetMissionProgressDT(const UWorld *world);
+
+    // 해당 사운드 컴포넌트 재생 중지 후 사운드 재생
+    static void PlaySoundWithPause(class UAudioComponent *audio, class USoundBase *sound);
 
     // 기본 미션 맵 사이즈 | 50만 cm == 5킬로
     constexpr static const float defaultMissionMapSize = 1000000.f;

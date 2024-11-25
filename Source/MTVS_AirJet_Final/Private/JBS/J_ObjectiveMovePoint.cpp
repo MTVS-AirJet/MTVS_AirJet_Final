@@ -64,6 +64,20 @@ void AJ_ObjectiveMovePoint::InitBindDel()
 	// 활/비활성화 함수 바인드
 	objectiveActiveDel.AddUObject(this, &AJ_ObjectiveMovePoint::ObjectiveActive);
 	objectiveDeactiveDel.AddUObject(this, &AJ_ObjectiveMovePoint::ObjectiveDeactive);
+
+    // 종료시 사운드 재생 바인드
+    objectiveEndDel.AddDynamic( this, &AJ_ObjectiveMovePoint::PlayObjSound);
+}
+
+void AJ_ObjectiveMovePoint::PlayObjSound()
+{
+    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    for(auto* pc : allPC)
+    {
+        if(!pc) return;
+
+        pc->CRPC_PlayObjSound(EObjSound::MOVE_POINT_END);
+    }
 }
 
 void AJ_ObjectiveMovePoint::SetObjectiveActive(bool value)

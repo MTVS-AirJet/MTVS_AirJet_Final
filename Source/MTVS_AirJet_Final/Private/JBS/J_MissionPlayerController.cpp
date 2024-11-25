@@ -38,6 +38,9 @@ AJ_MissionPlayerController::AJ_MissionPlayerController()
 
     commanderAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("commanderAudioComp"));
     commanderAudioComp->SetupAttachment(RootComponent);
+
+    objAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("objAudioComp"));
+    objAudioComp->SetupAttachment(RootComponent);
 }
 
 void AJ_MissionPlayerController::BeginPlay()
@@ -259,12 +262,8 @@ void AJ_MissionPlayerController::CRPC_PlayCommanderVoice_Implementation(const FS
     // 디코딩
     auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(voiceBase64);
     if(!voice) return;
-    // 정지
-    commanderAudioComp->Stop();
-    // 소리 설정
-    commanderAudioComp->SetSound(voice);
-    // 재생
-    commanderAudioComp->Play();
+    // 소리 재생
+    UJ_Utility::PlaySoundWithPause(commanderAudioComp, voice);
 }
 
 void AJ_MissionPlayerController::CRPC_PlayCommanderVoice2_Implementation(const ETacticalOrder &orderType)
@@ -283,35 +282,17 @@ void AJ_MissionPlayerController::PlayCommanderVoice3(const FCommanderVoiceRes &r
     auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(resData.voice);
     if(!voice) return;
     
-    PlayAIVoice(voice);
-}
-
-void AJ_MissionPlayerController::PlayAIVoice(USoundWaveProcedural *sound)
-{
-    if(!sound) return;
-
-    // 정지
-    commanderAudioComp->Stop();
-    // 소리 설정
-    commanderAudioComp->SetSound(sound);
-    // 재생
-    commanderAudioComp->Play();
+    // 소리 재생
+    UJ_Utility::PlaySoundWithPause(commanderAudioComp, voice);
 }
 
 void AJ_MissionPlayerController::CRPC_PlayCommanderVoice3_Implementation(int idx)
 {
-    // XXX 예전 개별 요청
-    // auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
-	// gi->commanderVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::PlayCommanderVoice3);
-	
-	// FCommanderVoiceReq req(idx);
-
-	// UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::COMMANDER_VOICE, req, gi);
-
     // 해당 인덱스 재생
     if(!missionVoiceMap.Contains(idx)) return;
 
-    PlayAIVoice(missionVoiceMap[idx]);
+    // 소리 재생
+    UJ_Utility::PlaySoundWithPause(commanderAudioComp, missionVoiceMap[idx]);
 }
 void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
 {
@@ -358,3 +339,9 @@ void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData
     }
 }
 
+void AJ_MissionPlayerController::CRPC_PlayObjSound_Implementation(const EObjSound &idx)
+{
+    if(!objSoundMap.Contains(idx)) return;
+
+    UJ_Utility::PlaySoundWithPause(objAudioComp, objSoundMap[idx]);
+}

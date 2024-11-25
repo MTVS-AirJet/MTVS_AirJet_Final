@@ -63,8 +63,12 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MRPC_SetVisibleBeam(bool value);
 
-        // 기준 방향 설정 | 호스트 전투기 기준
+	// 기준 방향 설정 | 호스트 전투기 기준
 	FVector SetBaseDir();
+
+	// 목표 종료시 사운드 재생
+	UFUNCTION(BlueprintCallable)
+	virtual void PlayObjSound();
 #pragma endregion
 
 #pragma region tick 목표 수행 단
