@@ -30,8 +30,10 @@ void AJ_ObjectiveTakeOff::InitBindDel()
 {
     Super::InitBindDel();
 
+    if(!HasAuthority()) return;
+
     // gm
-    const auto& gm = UJ_Utility::GetMissionGamemode(GetWorld());
+    auto* gm = UJ_Utility::GetMissionGamemode(GetWorld());
     gm->takeOffEndDel.AddDynamic(this, &AJ_ObjectiveTakeOff::ObjectiveEnd);
 }
 

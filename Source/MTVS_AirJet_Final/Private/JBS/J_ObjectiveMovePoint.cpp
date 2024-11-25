@@ -71,7 +71,7 @@ void AJ_ObjectiveMovePoint::InitBindDel()
 
 void AJ_ObjectiveMovePoint::PlayObjSound()
 {
-    const auto& allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
     for(auto* pc : allPC)
     {
         if(!pc) return;
@@ -168,7 +168,7 @@ bool AJ_ObjectiveMovePoint::CheckFail(const FVector &baseDir)
     if(!HasAuthority() || IS_OBJ_ENDED) return false;
     
     // 모든 파일럿 중 한 명이라도 기준 방향을 넘어가면 실패 처리
-    const auto& allPilot = UJ_Utility::GetAllMissionPawn(GetWorld());
+    auto allPilot = UJ_Utility::GetAllMissionPawn(GetWorld());
     
     for(const auto* pilot : allPilot)
     {

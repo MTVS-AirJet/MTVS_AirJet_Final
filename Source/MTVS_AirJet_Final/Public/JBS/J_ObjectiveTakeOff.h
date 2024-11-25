@@ -55,7 +55,7 @@ protected:
     FVector CalcBaseDirection();
 
     // 바인드
-    virtual void InitBindDel();
+    virtual void InitBindDel() override;
 #pragma endregion
 
 #pragma region 이륙 단
@@ -69,7 +69,7 @@ protected:
     // 목표 성공시 수행도 계산
     UFUNCTION(BlueprintCallable)
     void CalcSuccessPercent();
-
+    
     virtual void ObjectiveEnd(bool isSuccess = true) override;
 
 #pragma endregion
@@ -89,7 +89,7 @@ protected:
 -> 목표 종료 나 서브 목표 종료시 ui 애니메이션 실행 요청 | EndObjUI , EndSubObjUI
 -> 목표 종료시 비작동*/
 
-    virtual void SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit = false);
+    virtual void SendObjUIData(class AJ_MissionPlayerController *pc, bool isInit = false) override;
 
     // 목표 ui에 표시할 데이터 설정
     virtual FTakeOffData SetTakeOffUIData(class AJ_MissionPlayerController *pc = nullptr);
@@ -100,5 +100,5 @@ protected:
 #pragma endregion
 
 public:
-    virtual void Tick(float deltaTime);
+    virtual void Tick(float deltaTime) override;
 };
