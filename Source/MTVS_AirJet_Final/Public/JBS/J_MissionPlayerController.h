@@ -45,9 +45,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
 	TMap<int, class USoundWaveProcedural*> missionVoiceMap;
 
+	// 목표 사운드 데이터 맵
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	TMap<EObjSound, class USoundBase*> objSoundMap;
+
 	// 전체 보이스 요청 허용 | 낭비 방지
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
 	bool enableReqAllVoice = true;
+
 
 public:
 	// 목표 UI 관리 컴포넌트
@@ -57,6 +62,10 @@ public:
 	// 지휘관 보이스 라인 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
 	class UAudioComponent* commanderAudioComp;
+
+	// 목표 액터용 사운드 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Component")
+	class UAudioComponent* objAudioComp;
 
 	// 파일럿 역할
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values", Replicated)
@@ -131,10 +140,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PlayCommanderVoice3(const FCommanderVoiceRes &resData);
 
-	// 보이스 받아서 재생
-	UFUNCTION(BlueprintCallable)
-	void PlayAIVoice(class USoundWaveProcedural *sound);
-
         // 미션 보이스 데이터 요청
 	UFUNCTION(Client, Unreliable)
         void CRPC_ReqMissionVoiceData();
@@ -142,6 +147,10 @@ public:
         // 보이스 데이터 받아서 맵에 저장
 	UFUNCTION(BlueprintCallable)
 	void ResMissionVoiceData(const FAllVoiceRes &resData);
+
+	// 목표 소리 재생
+	UFUNCTION(Client, Unreliable)
+	void CRPC_PlayObjSound(const EObjSound &idx);
 
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")

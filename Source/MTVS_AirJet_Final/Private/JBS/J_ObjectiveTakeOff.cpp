@@ -16,6 +16,7 @@
 
 #pragma region 시작 단
 /* active -> 게임모드 이륙시 딜리게이트에 이륙 체크 함수 바인드 | AddFlightedPC -> SuccessTakeOff
+-> 이륙 시 목표 종료 하도록 바인드 | takeOffEndDel
 -> 목표 위치 텔포 박스로 설정 | SetPosition
 -> 실패 체크 기준 방향 설정 | CalcBaseDirection*/
 void AJ_ObjectiveTakeOff::BeginPlay()
@@ -23,6 +24,15 @@ void AJ_ObjectiveTakeOff::BeginPlay()
     Super::BeginPlay();
 
     if(!HasAuthority()) return;
+}
+
+void AJ_ObjectiveTakeOff::InitBindDel()
+{
+    Super::InitBindDel();
+
+    // gm
+    const auto& gm = UJ_Utility::GetMissionGamemode(GetWorld());
+    gm->takeOffEndDel.AddDynamic(this, &AJ_ObjectiveTakeOff::ObjectiveEnd);
 }
 
 void AJ_ObjectiveTakeOff::ObjectiveActive()
@@ -259,8 +269,5 @@ void AJ_ObjectiveTakeOff::UpdateObjUI()
 }
 
 #pragma endregion
-
-
-
 
 

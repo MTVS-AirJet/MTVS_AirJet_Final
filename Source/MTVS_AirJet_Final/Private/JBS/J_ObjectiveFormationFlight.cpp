@@ -44,6 +44,9 @@ void AJ_ObjectiveFormationFlight::InitBindDel()
     });
     // 목표 완료시 ui 업데이트 타이머 종료
     this->objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::ClearUIUpdateTimer);
+
+    // 종료시 사운드 재생 바인드
+    objectiveEndDel.AddDynamic( this, &AJ_ObjectiveFormationFlight::PlayObjSound);
 }
 
 void AJ_ObjectiveFormationFlight::ObjectiveActive()
