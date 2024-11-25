@@ -349,12 +349,12 @@ void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData
         auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(wavData.voice);
         if(!voice)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("%d 번 보이스 데이터 누락됨"), wavData.idx));
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("%d 번 보이스 데이터 누락됨"), wavData.id));
             continue;
         }
 
         // 맵에 저장
-        missionVoiceMap.Add(wavData.idx, voice);
+        missionVoiceMap.Add(wavData.id, voice);
     }
 }
 

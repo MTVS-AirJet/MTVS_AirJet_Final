@@ -359,7 +359,7 @@ public:
     FString description;
     // 인덱스
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-    int idx;
+    int id;
 };
 
 USTRUCT(BlueprintType)
