@@ -336,7 +336,12 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     isTPReady = flightedPCAry.Num() >= curAllPCNum;
 
     if(isTPReady)
+    {
+        // 이륙 종료 딜리게이트 실행
+        takeOffEndDel.Broadcast(isTPReady);
+        // 미션 시작
         StartTacticalOrder();
+    }
 
     // XXX 반환 해도 안쓰긴함
     return false;

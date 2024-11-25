@@ -271,7 +271,7 @@ void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
 	{
 		auto* objActor = objData.objectiveActor;
 		if(!objActor) continue;
-		if(!objActor->IS_OBJ_ENDED) continue;
+		if(objActor->IS_OBJ_ENDED) continue;
 
 		// 수행도는 0으로
 		objActor->SUCCESS_PERCENT = 0.f;

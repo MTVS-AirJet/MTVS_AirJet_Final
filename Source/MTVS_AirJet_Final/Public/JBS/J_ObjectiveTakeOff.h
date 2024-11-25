@@ -53,6 +53,9 @@ protected:
 
     // 기준 방향 설정 | 편대장 기준
     FVector CalcBaseDirection();
+
+    // 바인드
+    virtual void InitBindDel();
 #pragma endregion
 
 #pragma region 이륙 단
