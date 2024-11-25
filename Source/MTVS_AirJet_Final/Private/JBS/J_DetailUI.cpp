@@ -38,4 +38,6 @@ void UJ_DetailUI::SetDetailUI(const EMissionProcess& value)
     // 이미지 변경
     detailImage->SetBrush(imgMap[value]);
     curImgKey = value;
+    // 갱신 애니메이션 실행
+    PlayUpdateAnim();
 }

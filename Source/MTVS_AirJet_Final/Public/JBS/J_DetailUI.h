@@ -37,4 +37,7 @@ protected:
 public:
     void SetDetailUI(int idx);
     void SetDetailUI(const EMissionProcess& value);
+	// 이미지 갱신 애니메이션
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayUpdateAnim();
 };
