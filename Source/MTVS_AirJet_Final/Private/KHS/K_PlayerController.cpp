@@ -84,6 +84,7 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 	{
 		//CRPC로 StandbyUI세팅하고 IMC맵핑
 		CRPC_SetIMCnCreateStandbyUI();
+		CRPC_SetMissionUI();
 		LOG_S(Warning , TEXT("KPlayerzController Call Server_NotifyPawnPossessed!!!!!"));
 	}
 }
@@ -129,7 +130,8 @@ void AK_PlayerController::SRPC_StartGame_Implementation()
 	for(auto localPC : allPC)
 	{
 		localPC->CRPC_StartGame();
-		localPC->CRPC_SetMissionUI();
+		localPC->MissionTextUI->SetVisibility(ESlateVisibility::Visible);
+		//localPC->CRPC_SetMissionUI();
 	}
 	//Mission용 Del 실행
 	StartGameDel_Mission.Broadcast();
@@ -160,6 +162,7 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 		if (MissionTextUI && CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 		{
 			MissionTextUI->AddToViewport();
+			MissionTextUI->SetVisibility(ESlateVisibility::Hidden);
 
 			// if (UK_GameInstance* GI = Cast<UK_GameInstance>(GetGameInstance()))
 			// {

@@ -16,6 +16,9 @@ DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
 // 이륙 딜리게이트
 DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool);
 
+// 이륙 종료 딜리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTakeOffEndDel, bool, isSuccess);
+
 // 미션 시작 딜리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
 
@@ -137,6 +140,10 @@ public:
 
     // 해당 파일럿 이륙 딜리게이트
     FTakeOffDel onePilotTakeOffDel;
+
+    // 이륙 종료 딜리게이트
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
+    FTakeOffEndDel takeOffEndDel;
 
     FStartTacticalOrderDel startTODel;
 

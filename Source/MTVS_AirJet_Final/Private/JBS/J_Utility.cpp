@@ -3,6 +3,7 @@
 
 #include "JBS/J_Utility.h"
 #include "Algo/Accumulate.h"
+#include "Components/AudioComponent.h"
 #include "Containers/UnrealString.h"
 #include "Engine/Engine.h"
 #include "JBS/J_BaseMissionPawn.h"
@@ -20,6 +21,7 @@
 #include "JBS/J_MissionPlayerController.h"
 #include <Engine/World.h>
 
+#pragma region 전역 함수
 // 전역 함수
 UJ_GameInstance *UJ_Utility::GetJGameInstance(const UWorld* world)
 {
@@ -201,7 +203,20 @@ UDataTable *UJ_Utility::GetMissionProgressDT(const UWorld *world)
     return gi->missionProgressDT;
 }
 
-// === 구조체 함수 구현
+void UJ_Utility::PlaySoundWithPause(class UAudioComponent *audio, class USoundBase *sound)
+{
+    if(!sound || !audio) return;
+    // 정지
+    audio->Stop();
+    // 소리 설정
+    audio->SetSound(sound);
+    // 재생
+    audio->Play();
+}
+
+#pragma endregion
+
+#pragma region 구조체 함수 
 
 ETacticalOrder FMissionObject::GetOrderType() const
 {
@@ -485,5 +500,5 @@ FString FFormationFlightUIData::ToStringPilotRolt() const
 
     return result;
 }
-
+#pragma endregion
 

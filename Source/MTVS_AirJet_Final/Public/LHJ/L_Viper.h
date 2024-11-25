@@ -278,7 +278,7 @@ public:
 
 private:
 	// For Engine Using
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
+	UPROPERTY(EditDefaultsOnly , Category="Engine", Replicated)
 	bool IsEngineOn;
 
 	// For Change Arrow Rotate
@@ -396,13 +396,19 @@ private:
 	UFUNCTION()
 	void ChangeBooster();
 
-private:
-	UFUNCTION(Server , Unreliable)
-	void ServerRPCLocation(const float& MoveForce);
+public:
+	FTimerHandle syncLocTimer;
+	UFUNCTION(Server , Reliable)
+	void ServerRPC_SyncLocation(const FVector& location);
+private:	
+	UFUNCTION(NetMulticast, Unreliable)
+	void MultiRPC_SyncLocation(const FVector& location);
 	UFUNCTION(Client , Unreliable)
 	void ClientRPCLocation();
 	UFUNCTION(Server , Unreliable)
 	void ServerRPCRotation(FQuat newQuat);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MultiRPCRotation(const FQuat& newQuat);
 	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPCVisibleAirVFX(bool isOn);
 

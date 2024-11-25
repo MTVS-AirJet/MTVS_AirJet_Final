@@ -115,21 +115,18 @@ AL_Viper::AL_Viper()
 	MissileWidget->SetDrawSize(FVector2D(2048 , 2048));
 	MissileWidget->SetRelativeScale3D(FVector(0.01));
 	MissileWidget->SetVisibility(false);
-	MissileWidget->PrimaryComponentTick.bCanEverTick = false;
-	//============================================
+	
+	// 조종석 뷰
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
-	// 조종석 뷰
 	JetSprintArmFPS->SetRelativeLocationAndRotation(FVector(500 , 0 , 330) , FRotator(0 , 0 , 0));
 	JetSprintArmFPS->TargetArmLength = 0.f;
 	JetSprintArmFPS->bEnableCameraRotationLag = true;
 	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
-	JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
 
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
-	JetCameraFPS->PrimaryComponentTick.bCanEverTick = false;
 
 	JetSpringArmMissileCam = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSpringArmMissileCam"));
 	JetSpringArmMissileCam->SetupAttachment(JetMesh);
@@ -137,16 +134,13 @@ AL_Viper::AL_Viper()
 	JetSpringArmMissileCam->bInheritPitch = false;
 	JetSpringArmMissileCam->bInheritRoll = false;
 	JetSpringArmMissileCam->bInheritYaw = false;
-	JetSpringArmMissileCam->PrimaryComponentTick.bCanEverTick = false;
 
 	JetCameraMissileCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("JetCameraMissileCam"));
 	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
 	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
 	JetCameraMissileCam->SetRelativeScale3D(FVector(.1 , 1 , .5));
-	JetCameraMissileCam->PrimaryComponentTick.bCanEverTick = false;
-	JetCameraMissileCam->SetHiddenInGame(true);
+	//JetCameraMissileCam->SetHiddenInGame(true);
 
-	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
 	BoosterLeftVFX->SetupAttachment(JetMesh);
 	BoosterLeftVFX->SetRelativeLocationAndRotation(FVector(-780 , -50 , 180) , FRotator(0 , 180 , 0));
@@ -278,7 +272,7 @@ AL_Viper::AL_Viper()
 	QuatTargetRotation = FQuat::Identity;
 
 	bReplicates = true;
-	SetReplicateMovement(true);
+	SetReplicateMovement(false);
 }
 #pragma endregion
 
@@ -473,6 +467,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
 	DOREPLIFETIME(AL_Viper , RearWheel);
+	DOREPLIFETIME(AL_Viper , IsEngineOn);
 	// DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
 	// DOREPLIFETIME(AL_Viper , QuatTargetRotation);
 }
@@ -1118,17 +1113,9 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 #pragma region Retate Pawn
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
-	//SetActorRotation(QuatCurrentRotation.Rotator());
-	// std::thread t = std::thread(ServerRPCRotation(QuatTargetRotation));
-	AsyncTask(ENamedThreads::GameThread , [this]()
-	{
-		// 서버 RPC 호출
-		ServerRPCRotation(QuatTargetRotation);
-	});
-	// FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([this]()
-	// {
-	// 	ServerRPCRotation(QuatTargetRotation);
-	// } , TStatId() , nullptr , ENamedThreads::AnyBackgroundThreadNormalTask);
+
+	SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatTargetRotation);
 
 	if (bJetAirVFXOn)
 	{
@@ -1196,6 +1183,14 @@ void AL_Viper::BeginPlay()
 	QuatCurrentRotation = GetActorRotation().Quaternion();
 
 	JetCameraMissileCam->HideActorComponents(this);
+
+	if (IsLocallyControlled())
+	{
+		GetWorld()->GetTimerManager().SetTimer(syncLocTimer , [&]()
+		{
+			ServerRPC_SyncLocation(this->GetActorLocation());
+		} , .01f , true);
+	}
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1893,18 +1888,21 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 #pragma endregion
 
 #pragma region Set Location & Rotation
-void AL_Viper::ServerRPCLocation_Implementation(const float& MoveForce)
+void AL_Viper::ServerRPC_SyncLocation_Implementation(const FVector& location)
 {
-	// Add Force
-	FVector forceVec = JetArrow->GetForwardVector() * MoveForce;
-	FVector forceLoc = JetRoot->GetComponentLocation();
-	if (JetRoot->IsSimulatingPhysics())
-		JetRoot->AddForceAtLocation(forceVec , forceLoc);
+	float dis = FVector::Dist(this->GetActorLocation() , location);
+	if (dis < 5.f && !this->IsLocallyControlled()) return;
 
-	// Move Up & Down
-	auto jetRot = JetArrow->GetRelativeRotation();
-	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
-	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
+	this->SetActorLocation(location);
+	MultiRPC_SyncLocation(location);
+}
+
+void AL_Viper::MultiRPC_SyncLocation_Implementation(const FVector& location)
+{
+	if (this->IsLocallyControlled()) return;
+	if (location.Equals(this->GetActorLocation())) return;
+
+	this->SetActorLocation(location);
 }
 
 void AL_Viper::ClientRPCLocation_Implementation()
@@ -1914,7 +1912,18 @@ void AL_Viper::ClientRPCLocation_Implementation()
 		ValueOfMoveForce = 0;
 	else if (ValueOfMoveForce > MaxValueOfMoveForce)
 		ValueOfMoveForce = MaxValueOfMoveForce;
-	ServerRPCLocation(ValueOfMoveForce);
+	//ServerRPCLocation(ValueOfMoveForce);
+
+	// Add Force
+	FVector forceVec = JetArrow->GetForwardVector() * ValueOfMoveForce;
+	FVector forceLoc = JetRoot->GetComponentLocation();
+	if (JetRoot->IsSimulatingPhysics())
+		JetRoot->AddForceAtLocation(forceVec , forceLoc);
+
+	// Move Up & Down
+	auto jetRot = JetArrow->GetRelativeRotation();
+	float zRot = jetRot.Quaternion().Y * jetRot.Quaternion().W * ValueOfHeightForce * 10.f;
+	JetRoot->AddForceAtLocation(FVector(0 , 0 , zRot) , HeightForceLoc);
 }
 
 void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
@@ -1927,11 +1936,19 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 			MultiRPCVisibleAirVFX(false);
 	}
 
-	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
-	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , newQuat ,
-	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	QuatCurrentRotation = newQuat;
+	QuatTargetRotation = newQuat;
 	SetActorRotation(QuatCurrentRotation.Rotator());
-	//SetActorRelativeRotation(QuatCurrentRotation.Rotator());
+	MultiRPCRotation(newQuat);
+}
+
+void AL_Viper::MultiRPCRotation_Implementation(const FQuat& newQuat)
+{
+	if (IsLocallyControlled()) return;
+
+	QuatCurrentRotation = newQuat;
+	QuatTargetRotation = newQuat;
+	SetActorRotation(QuatCurrentRotation);
 }
 
 void AL_Viper::MultiRPCVisibleAirVFX_Implementation(bool isOn)
@@ -2964,17 +2981,17 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
-
 	StickRollAngle = 0.f;
 	StickPitchAngle = 0.f;
 
 #pragma region Retate Pawn
-	//ServerRPCRotation(QuatTargetRotation);
-	AsyncTask(ENamedThreads::GameThread , [this]()
-	{
-		// 서버 RPC 호출
-		ServerRPCRotation(QuatTargetRotation);
-	});
+	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
+									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	
+	SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatTargetRotation);
+	
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
@@ -3012,17 +3029,17 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 
 	// 목표 회전 설정 (RootComponent를 기준으로)
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
-
 	VRStickCurrentPitchValue = 0.f;
 	VRStickCurrentRollValue = 0.f;
 
 #pragma region Retate Pawn
-	//ServerRPCRotation(QuatTargetRotation);
-	AsyncTask(ENamedThreads::GameThread , [this]()
-	{
-		// 서버 RPC 호출
-		ServerRPCRotation(QuatTargetRotation);
-	});
+	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
+									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	
+	SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatTargetRotation);
+	
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
