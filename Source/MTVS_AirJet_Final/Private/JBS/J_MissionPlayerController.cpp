@@ -241,10 +241,27 @@ void AJ_MissionPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 void AJ_MissionPlayerController::MRPC_TeleportStartPoint_Implementation(FTransform tpTR)
 {
     // 전송
+    check(this);
     auto* pawn = this->GetPawn();
-    pawn->SetActorTransform(tpTR);
     auto* viper = Cast<AL_Viper>(pawn);
+    
+    if (!viper->IsLocallyControlled()) return;
+
+    auto& tm = GetWorld()->GetTimerManager();
+
+    tm.ClearTimer(viper->syncLocTimer);
+
+    viper->SetActorTransform(tpTR);
     viper->QuatCurrentRotation = tpTR.GetRotation();
+    viper->QuatTargetRotation = tpTR.GetRotation();
+    viper->ServerRPC_SyncLocation(viper->GetActorLocation());
+   
+    GetWorld()->GetTimerManager()
+        .SetTimer(viper->syncLocTimer, [viper]() mutable
+    {
+        //타이머에서 할 거
+        viper->ServerRPC_SyncLocation(viper->GetActorLocation());
+    }, 0.01f, true);
 }
 
 void AJ_MissionPlayerController::SRPC_SendEngineProgressSuccess_Implementation(EEngineProgress type)
