@@ -124,12 +124,10 @@ AL_Viper::AL_Viper()
 	JetSprintArmFPS->TargetArmLength = 0.f;
 	JetSprintArmFPS->bEnableCameraRotationLag = true;
 	JetSprintArmFPS->CameraRotationLagSpeed = 3.5f;
-	JetSprintArmFPS->PrimaryComponentTick.bCanEverTick = false;
 
 	JetCameraFPS = CreateDefaultSubobject<UCameraComponent>(TEXT("JetCameraFPS"));
 	JetCameraFPS->SetupAttachment(JetSprintArmFPS);
 	JetCameraFPS->SetActive(false);
-	JetCameraFPS->PrimaryComponentTick.bCanEverTick = false;
 
 	JetSpringArmMissileCam = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSpringArmMissileCam"));
 	JetSpringArmMissileCam->SetupAttachment(JetMesh);
