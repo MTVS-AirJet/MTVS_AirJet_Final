@@ -1,1 +1,1 @@
-"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Project\Unreal\MTVS_AirJet_Final\MTVS_AirJet_Final.uproject" -game -log
+"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Project\Unreal\MTVS_AirJet_Final\MTVS_AirJet_Final.uproject" -game -log -NetTrace=1 -Trace=Net

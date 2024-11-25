@@ -108,17 +108,17 @@ public:
 
 #pragma  region Session Management Functions
 	// 1) 세션 관련 함수 --------------------------------------------------------------------------------------
-	UFUNCTION(Exec) // Exec: 콘솔창에 입력할 수 있도록 만든다.
+	UFUNCTION(Exec) // Exec: 콘솔창에 입력할 수 있도록
 	void Host(FString ServerName , const FString& MapDataStruct) override; // 서버 열기 함수
 
 	UFUNCTION(Exec)
 	void Join(uint32 Index); // 서버 접속 함수
 
 	UFUNCTION()
-	void CreateSession(); // 세션을 만드는 함수
+	void CreateSession(); // 세션 생성 함수
 
 	UFUNCTION()
-	void RefreshServerList(); // 서버목록을 찾는 함수
+	void RefreshServerList(); // 서버목록 탐색 함수
 
 	UFUNCTION()
 	void OnMapPreloadComplete(); // Map 비동기 load 함수
