@@ -1182,7 +1182,15 @@ void AL_Viper::BeginPlay()
 
 	QuatCurrentRotation = GetActorRotation().Quaternion();
 
-	JetCameraMissileCam->HideActorComponents(this);	
+	JetCameraMissileCam->HideActorComponents(this);
+
+	if (IsLocallyControlled())
+	{
+		GetWorld()->GetTimerManager().SetTimer(syncLocTimer , [&]()
+		{
+			ServerRPC_SyncLocation(this->GetActorLocation());
+		} , .01f , true);
+	}
 }
 
 void AL_Viper::Tick(float DeltaTime)
@@ -1504,16 +1512,6 @@ void AL_Viper::Tick(float DeltaTime)
 		if (bStartAudio)
 		{
 			CurAudioTime += DeltaTime;
-
-			if (IsLocallyControlled() && !bSyncLocation)
-			{
-				GetWorld()->GetTimerManager().SetTimer(syncLocTimer , [&]()
-				{
-					ServerRPC_SyncLocation(this->GetActorLocation());
-				} , .01f , true);
-				bSyncLocation = true;
-			}
-			
 			if (CurAudioTime >= PlayAudioTime)
 			{
 				if (auto pc = Cast<AK_PlayerController>(Controller))
