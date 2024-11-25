@@ -115,7 +115,6 @@ AL_Viper::AL_Viper()
 	MissileWidget->SetDrawSize(FVector2D(2048 , 2048));
 	MissileWidget->SetRelativeScale3D(FVector(0.01));
 	MissileWidget->SetVisibility(false);
-	MissileWidget->PrimaryComponentTick.bCanEverTick = false;
 	//============================================
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -135,14 +134,12 @@ AL_Viper::AL_Viper()
 	JetSpringArmMissileCam->bInheritPitch = false;
 	JetSpringArmMissileCam->bInheritRoll = false;
 	JetSpringArmMissileCam->bInheritYaw = false;
-	JetSpringArmMissileCam->PrimaryComponentTick.bCanEverTick = false;
 
 	JetCameraMissileCam = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("JetCameraMissileCam"));
 	JetCameraMissileCam->SetupAttachment(JetSpringArmMissileCam);
 	JetCameraMissileCam->SetRelativeRotation(FRotator(-25 , 0 , 0));
 	JetCameraMissileCam->SetRelativeScale3D(FVector(.1 , 1 , .5));
-	JetCameraMissileCam->PrimaryComponentTick.bCanEverTick = false;
-	JetCameraMissileCam->SetHiddenInGame(true);
+	//JetCameraMissileCam->SetHiddenInGame(true);
 
 	//============================================
 	BoosterLeftVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BoosterLeftVFX"));
@@ -471,6 +468,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , CanopyPitch);
 	DOREPLIFETIME(AL_Viper , FrontWheel);
 	DOREPLIFETIME(AL_Viper , RearWheel);
+	DOREPLIFETIME(AL_Viper , IsEngineOn);
 	// DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
 	// DOREPLIFETIME(AL_Viper , QuatTargetRotation);
 }

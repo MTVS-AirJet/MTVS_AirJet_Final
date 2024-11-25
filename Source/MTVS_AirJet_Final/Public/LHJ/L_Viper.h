@@ -278,7 +278,7 @@ public:
 
 private:
 	// For Engine Using
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
+	UPROPERTY(EditDefaultsOnly , Category="Engine", Replicated)
 	bool IsEngineOn;
 
 	// For Change Arrow Rotate
