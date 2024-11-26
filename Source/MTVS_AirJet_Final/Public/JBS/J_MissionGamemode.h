@@ -14,7 +14,7 @@
 DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
 
 // 이륙 딜리게이트
-DECLARE_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, bool);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, pc, bool, isSuccess);
 
 // 이륙 종료 딜리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTakeOffEndDel, bool, isSuccess);
@@ -124,9 +124,14 @@ protected:
     }
         protected:
 
+    // 이륙 후 로딩 스크린 딜레이
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+    float loadingDelay = .5f;
+
     // 이륙 후 미션 시작 딜레이
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
     float missionStartDelay = 1.5f;
+
 public:
     // XXX 로드할 미션 맵 이름
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -139,6 +144,7 @@ public:
     int pIdx = 0;
 
     // 해당 파일럿 이륙 딜리게이트
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Delegate")
     FTakeOffDel onePilotTakeOffDel;
 
     // 이륙 종료 딜리게이트
@@ -182,7 +188,7 @@ protected:
     void SetSpawnPoints(FMissionPlayerSpawnPoints& spawnPointsStruct);
 
     // 스폰 포인트 액터 추가
-    class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole);
+    class AJ_MissionSpawnPointActor* AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, const EPlayerRole& addRole);
 
     // 0. 미션 레벨 시작 트리거 | 호스트가 시작 버튼 누르면 실행
     UFUNCTION(BlueprintCallable)

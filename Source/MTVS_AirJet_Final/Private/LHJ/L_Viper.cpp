@@ -1186,7 +1186,7 @@ void AL_Viper::BeginPlay()
 
 	if (IsLocallyControlled())
 	{
-		GetWorld()->GetTimerManager().SetTimer(syncLocTimer , [&]()
+		GetWorld()->GetTimerManager().SetTimer(syncLocTimer , [this]()
 		{
 			ServerRPC_SyncLocation(this->GetActorLocation());
 		} , .01f , true);

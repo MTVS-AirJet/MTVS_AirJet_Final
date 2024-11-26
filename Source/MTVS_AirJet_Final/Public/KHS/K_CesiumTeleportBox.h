@@ -57,10 +57,10 @@ public:
 	// PC에게 이륙했음을 알려주는 함수
 	UFUNCTION(BlueprintCallable)
 	void NotifyFlight(class APawn* flightPawn);
-
+	// XXX 아래 함수로 대체
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void ChangeMissionArea();
-	
+	// 미션 지역 변경
 	UFUNCTION(Server, Reliable)
 	void SRPC_ChangeMissionArea();
 
