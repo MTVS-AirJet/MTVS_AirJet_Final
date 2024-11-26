@@ -27,6 +27,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* MenuSwitcher; // 각 위젯으로 전환시킬 수 있는 Menu Switcher
 
+	UPROPERTY(meta=(BindWidget))
+	class UVerticalBox* Mission_Box_Text; //Mission Text Box
+	
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	class UWidgetAnimation* ShowMissionUIAnim;
 

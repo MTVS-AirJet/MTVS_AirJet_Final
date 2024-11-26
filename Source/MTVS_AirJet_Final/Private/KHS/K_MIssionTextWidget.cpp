@@ -4,6 +4,7 @@
 #include "KHS/K_MIssionTextWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "KHS/K_GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -45,7 +46,8 @@ void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 		MissionText->SetVisibility(ESlateVisibility::Visible);
 		Mission_txt_helper->SetVisibility(ESlateVisibility::Visible);
 		img_txtbackground->SetVisibility(ESlateVisibility::Visible);
-		Mission_txt_acting->SetVisibility(ESlateVisibility::Visible);
+		//Mission_txt_acting->SetVisibility(ESlateVisibility::Visible);
+		Mission_Box_Text->SetVisibility(ESlateVisibility::Visible);
 		
 		//SetText
 		Mission_txt_acting->SetText(FText::FromString(MissionData->MissionActing));
@@ -83,7 +85,8 @@ void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 		//Visibility 켜기
 		MissionText->SetVisibility(ESlateVisibility::Visible);
 		//MissionActing은 끄기
-		Mission_txt_acting->SetVisibility(ESlateVisibility::Hidden);
+		//Mission_txt_acting->SetVisibility(ESlateVisibility::Hidden);
+		Mission_Box_Text->SetVisibility(ESlateVisibility::Hidden);
 		//애니메이션 재생
 		PlayAnimation(ShowMissionUIAnim);
 
