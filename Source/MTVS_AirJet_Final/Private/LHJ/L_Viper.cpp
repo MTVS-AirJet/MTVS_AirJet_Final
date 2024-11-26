@@ -1114,8 +1114,10 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 
-	SetActorRotation(QuatTargetRotation);
-	ServerRPCRotation(QuatTargetRotation);
+	SetActorRotation(QuatCurrentRotation);
+	//SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatCurrentRotation);
+	//ServerRPCRotation(QuatTargetRotation);
 
 	if (bJetAirVFXOn)
 	{
