@@ -122,7 +122,11 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_SwitchResultUI(const TArray<FObjectiveData>& resultObjData);
 
-	// 팝업 ui 활성화 및 설정
+	// 미션 ai 피드백 데이터 전달
+	UFUNCTION(Client, Reliable)
+	void CRPC_SetResultAIFeedback(const FAIFeedbackRes &resData);
+
+        // 팝업 ui 활성화 및 설정
 	UFUNCTION(Client, Unreliable)
 	void CRPC_ActivePopupUI(const EMissionProcess &mpIdx);
 

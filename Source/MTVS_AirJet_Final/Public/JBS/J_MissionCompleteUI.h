@@ -47,6 +47,14 @@ protected:
 	// // 수행 결과 요소 프리팹
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	// TSubclassOf<class UJ_MissionCompleteObjElement> objElementPrefab;
+
+	// 총 수행도 평균
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	float spAvgValue = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FTextUIData spAvgData;
+	
 public:
 	// 로비로 돌아가기 버튼 딜리게이트
 	FReturnToLobbyDelegate returnLobbyDel;
@@ -60,15 +68,27 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void OnClickReturnLobby();
 
-	UFUNCTION(BlueprintCallable)
-	void SetAIFeedback(const FAIFeedbackRes &resData);
+	
 
 	// 결과 등급 등장
 	UFUNCTION(BlueprintCallable)
 	void PlayResultGrade(int rank);
 
+	// 랜덤 0~99 값 적용 | 결산 연출용
+	UFUNCTION(BlueprintCallable)
+	void SetAVGUIRandomValue();
+
     public:
+	// ai 피드백 받기
+	UFUNCTION(BlueprintCallable)
+	void SetAIFeedback(const FAIFeedbackRes &resData);
+
 	// 결과 값 받기
 	// 결과 리스트 UI에 값 설정
     void SetResultListValue(const TArray<FObjectiveData> &resultObjData);
+
+	// 시작 애니메이션 실행
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayStartAnim();
+	
 };

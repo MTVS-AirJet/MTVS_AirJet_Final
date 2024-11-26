@@ -415,15 +415,17 @@ FString FRichString::FormatString(const FString &str, ETextStyle type) const
     FString temp = str;
     temp.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
     temp.ReplaceInline(TEXT("\r"), TEXT("\n"));
-    temp.ParseIntoArray(stringAry, TEXT("\n"), true);
+    temp.ParseIntoArray(stringAry, TEXT("\n"), false);
 
     // 한 문장을 리치 텍스트로 묶어서 합치기
     if(stringAry.Num() > 1)
     {
         for(const auto& sentence : stringAry)
         {
-            if(!sentence.IsEmpty())
+            // if(!sentence.IsEmpty())
                 result.Append(FRichString(sentence, type).FormatString(sentence, type));
+
+            result.Append(TEXT("\n"));
         }
     }
     else {

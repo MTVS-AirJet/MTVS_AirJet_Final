@@ -11,6 +11,7 @@
 #include "JBS/J_GameInstance.h"
 #include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionCompleteObjElement.h"
+#include "JBS/J_ObjectiveSubElementUI.h"
 #include "JBS/J_Utility.h"
 #include "Layout/Margin.h"
 #include "Styling/SlateBrush.h"
@@ -38,24 +39,11 @@ void UJ_MissionCompleteUI::OnClickReturnLobby()
 
 void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resultObjData)
 {
-    // AI 피드백 함수 바인드
-    auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
-    gi->aiFeedbackResUseDel.BindUObject(this, &UJ_MissionCompleteUI::SetAIFeedback);
-
-    TArray<float> successPercentAry;
-    Algo::Transform(resultObjData, successPercentAry, [](FObjectiveData temp){
-        return temp.successPercent;
-    });
-    //캐스트 후
     
-    FAIFeedbackReq feedbackReq(successPercentAry);
-    // 서버에 피드백 요청
-    UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, feedbackReq);
-
 
     // 데이터 가지고 수행도 섹션 값 설정
     FTextUIData successData;
-    successData.headerText = FRichString(TEXT("클리어 지표"), ETextStyle::RESULTHEADER).GetFormatString();
+    successData.headerText = FRichString(TEXT("이번 직업체험에서 배운것"), ETextStyle::RESULTHEADER).GetFormatString();
     for(const auto& data : resultObjData)
     {
         FString bodyText = "";
@@ -86,6 +74,9 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
 
     MC_SuccessTextUI->SetTextUI(successData, true);
 
+    MC_SuccessTextUI->SetAllChildrenSize(0.0f);
+
+
     // ai 피드백
     FTextUIData aiComment;
     aiComment.headerText = FRichString(TEXT("AI 비행 분석"), ETextStyle::RESULTHEADER).GetFormatString();
@@ -95,18 +86,25 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
 
     MC_AICommentTextUI->SetTextUI(aiComment, true);
 
-    
+    MC_AICommentTextUI->SetAllChildrenSize(0.f);
 
-
-    float avg = UJ_Utility::CalcAverage(successPercentAry);
+    // 수행도 배열
+    TArray<float> successPercentAry;
+    Algo::Transform(resultObjData, successPercentAry, [](FObjectiveData temp){
+        return temp.successPercent;
+    });
+    // 수행도 평균 계산
+    spAvgValue = UJ_Utility::CalcAverage(successPercentAry);
  
-    FTextUIData successAvg;
-    successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
-    successAvg.bodyTextAry = {
-        FRichString(FString::Printf(TEXT("총점 : %d %%"), static_cast<int>(avg*100)), ETextStyle::RESULTDEFAULT).GetFormatString()
+    spAvgData.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
+    spAvgData.bodyTextAry = {
+        FRichString(FString::Printf(TEXT("총점 : %d %%"), static_cast<int>(spAvgValue*100)), ETextStyle::RESULTDEFAULT).GetFormatString()
     };
 
-    MC_SuccessAvgTextUI->SetTextUI(successAvg, true);
+    MC_SuccessAvgTextUI->SetTextUI(spAvgData, true);
+
+
+    PlayStartAnim();
 }
 
 void UJ_MissionCompleteUI::SetAIFeedback(const FAIFeedbackRes &resData)
@@ -119,6 +117,8 @@ void UJ_MissionCompleteUI::SetAIFeedback(const FAIFeedbackRes &resData)
     };
 
     MC_AICommentTextUI->SetTextUI(aiComment, true);
+
+    MC_AICommentTextUI->SetAllChildrenSize(0.0f);
 
     PlayResultGrade(resData.rank);
 }
@@ -135,4 +135,18 @@ void UJ_MissionCompleteUI::PlayResultGrade(int rank)
     else {
         GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("등급 값이 이상해요 : %d"), rank));
     }
+}
+
+void UJ_MissionCompleteUI::SetAVGUIRandomValue()
+{
+    FTextUIData successAvg;
+    successAvg.headerText = FRichString(TEXT("수행도"), ETextStyle::RESULTHEADER).GetFormatString();
+
+    int randomValue = FMath::RandRange(0,100);
+
+    successAvg.bodyTextAry = {
+        FRichString(FString::Printf(TEXT("총점 : %d %%"), randomValue), ETextStyle::RESULTDEFAULT).GetFormatString()
+    };
+
+    MC_SuccessAvgTextUI->SetTextUI(successAvg, false);
 }

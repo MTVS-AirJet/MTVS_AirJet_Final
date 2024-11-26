@@ -648,3 +648,7 @@ void UJ_ObjectiveUIComp::SRPC_DeactivatedPopupUI_Implementation()
 	this->popupEndDel.Broadcast();
 }
 
+void UJ_ObjectiveUIComp::CRPC_SetResultAIFeedback_Implementation(const FAIFeedbackRes &resData)
+{
+	OBJ_UI->missionCompleteUI->SetAIFeedback(resData);
+}

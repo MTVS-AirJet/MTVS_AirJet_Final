@@ -94,7 +94,9 @@ void UJ_GameInstance::RequestData(FResponseDelegate resDel, const FString& jsonD
 		{
 			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 1단계 성공"));
 			// 로그인 시에만 작동, 인증 값 저장해두기
-			authorValue = res->GetHeader(TEXT("Authorization"));
+			FString tempAuth = res->GetHeader(TEXT("Authorization"));
+			if(!tempAuth.IsEmpty() && !authorValue.Equals(tempAuth))
+				authorValue = tempAuth;
 			// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("인증 값 : %s"), *authorValue));
 
 			// json string 가져오기

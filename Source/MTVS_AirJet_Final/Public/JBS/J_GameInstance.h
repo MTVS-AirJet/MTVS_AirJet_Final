@@ -116,8 +116,7 @@ protected:
 	//FString defaultURL = TEXT("http://125.132.216.190:7757/api/");
 	FString defaultURL = TEXT("http://43.202.221.239/api/");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	FString authorValue = TEXT("");
+	
 
 	// 전송 타입 맵
 	TMap<ERequestType, FString> reqTypeMap = {
@@ -152,6 +151,10 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	// float missionObjDefaultHeight = 500'000;
 public:
+	// 로그인 시 발급되는 일회용 토큰
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	FString authorValue = TEXT("");
+
 	// 미션 진행 데이터 테이블
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	class UDataTable* missionProgressDT;

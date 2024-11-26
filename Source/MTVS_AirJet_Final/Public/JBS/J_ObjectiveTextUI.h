@@ -11,6 +11,8 @@
  */
 DECLARE_DELEGATE_OneParam(FUIAnimDel, class UJ_ObjectiveTextUI*);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUIEndDel);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_ObjectiveTextUI : public UJ_BaseTextUI
 {
@@ -53,6 +55,10 @@ public:
 	// 시작 애니메이션 딜리게이트
 	FUIAnimDel startAnimDel;
 
+	// 애니메이션 종료 딜리게이트
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, BlueprintCallable, BlueprintAssignable, Category="Default|Delegate")
+	FUIEndDel animEndDel;
+
 protected:
 	// 본문 텍스트 박스 설정(패딩 등등)
     void SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot) override;
@@ -87,5 +93,7 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
     void PlayEndAnim(const TArray<UWidget *> &allSub);
-	
+
+	UFUNCTION(BlueprintCallable)
+	void SetAllChildrenSize(float value);
 };
