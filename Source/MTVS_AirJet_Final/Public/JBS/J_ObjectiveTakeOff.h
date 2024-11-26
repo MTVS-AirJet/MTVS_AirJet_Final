@@ -64,6 +64,7 @@ protected:
 -> 전부 이륙시 매니저 쪽에서 완료 처리 | ObjectiveEnd*/
 
     // 해당 파일럿 이륙 성공 처리
+    UFUNCTION(BlueprintCallable)
     void SuccessTakeOff(class AJ_MissionPlayerController *pc, bool isSuccess = true);
 
     // 목표 성공시 수행도 계산

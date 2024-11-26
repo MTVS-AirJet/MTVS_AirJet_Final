@@ -269,9 +269,9 @@ void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
 {
 	for(const FObjectiveData& objData : defaultObjDataAry)
 	{
+		// 안 끝난 기본 목표 종료 처리
 		auto* objActor = objData.objectiveActor;
-		if(!objActor) continue;
-		if(objActor->IS_OBJ_ENDED) continue;
+		if(!objActor || objActor->IS_OBJ_ENDED) continue;
 
 		// 수행도는 0으로
 		objActor->SUCCESS_PERCENT = 0.f;

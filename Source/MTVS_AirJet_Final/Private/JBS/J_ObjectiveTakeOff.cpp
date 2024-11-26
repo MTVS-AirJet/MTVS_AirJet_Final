@@ -56,7 +56,8 @@ void AJ_ObjectiveTakeOff::ObjectiveActive()
 
     // 게임모드 이륙 딜리게이트에 바인드
     AJ_MissionGamemode* gm = UJ_Utility::GetMissionGamemode(GetWorld());
-    gm->onePilotTakeOffDel.BindUObject(this, &AJ_ObjectiveTakeOff::SuccessTakeOff);
+    gm->onePilotTakeOffDel.BindDynamic(this, &AJ_ObjectiveTakeOff::SuccessTakeOff);
+
     
     // 위치 텔포 박스로 설정
     if(gm->TP_BOX)

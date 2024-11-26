@@ -67,9 +67,7 @@ void AJ_MissionGamemode::StartMission()
     }
     // GI 미션 데이터 사용
     else 
-    {
         curMissionData = LoadMissionData();
-    }
 
     // 첫 미션 데이터 가져오기
     const auto& missions = curMissionData.mission;
@@ -80,8 +78,6 @@ void AJ_MissionGamemode::StartMission()
 
     // 목표 매니저 컴포넌트 존재 확인
     check(objectiveManagerComp);
-
-    // FIXME 여기부터 다시 리팩토링 시작
 
     // 시동 및 이륙 목표 추가
     objectiveManagerComp->InitDefaultObj();
@@ -158,13 +154,11 @@ void AJ_MissionGamemode::CacheCesiumActors()
     // 텔포 박스 가져오기
     cesiumTPBox = Cast<AK_CesiumTeleportBox>(
         UGameplayStatics::GetActorOfClass(GetWorld(), AK_CesiumTeleportBox::StaticClass()));
-    if(!cesiumTPBox) return;
 
     // 정점 액터 가져오기
     cesiumZeroPos = Cast<AK_CesiumManager>(
         UGameplayStatics::GetActorOfClass(GetWorld(),
          AK_CesiumManager::StaticClass()));
-    if(!cesiumZeroPos) return;
 
     // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("무사히 세슘 관련 액터 캐시 성공"));
 }
@@ -181,55 +175,56 @@ void AJ_MissionGamemode::CacheCesiumActors()
 -> 플레이어 생성 후 포제스 | SpawnActor, Possess
 -> 역할에 따라 마우스 커서 및 입력 처리
 
-// @@ 미션 시작 버튼 누르면 팝업 UI 시작 | ???
--> 팝업 UI 종료시 미션 시작 | StartMissionLevel
+// 미션 시작 버튼 누르면 미션 시작 설정 | StartMissionLevel
 -> 시작 보이스 및 자막 재생 | CRPC_PlayCommanderVoice3 | EMissionProcess::MISSION_START
+-> 팝업 UI 시작 | CRPC_ActivePopupUI
+-> 팝업 UI 종료시 시동 목표 시작 | StartDefaultObjective
 -> 미션 시작시 시동 절차 목표 활성화 | StartDefualtObj
 */
 void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
 {
     Super::PostLogin(newPlayer);
 
+    // 역할 설정후 플레이어 스폰
+    AJ_MissionPlayerController* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
+    if(!pc) return;
+
     // 현재 주요 스폰 시스템
     if(enableUseOldSpawnSystem)
-    {
-        // 역할 설정후 플레이어 스폰
-        auto* pc = CastChecked<AJ_MissionPlayerController>(newPlayer);
         pc->SpawnMyPlayer();
 
-        // 미션 보이스 로드 하라고 요청
-        pc->CRPC_ReqMissionVoiceData();
-        
-        // 호스트 시작 버튼에 미션 시작 함수 딜리게이트
-        // @@ 나중엔 챕터 UI 시작으로 변경
-        if(HasAuthority() && newPlayer->IsLocalController())
-            pc->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
-    }
+    // 미션 보이스 로드 하라고 요청
+    pc->CRPC_ReqMissionVoiceData();
+    
+    // 호스트 시작 버튼에 미션 시작 함수 딜리게이트
+    if(HasAuthority() && newPlayer->IsLocalController())
+        pc->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
 }
 
 // 산개 로직 적용해서 스폰 위치 계산
 FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_MissionPlayerController* pc)
 {
     // 해당 역할의 스폰 위치 계산
-    auto tr = this->GetSpawnPoint(role)->GetActorTransform();
+    auto spawnTR = this->GetSpawnPoint(role)->GetActorTransform();
     // 몇 번째 pc 인지 받아서 시작 위치에서 뒤로 - * i 만큼 계산
 
     // 시작 지점의 뒤 벡터 구하기
-    FVector backVector = -1 * tr.GetUnitAxis(EAxis::X);
-    backVector *= spawnInterval * spawnCnt;
+    FVector backVector = -1 * spawnTR.GetUnitAxis(EAxis::X)
+                        * spawnInterval * spawnCnt;
 
     // 위치 결정
-    tr.SetLocation(tr.GetLocation() + backVector);
+    spawnTR.SetLocation(spawnTR.GetLocation() + backVector);
 
     // 스폰 카운트
     spawnCnt++;
 
-    return tr;
+    return spawnTR;
 }
 
-// 있으면 그거 주고 없으면 찾기 
+// 스폰포인트 있으면 그거 주고 없으면 찾기 + 그래도 없으면 생성해서 주기
 AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
 {
+    // 절대 획득
     auto* spPos = spawnPoints.spawnPointMap[role];
     if(!spPos)
     {
@@ -244,11 +239,11 @@ AJ_MissionSpawnPointActor* AJ_MissionGamemode::GetSpawnPoint(EPlayerRole role)
     return spPos;
 }
 
-AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, EPlayerRole addRole)
+AJ_MissionSpawnPointActor* AJ_MissionGamemode::AddSpawnPoint(FMissionPlayerSpawnPoints& spawnPointsStruct, const EPlayerRole& addRole)
 {
     // 해당 역할을 가진 스폰 포인트 생성
     auto* spPoint = GetWorld()->SpawnActor<AJ_MissionSpawnPointActor>(spawnPointsStruct.spawnPointPrefab, spawnPointsStruct.spawnPointDefaultPos[addRole]);
-
+    // 역할 설정
     spPoint->spawnType = addRole;
 
     // 맵에 추가
@@ -277,9 +272,14 @@ void AJ_MissionGamemode::StartMissionLevel()
 
 void AJ_MissionGamemode::StartDefaultObjective()
 {
+    // 호스트 팝업의 바인드 제거
+
+    // 호스트 가져오기
     AJ_MissionPlayerController* outHost;
-    // 바인드 제거
     UJ_Utility::GetLocalPlayerController(GetWorld(), outHost);
+    if(!outHost) return;
+
+    // 바인드 제거
     outHost->objUIComp->popupEndDel.RemoveDynamic( this, &AJ_MissionGamemode::StartDefaultObjective);
 
     // 시동 목표 시작
@@ -288,18 +288,25 @@ void AJ_MissionGamemode::StartDefaultObjective()
 
 #pragma endregion
 
-
-
 #pragma region 이륙 단
 /*
+// AddFlightedPC
 텔포 박스에서 충돌시 해당 pc 이륙 체크 | AddFlightedPC
--> 한 명 이륙 시 딜리게이트 실행 | onePilotTakeOffDel
--> 이륙 목표 액터에서 수행도 갱신 처리 | SuccessTakeOff
+-> 한 명 이륙 딜리게이트 실행 | onePilotTakeOffDel
+-> 이륙 목표 액터에서 수행도 갱신 처리 | takeOffObj->SuccessTakeOff
 -> 로딩 UI 추가 | CRPC_AddLoadingUI
--> 이륙한 플레이어 수가 전체 플레이어 수와 같아지면 전술명령 단 시작 | StartTacticalOrder
-StartTacticalOrder
+-> 전체 플레이어 이륙 체크
+-> 이륙 종료 딜리게이트 실행 | takeOffEndDel
+-> 이륙 목표 종료 처리 | takeOffObj->ObjectiveEnd
+-> 전술명령 시작 | StartTacticalOrder
+// StartTacticalOrder
 -> 끝내지 않은 기본 목표(시동,이륙) 종료 처리 | startTODel, SkipDefaultObj, ObjectiveEnd
 -> 약간 딜레이 이후 미션 지역으로 변경 | ChangeMissionArea
+// ChangeMissionArea
+-> 미션 지역으로 위경도 변경 | SetDestinationLogitudeLatitude
+-> 미션 지역으로 세슘 머티리얼 변경 | SRPC_ChangeMissionArea
+-> 텔포 박스 콜리전 제거 | boxComp->DestroyComponent
+// TeleportAllStartPoint
 -> 미션 시작 지점으로 전투기 위치 이동 | TeleportAllStartPoint
 -> 약간 딜레이 이후 미션 시작 | DelayStartTacticalOrder
 -> 이륙 보이스 재생 요청 | CRPC_PlayCommanderVoice3, FLIGHT_START
@@ -308,7 +315,7 @@ StartTacticalOrder
 */
 
 // 이륙 체크 및 미션 시작 단
-bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, bool isSuccess)
+bool AJ_MissionGamemode::AddFlightedPC(AJ_MissionPlayerController *pc, bool isSuccess)
 {
     // 이미 있으면 무시
     if(flightedPCAry.Contains(pc)) return false;
@@ -319,17 +326,8 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     // 이륙 딜리게이트 실행
     onePilotTakeOffDel.ExecuteIfBound(pc, isSuccess);
 
-    // @@ 해당 pc 로딩 UI 추가  | 굳이 타이머 넣을 필요 있나? 테스트 필요
+    // 해당 pc 로딩 ui 추가
     pc->CRPC_AddLoadingUI();
-    // FTimerHandle timerHandle;
-    // GetWorld()->GetTimerManager()
-    //     .SetTimer(timerHandle, [this,pc]() mutable
-    // {
-    //     if(isStartTO) return;
-    //     //타이머에서 할 거
-    //     // 해당 pc에게 로딩 UI 추가
-    //     pc->CRPC_AddLoadingUI();
-    // }, 1.5f, false);
 
     const int curAllPCNum = GetGameState<AJ_MissionGameState>()->GetAllPlayerController().Num();
     // 배열 크기가 현재 플레이어 수와 같아지면 시작 지점 텔포 및 미션 시작
@@ -344,7 +342,7 @@ bool AJ_MissionGamemode::AddFlightedPC(class AJ_MissionPlayerController *pc, boo
     }
 
     // XXX 반환 해도 안쓰긴함
-    return false;
+    return isTPReady;
 }
 
 void AJ_MissionGamemode::StartTacticalOrder()
@@ -352,7 +350,7 @@ void AJ_MissionGamemode::StartTacticalOrder()
     // 이미 시작 했으면 무시
     if(isStartTO) return;
 
-    // solved 기본 목표 종료 처리
+    // 안 끝난 기본 목표 종료 처리
     startTODel.Broadcast(true);
     isStartTO = true;
 
@@ -369,21 +367,22 @@ void AJ_MissionGamemode::StartTacticalOrder()
 
         // 딜레이 이후 미션 시작
         DelayStartTacticalOrder(missionStartDelay);
-    }, .5f, false);
+    }, loadingDelay, false);
 }
 
 
 
 void AJ_MissionGamemode::ChangeMissionArea()
 {
+    if(!cesiumTPBox) return;
+
     // 위경도 미션 지역으로 설정
     cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
     // 변경 요청
     cesiumTPBox->SRPC_ChangeMissionArea();
     //텔포박스 비활성화
     auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
-    // if(boxComp)
-    //     boxComp->SetCollisionProfileName(FName(TEXT("NoCollision")));
+    if(!boxComp) return;
     // 충돌의 원인을 제거
     boxComp->DestroyComponent();
 }
