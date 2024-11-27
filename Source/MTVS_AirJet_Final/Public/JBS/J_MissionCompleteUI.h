@@ -13,6 +13,8 @@
 // pc에 로비로 돌아가기 바인드할 딜리게이트 추가
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReturnToLobbyDelegate);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRankDel);
+
 UCLASS()
 class MTVS_AIRJET_FINAL_API UJ_MissionCompleteUI : public UUserWidget
 {
@@ -48,6 +50,15 @@ protected:
 	TArray<FSlateBrush> gradeImgAry;
 	// 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isGetData = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool isEndAnim = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	int dataRank = 0;
+
 	// // 수행 결과 요소 프리팹
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	// TSubclassOf<class UJ_MissionCompleteObjElement> objElementPrefab;
@@ -67,7 +78,17 @@ public:
 	// 로비로 돌아가기 버튼 딜리게이트
 	FReturnToLobbyDelegate returnLobbyDel;
 	// 요소 추가
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintCallable, BlueprintAssignable, Category="Default|Delegate")
+	FRankDel rankDel;
 protected:
+
+	// 랭크 모션 준비 확인 후 실행
+	UFUNCTION(BlueprintCallable)
+	void PlayRankMotion()
+	{
+		if(isGetData && isEndAnim)
+			PlayResultGrade(dataRank);
+	}
 
 	// init
 	virtual void NativeConstruct() override;
