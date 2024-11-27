@@ -1176,7 +1176,10 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 
-	SetActorRotation(QuatCurrentRotation);
+	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
+	if (!HasAuthority())
+		SetActorRotation(QuatCurrentRotation);
+	
 	//SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatCurrentRotation);
 	//ServerRPCRotation(QuatTargetRotation);
@@ -1986,7 +1989,7 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 void AL_Viper::ServerRPC_SyncLocation_Implementation(const FVector& location)
 {
 	float dis = FVector::Dist(this->GetActorLocation() , location);
-	if (dis < 5.f && !this->IsLocallyControlled()) return;
+	if (dis < 5.f && this->IsLocallyControlled()) return;
 
 	this->SetActorLocation(location);
 	MultiRPC_SyncLocation(location);
@@ -2032,8 +2035,8 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 	}
 
 	QuatCurrentRotation = newQuat;
-	QuatTargetRotation = newQuat;
-	SetActorRotation(QuatCurrentRotation.Rotator());
+	QuatTargetRotation = newQuat;	
+	SetActorRotation(QuatCurrentRotation.Rotator());	
 	MultiRPCRotation(newQuat);
 }
 
@@ -2151,7 +2154,7 @@ void AL_Viper::ClientRPCLockOn_Implementation()
 		Diametr *= 2.f;
 		Start += (ForwardVector * Diametr / 4) + (DownVector * Diametr / 2);
 		if (UKismetSystemLibrary::SphereTraceMulti(GetWorld() , Start , Start , Diametr / 2.f , TraceTypeQuery1 ,
-		                                           false , Overlaps , EDrawDebugTrace::ForOneFrame , OutHit , true))
+		                                           false , Overlaps , EDrawDebugTrace::None , OutHit , true))
 		{
 			for (auto hit : OutHit)
 			{
@@ -3083,8 +3086,10 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 									   RotationSpeed * GetWorld()->GetDeltaSeconds());
-	
-	SetActorRotation(QuatTargetRotation);
+
+	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
+	if (!HasAuthority())
+		SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatTargetRotation);
 	
 	if (bJetAirVFXOn)
@@ -3131,8 +3136,10 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 									   RotationSpeed * GetWorld()->GetDeltaSeconds());
-	
-	SetActorRotation(QuatTargetRotation);
+
+	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
+	if (!HasAuthority())
+		SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatTargetRotation);
 	
 	if (bJetAirVFXOn)
