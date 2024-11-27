@@ -37,6 +37,7 @@ protected:
 	int curActiveSubMPIdx = -1;
 		public:
 	__declspec(property(get = GetCurSubMPIdx, put = SetCurSubMPIdx)) int CUR_ACTIVE_SUBMP_IDX;
+	UFUNCTION(BlueprintCallable)
 	int GetCurSubMPIdx() {return curActiveSubMPIdx;}
 	void SetCurSubMPIdx(int value) {curActiveSubMPIdx = value;}
 		protected:
@@ -51,9 +52,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|SubMP|Values")
 	float xMPDis = 27300;
 
-	// 하위 이동 목표 배열
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|SubMP|Objects")
-	TArray<class AJ_ObjectiveMovePoint*> subMPArray;
+	
 
 #pragma endregion
 
@@ -74,6 +73,9 @@ protected:
 	FTargetActiveDelegate targetActiveDel;
 #pragma endregion
 public:
+	// 하위 이동 목표 배열
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|SubMP|Objects")
+	TArray<class AJ_ObjectiveMovePoint*> subMPArray;
 
 protected:
 #pragma region 시작 설정 단

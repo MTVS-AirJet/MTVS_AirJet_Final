@@ -149,7 +149,7 @@ void AK_CesiumTeleportBox::NotifyFlight(APawn* flightPawn)
 
 void AK_CesiumTeleportBox::SRPC_ChangeMissionArea_Implementation()
 {
-    const FVector targetVec(DestLatitude, DestLongitude, 0);
+    const FVector targetVec(DestLongitude, DestLatitude, 0);
 
     MRPC_ChangeMissionArea(targetVec);
 }

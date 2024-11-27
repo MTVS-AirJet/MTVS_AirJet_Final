@@ -899,9 +899,9 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 	}
 	if (JetCameraFPS)
 	{
-		if (!bStartMission && StartMissionViper_Del.IsBound())
+		if (!bStartMission/* && StartMissionViper_Del.IsBound()*/)
 		{
-			StartMissionViper_Del.Broadcast();
+			//StartMissionViper_Del.Broadcast();
 			bStartMission = true;
 
 			if (IsLocallyControlled())
@@ -1114,8 +1114,10 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
 	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 
-	SetActorRotation(QuatTargetRotation);
-	ServerRPCRotation(QuatTargetRotation);
+	SetActorRotation(QuatCurrentRotation);
+	//SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatCurrentRotation);
+	//ServerRPCRotation(QuatTargetRotation);
 
 	if (bJetAirVFXOn)
 	{
@@ -1137,6 +1139,8 @@ void AL_Viper::BeginPlay()
 {
 	Super::BeginPlay();
 
+	JetCameraFPS->SetActive(false);
+	
 	CRPC_CanopyAudioControl(false);
 	CRPC_AudioControl(false);
 	CRPC_AirSound(false);
@@ -1424,7 +1428,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 				if (bFirstEngine)
 				{
-					CRPC_EngineSound(true , 1);
+					CRPC_EngineSound(true , 2);
 					engineProgSuccessDel.Broadcast(EEngineProgress::ENGINE_THROTTLE_IDLE);
 					DummyThrottleMesh->SetRenderCustomDepth(false);
 					DummyThrottleMesh->CustomDepthStencilValue = 0;
@@ -2504,14 +2508,14 @@ void AL_Viper::CRPC_EngineSound_Implementation(bool bStart , int32 idx)
 			JetEngineAudio->SetIntParameter("JetSoundIdx" , idx);
 			JetEngineAudio->Play(0.f);
 
-			if (idx == 1)
+			if (idx == 0)
 			{
 				FTimerHandle Thnd;
 				GetWorld()->GetTimerManager().SetTimer(Thnd , [&]()
 				{
-					JetEngineAudio->SetIntParameter("JetSoundIdx" , 2);
+					JetEngineAudio->SetIntParameter("JetSoundIdx" , 1);
 					JetEngineAudio->Play(0.f);
-				} , 5.f , false);
+				} , 3.4f , false);
 			}
 		}
 	}
