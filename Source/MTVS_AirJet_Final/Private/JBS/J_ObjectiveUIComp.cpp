@@ -65,8 +65,10 @@ void UJ_ObjectiveUIComp::InitObjUI()
 	// 주인 pc
 	auto* ownerPC = this->GetOwner<AJ_MissionPlayerController>();
 
+	// 로비 돌아가기 전 바이퍼 이동 동기화 타이머 해제 함수 바인드
+	this->GetMissionCompleteUI()->returnLobbyDel.AddDynamic(ownerPC, &AJ_MissionPlayerController::ClearSyncTimer);
 	// 로비 돌아가기 함수 바인드
-	this->GetMissionCompleteUI()->returnLobbyDel.BindUObject(ownerPC, &AJ_MissionPlayerController::TravelToLobbyLevel);
+	this->GetMissionCompleteUI()->returnLobbyDel.AddDynamic(ownerPC, &AJ_MissionPlayerController::TravelToLobbyLevel);
 
 	// 팝업 ui 비활성화 딜리게이트 바인드
 	OBJ_UI->POPUP_UI->deactiveDel.AddDynamic( this, &UJ_ObjectiveUIComp::SRPC_DeactivatedPopupUI);
@@ -566,12 +568,17 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 			case EEngineProgress::TAKE_OFF:
 				textStr = TEXT("엔진 출력을 80%로 높여 활주로를 따라 이륙을 시작합니다.");
 				break;
+			default:
+				textStr = TEXT("");
+				break;
 		}
 		subObj.bodyTextAry = {
 			FRichString(textStr, ETextStyle::OBJDETAIL).GetFormatString()
 		};
 
-		objUIData.bodyObjAry.Add(subObj);
+		objUIData.bodyTextAry.Add(subObj.headerText);
+
+		// objUIData.bodyObjAry.Add(subObj);
 	}
 
 	// 상세 단

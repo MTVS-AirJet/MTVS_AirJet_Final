@@ -152,6 +152,10 @@ public:
 	UFUNCTION(Client, Unreliable)
 	void CRPC_PlayObjSound(const EObjSound &idx);
 
+	// 미션 종료 전 동기화 타이머 해제
+	UFUNCTION(BlueprintCallable)
+	void ClearSyncTimer();
+
 #pragma region LHJ 추가
 	UPROPERTY(EditDefaultsOnly , Category="UI")
 	TSubclassOf<class UUserWidget> WaitingForStartFac;

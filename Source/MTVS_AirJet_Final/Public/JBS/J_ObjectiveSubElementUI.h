@@ -43,9 +43,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void PlaySubEndAnim();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayImpactAnim();
+
+
+
 	// 리치 텍스트 설정
 	void SetSubText(const FString& str);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetSpacerSize(float value);
+
+
 };

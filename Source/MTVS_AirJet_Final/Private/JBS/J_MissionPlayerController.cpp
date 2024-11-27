@@ -362,3 +362,9 @@ void AJ_MissionPlayerController::CRPC_PlayObjSound_Implementation(const EObjSoun
 
     UJ_Utility::PlaySoundWithPause(objAudioComp, objSoundMap[idx]);
 }
+
+void AJ_MissionPlayerController::ClearSyncTimer()
+{
+    auto* viper = this->GetPawn<AL_Viper>();
+    GetWorld()->GetTimerManager().ClearTimer(viper->syncLocTimer);
+}
