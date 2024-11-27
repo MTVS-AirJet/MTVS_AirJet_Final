@@ -2,6 +2,8 @@
 
 
 #include "JBS/J_CustomWidgetComponent.h"
+
+#include "MTVS_AirJet_Final.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/MathFwd.h"
@@ -88,6 +90,7 @@ void UJ_CustomWidgetComponent::FixHeight(APlayerController * pc)
 
 void UJ_CustomWidgetComponent::MRPC_SetVisible_Implementation(bool value)
 {
+    LOG_S(Warning , TEXT("MRPC_SetVisible %s") , value?*FString(TEXT("true")):*FString(TEXT("false")));
     SetVisible(value);
 }
 

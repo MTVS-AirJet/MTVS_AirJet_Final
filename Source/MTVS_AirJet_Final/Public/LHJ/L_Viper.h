@@ -107,6 +107,53 @@ public:
 	class UStaticMeshComponent* JetJFSPannel;
 #pragma endregion
 
+#pragma region Prop2
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class USceneComponent* JetPropRootScene;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetPropObj4;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetPropObj11;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetPropObj9;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetPropObj8;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetPropObj7;
+
+	// Canopy Prop
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp0_C;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp0_R;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp0_L;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp3_L;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp3_R;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp1;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp2;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp10;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp6_R;
+	UPROPERTY(EditDefaultsOnly, Category="Components")
+	class UStaticMeshComponent* JetProp6_L;
+#pragma endregion
+
+public:
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite , Category="Default|Component")
+	class UJ_CustomWidgetComponent* PlayerNameWidgetComponent;
+	UPROPERTY(Replicated)
+	bool bOnceUpdatePlayerName;
+	
+private:
+	UFUNCTION(Server, Unreliable)
+	void SRPC_SetMyName(const FString& PlayerName);
+	
 private:
 #pragma region Widget & Effect
 	UPROPERTY(EditDefaultsOnly , category="Components")
@@ -833,4 +880,8 @@ private:
 	void CRPC_SetMissileCamRotate();
 	UPROPERTY(EditDefaultsOnly)
 	class UMaterialInterface* MissileSceneMat;
+	UFUNCTION(Server,Reliable)
+	void SRPC_VisiblePlayerName();
+	UFUNCTION(NetMulticast,Reliable)
+	void MRPC_VisiblePlayerName();
 };
