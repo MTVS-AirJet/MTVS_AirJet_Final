@@ -31,6 +31,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
 	TMap<EMissionProcess, FSlateBrush> textImgMap;
 
+	// 초상화 이미지 맵( 미션 절차, 텍스쳐 )
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TMap<EMissionProcess, FSlateBrush> portraitImgMap;
+
 	
 
 	// 비활성화 딜레이 시간

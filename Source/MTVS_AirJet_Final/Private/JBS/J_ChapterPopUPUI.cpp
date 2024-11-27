@@ -25,6 +25,7 @@ void UJ_ChapterPopUPUI::SetPopupText(const EMissionProcess& mpIdx, const FString
     if(textImgMap.Contains(mpIdx))
     {
         popupTextImg->SetBrush(textImgMap[mpIdx]);
+        portraitImg->SetBrush(portraitImgMap[mpIdx]);
     }
 }
 

@@ -535,39 +535,39 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 			case EEngineProgress::None:
 				textStr = "";
 				break;
-			case EEngineProgress::MIC_SWITCH_ON:
-				textStr = TEXT("지상 및 항공관제와 통신을 위해 무전기를 켭니다.");
-				break;
-			case EEngineProgress::ENGINE_GEN_SWITCH_ON:
-				textStr = TEXT("엔진을 작동시키기 위해 전력 공급을 시작합니다.");
-				break;
-			case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
-				textStr = TEXT("엔진의 작동을 조절할 수 있도록 제어 장치를 켭니다.");
-				break;
-			case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
-				textStr = TEXT("엔진의 모든 주요 시스템을 활성화합니다.");
-				break;
-			case EEngineProgress::JFS_STARTER_SWITCH_ON:
-				textStr = TEXT("JFS(보조 동력 장치)는 엔진 시동을 위한 필수 장치입니다. 이 장치를 켜서 주 엔진을 시작할 준비를 합니다.");
-				break;
-			case EEngineProgress::JFS_HANDLE_PULL:
-				textStr = TEXT("JFS(보조 동력 장치) 을 당기면, 주 엔진이 실제로 회전하기 시작합니다.");
-				break;
-			case EEngineProgress::ENGINE_THROTTLE_IDLE:
-				textStr = TEXT("엔진이 천천히 회전하도록 합니다. 이때, 안정된 시동 상태를 유지합니다.");
-				break;
-			case EEngineProgress::CLOSE_CANOPY:
-				textStr = TEXT("조종석 덮개를 닫습니다. 충분히 닫히면, 캐노피를 고정하여 외부와 격리된 비행 준비가 완료됩니다.");
-				break;
-			case EEngineProgress::STANDBY_OTHER_PLAYER:
-				textStr = TEXT("다른 플레이어의 시동 절차가 완료될때까지 기다려주세요.");
-				break;
-			case EEngineProgress::RELEASE_SIDE_BREAK:
-				textStr = TEXT("이륙 전 브레이크를 풀어 기체를 이륙시킬 준비를 합니다.");
-				break;
-			case EEngineProgress::TAKE_OFF:
-				textStr = TEXT("엔진 출력을 80%로 높여 활주로를 따라 이륙을 시작합니다.");
-				break;
+			// case EEngineProgress::MIC_SWITCH_ON:
+			// 	textStr = TEXT("지상 및 항공관제와 통신을 위해 무전기를 켭니다.");
+			// 	break;
+			// case EEngineProgress::ENGINE_GEN_SWITCH_ON:
+			// 	textStr = TEXT("엔진을 작동시키기 위해 전력 공급을 시작합니다.");
+			// 	break;
+			// case EEngineProgress::ENGINE_CONTROL_SWITCH_ON:
+			// 	textStr = TEXT("엔진의 작동을 조절할 수 있도록 제어 장치를 켭니다.");
+			// 	break;
+			// case EEngineProgress::ENGINE_MASTER_SWITCH_ON:
+			// 	textStr = TEXT("엔진의 모든 주요 시스템을 활성화합니다.");
+			// 	break;
+			// case EEngineProgress::JFS_STARTER_SWITCH_ON:
+			// 	textStr = TEXT("JFS(보조 동력 장치)는 엔진 시동을 위한 필수 장치입니다. 이 장치를 켜서 주 엔진을 시작할 준비를 합니다.");
+			// 	break;
+			// case EEngineProgress::JFS_HANDLE_PULL:
+			// 	textStr = TEXT("JFS(보조 동력 장치) 을 당기면, 주 엔진이 실제로 회전하기 시작합니다.");
+			// 	break;
+			// case EEngineProgress::ENGINE_THROTTLE_IDLE:
+			// 	textStr = TEXT("엔진이 천천히 회전하도록 합니다. 이때, 안정된 시동 상태를 유지합니다.");
+			// 	break;
+			// case EEngineProgress::CLOSE_CANOPY:
+			// 	textStr = TEXT("조종석 덮개를 닫습니다. 충분히 닫히면, 캐노피를 고정하여 외부와 격리된 비행 준비가 완료됩니다.");
+			// 	break;
+			// case EEngineProgress::STANDBY_OTHER_PLAYER:
+			// 	textStr = TEXT("다른 플레이어의 시동 절차가 완료될때까지 기다려주세요.");
+			// 	break;
+			// case EEngineProgress::RELEASE_SIDE_BREAK:
+			// 	textStr = TEXT("이륙 전 브레이크를 풀어 기체를 이륙시킬 준비를 합니다.");
+			// 	break;
+			// case EEngineProgress::TAKE_OFF:
+			// 	textStr = TEXT("엔진 출력을 80%로 높여 활주로를 따라 이륙을 시작합니다.");
+				// break;
 			default:
 				textStr = TEXT("");
 				break;
@@ -576,9 +576,9 @@ void UJ_ObjectiveUIComp::CreateUIData(const FEngineProgressData &data, TArray<FT
 			FRichString(textStr, ETextStyle::OBJDETAIL).GetFormatString()
 		};
 
-		objUIData.bodyTextAry.Add(subObj.headerText);
+		// objUIData.bodyTextAry.Add(subObj.headerText);
 
-		// objUIData.bodyObjAry.Add(subObj);
+		objUIData.bodyObjAry.Add(subObj);
 	}
 
 	// 상세 단
