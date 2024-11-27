@@ -30,6 +30,8 @@ void UJ_MissionCompleteUI::NativeConstruct()
     UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(ETextStyle::DEFAULT));
 
     // MC_SuccessGradeImage->SetVisibility(ESlateVisibility::Hidden);
+
+    rankDel.AddDynamic( this, &UJ_MissionCompleteUI::PlayRankMotion);
 }
 
 void UJ_MissionCompleteUI::OnClickReturnLobby()
@@ -68,7 +70,7 @@ void UJ_MissionCompleteUI::SetResultListValue(const TArray<FObjectiveData> &resu
                 break;
         }
 
-        FString bodyTextResult = FString::Printf(TEXT("%s %s"), *bodyText, *UJ_Utility::ToStringPercent(data.successPercent));
+        FString bodyTextResult = FRichString(FString::Printf(TEXT("%s %s"), *bodyText, *UJ_Utility::ToStringPercent(data.successPercent)), ETextStyle::RESULTDEFAULT).GetFormatString();
         // 수행도 텍스트 설정
         successData.bodyTextAry.Add(bodyTextResult);
     }
@@ -122,10 +124,13 @@ void UJ_MissionCompleteUI::SetAIFeedback(const FAIFeedbackRes &resData)
 {
     // ai 피드백
     aiComment = resData.comment;
+    dataRank = resData.rank;
 
-    
+    isGetData = true;
 
-    PlayResultGrade(resData.rank);
+    rankDel.Broadcast();
+
+    // PlayResultGrade(resData.rank);
 }
 
 void UJ_MissionCompleteUI::SetAIComment()
