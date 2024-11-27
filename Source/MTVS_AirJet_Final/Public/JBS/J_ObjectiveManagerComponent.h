@@ -83,15 +83,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
 	bool enablePrintCurActiveMissionActor = false;
 
-public:
+	// 결산 ai 피드백 데이터 보내기
+	UFUNCTION(BlueprintCallable)
+	void ResSendResultData(const FAIFeedbackRes &resData);
+
+    public:
 	// @@ 목표 전환 대기 시간 | 잘 처리 할 방법 궁리 필요
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float objSwitchInterval = 1.5f;
 
 protected:
-	// 미션 클리어
-	UFUNCTION(BlueprintCallable)
-	void MissionComplete();
+	
 
 	// 목표 액터 생성 및 설정
 	class AJ_BaseMissionObjective* SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR = FTransform());
@@ -105,6 +107,9 @@ protected:
 	void StartTakeOffObj();
 
     public:
+	// 미션 클리어
+	UFUNCTION(BlueprintCallable)
+	void MissionComplete();
 	// 레벨 시작 시 시동/이륙 목표 설정
     void InitDefaultObj();
     // 미션 시작 시 목표 리스트 설정

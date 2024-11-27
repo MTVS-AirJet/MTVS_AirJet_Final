@@ -158,3 +158,15 @@ void UJ_ObjectiveTextUI::SetBodyVBoxSlot(class UVerticalBoxSlot *newSlot)
     newSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 
 }
+
+void UJ_ObjectiveTextUI::SetAllChildrenSize(float value)
+{
+    const auto& children = this->OBJ_BODY_VBOX->GetAllChildren();
+    for(auto* child : children)
+    {
+        auto* subEle = Cast<UJ_ObjectiveSubElementUI>(child);
+        if(!subEle) continue;
+
+        subEle->SetSpacerSize(value);
+    }
+}

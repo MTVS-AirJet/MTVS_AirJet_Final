@@ -8,10 +8,12 @@
 #include "JBS/J_BaseMissionObjective.h"
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
+#include "KHS/K_GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_ObjectiveUIComp.h"
 #include "Math/MathFwd.h"
+#include "JBS/J_JsonUtility.h"
 #include "TimerManager.h"
 
 // Sets default values for this component's properties
@@ -208,7 +210,23 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	TArray<FObjectiveData> fullObjData;
 	fullObjData.Append(defaultObjDataAry);
 	fullObjData.Append(objectiveDataAry);
-	
+
+	// 결산 데이터 가지고 ai 피드백 요청
+	// 게임 인스턴스 가져와서 만들어둔 딜리게이트에 내 함수 바인딩
+	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
+	gi->aiFeedbackResUseDel.BindUObject(this, &UJ_ObjectiveManagerComponent::ResSendResultData);
+
+	// 결과 데이터 제작
+	TArray<float> successPercentAry;
+    Algo::Transform(fullObjData, successPercentAry, [](FObjectiveData temp){
+        return temp.successPercent;
+    });
+    //캐스트 후
+    FAIFeedbackReq feedbackReq(successPercentAry);
+
+	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
+	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, feedbackReq);
+
 	// 미션 완료 ui 전환
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager()
@@ -223,6 +241,16 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 			pc->objUIComp->CRPC_SwitchResultUI(fullObjData);
 		}
 	}, objSwitchInterval, false);
+}
+
+void UJ_ObjectiveManagerComponent::ResSendResultData(const FAIFeedbackRes &resData)
+{
+	// 결과 데이터 결과 ui에 전달
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	for(auto* pc : allPC)
+	{
+		pc->objUIComp->CRPC_SetResultAIFeedback(resData);
+	}
 }
 
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
@@ -292,3 +320,4 @@ void UJ_ObjectiveManagerComponent::StartTakeOffObj()
 	// 활성화
 	DelayedObjectiveActive(takeOffObj, objSwitchInterval);
 }
+

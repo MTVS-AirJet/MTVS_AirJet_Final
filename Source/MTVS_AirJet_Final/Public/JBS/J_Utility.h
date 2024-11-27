@@ -141,6 +141,7 @@ public:
         takeOff = successValues[1];
         formation = successValues[2];
         airToGround = successValues[3];
+        playTime = 0;
     }
 };
 
@@ -956,6 +957,7 @@ enum class EObjSound : uint8
 {
     NONE = 0
     ,MOVE_POINT_END = 1
+    ,RESULT = 2
 };
 
 // solved 테스트 용

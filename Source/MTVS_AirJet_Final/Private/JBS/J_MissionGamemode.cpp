@@ -8,6 +8,7 @@
 #include "Engine/LatentActionManager.h"
 #include "GameFramework/PlayerController.h"
 #include "JBS/J_GameInstance.h"
+#include "JBS/J_JsonUtility.h"
 #include "JBS/J_MissionGameState.h"
 #include "JBS/J_MissionPlayerController.h"
 #include "JBS/J_MissionStartPointActor.h"
@@ -198,7 +199,20 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
     
     // 호스트 시작 버튼에 미션 시작 함수 딜리게이트
     if(HasAuthority() && newPlayer->IsLocalController())
+    {
         pc->StartGameDel_Mission.AddUObject(this, &AJ_MissionGamemode::StartMissionLevel);
+
+        // 호스트 일때 비로그인시 임시 로그인 처리
+        auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
+        if(gi->authorValue.IsEmpty())
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("디버그용 임시 로그인 처리"));
+
+            FLoginReq tempLogin(TEXT("user"), TEXT("1234"));
+
+            UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::LOGIN, tempLogin, gi);
+        }
+    }
 }
 
 // 산개 로직 적용해서 스폰 위치 계산

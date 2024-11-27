@@ -21,6 +21,9 @@ protected:
 	float subObjDetailiconSize = 32.f;
 
 public:
+	// 스페이서
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	class USpacer* frontSpacer;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class UImage* objSubIcon;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
@@ -40,6 +43,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void PlaySubEndAnim();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void PlayImpactAnim();
+
+
+
 	// 리치 텍스트 설정
 	void SetSubText(const FString& str);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetSpacerSize(float value);
+
+
 };

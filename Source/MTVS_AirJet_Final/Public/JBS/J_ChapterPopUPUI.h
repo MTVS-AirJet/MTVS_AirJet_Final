@@ -20,10 +20,20 @@ protected:
 	class UImage* portraitImg;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
 	class URichTextBlock* popupText;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|UI", meta = (BindWidget))
+	class UImage* popupTextImg;
 
 	// 텍스트 스타일
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	ETextStyle textStyle;
+
+	// 텍스트 이미지 맵( 미션 절차, 텍스쳐 )
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TMap<EMissionProcess, FSlateBrush> textImgMap;
+
+	// 초상화 이미지 맵( 미션 절차, 텍스쳐 )
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Classes")
+	TMap<EMissionProcess, FSlateBrush> portraitImgMap;
 
 	
 
