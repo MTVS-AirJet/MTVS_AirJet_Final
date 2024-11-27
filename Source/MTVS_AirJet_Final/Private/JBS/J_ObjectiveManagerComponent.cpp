@@ -203,6 +203,8 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 
 	isMissionComplete = true;
 
+	CUR_ACTIVE_MISSION = nullptr;
+
 	// 여기부터 결산 단계
 	// 미션 종료 딜리게이트 실행
 	ownerGM->missionEndDel.Broadcast();

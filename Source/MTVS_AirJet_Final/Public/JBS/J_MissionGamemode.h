@@ -157,7 +157,7 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
     bool isTPReady = false;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Values")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintCallable, BlueprintAssignable, Category="Default|Delegate")
     FMissionEndDelegate missionEndDel;
 
 protected:
