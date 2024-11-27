@@ -15,9 +15,8 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Asset/JBS/DT_MissionProcess2.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Asset/JBS/DT_MissionProcess2.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ObjectiveMarker.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ObjectiveMarker.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,10 +47,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///AIAssistantSnippet." root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.4/Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Epic Games/UE_5.4/Engine/Source/Programs/Shared/EpicGames.Jupiter/JupiterTree.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Epic Games/UE_5.4/Engine/Source/Programs/Shared/EpicGames.OIDC/OidcTokenManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.gen.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UnrealEditor/Inc/MTVS_AirJet_Final/UHT/L_Viper.generated.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/MTVS_AirJet_Final/Private/KHS/K_VRControlScene.cpp" root0="FORCE_HIGHLIGHTING" />
