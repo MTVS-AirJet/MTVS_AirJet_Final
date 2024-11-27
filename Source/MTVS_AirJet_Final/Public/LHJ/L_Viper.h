@@ -146,6 +146,8 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite , Category="Default|Component")
+	class USpringArmComponent* PlayerNameSpringArm;
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite , Category="Default|Component")
 	class UJ_CustomWidgetComponent* PlayerNameWidgetComponent;
 	UPROPERTY(Replicated)
 	bool bOnceUpdatePlayerName;
@@ -414,6 +416,7 @@ public:
 	void ClientRPC_LockOnStart();
 	
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Default|Attack")
 	bool bLockOnStart;	
 
 	float Diametr = 30.f;
@@ -884,4 +887,8 @@ private:
 	void SRPC_VisiblePlayerName();
 	UFUNCTION(NetMulticast,Reliable)
 	void MRPC_VisiblePlayerName();
+
+private:
+	UFUNCTION()
+	void StopAllVoice();
 };
