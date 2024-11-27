@@ -1,7 +1,5 @@
 ﻿#include "LHJ/L_Viper.h"
 
-#include <thread>
-
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "JBS/J_Utility.h"
@@ -16,6 +14,7 @@
 #include "Components/Image.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -32,9 +31,11 @@
 #include "KHS/K_GameState.h"
 #include "KHS/K_StandbyWidget.h"
 #include "GameFramework/PlayerState.h"
+#include "JBS/J_CustomWidgetComponent.h"
 #include "JBS/J_GroundTarget.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "LHJ/L_MissileCam.h"
+#include "LHJ/L_PlayerNameWidget.h"
 #include "LHJ/L_Target.h"
 
 FKey lMouse = EKeys::LeftMouseButton;
@@ -258,6 +259,55 @@ AL_Viper::AL_Viper()
 	//JetFlareArrow2->SetHiddenInGame(false); // For Test
 
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
+
+	PlayerNameWidgetComponent = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("PlayerNameWidgetComponent"));
+	PlayerNameWidgetComponent->SetupAttachment(RootComponent);
+	PlayerNameWidgetComponent->SetIsReplicated(true);
+	PlayerNameWidgetComponent->SetCollisionProfileName(FName(TEXT("NoCollision")));
+#pragma endregion
+
+#pragma region Prop2
+	JetPropRootScene = CreateDefaultSubobject<USceneComponent>(TEXT("JetPropRootScene"));
+	JetPropRootScene->SetupAttachment(JetMesh);
+
+	JetPropObj4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj4"));
+	JetPropObj4->SetupAttachment(JetPropRootScene);
+	JetPropObj4->SetRelativeLocationAndRotation(FVector(557, 0, 290), FRotator(-10,0,0));	
+	JetPropObj11 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj11"));
+	JetPropObj11->SetupAttachment(JetPropRootScene);
+	JetPropObj11->SetRelativeLocationAndRotation(FVector(555.5, -37.5, 296), FRotator(-10,0,0));
+	JetPropObj9 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj9"));
+	JetPropObj9->SetupAttachment(JetPropRootScene);
+	JetPropObj9->SetRelativeLocationAndRotation(FVector(555.5 , 37.4 , 298) , FRotator(-10 , 0 , 0));
+	JetPropObj8 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj8"));
+	JetPropObj8->SetupAttachment(JetPropRootScene);
+	JetPropObj8->SetRelativeLocationAndRotation(FVector(555.5, 24, 276), FRotator(-10,0,0));
+	JetPropObj8->SetRelativeScale3D(FVector(1 , 1.1 , 1.3));
+	JetPropObj7 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj7"));
+	JetPropObj7->SetupAttachment(JetPropRootScene);
+	JetPropObj7->SetRelativeLocationAndRotation(FVector(555.5, -23.5, 276), FRotator(-10,0,0));
+	JetPropObj7->SetRelativeScale3D(FVector(1 , 1.3 , 1.5));
+	
+	JetProp0_C = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp0_C"));
+	JetProp0_C->SetupAttachment(JetMesh , FName("Prop0_C"));
+	JetProp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp2"));
+	JetProp2->SetupAttachment(JetMesh , FName("Prop2"));
+	JetProp1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp1"));
+	JetProp1->SetupAttachment(JetMesh , FName("Prop1"));
+	JetProp3_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp3_L"));
+	JetProp3_L->SetupAttachment(JetMesh , FName("Prop3_L"));	
+	JetProp0_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp0_L"));
+	JetProp0_L->SetupAttachment(JetMesh , FName("Prop0_L"));
+	JetProp10 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp10"));
+	JetProp10->SetupAttachment(JetMesh , FName("Prop10"));
+	JetProp0_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp0_R"));
+	JetProp0_R->SetupAttachment(JetMesh , FName("Prop0_R"));
+	JetProp3_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp3_R"));
+	JetProp3_R->SetupAttachment(JetMesh , FName("Prop3_R"));
+	JetProp6_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp6_L"));
+	JetProp6_L->SetupAttachment(JetMesh , FName("Prop6_L"));
+	JetProp6_R = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp6_R"));
+	JetProp6_R->SetupAttachment(JetMesh , FName("Prop6_R"));
 #pragma endregion
 
 	CreateDumyComp();
@@ -403,13 +453,14 @@ void AL_Viper::CreateDumyComp()
 #pragma region Throttle
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
 	DummyThrottleMesh->SetupAttachment(JetMesh);
-	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1));
+	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1.5));
 	DummyThrottleMesh->SetRelativeLocation(FVector(515 , -35 , 250));
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(DummyThrottleMesh);
-	JetFirstEngine->SetRelativeLocation(FVector(0 , 0 , 7));
+	JetFirstEngine->SetRelativeLocation(FVector(0 , 0 , 3.5));
 	JetFirstEngine->SetBoxExtent(FVector(3 , 3 , 5));
+	JetFirstEngine->SetRelativeScale3D(FVector(.8 , 1 , .5));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
 #pragma endregion
@@ -468,6 +519,7 @@ void AL_Viper::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AL_Viper , FrontWheel);
 	DOREPLIFETIME(AL_Viper , RearWheel);
 	DOREPLIFETIME(AL_Viper , IsEngineOn);
+	DOREPLIFETIME(AL_Viper , bOnceUpdatePlayerName);
 	// DOREPLIFETIME(AL_Viper , QuatCurrentRotation);
 	// DOREPLIFETIME(AL_Viper , QuatTargetRotation);
 }
@@ -1202,6 +1254,29 @@ void AL_Viper::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// PrintNetLog();
+
+	if (bOnceUpdatePlayerName)
+	{
+		LOG_S(Warning, TEXT("bOnceUpdatePlayerName is true"));
+
+		// visible = true
+		SRPC_VisiblePlayerName();
+
+		// target setting
+		if(auto p = UGameplayStatics::GetPlayerPawn(GetWorld() , 0))
+			 PlayerNameWidgetComponent->SetTargetActor(p);
+
+		// 이름 설정
+		if (IsLocallyControlled())
+		{
+			if (auto gi = Cast<UK_GameInstance>(GetGameInstance()))
+			{
+				SRPC_SetMyName(gi->GetUserId());
+			}
+		}
+	
+		bOnceUpdatePlayerName=!bOnceUpdatePlayerName;
+	}
 
 #pragma region 제트엔진 이펙트
 	if (bJetTailVFXOn)
@@ -3067,4 +3142,23 @@ void AL_Viper::CRPC_TeleportSetting_Implementation()
 	bJetTailVFXOn = true;
 	bJetAirVFXOn = true;
 	IsEngineOn = false;
+}
+
+void AL_Viper::SRPC_SetMyName_Implementation(const FString& PlayerName)
+{
+	if (auto PlayerNameWidget = Cast<UL_PlayerNameWidget>(PlayerNameWidgetComponent->GetWidget()))
+	{
+		PlayerNameWidget->txtPlayerName->SetText(FText::FromString(PlayerName));
+	}
+}
+
+void AL_Viper::SRPC_VisiblePlayerName_Implementation()
+{
+	MRPC_VisiblePlayerName();
+}
+
+void AL_Viper::MRPC_VisiblePlayerName_Implementation()
+{
+	PlayerNameWidgetComponent->SetHiddenInGame(false);
+	PlayerNameWidgetComponent->SetVisibility(true);
 }

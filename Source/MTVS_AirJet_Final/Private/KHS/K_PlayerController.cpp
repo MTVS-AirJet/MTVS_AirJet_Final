@@ -129,7 +129,7 @@ void AK_PlayerController::SRPC_StartGame_Implementation()
 	//PC배열에 전체 CRPC작동 명령
 	for(auto localPC : allPC)
 	{
-		localPC->CRPC_StartGame();		
+		localPC->CRPC_StartGame();
 		//localPC->CRPC_SetMissionUI();
 	}
 	//Mission용 Del 실행
@@ -144,6 +144,19 @@ bool AK_PlayerController::SRPC_StartGame_Validate()
 // 전체 클라에 게임시작 전달 Client RPC
 void AK_PlayerController::CRPC_StartGame_Implementation()
 {
+	// 모든 바이퍼를 찾아서 bool값을 변경
+	
+	// 모든 AL_Viper를 찾음
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AL_Viper::StaticClass(), FoundActors);
+	for (AActor* Actor : FoundActors)
+	{
+		if (AL_Viper* Viper = Cast<AL_Viper>(Actor))
+		{
+			Viper->bOnceUpdatePlayerName = true;
+		}
+	}
+	
 	MissionTextUI->SetVisibility(ESlateVisibility::Visible);
 	if(StandbyUI)
 	{
