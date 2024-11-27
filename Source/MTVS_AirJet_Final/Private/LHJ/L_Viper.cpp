@@ -33,6 +33,7 @@
 #include "GameFramework/PlayerState.h"
 #include "JBS/J_CustomWidgetComponent.h"
 #include "JBS/J_GroundTarget.h"
+#include "JBS/J_MissionGamemode.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "LHJ/L_MissileCam.h"
 #include "LHJ/L_PlayerNameWidget.h"
@@ -260,8 +261,15 @@ AL_Viper::AL_Viper()
 
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
 
+	PlayerNameSpringArm=CreateDefaultSubobject<USpringArmComponent>(TEXT("PlayerNameSpringArm"));
+	PlayerNameSpringArm->SetupAttachment(RootComponent);
+	PlayerNameSpringArm->SetRelativeRotation(FRotator(-90 , 0 , 0));
+	PlayerNameSpringArm->bInheritPitch = false;
+	PlayerNameSpringArm->bInheritRoll = false;
+	PlayerNameSpringArm->bInheritYaw = false;
+		
 	PlayerNameWidgetComponent = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("PlayerNameWidgetComponent"));
-	PlayerNameWidgetComponent->SetupAttachment(RootComponent);
+	PlayerNameWidgetComponent->SetupAttachment(PlayerNameSpringArm);
 	PlayerNameWidgetComponent->SetIsReplicated(true);
 	PlayerNameWidgetComponent->SetCollisionProfileName(FName(TEXT("NoCollision")));
 #pragma endregion
@@ -535,9 +543,10 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 			intTriggerNum = 1;
 			if (IsLocallyControlled())
 			{
-				if (auto pc = Cast<AK_PlayerController>(Controller))
+				if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 				{
 					pc->CRPC_SetMissionTextUI(20);
+					pc->CRPC_PlayCommanderVoice3(20);
 				}
 			}
 		}
@@ -547,9 +556,10 @@ void AL_Viper::OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor
 			IsFlyStart = true;
 			if (IsLocallyControlled())
 			{
-				if (auto pc = Cast<AK_PlayerController>(Controller))
+				if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 				{
 					pc->CRPC_SetMissionTextUI(21);
+					pc->CRPC_PlayCommanderVoice3(21);
 				}
 			}
 			CRPC_AudioControl(false);
@@ -1197,6 +1207,11 @@ void AL_Viper::BeginPlay()
 	CRPC_AudioControl(false);
 	CRPC_AirSound(false);
 
+	if (auto gm = Cast<AJ_MissionGamemode>(GetWorld()->GetAuthGameMode()))
+	{
+		gm->missionEndDel.AddDynamic(this, &AL_Viper::StopAllVoice);
+	}
+
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -1593,9 +1608,10 @@ void AL_Viper::Tick(float DeltaTime)
 			CurAudioTime += DeltaTime;
 			if (CurAudioTime >= PlayAudioTime)
 			{
-				if (auto pc = Cast<AK_PlayerController>(Controller))
+				if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 				{
 					pc->CRPC_SetMissionTextUI(19);
+					pc->CRPC_PlayCommanderVoice3(19);
 				}
 				bStartAudio = false;
 			}
@@ -3161,4 +3177,24 @@ void AL_Viper::MRPC_VisiblePlayerName_Implementation()
 {
 	PlayerNameWidgetComponent->SetHiddenInGame(false);
 	PlayerNameWidgetComponent->SetVisibility(true);
+}
+
+void AL_Viper::StopAllVoice()
+{
+	if (JetAudio && JetAudio->GetSound())
+		JetAudio->Stop();
+	if (JetMICAudio && JetMICAudio->GetSound())
+		JetMICAudio->Stop();
+	if (JetEngineAudio && JetEngineAudio->GetSound())
+		JetEngineAudio->Stop();
+	if (JetAirAudio && JetAirAudio->GetSound())
+	{
+		JetAirAudio->Stop();
+		JetAirAudio->SetSound(nullptr);
+	}
+	if (JetMissileAudio && JetMissileAudio->GetSound())
+	{
+		JetMissileAudio->Stop();
+		JetMissileAudio->SetSound(nullptr);
+	}
 }
