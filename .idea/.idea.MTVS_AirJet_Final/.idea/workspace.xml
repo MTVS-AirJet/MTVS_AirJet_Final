@@ -15,9 +15,11 @@
   <component name="ChangeListManager">
     <list default="true" id="77bcc9e4-abc3-4b42-afe0-fc9d15221a23" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MTVS_AirJet_Final/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/Server/AirjetTotalMission.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/KHS/VR/BP_VRViper.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/JBS/WBP_ObjectiveUI.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/JBS/WBP_ObjectiveUI.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_MissionTextUI.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_MissionTextUI.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ObjectiveMarker.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_ObjectiveMarker.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_StandbyWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Blueprints/UI/KHS/WBP_StandbyWidget.uasset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
