@@ -847,9 +847,10 @@ void AL_Viper::OnMyBreakHoldClicked(UPrimitiveComponent* TouchedComponent , stru
 	{
 		if (!IsFirstBreakHoldClick)
 		{
-			if (auto pc = Cast<AK_PlayerController>(Controller))
+			if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 			{
 				pc->CRPC_SetMissionTextUI(17);
+				pc->CRPC_PlayCommanderVoice3(17);
 			}
 			IsFirstBreakHoldClick = true;
 			bStartAudio = true;
@@ -968,9 +969,10 @@ void AL_Viper::F_ViperFpsStarted(const struct FInputActionValue& value)
 
 			if (IsLocallyControlled())
 			{
-				if (auto pc = Cast<AK_PlayerController>(Controller))
+				if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 				{
 					pc->CRPC_SetMissionTextUI(6);
+					pc->CRPC_PlayCommanderVoice3(6);
 				}
 				CRPC_AudioControl(true , 0);
 			}
@@ -1989,9 +1991,9 @@ void AL_Viper::MulticastRPCBoost_Implementation(bool isOn)
 void AL_Viper::ServerRPC_SyncLocation_Implementation(const FVector& location)
 {
 	float dis = FVector::Dist(this->GetActorLocation() , location);
-	if (dis < 5.f && this->IsLocallyControlled()) return;
+	if (dis < 5.f && !this->IsLocallyControlled()) return;
 
-	this->SetActorLocation(location);
+	//this->SetActorLocation(location);
 	MultiRPC_SyncLocation(location);
 }
 
@@ -1999,7 +2001,6 @@ void AL_Viper::MultiRPC_SyncLocation_Implementation(const FVector& location)
 {
 	if (this->IsLocallyControlled()) return;
 	if (location.Equals(this->GetActorLocation())) return;
-
 	this->SetActorLocation(location);
 }
 
