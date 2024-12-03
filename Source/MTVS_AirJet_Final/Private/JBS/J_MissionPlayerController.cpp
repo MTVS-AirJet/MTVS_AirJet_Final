@@ -305,12 +305,27 @@ void AJ_MissionPlayerController::PlayCommanderVoice3(const FCommanderVoiceRes &r
 
 void AJ_MissionPlayerController::CRPC_PlayCommanderVoice3_Implementation(int idx)
 {
+    PlayVoiceByIdx(idx);
+}
+
+void AJ_MissionPlayerController::PlayVoiceByIdx(const int &idx)
+{
     // 해당 인덱스 재생
     if(!missionVoiceMap.Contains(idx)) return;
 
     // 소리 재생
     UJ_Utility::PlaySoundWithPause(commanderAudioComp, missionVoiceMap[idx]);
 }
+
+void AJ_MissionPlayerController::CRPC_PlayVoiceByMP_Implementation(const EMissionProcess &missionProcess)
+{
+    // 인덱스로 변환후 재생
+    const int idx = static_cast<int>(missionProcess);
+    
+    PlayVoiceByIdx(idx);
+}
+
+
 void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
 {
     if(!enableReqAllVoice)
@@ -368,3 +383,5 @@ void AJ_MissionPlayerController::ClearSyncTimer()
     auto* viper = this->GetPawn<AL_Viper>();
     GetWorld()->GetTimerManager().ClearTimer(viper->syncLocTimer);
 }
+
+
