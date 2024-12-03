@@ -1408,6 +1408,7 @@ void AL_Viper::Tick(float DeltaTime)
 		{
 #pragma region 시동절차
 			FString ScenarioFront = StartScenario.front();
+			CurrentScenario = ScenarioFront;
 			UStaticMeshComponent* ScenarioComponent = nullptr;
 			if (ScenarioFront.Equals("MIC"))
 			{
