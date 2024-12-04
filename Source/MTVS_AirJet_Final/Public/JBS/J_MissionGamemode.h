@@ -7,18 +7,16 @@
 #include <JBS/J_Utility.h>
 #include "J_MissionGamemode.generated.h"
 
-// FIXME 변수정리 부터
-//  로딩 ui 제거
-DECLARE_MULTICAST_DELEGATE(FRemoveLoadingUIDel);
-
 // 이륙 딜리게이트
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FTakeOffDel, class AJ_MissionPlayerController*, pc, bool, isSuccess);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FTakeOffDel
+                                , class AJ_MissionPlayerController*, pc
+                                , bool, isSuccess);
 
 // 이륙 종료 딜리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTakeOffEndDel, bool, isSuccess);
 
 // 미션 시작 딜리게이트
-DECLARE_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartTacticalOrderDel, bool, isSuccess);
 
 // 미션 종료 딜리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMissionEndDelegate);

@@ -1,6 +1,8 @@
 #include "JBS/J_DetailUI.h"
 #include "Components/Image.h"
+#include "Containers/Map.h"
 #include "JBS/J_Utility.h"
+#include "Styling/SlateBrush.h"
 
 
 
@@ -31,13 +33,38 @@ void UJ_DetailUI::AdjustIdx(int &idx)
 
 void UJ_DetailUI::SetDetailUI(const EMissionProcess& value)
 {
-    if(!imgMap.Contains(value)) return;
     // 낭비 방지 처리
     if(curImgKey == value) return;
 
     // 이미지 변경
-    detailImage->SetBrush(imgMap[value]);
+    SetDetailImg(value);
     curImgKey = value;
     // 갱신 애니메이션 실행
     PlayUpdateAnim();
+}
+
+void UJ_DetailUI::SetDetailImg(const EMissionProcess &value)
+{
+    detailImage->SetBrush(GetImg(value));
+}
+
+FSlateBrush UJ_DetailUI::GetImg(const EMissionProcess& process)
+{
+    const TMap<EMissionProcess, FSlateBrush>* imgMap;
+    // 현재 입력장치에 따라 imgMap 선택
+    switch (curInput) {
+        case EInputDevice::KEYBOARD:
+            imgMap = &imgMapKeyboard;
+            break;
+        case EInputDevice::FLIGHT_CONTROLLER:
+            imgMap = &imgMapDefault;
+            break;
+        default:
+            imgMap = &imgMapDefault;
+            break;
+    }
+
+    if(!imgMap->Contains(process)) return FSlateBrush();
+    // 이미지 반환
+    return (*imgMap)[process];
 }
