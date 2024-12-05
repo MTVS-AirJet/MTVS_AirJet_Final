@@ -100,6 +100,8 @@ public:
 	UPROPERTY(EditdefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UBoxComponent* JetBreakHold;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class UBoxComponent* JetRotationStick;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetLeftPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetRightPannel;
@@ -583,18 +585,24 @@ public:
 	float CurAudioTime = 0.f;
 	UPROPERTY(EditDefaultsOnly , Category="Default|MissionTextUI")
 	float PlayAudioTime = 3.f;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
+	class USkeletalMeshComponent* DummyStick;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class UPhysicsConstraintComponent* RotationStickConstraint;
 #pragma endregion
 
 public:
 	UPROPERTY(BlueprintReadOnly)
 	FString CurrentScenario = "";
-	UPROPERTY(EditDefaultsOnly , Category="Engine", BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly , Category="Engine" , BlueprintReadOnly)
 	bool IsStart;
+
 private:
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
-	void PushQueue();	
+	void PushQueue();
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
 
@@ -624,9 +632,11 @@ private:
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
 	float CanopyRotatePitchValue = .3f;
+
 public:
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents", BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
 	class UStaticMeshComponent* DummyCanopyMesh;
+
 private:
 	//=====================================
 	// 바퀴
@@ -897,4 +907,30 @@ private:
 private:
 	UFUNCTION()
 	void StopAllVoice();
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxRoll = 20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMinRoll = -20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxPitch = -20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMinPitch = 20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxThreshold = .4f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivBankRoll = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivBankPitch = 10.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivRoll = 9.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivPitch = 8.f;
+public:
+	UFUNCTION(BlueprintCallable)
+	void StickRotation();
+	//=============================================
+	UFUNCTION(BlueprintCallable)
+	void SetCanopyGearLevel();
 };
