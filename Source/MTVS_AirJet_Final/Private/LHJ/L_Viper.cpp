@@ -1295,10 +1295,21 @@ void AL_Viper::Tick(float DeltaTime)
 
 	if (bOnceUpdatePlayerName)
 	{
-		LOG_S(Warning , TEXT("bOnceUpdatePlayerName is true"));
-
+		LOG_S(Warning , TEXT("%s bOnceUpdatePlayerName is true") , *this->GetName());
+		ServerRPCRotation(GetActorRotation().Quaternion());
 		// visible = true
-		SRPC_VisiblePlayerName();
+		// SRPC_VisiblePlayerName();
+		//
+		// if (IsLocallyControlled())
+		// {
+		// 	PlayerNameWidgetComponent->SetHiddenInGame(true);
+		// 	PlayerNameWidgetComponent->SetVisibility(false);
+		// }
+		if (!IsLocallyControlled())
+		{
+			PlayerNameWidgetComponent->SetHiddenInGame(false);
+			PlayerNameWidgetComponent->SetVisibility(true);			
+		}
 
 		// target setting
 		if (auto p = UGameplayStatics::GetPlayerPawn(GetWorld() , 0))
@@ -3189,8 +3200,15 @@ void AL_Viper::CRPC_TeleportSetting_Implementation()
 
 void AL_Viper::SRPC_SetMyName_Implementation(const FString& PlayerName)
 {
+	MRPC_SetMyName(PlayerName);	
+}
+
+void AL_Viper::MRPC_SetMyName_Implementation(const FString& PlayerName)
+{
+	LOG_S(Warning, TEXT("MRPC_SetMyName Start"));
 	if (auto PlayerNameWidget = Cast<UL_PlayerNameWidget>(PlayerNameWidgetComponent->GetWidget()))
 	{
+		LOG_S(Warning, TEXT("%s Player Name : %s"), *this->GetName(), *PlayerName);		
 		PlayerNameWidget->txtPlayerName->SetText(FText::FromString(PlayerName));
 	}
 }

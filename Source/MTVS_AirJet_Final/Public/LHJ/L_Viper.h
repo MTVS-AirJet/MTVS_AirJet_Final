@@ -157,6 +157,8 @@ public:
 private:
 	UFUNCTION(Server , Unreliable)
 	void SRPC_SetMyName(const FString& PlayerName);
+	UFUNCTION(NetMulticast , Reliable)
+	void MRPC_SetMyName(const FString& PlayerName);
 
 private:
 #pragma region Widget & Effect
