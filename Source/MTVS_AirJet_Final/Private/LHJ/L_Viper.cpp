@@ -38,6 +38,7 @@
 #include "LHJ/L_MissileCam.h"
 #include "LHJ/L_PlayerNameWidget.h"
 #include "LHJ/L_Target.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 
 FKey lMouse = EKeys::LeftMouseButton;
 FKey rMouse = EKeys::RightMouseButton;
@@ -117,7 +118,7 @@ AL_Viper::AL_Viper()
 	MissileWidget->SetDrawSize(FVector2D(2048 , 2048));
 	MissileWidget->SetRelativeScale3D(FVector(0.01));
 	MissileWidget->SetVisibility(false);
-	
+
 	// 조종석 뷰
 	JetSprintArmFPS = CreateDefaultSubobject<USpringArmComponent>(TEXT("JetSprintArmFPS"));
 	JetSprintArmFPS->SetupAttachment(JetMesh);
@@ -261,13 +262,13 @@ AL_Viper::AL_Viper()
 
 	JetPostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("JetPostProcess"));
 
-	PlayerNameSpringArm=CreateDefaultSubobject<USpringArmComponent>(TEXT("PlayerNameSpringArm"));
+	PlayerNameSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("PlayerNameSpringArm"));
 	PlayerNameSpringArm->SetupAttachment(RootComponent);
 	PlayerNameSpringArm->SetRelativeRotation(FRotator(-90 , 0 , 0));
 	PlayerNameSpringArm->bInheritPitch = false;
 	PlayerNameSpringArm->bInheritRoll = false;
 	PlayerNameSpringArm->bInheritYaw = false;
-		
+
 	PlayerNameWidgetComponent = CreateDefaultSubobject<UJ_CustomWidgetComponent>(TEXT("PlayerNameWidgetComponent"));
 	PlayerNameWidgetComponent->SetupAttachment(PlayerNameSpringArm);
 	PlayerNameWidgetComponent->SetIsReplicated(true);
@@ -280,22 +281,22 @@ AL_Viper::AL_Viper()
 
 	JetPropObj4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj4"));
 	JetPropObj4->SetupAttachment(JetPropRootScene);
-	JetPropObj4->SetRelativeLocationAndRotation(FVector(557, 0, 290), FRotator(-10,0,0));	
+	JetPropObj4->SetRelativeLocationAndRotation(FVector(557 , 0 , 290) , FRotator(-10 , 0 , 0));
 	JetPropObj11 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj11"));
 	JetPropObj11->SetupAttachment(JetPropRootScene);
-	JetPropObj11->SetRelativeLocationAndRotation(FVector(555.5, -37.5, 296), FRotator(-10,0,0));
+	JetPropObj11->SetRelativeLocationAndRotation(FVector(555.5 , -37.5 , 296) , FRotator(-10 , 0 , 0));
 	JetPropObj9 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj9"));
 	JetPropObj9->SetupAttachment(JetPropRootScene);
 	JetPropObj9->SetRelativeLocationAndRotation(FVector(555.5 , 37.4 , 298) , FRotator(-10 , 0 , 0));
 	JetPropObj8 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj8"));
 	JetPropObj8->SetupAttachment(JetPropRootScene);
-	JetPropObj8->SetRelativeLocationAndRotation(FVector(555.5, 24, 276), FRotator(-10,0,0));
+	JetPropObj8->SetRelativeLocationAndRotation(FVector(555.5 , 24 , 276) , FRotator(-10 , 0 , 0));
 	JetPropObj8->SetRelativeScale3D(FVector(1 , 1.1 , 1.3));
 	JetPropObj7 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetPropObj7"));
 	JetPropObj7->SetupAttachment(JetPropRootScene);
-	JetPropObj7->SetRelativeLocationAndRotation(FVector(555.5, -23.5, 276), FRotator(-10,0,0));
+	JetPropObj7->SetRelativeLocationAndRotation(FVector(555.5 , -23.5 , 276) , FRotator(-10 , 0 , 0));
 	JetPropObj7->SetRelativeScale3D(FVector(1 , 1.3 , 1.5));
-	
+
 	JetProp0_C = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp0_C"));
 	JetProp0_C->SetupAttachment(JetMesh , FName("Prop0_C"));
 	JetProp2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp2"));
@@ -303,7 +304,7 @@ AL_Viper::AL_Viper()
 	JetProp1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp1"));
 	JetProp1->SetupAttachment(JetMesh , FName("Prop1"));
 	JetProp3_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp3_L"));
-	JetProp3_L->SetupAttachment(JetMesh , FName("Prop3_L"));	
+	JetProp3_L->SetupAttachment(JetMesh , FName("Prop3_L"));
 	JetProp0_L = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp0_L"));
 	JetProp0_L->SetupAttachment(JetMesh , FName("Prop0_L"));
 	JetProp10 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("JetProp10"));
@@ -499,6 +500,23 @@ void AL_Viper::CreateDumyComp()
 	JetBreakHold->SetGenerateOverlapEvents(true);
 	JetBreakHold->OnClicked.AddDynamic(this , &AL_Viper::OnMyBreakHoldClicked);
 #pragma endregion
+
+	DummyStick = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("DummyStick"));
+	DummyStick->SetupAttachment(JetMesh);
+	DummyStick->SetRelativeLocation(FVector(539 , .3 , 227.5));
+	DummyStick->SetRelativeScale3D(FVector(1.2 , 1.2 , 1.4));
+
+	JetRotationStick = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRotationStick"));
+	JetRotationStick->SetupAttachment(DummyStick);
+	JetRotationStick->SetBoxExtent(FVector(1.5 , 1.5 , 5));
+	JetRotationStick->SetRelativeLocation(FVector(-1.9 , 0 , 28.5));
+	JetRotationStick->SetGenerateOverlapEvents(true);
+
+	RotationStickConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("RotationStickConstraint"));
+	RotationStickConstraint->SetupAttachment(DummyStick);
+	RotationStickConstraint->SetAngularSwing1Limit(ACM_Limited , 20.f);
+	RotationStickConstraint->SetAngularSwing2Limit(ACM_Limited , 20.f);
+	RotationStickConstraint->SetAngularTwistLimit(ACM_Locked , 45.f);
 }
 #pragma endregion
 
@@ -1181,7 +1199,7 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
 	if (!HasAuthority())
 		SetActorRotation(QuatCurrentRotation);
-	
+
 	//SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatCurrentRotation);
 	//ServerRPCRotation(QuatTargetRotation);
@@ -1207,14 +1225,14 @@ void AL_Viper::BeginPlay()
 	Super::BeginPlay();
 
 	JetCameraFPS->SetActive(false);
-	
+
 	CRPC_CanopyAudioControl(false);
 	CRPC_AudioControl(false);
 	CRPC_AirSound(false);
 
 	if (auto gm = Cast<AJ_MissionGamemode>(GetWorld()->GetAuthGameMode()))
 	{
-		gm->missionEndDel.AddDynamic(this, &AL_Viper::StopAllVoice);
+		gm->missionEndDel.AddDynamic(this , &AL_Viper::StopAllVoice);
 	}
 
 	auto pc = Cast<APlayerController>(Controller);
@@ -1277,14 +1295,25 @@ void AL_Viper::Tick(float DeltaTime)
 
 	if (bOnceUpdatePlayerName)
 	{
-		LOG_S(Warning, TEXT("bOnceUpdatePlayerName is true"));
-
+		LOG_S(Warning , TEXT("%s bOnceUpdatePlayerName is true") , *this->GetName());
+		ServerRPCRotation(GetActorRotation().Quaternion());
 		// visible = true
-		SRPC_VisiblePlayerName();
+		// SRPC_VisiblePlayerName();
+		//
+		// if (IsLocallyControlled())
+		// {
+		// 	PlayerNameWidgetComponent->SetHiddenInGame(true);
+		// 	PlayerNameWidgetComponent->SetVisibility(false);
+		// }
+		if (!IsLocallyControlled())
+		{
+			PlayerNameWidgetComponent->SetHiddenInGame(false);
+			PlayerNameWidgetComponent->SetVisibility(true);			
+		}
 
 		// target setting
-		if(auto p = UGameplayStatics::GetPlayerPawn(GetWorld() , 0))
-			 PlayerNameWidgetComponent->SetTargetActor(p);
+		if (auto p = UGameplayStatics::GetPlayerPawn(GetWorld() , 0))
+			PlayerNameWidgetComponent->SetTargetActor(p);
 
 		// 이름 설정
 		if (IsLocallyControlled())
@@ -1294,8 +1323,8 @@ void AL_Viper::Tick(float DeltaTime)
 				SRPC_SetMyName(gi->GetUserId());
 			}
 		}
-	
-		bOnceUpdatePlayerName=!bOnceUpdatePlayerName;
+
+		bOnceUpdatePlayerName = !bOnceUpdatePlayerName;
 	}
 
 #pragma region 제트엔진 이펙트
@@ -1408,6 +1437,7 @@ void AL_Viper::Tick(float DeltaTime)
 		{
 #pragma region 시동절차
 			FString ScenarioFront = StartScenario.front();
+			CurrentScenario = ScenarioFront;
 			UStaticMeshComponent* ScenarioComponent = nullptr;
 			if (ScenarioFront.Equals("MIC"))
 			{
@@ -2036,8 +2066,8 @@ void AL_Viper::ServerRPCRotation_Implementation(FQuat newQuat)
 	}
 
 	QuatCurrentRotation = newQuat;
-	QuatTargetRotation = newQuat;	
-	SetActorRotation(QuatCurrentRotation.Rotator());	
+	QuatTargetRotation = newQuat;
+	SetActorRotation(QuatCurrentRotation.Rotator());
 	MultiRPCRotation(newQuat);
 }
 
@@ -3086,13 +3116,13 @@ void AL_Viper::F_StickAxis3(const struct FInputActionValue& value)
 #pragma region Retate Pawn
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
-									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 
 	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
 	if (!HasAuthority())
 		SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatTargetRotation);
-	
+
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
@@ -3136,13 +3166,13 @@ void AL_Viper::VRSticAxis(const FVector2D& value)
 #pragma region Retate Pawn
 	// 현재 회전을 목표 회전으로 보간 (DeltaTime과 RotationSpeed를 사용하여 부드럽게)
 	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
-									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	                                   RotationSpeed * GetWorld()->GetDeltaSeconds());
 
 	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
 	if (!HasAuthority())
 		SetActorRotation(QuatTargetRotation);
 	ServerRPCRotation(QuatTargetRotation);
-	
+
 	if (bJetAirVFXOn)
 	{
 		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
@@ -3170,8 +3200,15 @@ void AL_Viper::CRPC_TeleportSetting_Implementation()
 
 void AL_Viper::SRPC_SetMyName_Implementation(const FString& PlayerName)
 {
+	MRPC_SetMyName(PlayerName);	
+}
+
+void AL_Viper::MRPC_SetMyName_Implementation(const FString& PlayerName)
+{
+	LOG_S(Warning, TEXT("MRPC_SetMyName Start"));
 	if (auto PlayerNameWidget = Cast<UL_PlayerNameWidget>(PlayerNameWidgetComponent->GetWidget()))
 	{
+		LOG_S(Warning, TEXT("%s Player Name : %s"), *this->GetName(), *PlayerName);		
 		PlayerNameWidget->txtPlayerName->SetText(FText::FromString(PlayerName));
 	}
 }
@@ -3204,5 +3241,72 @@ void AL_Viper::StopAllVoice()
 	{
 		JetMissileAudio->Stop();
 		JetMissileAudio->SetSound(nullptr);
+	}
+}
+
+void AL_Viper::StickRotation()
+{
+	float StickCurRoll = DummyStick->GetRelativeRotation().Roll;
+	float StickCurPitch = DummyStick->GetRelativeRotation().Pitch;
+
+	auto RollValue = FMath::Abs(StickCurRoll);
+	auto PitchValue = FMath::Abs(StickCurPitch);
+
+	auto RollPer = RollValue / StickMaxRoll;
+	auto PitchPer = PitchValue / StickMinPitch;
+
+	if (StickCurRoll < 0)
+		RollPer *= -1;
+	if (StickCurPitch < 0)
+		PitchPer *= -1;
+
+	float RollAngle = 0.f;
+	float PitchAngle = 0.f;
+	float StickMinThreshold = StickMaxThreshold * -1;
+
+	if ((RollPer > StickMaxThreshold || RollPer < StickMinThreshold) && (PitchPer > StickMaxThreshold || PitchPer <
+		StickMinThreshold))
+	{
+		RollAngle = RollPer * MaxRotationAngle / StickDivRoll;
+		PitchAngle = PitchPer * MaxRotationAngle / StickDivPitch;
+	}
+	else
+	{
+		RollAngle = RollPer * MaxRotationAngle / StickDivBankRoll;
+		PitchAngle = PitchPer * MaxRotationAngle / StickDivBankPitch;
+	}
+
+	// Roll과 Pitch를 쿼터니언 회전으로 변환
+	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(RollAngle));
+	FQuat PitchRotation = FQuat(FVector(0 , 1 , 0) , FMath::DegreesToRadians(PitchAngle));
+
+	// 목표 회전 설정 (RootComponent를 기준으로)
+	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
+	RollAngle = 0.f;
+	PitchAngle = 0.f;
+}
+
+void AL_Viper::SetCanopyGearLevel()
+{
+	auto currLoc = DummyCanopyMesh->GetRelativeLocation();
+	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
+	{
+		CRPC_CanopyAudioControl(true , 1);
+		iCanopyNum = 3;
+	}
+	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
+	{
+		CRPC_CanopyAudioControl(true , 1);
+		iCanopyNum = 2;
+	}
+	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
+	{
+		CRPC_CanopyAudioControl(true , 0);
+		iCanopyNum = 1;
+	}
+	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
+	{
+		CRPC_CanopyAudioControl(false);
+		iCanopyNum = 0;
 	}
 }

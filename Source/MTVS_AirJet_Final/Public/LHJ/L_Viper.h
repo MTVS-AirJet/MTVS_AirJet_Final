@@ -100,6 +100,8 @@ public:
 	UPROPERTY(EditdefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UBoxComponent* JetBreakHold;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class UBoxComponent* JetRotationStick;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetLeftPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetRightPannel;
@@ -108,39 +110,39 @@ public:
 #pragma endregion
 
 #pragma region Prop2
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class USceneComponent* JetPropRootScene;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetPropObj4;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetPropObj11;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetPropObj9;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetPropObj8;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetPropObj7;
 
 	// Canopy Prop
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp0_C;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp0_R;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp0_L;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp3_L;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp3_R;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp1;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp2;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp10;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp6_R;
-	UPROPERTY(EditDefaultsOnly, Category="Components")
+	UPROPERTY(EditDefaultsOnly , Category="Components")
 	class UStaticMeshComponent* JetProp6_L;
 #pragma endregion
 
@@ -151,11 +153,13 @@ public:
 	class UJ_CustomWidgetComponent* PlayerNameWidgetComponent;
 	UPROPERTY(Replicated)
 	bool bOnceUpdatePlayerName;
-	
+
 private:
-	UFUNCTION(Server, Unreliable)
+	UFUNCTION(Server , Unreliable)
 	void SRPC_SetMyName(const FString& PlayerName);
-	
+	UFUNCTION(NetMulticast , Reliable)
+	void MRPC_SetMyName(const FString& PlayerName);
+
 private:
 #pragma region Widget & Effect
 	UPROPERTY(EditDefaultsOnly , category="Components")
@@ -327,7 +331,7 @@ public:
 
 private:
 	// For Engine Using
-	UPROPERTY(EditDefaultsOnly , Category="Engine", Replicated)
+	UPROPERTY(EditDefaultsOnly , Category="Engine" , Replicated)
 	bool IsEngineOn;
 
 	// For Change Arrow Rotate
@@ -414,10 +418,10 @@ private:
 public:
 	UFUNCTION(Client , Reliable)
 	void ClientRPC_LockOnStart();
-	
+
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Default|Attack")
-	bool bLockOnStart;	
+	UPROPERTY(EditDefaultsOnly , Category="Default|Attack")
+	bool bLockOnStart;
 
 	float Diametr = 30.f;
 	UPROPERTY(EditDefaultsOnly , Category="Attack")
@@ -450,14 +454,15 @@ public:
 	FTimerHandle syncLocTimer;
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_SyncLocation(const FVector& location);
-private:	
-	UFUNCTION(NetMulticast, Unreliable)
+
+private:
+	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPC_SyncLocation(const FVector& location);
 	UFUNCTION(Client , Unreliable)
 	void ClientRPCLocation();
 	UFUNCTION(Server , Unreliable)
 	void ServerRPCRotation(FQuat newQuat);
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPCRotation(const FQuat& newQuat);
 	UFUNCTION(NetMulticast , Unreliable)
 	void MultiRPCVisibleAirVFX(bool isOn);
@@ -469,14 +474,14 @@ private:
 	void MulticastRPCBoost(bool isOn);
 	bool bCurrBoostState;
 #pragma endregion
-	
+
 	UFUNCTION(Client , Unreliable)
 	void ClientRPCLockOn();
-	UFUNCTION(Client, Unreliable)
+	UFUNCTION(Client , Unreliable)
 	void CRPC_MissileCapture();
 
 	bool bStartLockOn;
-	
+
 	UFUNCTION(Server , Unreliable)
 	void ServerRPCLockOn(AActor* target);
 	UFUNCTION(NetMulticast , Unreliable)
@@ -484,6 +489,7 @@ private:
 	void PlayLockOnSound();
 
 #pragma region Missile & Flare
+
 public:
 	UFUNCTION(Server , Reliable , BlueprintCallable)
 	void ServerRPCMissile(AActor* newOwner);
@@ -578,18 +584,27 @@ public:
 	bool IsFirstBreakHoldClick;
 	bool bStartAudio;
 
-	float CurAudioTime=0.f;
-	UPROPERTY(EditDefaultsOnly, Category="Default|MissionTextUI")
-	float PlayAudioTime=3.f;
+	float CurAudioTime = 0.f;
+	UPROPERTY(EditDefaultsOnly , Category="Default|MissionTextUI")
+	float PlayAudioTime = 3.f;
+
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
+	class USkeletalMeshComponent* DummyStick;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class UPhysicsConstraintComponent* RotationStickConstraint;
 #pragma endregion
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FString CurrentScenario = "";
+	UPROPERTY(EditDefaultsOnly , Category="Engine" , BlueprintReadOnly)
+	bool IsStart;
 
 private:
 	//==================================
 	// 시동 절차
 	std::queue<FString> StartScenario;
 	void PushQueue();
-	UPROPERTY(EditDefaultsOnly , Category="Engine")
-	bool IsStart;
 	UPROPERTY(EditDefaultsOnly , Category="Engine")
 	bool IsFlyStart;
 
@@ -599,8 +614,8 @@ public:
 private:
 	UFUNCTION()
 	void OnMyMeshOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
-						 UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
-						 const FHitResult& SweepResult);
+	                     UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep ,
+	                     const FHitResult& SweepResult);
 	//=====================================
 	// 캐노피
 	int iCanopyNum = 1; //0=열기, 1=기본, 2=닫기, 3=잠금
@@ -620,8 +635,11 @@ private:
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
 	float CanopyRotatePitchValue = .3f;
 
-	UPROPERTY(EditDefaultsOnly , Category="DumyComponents")
+public:
+	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
 	class UStaticMeshComponent* DummyCanopyMesh;
+
+private:
 	//=====================================
 	// 바퀴
 	UFUNCTION(Server , Reliable)
@@ -665,9 +683,9 @@ private:
 #pragma region KHS Works
 
 	//KHS 작업부분
-	public :
-		// 플레이어리스트 업데이트 서버 요청
-		UFUNCTION(Server , Reliable)
+public :
+	// 플레이어리스트 업데이트 서버 요청
+	UFUNCTION(Server , Reliable)
 	void ServerRPC_SetConnectedPlayerNames(const FString& newName);
 	// 플레이어리스트 Multicast 업데이트
 	UFUNCTION(Client , Reliable)
@@ -685,16 +703,16 @@ private:
 	void CRPC_PlaySwitchSound(FVector SoundLoc);
 	UFUNCTION(Client , Reliable)
 	void CRPC_EngineSound(bool bStart , int32 idx = 0);
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client , Reliable)
 	void CRPC_AirSound(bool bStart);
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client , Reliable)
 	void CRPC_MissileSound(bool bStart);
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client , Reliable)
 	void CRPC_MissilePitch(const float& Pitch);
 
 	UPROPERTY()
 	class AJ_GroundTarget* GroundTarget;
-	
+
 public:
 	void Call_CRPC_MissileImpact(FVector ImpactLoc);
 	UFUNCTION(Client , Reliable)
@@ -704,7 +722,7 @@ public:
 
 private:
 	bool bPlayCanopyEndSound;
-	
+
 	UPROPERTY(EditDefaultsOnly , Category="Default|Camera")
 	TSubclassOf<class UCameraShakeBase> LoadCameraShake;
 	UFUNCTION(Client , Reliable)
@@ -875,20 +893,46 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetEngineOn();
 
-	UFUNCTION(BlueprintCallable, Client, Reliable)
+	UFUNCTION(BlueprintCallable , Client , Reliable)
 	void CRPC_TeleportSetting();
 
 private:
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(Client , Reliable)
 	void CRPC_SetMissileCamRotate();
 	UPROPERTY(EditDefaultsOnly)
 	class UMaterialInterface* MissileSceneMat;
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server , Reliable)
 	void SRPC_VisiblePlayerName();
-	UFUNCTION(NetMulticast,Reliable)
+	UFUNCTION(NetMulticast , Reliable)
 	void MRPC_VisiblePlayerName();
 
 private:
 	UFUNCTION()
 	void StopAllVoice();
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxRoll = 20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMinRoll = -20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxPitch = -20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMinPitch = 20;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickMaxThreshold = .4f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivBankRoll = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivBankPitch = 10.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivRoll = 9.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Default|StickMove")
+	float StickDivPitch = 8.f;
+public:
+	UFUNCTION(BlueprintCallable)
+	void StickRotation();
+	//=============================================
+	UFUNCTION(BlueprintCallable)
+	void SetCanopyGearLevel();
 };
