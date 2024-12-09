@@ -467,9 +467,9 @@ void AL_Viper::CreateDumyComp()
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(DummyThrottleMesh);
-	JetFirstEngine->SetRelativeLocation(FVector(0 , 0 , 3.5));
+	JetFirstEngine->SetRelativeLocation(FVector(0 , 0 , 6.5));
 	JetFirstEngine->SetBoxExtent(FVector(3 , 3 , 5));
-	JetFirstEngine->SetRelativeScale3D(FVector(.8 , 1 , .5));
+	JetFirstEngine->SetRelativeScale3D(FVector(.8 , 1 , 1.3));
 	JetFirstEngine->SetGenerateOverlapEvents(true);
 	JetFirstEngine->OnClicked.AddDynamic(this , &AL_Viper::OnMyFirstEngineClicked);
 #pragma endregion
