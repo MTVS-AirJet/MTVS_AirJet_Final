@@ -89,6 +89,8 @@ protected:
 	// XXX streaming ui 생성 | 의존성 제거됨
 	void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
 
+	// 
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 
 public:

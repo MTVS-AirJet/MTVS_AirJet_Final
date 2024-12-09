@@ -132,7 +132,7 @@ public:
 	void CRPC_SetResultAIFeedback(const FAIFeedbackRes &resData);
 
         // 팝업 ui 활성화 및 설정
-	UFUNCTION(Client, Unreliable)
+	UFUNCTION(Client, Reliable)
 	void CRPC_ActivePopupUI(const EMissionProcess &mpIdx);
 
 	// 팝업 ui 비활성화

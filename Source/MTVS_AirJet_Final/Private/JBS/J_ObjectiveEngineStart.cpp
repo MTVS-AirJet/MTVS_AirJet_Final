@@ -84,7 +84,7 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     ActiveNextProgress(data, isSuccess);
 
     // 스탠바이 상태가 되면 팝업 활성화
-    if(data.curProgress == EEngineProgress::STANDBY_OTHER_PLAYER)
+    if(data.curProgress == EEngineProgress::RELEASE_SIDE_BREAK)
     {
         pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::STANDBY_OTHER_PLAYER);
     }
