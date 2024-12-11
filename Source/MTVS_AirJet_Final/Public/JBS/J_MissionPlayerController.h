@@ -89,6 +89,8 @@ protected:
 	// XXX streaming ui 생성 | 의존성 제거됨
 	void InitStreamingUI(class AJ_BaseMissionPawn *newPawn);
 
+	// 
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const override;
 
 public:
@@ -133,16 +135,29 @@ public:
 	UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice2(const ETacticalOrder &orderType);
 
-	UFUNCTION(Client, Reliable)
+
+
+	// 보이스라인 재생
+	UFUNCTION(BlueprintCallable)
+	void PlayVoiceByIdx(const int &idx);
+
+        UFUNCTION(Client, Reliable)
 	void CRPC_PlayCommanderVoice3(int idx);
+
+	UFUNCTION(Client, Unreliable)
+	void CRPC_PlayVoiceByMP(const EMissionProcess &missionProcess);
+
+
+
+
 
 	// 보이스 라인 재생
 	UFUNCTION(BlueprintCallable)
 	void PlayCommanderVoice3(const FCommanderVoiceRes &resData);
 
-        // 미션 보이스 데이터 요청
+	// 미션 보이스 데이터 요청
 	UFUNCTION(Client, Unreliable)
-        void CRPC_ReqMissionVoiceData();
+	void CRPC_ReqMissionVoiceData();
 
         // 보이스 데이터 받아서 맵에 저장
 	UFUNCTION(BlueprintCallable)

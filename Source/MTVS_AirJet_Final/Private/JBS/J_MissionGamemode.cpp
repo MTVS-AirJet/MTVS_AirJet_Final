@@ -35,6 +35,23 @@
 //     UGameplayStatics::LoadStreamLevelBySoftObjectPtr(GetWorld(), missionMapPrefab, true, true, FLatentActionInfo());
 // }
 
+void AJ_MissionGamemode::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+}
+
+#pragma endregion
+
+#pragma region getset
+AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
+{
+    // 없으면 다시 생성
+    if(!startPointActor)
+        InitMissionStartPoint(curMissionData.startPoint);
+
+    return startPointActor;
+}
+
 #pragma endregion
 
 #pragma region 레벨 시작 단
@@ -176,7 +193,7 @@ void AJ_MissionGamemode::CacheCesiumActors()
 -> 플레이어 생성 후 포제스 | SpawnActor, Possess
 -> 역할에 따라 마우스 커서 및 입력 처리
 
-// 미션 시작 버튼 누르면 미션 시작 설정 | StartMissionLevel
+미션 시작 버튼 누르면 미션 시작 설정 | StartMissionLevel
 -> 시작 보이스 및 자막 재생 | CRPC_PlayCommanderVoice3 | EMissionProcess::MISSION_START
 -> 팝업 UI 시작 | CRPC_ActivePopupUI
 -> 팝업 UI 종료시 시동 목표 시작 | StartDefaultObjective
@@ -223,7 +240,7 @@ FTransform AJ_MissionGamemode::GetPlayerSpawnTransfrom(EPlayerRole role, AJ_Miss
     // 몇 번째 pc 인지 받아서 시작 위치에서 뒤로 - * i 만큼 계산
 
     // 시작 지점의 뒤 벡터 구하기
-    FVector backVector = -1 * spawnTR.GetUnitAxis(EAxis::X)
+    const FVector& backVector = -1 * spawnTR.GetUnitAxis(EAxis::X)
                         * spawnInterval * spawnCnt;
 
     // 위치 결정
@@ -304,7 +321,6 @@ void AJ_MissionGamemode::StartDefaultObjective()
 
 #pragma region 이륙 단
 /*
-// AddFlightedPC
 텔포 박스에서 충돌시 해당 pc 이륙 체크 | AddFlightedPC
 -> 한 명 이륙 딜리게이트 실행 | onePilotTakeOffDel
 -> 이륙 목표 액터에서 수행도 갱신 처리 | takeOffObj->SuccessTakeOff
@@ -312,20 +328,9 @@ void AJ_MissionGamemode::StartDefaultObjective()
 -> 전체 플레이어 이륙 체크
 -> 이륙 종료 딜리게이트 실행 | takeOffEndDel
 -> 이륙 목표 종료 처리 | takeOffObj->ObjectiveEnd
--> 전술명령 시작 | StartTacticalOrder
-// StartTacticalOrder
+
+전술명령 시작 | StartTacticalOrder
 -> 끝내지 않은 기본 목표(시동,이륙) 종료 처리 | startTODel, SkipDefaultObj, ObjectiveEnd
--> 약간 딜레이 이후 미션 지역으로 변경 | ChangeMissionArea
-// ChangeMissionArea
--> 미션 지역으로 위경도 변경 | SetDestinationLogitudeLatitude
--> 미션 지역으로 세슘 머티리얼 변경 | SRPC_ChangeMissionArea
--> 텔포 박스 콜리전 제거 | boxComp->DestroyComponent
-// TeleportAllStartPoint
--> 미션 시작 지점으로 전투기 위치 이동 | TeleportAllStartPoint
--> 약간 딜레이 이후 미션 시작 | DelayStartTacticalOrder
--> 이륙 보이스 재생 요청 | CRPC_PlayCommanderVoice3, FLIGHT_START
--> 이륙 팝업 UI 활성화 | ???
--> 첫 번째 전술명령 활성화 | ActiveNextObjective
 */
 
 // 이륙 체크 및 미션 시작 단
@@ -384,7 +389,13 @@ void AJ_MissionGamemode::StartTacticalOrder()
     }, loadingDelay, false);
 }
 
-
+#pragma region 미션 지역 이동 단
+/*
+약간 딜레이 이후 미션 지역으로 변경 | ChangeMissionArea
+-> 미션 지역으로 위경도 변경 | SetDestinationLogitudeLatitude
+-> 미션 지역으로 세슘 머티리얼 변경 | SRPC_ChangeMissionArea
+-> 텔포 박스 콜리전 제거 | boxComp->DestroyComponent
+*/
 
 void AJ_MissionGamemode::ChangeMissionArea()
 {
@@ -394,137 +405,86 @@ void AJ_MissionGamemode::ChangeMissionArea()
     cesiumTPBox->SetDestinationLogitudeLatitude(curMissionData.longitude, curMissionData.latitude);
     // 변경 요청
     cesiumTPBox->SRPC_ChangeMissionArea();
+
     //텔포박스 비활성화
     auto* boxComp = cesiumTPBox->GetComponentByClass<UBoxComponent>();
     if(!boxComp) return;
+
     // 충돌의 원인을 제거
     boxComp->DestroyComponent();
 }
+#pragma endregion
 
+#pragma region 전투기 텔포 단
+/*
+미션 시작 지점으로 전투기 위치 이동 | TeleportAllStartPoint
+-> 각 pc 로딩 ui 제거 | pc->CRPC_RemoveLoadingUI
+-> 번호순 파일럿 역할 설정
+-> 역할에 따른 위치 계산 | CalcTeleportTransform
+-> 계산된 위치로 텔레포트 | pc->MRPC_TeleportStartPoint
+*/
 void AJ_MissionGamemode::TeleportAllStartPoint(AJ_MissionStartPointActor *startPoint)
 {
     if(!HasAuthority()) return;
 
-    // 모든 플레이어의 폰 가져오기
+    // 모든 pc 가져오기
     auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-    auto allPawns = UJ_Utility::GetAllMissionPawn(GetWorld());
 
-    // 시작 지점으로 위치 이동
+    // 미션 시작 지점으로 위치 이동
     for(int i = 0; i < allPC.Num(); i++)
     {
-        const auto* viper = allPawns[i];
         auto* pc = allPC[i];
+        const auto* pawn = pc->GetPawn();
+
         // pc 로딩 ui 잇으면 제거
         pc->CRPC_RemoveLoadingUI();
-        // idx 0,1,2 를 각각 리더, lt 윙맨, rt 윙맨으로 설정
+        
+        // idx 0,1,2 를 각각 리더, rt 윙맨, lt 윙맨으로 설정
         pc->pilotRole = static_cast<EPilotRole>(i % 3);
 
         // 순서에 따른 위치 조정 (산개용)
         FTransform newTR = CalcTeleportTransform(pc->pilotRole);
         // 스케일 조정되지 않도록 변경
-        newTR = FTransform(newTR.GetRotation(), newTR.GetLocation(), viper->GetActorScale());
+        newTR = FTransform(newTR.GetRotation()
+                        , newTR.GetLocation()
+                        , pawn->GetActorScale());
+
         pc->MRPC_TeleportStartPoint(newTR);
     }
 }
 
-void AJ_MissionGamemode::DelayStartTacticalOrder(float delayTime)
-{
-    FTimerHandle timerHandle;
-    GetWorld()->GetTimerManager()
-    .SetTimer(timerHandle, [this]() mutable
-    {
-        // 이륙 성공 보이스 재생
-        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-        for(auto* pc : allPC)
-        {
-            if(!pc) continue;
-            pc->CRPC_PlayCommanderVoice3(static_cast<int>(EMissionProcess::FLIGHT_START));
-            // 비활성화 될때 전술 명령 시작 | 호스트만
-            if(pc->IsLocalPlayerController())
-                pc->objUIComp->popupEndDel.AddDynamic( this, &AJ_MissionGamemode::StartFirstTacticalOrder);
-            // 팝업 UI 활성화
-            pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::TAKE_OFF_END);
-        }
-    }, delayTime, false);
-}
-
-void AJ_MissionGamemode::StartFirstTacticalOrder()
-{
-    // 팝업 바인드 제거
-    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-            
-    //타이머에서 할 거
-    for(auto* pc : allPC)
-    {
-        if(!pc) continue;
-
-        // 호스트면 바인드된 함수 제거
-        if(pc->IsLocalPlayerController())
-            pc->objUIComp->popupEndDel.RemoveDynamic(this, &AJ_MissionGamemode::StartFirstTacticalOrder);
-
-        auto* pawn = pc->GetPawn<AL_Viper>();
-        if(!pawn) continue;
-        // 고정 해제
-        pawn->SetEngineOn();
-    }
-    // 미션 시작
-    this->objectiveManagerComp->ActiveNextObjective();
-}
-
-void AJ_MissionGamemode::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-}
-
-
-
-
-
-
-
-AJ_MissionStartPointActor *AJ_MissionGamemode::GetStartPointActor()
-{
-    // 없으면 그냥 맵 중앙으로 설정
-    if(startPointActor == nullptr)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 13.f, FColor::Red, TEXT("미션 시작 지점 미설정 | 기본 위치 적용"));
-
-        FMissionStartPos& curSPData = curMissionData.startPoint;
-        InitMissionStartPoint(curSPData);
-    }
-
-
-    return startPointActor;
-}
-
-FTransform AJ_MissionGamemode::CalcTeleportTransform(int idx)
+FTransform AJ_MissionGamemode::CalcTeleportTransform(const int idx)
 {
     return CalcTeleportTransform(static_cast<EPilotRole>(idx % 3));
 }
 
-FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
+FTransform AJ_MissionGamemode::CalcTeleportTransform(const EPilotRole& role)
 {
     // 시작 지점 트랜스폼
     FTransform baseTR = START_POINT_ACTOR->GetActorTransform();
+    // 값이 없으면 반환
     if(baseTR.Equals(FTransform::Identity))
         return baseTR;
+    
+    // 방향 구하기
+    const FVector& forV = START_POINT_ACTOR->GetActorForwardVector();
+    const FVector& rtV = START_POINT_ACTOR->GetActorRightVector();
+    /*  산개 로직
+        def triangle_vertices(h, BC, AB):
+        A = (0, h)
+        B = (-BC / 2, -h)
+        C = (BC / 2, -h)
+        return A, B, C
 
-    FVector forV = START_POINT_ACTOR->GetActorForwardVector();
-    FVector rtV = START_POINT_ACTOR->GetActorRightVector();
-    // 산개 로직 
-    /*def triangle_vertices(h, BC, AB):
-    A = (0, h)
-    B = (-BC / 2, -h)
-    C = (BC / 2, -h)
-    return A, B, C
-
-    A, B, C = triangle_vertices(200, 1220, 681) */
+        A, B, C = triangle_vertices(200, 1220, 681)
+    */
+    // 멀어질 거리 가져오기
     FVector addVec;
-    float& forValue = formationData.height;
-    float& rtValue = formationData.baseLength;
+    const float& forValue = formationData.height;
+    const float& rtValue = formationData.baseLength;
 
+    // 역할에 따라 거리 적용
     switch (role) {
-    // 시작 지점 + 길이
     case EPilotRole::WING_COMMANDER:
         addVec = forV * forValue;
         break;
@@ -536,24 +496,69 @@ FTransform AJ_MissionGamemode::CalcTeleportTransform(EPilotRole role)
         break;
     }
 
-    // GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::White, FString::Printf(TEXT("시작 지점 %s\n변경된 지점 %s")
-    //     , *baseTR.GetLocation().ToString()
-    //     , *(baseTR.GetLocation() + addVec).ToString()));
-
     baseTR.SetLocation(baseTR.GetLocation() + addVec);
 
     return baseTR;
 }
 
+#pragma endregion
 
-
-
-
-
-
-void AJ_MissionGamemode::SRPC_RemoveLoadingUIByPC_Implementation(class AJ_MissionPlayerController *missionPC)
+#pragma region 미션 시작 단
+/*
+약간 딜레이 이후 미션 시작 | DelayStartTacticalOrder
+-> 이륙 보이스 재생 요청 | CRPC_PlayCommanderVoice3, FLIGHT_START
+-> 이륙 팝업 UI 활성화 | CRPC_ActivePopupUI
+-> 팝업 종료시 첫 번째 전술명령 활성화 | StartFirstTacticalOrder
+-> 전투기 고정 해제 | viper->SetEngineOn
+-> 첫 목표 시작 | ActiveNextObjective
+*/
+void AJ_MissionGamemode::DelayStartTacticalOrder(float delayTime)
 {
-    
+    // 타임 만큼 딜레이
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager()
+    .SetTimer(timerHandle, [this]() mutable
+    {
+        auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+        for(auto* pc : allPC)
+        {
+            // 미션 시작 보이스 재생
+            pc->CRPC_PlayVoiceByMP(EMissionProcess::FLIGHT_START);
+
+            // 팝업 비활성화 될때 전술 명령 시작 바인드 | 호스트만
+            if(pc->IsLocalPlayerController())
+                pc->objUIComp->popupEndDel.AddDynamic( this, &AJ_MissionGamemode::StartFirstTacticalOrder);
+            
+            // 팝업 UI 활성화
+            pc->objUIComp->CRPC_ActivePopupUI(EMissionProcess::TAKE_OFF_END);
+        }
+    }, delayTime, false);
 }
+
+void AJ_MissionGamemode::StartFirstTacticalOrder()
+{
+    auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+
+    for(auto* pc : allPC)
+    {
+        // 호스트면 팝업에 바인드된 함수 제거
+        if(pc->IsLocalPlayerController())
+            pc->objUIComp->popupEndDel.RemoveDynamic(this, &AJ_MissionGamemode::StartFirstTacticalOrder);
+        
+        auto* viper = pc->GetPawn<AL_Viper>();
+        if(!viper) continue;
+        // 전투기 고정 해제
+        viper->SetEngineOn();
+    }
+    
+    // 미션 시작
+    this->objectiveManagerComp->ActiveNextObjective();
+}
+#pragma endregion
+
+#pragma endregion
+
+
 
 

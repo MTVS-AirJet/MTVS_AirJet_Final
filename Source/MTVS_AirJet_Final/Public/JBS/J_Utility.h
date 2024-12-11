@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Templates/SubclassOf.h"
 #include "J_Utility.generated.h"
@@ -959,6 +960,19 @@ enum class EObjSound : uint8
     ,MOVE_POINT_END = 1
     ,RESULT = 2
 };
+
+// 입력 장치
+UENUM(BlueprintType)
+enum class EInputDevice : uint8
+{
+	KEYBOARD
+	,FLIGHT_CONTROLLER
+	,VR_CONTROLLER
+};
+
+// 입력 전환 딜리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChangeInputDel);
+
 
 // solved 테스트 용
 USTRUCT(BlueprintType)

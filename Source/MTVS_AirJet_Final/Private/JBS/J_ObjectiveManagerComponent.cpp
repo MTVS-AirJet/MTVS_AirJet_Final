@@ -37,7 +37,7 @@ void UJ_ObjectiveManagerComponent::BeginPlay()
 	ownerGM = this->GetOwner<AJ_MissionGamemode>();
 
 	// 이륙 시 기본 목표 스킵 바인드
-	ownerGM->startTODel.AddUObject(this, &UJ_ObjectiveManagerComponent::SkipDefaultObj);
+	ownerGM->startTODel.AddDynamic(this, &UJ_ObjectiveManagerComponent::SkipDefaultObj);
 }
 
 

@@ -48,8 +48,9 @@ protected:
 
 public:
 	// 팝업 비활성화 딜리게이트
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintAssignable, Category="Default|Delegate")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintCallable, BlueprintAssignable, Category="Default|Delegate")
 	FPopupEndDelegate popupEndDel;
+
 protected:
 	// 목표 UI 생성
     void InitObjUI();
@@ -62,6 +63,10 @@ protected:
     void CreateUIData(const FEngineProgressData &data, TArray<FTextUIData> &outData, bool isInit = false);
 	// 이륙 절차
     void CreateUIData(const FTakeOffData &data, TArray<FTextUIData> &outData, bool isInit = false);
+
+
+	// 인풋 변경시 설명 ui 이미지 변경
+    void EventChangeInput(const EInputDevice &device);
 
 public:
 	// 목표 UI 시작 및 갱신
@@ -127,7 +132,7 @@ public:
 	void CRPC_SetResultAIFeedback(const FAIFeedbackRes &resData);
 
         // 팝업 ui 활성화 및 설정
-	UFUNCTION(Client, Unreliable)
+	UFUNCTION(Client, Reliable)
 	void CRPC_ActivePopupUI(const EMissionProcess &mpIdx);
 
 	// 팝업 ui 비활성화

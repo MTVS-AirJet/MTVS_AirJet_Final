@@ -659,3 +659,9 @@ void UJ_ObjectiveUIComp::CRPC_SetResultAIFeedback_Implementation(const FAIFeedba
 {
 	OBJ_UI->missionCompleteUI->SetAIFeedback(resData);
 }
+
+void UJ_ObjectiveUIComp::EventChangeInput(const EInputDevice &device)
+{
+	// 인풋 변경
+	OBJ_UI->DETAIL_TEXT_UI->SetCurInput(device);
+}
