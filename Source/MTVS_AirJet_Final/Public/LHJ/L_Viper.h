@@ -102,6 +102,8 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UBoxComponent* JetRotationStick;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class USceneComponent* JetStickScene;
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetLeftPannel;
 	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
 	class UStaticMeshComponent* JetRightPannel;
@@ -931,7 +933,7 @@ private:
 	float StickDivPitch = 8.f;
 public:
 	UFUNCTION(BlueprintCallable)
-	void StickRotation();
+	void StickRotation(const FRotator& NewRotation);
 	//=============================================
 	UFUNCTION(BlueprintCallable)
 	void SetCanopyGearLevel();
