@@ -501,11 +501,14 @@ void AL_Viper::CreateDumyComp()
 	JetBreakHold->OnClicked.AddDynamic(this , &AL_Viper::OnMyBreakHoldClicked);
 #pragma endregion
 
+	JetStickScene = CreateDefaultSubobject<USceneComponent>(TEXT("JetStickScene"));
+	JetStickScene->SetupAttachment(JetMesh);
+	JetStickScene->SetRelativeLocation(FVector(539 , .3 , 227.5));
+	
 	DummyStick = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("DummyStick"));
-	DummyStick->SetupAttachment(JetMesh);
-	DummyStick->SetRelativeLocation(FVector(539 , .3 , 227.5));
+	DummyStick->SetupAttachment(JetStickScene);	
 	DummyStick->SetRelativeScale3D(FVector(1.2 , 1.2 , 1.4));
-
+	
 	JetRotationStick = CreateDefaultSubobject<UBoxComponent>(TEXT("JetRotationStick"));
 	JetRotationStick->SetupAttachment(DummyStick);
 	JetRotationStick->SetBoxExtent(FVector(1.5 , 1.5 , 5));
@@ -3244,22 +3247,25 @@ void AL_Viper::StopAllVoice()
 	}
 }
 
-void AL_Viper::StickRotation()
+void AL_Viper::StickRotation(const FRotator& NewRotation)
 {
-	float StickCurRoll = DummyStick->GetRelativeRotation().Roll;
-	float StickCurPitch = DummyStick->GetRelativeRotation().Pitch;
-
+	// float StickCurRoll = JetStickScene->GetRelativeRotation().Roll;
+	// float StickCurPitch = JetStickScene->GetRelativeRotation().Pitch;
+	float StickCurRoll = NewRotation.Roll;
+	float StickCurPitch = NewRotation.Pitch;
+		
 	auto RollValue = FMath::Abs(StickCurRoll);
 	auto PitchValue = FMath::Abs(StickCurPitch);
 
 	auto RollPer = RollValue / StickMaxRoll;
 	auto PitchPer = PitchValue / StickMinPitch;
 
-	if (StickCurRoll < 0)
+	if (StickCurRoll > 0)
 		RollPer *= -1;
-	if (StickCurPitch < 0)
+	if (StickCurPitch > 0)
 		PitchPer *= -1;
 
+	// LOG_SCREEN("Roll Per %f, Pitch Per %f", RollPer, PitchPer);
 	float RollAngle = 0.f;
 	float PitchAngle = 0.f;
 	float StickMinThreshold = StickMaxThreshold * -1;
@@ -3275,6 +3281,7 @@ void AL_Viper::StickRotation()
 		RollAngle = RollPer * MaxRotationAngle / StickDivBankRoll;
 		PitchAngle = PitchPer * MaxRotationAngle / StickDivBankPitch;
 	}
+	// LOG_SCREEN("RollAngle %f, PitchAngle %f", RollAngle, PitchAngle);
 
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
 	FQuat RollRotation = FQuat(FVector(1 , 0 , 0) , FMath::DegreesToRadians(RollAngle));
@@ -3284,6 +3291,25 @@ void AL_Viper::StickRotation()
 	QuatTargetRotation = QuatCurrentRotation * RollRotation * PitchRotation;
 	RollAngle = 0.f;
 	PitchAngle = 0.f;
+
+	// 목표 회전 설정 (RootComponent를 기준으로)
+	QuatCurrentRotation = FQuat::Slerp(QuatCurrentRotation , QuatTargetRotation ,
+									   RotationSpeed * GetWorld()->GetDeltaSeconds());
+	// 서버일때 회전을 하면 SRPC에서 한번 더 회전되기 때문에 문제될 수 있다. 
+	if (!HasAuthority())
+		SetActorRotation(QuatCurrentRotation);
+
+	//SetActorRotation(QuatTargetRotation);
+	ServerRPCRotation(QuatCurrentRotation);
+	//ServerRPCRotation(QuatTargetRotation);
+
+	if (bJetAirVFXOn)
+	{
+		if (GetActorRotation().Pitch > 10 && QuatCurrentRotation.Rotator().Pitch <= QuatTargetRotation.Rotator().Pitch)
+			CRPC_AirSound(true);
+		else
+			CRPC_AirSound(false);
+	}
 }
 
 void AL_Viper::SetCanopyGearLevel()
