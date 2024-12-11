@@ -937,4 +937,7 @@ public:
 	//=============================================
 	UFUNCTION(BlueprintCallable)
 	void SetCanopyGearLevel();
+	//=============================================
+	UFUNCTION(Blueprintable)
+	void SetThrottleLoc(const FVector& NewLocation, bool bIsAccel);
 };

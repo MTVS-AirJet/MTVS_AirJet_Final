@@ -3336,3 +3336,78 @@ void AL_Viper::SetCanopyGearLevel()
 		iCanopyNum = 0;
 	}
 }
+
+void AL_Viper::SetThrottleLoc(const FVector& NewLocation, bool bIsAccel)
+{
+	if (bIsAccel)
+	{
+		if (intTriggerNum == 0)
+		{
+			auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+			auto per = SizeValue * 25 / 100;
+			FVector VecTrigger0 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+			if (NewLocation.X < VecTrigger0.X)
+			{
+				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
+				if (VecTrigger0.X - newEngineX < 0.2)
+					DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+				else
+					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+			}
+		}
+		else if (intTriggerNum == 1)
+		{
+			auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
+			auto per = SizeValue * 80 / 100;
+			FVector VecTrigger1 = FVector(ThrottleOffLoc.X + per , ThrottleOffLoc.Y , ThrottleOffLoc.Z);
+
+			if (NewLocation.X < ThrottleMilLoc.X)
+			{
+				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+				if (ThrottleMilLoc.X - newEngineX < 0.2)
+					DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				else
+					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+			}
+			if (NewLocation.X < VecTrigger1.X)
+			{
+				auto newEngineX = NewLocation.X + ThrottleMoveSpeed2;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
+				if (VecTrigger1.X - newEngineX < 0.2)
+					DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+				else
+					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+			}
+		}
+		else if (intTriggerNum == 2)
+		{
+			if (NewLocation.X < ThrottleMilLoc.X)
+			{
+				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
+				if (ThrottleMilLoc.X - newEngineX < 0.2)
+					DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				else
+					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+			}
+			else if (NewLocation.X < ThrottleMaxLoc.X)
+			{
+				auto newEngineX = NewLocation.X + ThrottleMoveSpeed2;
+				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
+				DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+			}
+		}
+	}
+	else
+	{
+		float newEngineX = 0.f;
+		if (NewLocation.X > ThrottleMilLoc.X)
+			newEngineX = NewLocation.X - ThrottleMoveSpeed2;
+		else if (NewLocation.X > ThrottleOffLoc.X)
+			newEngineX = NewLocation.X - ThrottleMoveSpeed1;
+		newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
+		DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+	}
+}
