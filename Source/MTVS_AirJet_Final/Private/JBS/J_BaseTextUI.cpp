@@ -33,6 +33,9 @@ void UJ_BaseTextUI::SetBodyText(const TArray<FString>& strAry, bool isInit, UVer
         // strAry 개수 만큼 richtext 생성
         for(auto str : strAry)
         {
+            // if(str.IsEmpty())
+            //     continue;
+
             // 새 본문 요소 생성
             auto* newBodyElement = CreateBodyElement(UWidget::StaticClass(), str);
 

@@ -8,6 +8,7 @@
 #include "JBS/J_MissionGamemode.h"
 #include "JBS/J_Utility.h"
 #include "JBS/J_ObjectiveUIComp.h"
+#include "TimerManager.h"
 
 #pragma region 시작 단
 /* begin -> active 엔진 수행 데이터 초기화, 수행 딜리게이트 바인드
@@ -93,6 +94,17 @@ void AJ_ObjectiveEngineStart::CheckProgress(class AJ_MissionPlayerController *pc
     // 시동 절차 -> 미션 인덱스로 변환
     int mpIdx = UJ_Utility::ConvertEngineProgressToMissionProcessIdx(data.curProgress);
     ReqPlayCommVoice(mpIdx, {pc});
+
+    if(mpIdx == 18)
+    {
+        FTimerHandle timerHandle;
+        GetWorld()->GetTimerManager()
+            .SetTimer(timerHandle, [this, pc]() mutable
+        {
+            //타이머에서 할 거
+            ReqPlayCommVoice(19, {pc});
+        }, 5.f, false);
+    }
 
     // 사이드 브레이크 수행이 들어왔을때 현재 진행이 그거 이전일때 takeoff로 설정 | 대기 무시하고 다 켜버리는 경우
     if(!isSuccess && type == EEngineProgress::RELEASE_SIDE_BREAK && data.curProgress <= type)

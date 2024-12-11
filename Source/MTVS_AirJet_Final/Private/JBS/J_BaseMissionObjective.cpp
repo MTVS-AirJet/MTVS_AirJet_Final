@@ -376,6 +376,8 @@ void AJ_BaseMissionObjective::ReqPlayCommVoice(int idx, const TArray<AJ_MissionP
 	// 모든 pc에 재생 요청
 	for(auto* pc : pcs)
 	{
+		if(!pc) continue;
+		
 		pc->CRPC_PlayCommanderVoice3(idx);
 		pc->CRPC_SetMissionTextUI(idx);
 	}

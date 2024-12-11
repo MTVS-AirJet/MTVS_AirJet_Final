@@ -131,6 +131,8 @@ void UJ_ObjectiveUI::RunAlphaSubObjTimer(UWidget *subObjUI)
     // 사이즈 0 이됨
     if(size.Value <= .1f)
     {
+        size.Value = 0;
+        slot->SetSize(size);
         slot->SetPadding(FMargin(0,0,0,0));
         subObjUI->SetVisibility(ESlateVisibility::Hidden);
         // 타이머 종료

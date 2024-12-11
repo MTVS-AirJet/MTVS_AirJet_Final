@@ -1646,7 +1646,8 @@ void AL_Viper::Tick(float DeltaTime)
 				if (auto pc = Cast<AJ_MissionPlayerController>(Controller))
 				{
 					pc->CRPC_SetMissionTextUI(19);
-					pc->CRPC_PlayCommanderVoice3(19);
+					// JBS 수정 18번 보이스 종료후 실행으로 타이밍 옮김
+					// pc->CRPC_PlayCommanderVoice3(19);
 				}
 				bStartAudio = false;
 			}
