@@ -630,16 +630,22 @@ public:
 	void BackMoveCanopyHandle();
 
 private:
-	FVector CanopyOpenLoc = FVector(-35 , 0 , 5);
-	FVector CanopyNormalLoc = FVector(-30 , 0 , 5);
-	FVector CanopyCloseLoc = FVector(-25 , 0 , 5);
-	FVector CanopyHoldLoc = FVector(-20 , 0 , 5);
+	// FVector CanopyOpenLoc = FVector(-35 , 0 , 5);
+	// FVector CanopyNormalLoc = FVector(-30 , 0 , 5);
+	// FVector CanopyCloseLoc = FVector(-25 , 0 , 5);
+	// FVector CanopyHoldLoc = FVector(-20 , 0 , 5);
+	FVector CanopyOpenLoc = FVector(485, 42, 270);
+	FVector CanopyNormalLoc = FVector(490, 42, 270);
+	FVector CanopyCloseLoc = FVector(495, 42, 270);
+	FVector CanopyHoldLoc = FVector(500, 42, 270);
 	UFUNCTION(Server , Reliable)
 	void ServerRPC_Canopy(bool bOpen);
 	UPROPERTY(EditDefaultsOnly , Category="Canopy")
 	float CanopyRotatePitchValue = .3f;
 
 public:
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class USceneComponent* JetCanopyScene;
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
 	class UStaticMeshComponent* DummyCanopyMesh;
 

@@ -478,14 +478,16 @@ void AL_Viper::CreateDumyComp()
 #pragma endregion
 
 #pragma region Canopy
+	JetCanopyScene=CreateDefaultSubobject<USceneComponent>(TEXT("JetCanopyScene"));
+	JetCanopyScene->SetupAttachment(JetMesh);
+	JetCanopyScene->SetRelativeLocation(CanopyNormalLoc);
+	
 	DummyCanopyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyCanopyMesh"));
-	DummyCanopyMesh->SetupAttachment(JetMesh);
-	DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
+	DummyCanopyMesh->SetupAttachment(JetCanopyScene);
 
 	JetCanopy = CreateDefaultSubobject<UBoxComponent>(TEXT("JetCanopy"));
 	JetCanopy->SetupAttachment(DummyCanopyMesh);
 	JetCanopy->SetBoxExtent(FVector(3 , 6 , 3));
-	JetCanopy->SetRelativeLocation(FVector(522 , 42 , 269));
 	JetCanopy->SetGenerateOverlapEvents(true);
 	JetCanopy->OnClicked.AddDynamic(this , &AL_Viper::OnMyCanopyClicked);
 #pragma endregion
@@ -845,23 +847,27 @@ void AL_Viper::OnMyJFSHandle1Clicked(UPrimitiveComponent* TouchedComponent , str
 void AL_Viper::OnMyCanopyClicked(UPrimitiveComponent* TouchedComponent , struct FKey ButtonPressed)
 {
 	CRPC_PlaySwitchSound(TouchedComponent->GetComponentLocation());
-	auto currLoc = DummyCanopyMesh->GetRelativeLocation();
+	auto currLoc = JetCanopyScene->GetRelativeLocation();
+	// auto currLoc = DummyCanopyMesh->GetRelativeLocation();
 
-	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
+	if (FMath::Abs(currLoc.X - CanopyCloseLoc.X) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyHoldLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyHoldLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyHoldLoc);
 		CRPC_CanopyAudioControl(true , 1);
 		iCanopyNum = 3;
 	}
-	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
+	else if (FMath::Abs(currLoc.X - CanopyNormalLoc.X) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyCloseLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
 		CRPC_CanopyAudioControl(true , 0);
 		iCanopyNum = 2;
 	}
-	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
+	else if (FMath::Abs(currLoc.X - CanopyOpenLoc.X) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyNormalLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
 		CRPC_CanopyAudioControl(false);
 		iCanopyNum = 1;
 	}
@@ -1160,9 +1166,10 @@ void AL_Viper::F_ViperDevelopStarted(const struct FInputActionValue& value)
 			}
 			else if (ScenarioFront.Equals("Canopy"))
 			{
-				if (DummyCanopyMesh && iCanopyNum != 2)
+				if (JetCanopyScene && iCanopyNum != 2)
 				{
-					DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
+					JetCanopyScene->SetRelativeLocation(CanopyCloseLoc);
+					// DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
 					iCanopyNum = 2;
 				}
 
@@ -2430,26 +2437,30 @@ void AL_Viper::PerformLineTrace()
 #pragma region Move Canopy Hnd
 void AL_Viper::BackMoveCanopyHandle()
 {
-	CRPC_PlaySwitchSound(DummyCanopyMesh->GetComponentLocation());
+	CRPC_PlaySwitchSound(JetCanopyScene->GetComponentLocation());
 
-	auto currLoc = DummyCanopyMesh->GetRelativeLocation();
+	auto currLoc = JetCanopyScene->GetRelativeLocation();
+	// auto currLoc = DummyCanopyMesh->GetRelativeLocation();
 
 	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyCloseLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
 		if (CanopyPitch > 0)
 			CRPC_CanopyAudioControl(true , 1);
 		iCanopyNum = 2;
 	}
 	else if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyNormalLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
 		CRPC_CanopyAudioControl(false);
 		iCanopyNum = 1;
 	}
 	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
 	{
-		DummyCanopyMesh->SetRelativeLocation(CanopyOpenLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyOpenLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyOpenLoc);
 		if (CanopyPitch < 80)
 			CRPC_CanopyAudioControl(true , 0);
 		iCanopyNum = 0;
@@ -2934,7 +2945,8 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 		bCanopyOpenSound = false;
 		bCanopyCloseSound = false;
 		// 잠금
-		DummyCanopyMesh->SetRelativeLocation(CanopyHoldLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyHoldLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyHoldLoc);
 		if (!bCanopyHoldSound)
 		{
 			bCanopyHoldSound = true;
@@ -2948,7 +2960,8 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 		bCanopyNormalSound = false;
 		bCanopyOpenSound = false;
 		// 닫기
-		DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyCloseLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyCloseLoc);
 		if (!bCanopyCloseSound && CanopyPitch > 0)
 		{
 			bCanopyCloseSound = true;
@@ -2962,7 +2975,8 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 		bCanopyOpenSound = false;
 		bCanopyCloseSound = false;
 		// 중립
-		DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyNormalLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyNormalLoc);
 		if (!bCanopyNormalSound)
 		{
 			bCanopyNormalSound = true;
@@ -2976,7 +2990,8 @@ void AL_Viper::F_ThrottleAxis6(const struct FInputActionValue& value)
 		bCanopyNormalSound = false;
 		bCanopyNormalSound = false;
 		// 열기
-		DummyCanopyMesh->SetRelativeLocation(CanopyOpenLoc);
+		JetCanopyScene->SetRelativeLocation(CanopyOpenLoc);
+		// DummyCanopyMesh->SetRelativeLocation(CanopyOpenLoc);
 		if (!bCanopyOpenSound && CanopyPitch < 80)
 		{
 			bCanopyOpenSound = true;
@@ -3353,26 +3368,23 @@ void AL_Viper::StickRotation(const FRotator& NewRotation)
 
 void AL_Viper::SetCanopyGearLevel()
 {
-	auto currLoc = DummyCanopyMesh->GetRelativeLocation();
-	if (FVector::Dist(currLoc , CanopyHoldLoc) <= 1)
+	auto currLoc = JetCanopyScene->GetRelativeLocation();
+	// auto currLoc = DummyCanopyMesh->GetRelativeLocation();
+
+	if (FMath::Abs(currLoc.X - CanopyCloseLoc.X) <= 1)
 	{
 		CRPC_CanopyAudioControl(true , 1);
 		iCanopyNum = 3;
 	}
-	if (FVector::Dist(currLoc , CanopyCloseLoc) <= 1)
-	{
-		CRPC_CanopyAudioControl(true , 1);
-		iCanopyNum = 2;
-	}
-	else if (FVector::Dist(currLoc , CanopyNormalLoc) <= 1)
+	else if (FMath::Abs(currLoc.X - CanopyNormalLoc.X) <= 1)
 	{
 		CRPC_CanopyAudioControl(true , 0);
-		iCanopyNum = 1;
+		iCanopyNum = 2;
 	}
-	else if (FVector::Dist(currLoc , CanopyOpenLoc) <= 1)
+	else if (FMath::Abs(currLoc.X - CanopyOpenLoc.X) <= 1)
 	{
 		CRPC_CanopyAudioControl(false);
-		iCanopyNum = 0;
+		iCanopyNum = 1;
 	}
 }
 
