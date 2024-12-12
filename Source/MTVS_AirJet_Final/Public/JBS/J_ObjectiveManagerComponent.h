@@ -62,10 +62,7 @@ protected:
 	int curActiveMissionIdx = -1;
 		public:
 	__declspec(property(get = GetCurActiveMissionIdx, put = SetCurActiveMissionIdx)) int CUR_ACTIVE_MISSION_IDX;
-	int GetCurActiveMissionIdx()
-	{
-		return curActiveMissionIdx;
-	}
+	int GetCurActiveMissionIdx() {return curActiveMissionIdx;}
 	void SetCurActiveMissionIdx(int value);
 
     protected:
@@ -88,7 +85,7 @@ protected:
 	void ResSendResultData(const FAIFeedbackRes &resData);
 
     public:
-	// @@ 목표 전환 대기 시간 | 잘 처리 할 방법 궁리 필요
+	// 목표 전환 대기 시간
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float objSwitchInterval = 1.5f;
 
