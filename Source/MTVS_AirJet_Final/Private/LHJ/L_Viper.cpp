@@ -515,11 +515,11 @@ void AL_Viper::CreateDumyComp()
 	JetRotationStick->SetRelativeLocation(FVector(-1.9 , 0 , 28.5));
 	JetRotationStick->SetGenerateOverlapEvents(true);
 
-	RotationStickConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("RotationStickConstraint"));
-	RotationStickConstraint->SetupAttachment(DummyStick);
-	RotationStickConstraint->SetAngularSwing1Limit(ACM_Limited , 20.f);
-	RotationStickConstraint->SetAngularSwing2Limit(ACM_Limited , 20.f);
-	RotationStickConstraint->SetAngularTwistLimit(ACM_Locked , 45.f);
+	// RotationStickConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("RotationStickConstraint"));
+	// RotationStickConstraint->SetupAttachment(DummyStick);
+	// RotationStickConstraint->SetAngularSwing1Limit(ACM_Limited , 20.f);
+	// RotationStickConstraint->SetAngularSwing2Limit(ACM_Limited , 20.f);
+	// RotationStickConstraint->SetAngularTwistLimit(ACM_Locked , 45.f);
 }
 #pragma endregion
 

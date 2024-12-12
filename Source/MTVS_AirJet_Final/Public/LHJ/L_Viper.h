@@ -592,8 +592,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
 	class USkeletalMeshComponent* DummyStick;
-	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
-	class UPhysicsConstraintComponent* RotationStickConstraint;
+	// UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	// class UPhysicsConstraintComponent* RotationStickConstraint;
 #pragma endregion
 
 public:
