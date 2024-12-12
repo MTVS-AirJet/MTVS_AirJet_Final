@@ -27,12 +27,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
 	AActor* targetActor;
 
+	// 시작 시 활성화 유무
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
+	bool activeOnStart = false;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool enableBillboard = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool enableFixScale = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	bool enableFixHeight = true;
+
 public:
 	
 

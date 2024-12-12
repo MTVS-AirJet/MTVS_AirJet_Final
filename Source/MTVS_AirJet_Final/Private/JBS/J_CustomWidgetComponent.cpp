@@ -20,10 +20,9 @@ void UJ_CustomWidgetComponent::BeginPlay()
     // 원래 스케일 저장
     // orgUIScale = this->GetRelativeScale3D();
     orgUIScale = FVector::OneVector;
-    // FIXME
-    this->SetActive(false);
-	this->SetHiddenInGame(!false);
 
+    this->SetActive(activeOnStart);
+	this->SetHiddenInGame(!activeOnStart);
 }
 
 void UJ_CustomWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
