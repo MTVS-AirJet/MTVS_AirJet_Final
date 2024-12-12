@@ -561,6 +561,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bJFSHandle;
 
+	UPROPERTY(EditDefaultsOnly , Category="Components" , BlueprintReadOnly)
+	class USceneComponent* JetThrottleScene;
 	UPROPERTY(EditDefaultsOnly , Category="DumyComponents" , BlueprintReadOnly)
 	class UStaticMeshComponent* DummyThrottleMesh;
 	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite)

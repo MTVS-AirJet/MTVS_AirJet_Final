@@ -460,10 +460,13 @@ void AL_Viper::CreateDumyComp()
 #pragma endregion
 
 #pragma region Throttle
+	JetThrottleScene=CreateDefaultSubobject<USceneComponent>(TEXT("JetThrottleScene"));
+	JetThrottleScene->SetupAttachment(JetMesh);
+	JetThrottleScene->SetRelativeLocation(FVector(515 , -35 , 250));
+	
 	DummyThrottleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DummyThrottleMesh"));
-	DummyThrottleMesh->SetupAttachment(JetMesh);
+	DummyThrottleMesh->SetupAttachment(JetThrottleScene);
 	DummyThrottleMesh->SetRelativeScale3D(FVector(1.5 , 1.5 , 1.5));
-	DummyThrottleMesh->SetRelativeLocation(FVector(515 , -35 , 250));
 
 	JetFirstEngine = CreateDefaultSubobject<UBoxComponent>(TEXT("JetFirstEngine"));
 	JetFirstEngine->SetupAttachment(DummyThrottleMesh);
@@ -680,9 +683,12 @@ void AL_Viper::OnMyFirstEngineClicked(UPrimitiveComponent* TouchedComponent , FK
 	{
 		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 		auto per = SizeValue * 25 / 100;
-		DummyThrottleMesh->SetRelativeLocation(FVector(ThrottleOffLoc.X + per ,
-		                                               DummyThrottleMesh->GetRelativeLocation().Y ,
-		                                               DummyThrottleMesh->GetRelativeLocation().Z));
+		// DummyThrottleMesh->SetRelativeLocation(FVector(ThrottleOffLoc.X + per ,
+		//                                                DummyThrottleMesh->GetRelativeLocation().Y ,
+		//                                                DummyThrottleMesh->GetRelativeLocation().Z));
+		JetThrottleScene->SetRelativeLocation(FVector(ThrottleOffLoc.X + per ,
+		                                               JetThrottleScene->GetRelativeLocation().Y ,
+		                                               JetThrottleScene->GetRelativeLocation().Z));
 		AccelGear = 1;
 		bFirstEngine = true;
 	}
@@ -1659,7 +1665,8 @@ void AL_Viper::Tick(float DeltaTime)
 		FRotator jetRot = JetArrow->GetRelativeRotation();
 
 #pragma region Move Throttle
-		FVector engineLoc = DummyThrottleMesh->GetRelativeLocation();
+		FVector engineLoc = JetThrottleScene->GetRelativeLocation();
+		// FVector engineLoc = DummyThrottleMesh->GetRelativeLocation();
 
 		if (IsLocallyControlled())
 		{
@@ -1675,9 +1682,15 @@ void AL_Viper::Tick(float DeltaTime)
 						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
 						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
 						if (VecTrigger0.X - newEngineX < 0.2)
-							DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+						{
+							JetThrottleScene->SetRelativeLocation(VecTrigger0);
+							// DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+						}
 						else
-							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						{
+							JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+							// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						}
 					}
 				}
 				else if (intTriggerNum == 1)
@@ -1691,18 +1704,30 @@ void AL_Viper::Tick(float DeltaTime)
 						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
 						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 						if (ThrottleMilLoc.X - newEngineX < 0.2)
-							DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						{
+							JetThrottleScene->SetRelativeLocation(ThrottleMilLoc);
+							// DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						}
 						else
-							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						{
+							JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+							// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						}
 					}
 					if (engineLoc.X < VecTrigger1.X)
 					{
 						auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
 						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
 						if (VecTrigger1.X - newEngineX < 0.2)
-							DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+						{
+							JetThrottleScene->SetRelativeLocation(VecTrigger1);
+							// DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+						}
 						else
-							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						{
+							JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+							// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						}
 					}
 				}
 				else if (intTriggerNum == 2)
@@ -1712,15 +1737,22 @@ void AL_Viper::Tick(float DeltaTime)
 						auto newEngineX = engineLoc.X + ThrottleMoveSpeed1;
 						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 						if (ThrottleMilLoc.X - newEngineX < 0.2)
-							DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						{
+							JetThrottleScene->SetRelativeLocation(ThrottleMilLoc);
+							// DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+						}
 						else
-							DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						{
+							JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+							// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						}
 					}
 					else if (engineLoc.X < ThrottleMaxLoc.X)
 					{
 						auto newEngineX = engineLoc.X + ThrottleMoveSpeed2;
 						newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-						DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+						// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 					}
 				}
 			}
@@ -1733,7 +1765,8 @@ void AL_Viper::Tick(float DeltaTime)
 				else if (engineLoc.X > ThrottleOffLoc.X)
 					newEngineX = engineLoc.X - ThrottleMoveSpeed1;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
-				DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				JetThrottleScene->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
+				// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , engineLoc.Y , engineLoc.Z));
 			}
 		}
 #pragma endregion
@@ -2340,7 +2373,8 @@ void AL_Viper::SetAccelGear()
 {
 	// 기어 변동 구간
 	// 0%, 50%, 90%
-	auto currAccelGear = DummyThrottleMesh->GetRelativeLocation().X;
+	auto currAccelGear = JetThrottleScene->GetRelativeLocation().X;
+	// auto currAccelGear = DummyThrottleMesh->GetRelativeLocation().X;
 	auto currValue = currAccelGear - ThrottleOffLoc.X;
 	auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 	auto per = currValue / SizeValue * 100;
@@ -2851,7 +2885,9 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 
 		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 		auto moveValue = SizeValue * newData;
-		DummyThrottleMesh->
+		// DummyThrottleMesh->
+		// 	SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
+		JetThrottleScene->
 			SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
 	}
 	else
@@ -2881,7 +2917,9 @@ void AL_Viper::F_ThrottleAxis4(const struct FInputActionValue& value)
 
 		auto SizeValue = ThrottleMaxLoc.X - ThrottleOffLoc.X;
 		auto moveValue = SizeValue * newData;
-		DummyThrottleMesh->
+		// DummyThrottleMesh->
+		// 	SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
+		JetThrottleScene->
 			SetRelativeLocation(FVector(ThrottleOffLoc.X + moveValue , ThrottleOffLoc.Y , ThrottleOffLoc.Z));
 	}
 	DeviceThrottleCurrentValue = data;
@@ -3352,9 +3390,15 @@ void AL_Viper::SetThrottleLoc(const FVector& NewLocation, bool bIsAccel)
 				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger0.X);
 				if (VecTrigger0.X - newEngineX < 0.2)
-					DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+				{
+					JetThrottleScene->SetRelativeLocation(VecTrigger0);
+					// DummyThrottleMesh->SetRelativeLocation(VecTrigger0);
+				}
 				else
-					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				{
+					JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+					// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				}
 			}
 		}
 		else if (intTriggerNum == 1)
@@ -3368,18 +3412,30 @@ void AL_Viper::SetThrottleLoc(const FVector& NewLocation, bool bIsAccel)
 				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 				if (ThrottleMilLoc.X - newEngineX < 0.2)
-					DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				{
+					JetThrottleScene->SetRelativeLocation(ThrottleMilLoc);
+					// DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				}
 				else
-					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				{
+					JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+					// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				}
 			}
 			if (NewLocation.X < VecTrigger1.X)
 			{
 				auto newEngineX = NewLocation.X + ThrottleMoveSpeed2;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , VecTrigger1.X);
 				if (VecTrigger1.X - newEngineX < 0.2)
-					DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+				{
+					JetThrottleScene->SetRelativeLocation(VecTrigger1);
+					// DummyThrottleMesh->SetRelativeLocation(VecTrigger1);
+				}
 				else
-					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				{
+					JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+					// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				}
 			}
 		}
 		else if (intTriggerNum == 2)
@@ -3389,15 +3445,22 @@ void AL_Viper::SetThrottleLoc(const FVector& NewLocation, bool bIsAccel)
 				auto newEngineX = NewLocation.X + ThrottleMoveSpeed1;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMilLoc.X);
 				if (ThrottleMilLoc.X - newEngineX < 0.2)
-					DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				{
+					JetThrottleScene->SetRelativeLocation(ThrottleMilLoc);
+					// DummyThrottleMesh->SetRelativeLocation(ThrottleMilLoc);
+				}
 				else
-					DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				{
+					JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+					// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				}
 			}
 			else if (NewLocation.X < ThrottleMaxLoc.X)
 			{
 				auto newEngineX = NewLocation.X + ThrottleMoveSpeed2;
 				newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleMilLoc.X , ThrottleMaxLoc.X);
-				DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+				// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
 			}
 		}
 	}
@@ -3409,6 +3472,7 @@ void AL_Viper::SetThrottleLoc(const FVector& NewLocation, bool bIsAccel)
 		else if (NewLocation.X > ThrottleOffLoc.X)
 			newEngineX = NewLocation.X - ThrottleMoveSpeed1;
 		newEngineX = UKismetMathLibrary::FClamp(newEngineX , ThrottleOffLoc.X , ThrottleMaxLoc.X);
-		DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+		JetThrottleScene->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
+		// DummyThrottleMesh->SetRelativeLocation(FVector(newEngineX , NewLocation.Y , NewLocation.Z));
 	}
 }
