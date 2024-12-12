@@ -163,7 +163,7 @@ protected:
 -> 미션 시작 | StartMission
 -> 미션 데이터 호스트 게임 인스턴스 에서 가져오기 | LoadMissionData
 -> 미션 시작 지점 포인트 액터 생성 | InitMissionStartPoint
--> 전술명령 생성 및 초기화 | InitDefaultObj, InitObjectiveList
+-> 전술명령 생성 및 초기화 | objMan->InitDefaultObj, InitObjectiveList
 -> 플레이어 시작 위치 설정 | SetSpawnPoints // 지휘관 있었을때의 영향으로 역할에 따라 분류되서 가져옴
 -> 다른 액터들이 준비되도록 .1초 타이머 이후 세슘 액터 캐시 | CacheCesiumActors
 */

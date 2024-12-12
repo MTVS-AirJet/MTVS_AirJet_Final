@@ -16,23 +16,28 @@
 #include "JBS/J_JsonUtility.h"
 #include "TimerManager.h"
 
-// Sets default values for this component's properties
 UJ_ObjectiveManagerComponent::UJ_ObjectiveManagerComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
+#pragma region 생성단
+/*
+BeginPlay
+->주인 게임모드 캐시
+->이륙시 (시동, 이륙) 스킵 함수 바인드 | startTODel, SkipDefaultObj
 
-// Called when the game starts
+GM 에서 전술명령 생성 및 초기화 요청 | InitDefaultObj, InitObjectiveList
+->시동 , 이륙 목표 생성| SpawnObjActor
+->생성한 목표 기본 설정 | objActor->InitObjective
+->수행도 갱신 함수 바인드 | UpdateObjectiveSuccess
+->시동 목표는 종료시 이륙 목표 시작 함수 바인드 | StartTakeOffObj
+*/
 void UJ_ObjectiveManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
+	
 	// 주인 게임모드 설정
 	ownerGM = this->GetOwner<AJ_MissionGamemode>();
 
@@ -40,25 +45,9 @@ void UJ_ObjectiveManagerComponent::BeginPlay()
 	ownerGM->startTODel.AddDynamic(this, &UJ_ObjectiveManagerComponent::SkipDefaultObj);
 }
 
-
-// Called every frame
-void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-	if(enablePrintCurActiveMissionActor)
-	{
-		if(!CUR_ACTIVE_MISSION) return;
-		
-		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
-	}
-}
-
 void UJ_ObjectiveManagerComponent::InitDefaultObj()
 {
 	if(!GetOwner()->HasAuthority()) return;
-	// solved 전술명령 목표와는 별개로 동작하면서 비슷한 로직으로 구성
 	
 	for(auto& dmData : defaultObjDataAry)
 	{
@@ -79,19 +68,28 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 	}
 }
 
-// 기본 목표 시작 | 시동
-void UJ_ObjectiveManagerComponent::StartDefualtObj()
+// 목표 액터 스폰 
+AJ_BaseMissionObjective*  UJ_ObjectiveManagerComponent::SpawnObjActor(const ETacticalOrder& type, const FTransform &spawnTR)
 {
-	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("응애에요"));
+	// 목표 종류에 따라 프리팹 가져오기
+	const auto& prefab = objectiveActorPrefabMap[type];
 
-	auto* engineObj = defaultObjDataAry[0].objectiveActor;
-	check(engineObj);
+	// 항상 스폰 처리
+	FActorSpawnParameters params;
+	params.bNoFail = true;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	// 활성화
-	DelayedObjectiveActive(engineObj, 0.001f);
+	// 목표 액터 스폰
+	auto* objectiveActor = GetWorld()
+		->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR, params);
+
+	// 목표 액터 설정
+	objectiveActor->InitObjective(type, false);
+
+	return objectiveActor;
 }
 
-void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObject> missions)
+void UJ_ObjectiveManagerComponent::InitObjectiveList(const TArray<FMissionObject>& missions)
 {
 	// 목표 배열 초기화
 	objectiveDataAry.Init(FObjectiveData(), missions.Num());
@@ -121,26 +119,41 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(TArray<struct FMissionObjec
 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("목표 액터 추가 완료 개수 : %d"), objectiveDataAry.Num()));
 }
 
-// 목표 액터 스폰 
-AJ_BaseMissionObjective*  UJ_ObjectiveManagerComponent::SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR)
+#pragma endregion
+
+
+
+
+void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	// 목표 종류에 따라 프리팹 가져오기
-	auto prefab = objectiveActorPrefabMap[type];
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// 항상 스폰 처리
-	FActorSpawnParameters params;
-	params.bNoFail = true;
-	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	// 목표 액터 스폰
-	auto* objectiveActor = GetWorld()->SpawnActor<AJ_BaseMissionObjective>(prefab, spawnTR, params);
-
-	// 목표 액터 설정
-	objectiveActor->InitObjective(type, false);
-	
-
-	return objectiveActor;
+	// 디버그용 현재 활성화된 목표 표시
+	if(enablePrintCurActiveMissionActor)
+	{
+		if(!CUR_ACTIVE_MISSION) return;
+		
+		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
+	}
 }
+
+
+
+// 기본 목표 시작 | 시동
+void UJ_ObjectiveManagerComponent::StartDefualtObj()
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("응애에요"));
+
+	auto* engineObj = defaultObjDataAry[0].objectiveActor;
+	check(engineObj);
+
+	// 활성화
+	DelayedObjectiveActive(engineObj, 0.001f);
+}
+
+
+
+
 
 void UJ_ObjectiveManagerComponent::ActiveObjectiveByIdx(int mIdx, bool isFirst)
 {

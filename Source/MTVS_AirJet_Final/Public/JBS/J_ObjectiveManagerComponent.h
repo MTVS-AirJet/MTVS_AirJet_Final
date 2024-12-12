@@ -96,7 +96,7 @@ protected:
 	
 
 	// 목표 액터 생성 및 설정
-	class AJ_BaseMissionObjective* SpawnObjActor(ETacticalOrder type, const FTransform &spawnTR = FTransform());
+	class AJ_BaseMissionObjective* SpawnObjActor(const ETacticalOrder& type, const FTransform &spawnTR = FTransform());
 
 	// 미션 시작시 기본 목표(시동/이륙) 종료 처리
 	UFUNCTION(BlueprintCallable)
@@ -113,7 +113,7 @@ protected:
 	// 레벨 시작 시 시동/이륙 목표 설정
     void InitDefaultObj();
     // 미션 시작 시 목표 리스트 설정
-    void InitObjectiveList(TArray<struct FMissionObject> missions);
+    void InitObjectiveList(const TArray<struct FMissionObject>& missions);
 
 	// 해당 목표 활성화
     void ActiveObjectiveByIdx(int mIdx, bool isFirst = false);
