@@ -128,7 +128,7 @@ void AJ_BaseMissionObjective::InitBindDel()
 	objectiveEndDel.AddDynamic(this, &AJ_BaseMissionObjective::EndObjUI);
 }
 
-// 목표 타입, 초기 활성 여부 (false 만 사용) 설정
+// 목표 타입, 초기 활성 여부 (사실상 false 만 사용) 설정
 void AJ_BaseMissionObjective::InitObjective(ETacticalOrder type, bool initActive)
 {
 	orderType = type;
