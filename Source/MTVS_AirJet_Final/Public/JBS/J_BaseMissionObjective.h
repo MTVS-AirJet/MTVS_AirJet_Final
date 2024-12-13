@@ -9,7 +9,7 @@
 #include "J_BaseMissionObjective.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, float);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSendSuccessDelegate, AJ_BaseMissionObjective*, objActor, float, successPercent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FObjectiveEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FObjectiveActiveDelegate);
 DECLARE_MULTICAST_DELEGATE(FObjectiveSuccessUpdateDelegate);
@@ -105,6 +105,7 @@ public:
 	// 미션 수행도 갱신 딜리게이트
 	FObjectiveSuccessUpdateDelegate objSuccessUpdateDel;
 	// 미션 수행도 전송 딜리게이트
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintCallable, BlueprintAssignable, Category="Default|Delegate")
 	FSendSuccessDelegate sendObjSuccessDel;
 #pragma endregion
 

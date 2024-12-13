@@ -15,17 +15,7 @@ class MTVS_AIRJET_FINAL_API UJ_ObjectiveManagerComponent : public UActorComponen
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UJ_ObjectiveManagerComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 protected:
 	// 주인 게임모드 액터
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
@@ -43,18 +33,14 @@ protected:
 	TArray<FObjectiveData> objectiveDataAry;
 
 	// 현재 진행 중인 미션 | Set 은 인덱스를 통하기
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Default|Objects")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, BlueprintGetter=GetCurActiveMission, BlueprintSetter=SetCurActiveMission, Category="Default|Objects")
 	class AJ_BaseMissionObjective* curActiveMission = nullptr;
 		public:
 	__declspec(property(get = GetCurActiveMission, put = SetCurActiveMission)) class AJ_BaseMissionObjective* CUR_ACTIVE_MISSION;
-	class AJ_BaseMissionObjective* GetCurActiveMission()
-	{
-		return curActiveMission;
-	}
-	void SetCurActiveMission(class AJ_BaseMissionObjective* value)
-	{
-		curActiveMission = value;
-	}
+	UFUNCTION(BlueprintGetter)
+	class AJ_BaseMissionObjective* GetCurActiveMission() {return curActiveMission;}
+	UFUNCTION(BlueprintSetter)
+	void SetCurActiveMission(class AJ_BaseMissionObjective* value) {curActiveMission = value;}
 		protected:
 
 	// 현재 진행 중인 인덱스
@@ -64,9 +50,7 @@ protected:
 	__declspec(property(get = GetCurActiveMissionIdx, put = SetCurActiveMissionIdx)) int CUR_ACTIVE_MISSION_IDX;
 	int GetCurActiveMissionIdx() {return curActiveMissionIdx;}
 	void SetCurActiveMissionIdx(int value);
-
-    protected:
-
+		protected:
 
 	// 미션 클리어
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
@@ -80,52 +64,104 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Debug")
 	bool enablePrintCurActiveMissionActor = false;
 
-	// 결산 ai 피드백 데이터 보내기
-	UFUNCTION(BlueprintCallable)
-	void ResSendResultData(const FAIFeedbackRes &resData);
-
-    public:
+public:
 	// 목표 전환 대기 시간
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
 	float objSwitchInterval = 1.5f;
 
 protected:
-	
+#pragma region 생성단
+/*
+BeginPlay
+-> 주인 게임모드 캐시
+-> 이륙시 (시동, 이륙) 스킵 함수 바인드 | startTODel => SkipDefaultObj
 
+GM 에서 전술명령 생성 및 초기화 요청 | InitDefaultObj
+-> 시동 , 이륙 목표 생성| SpawnObjActor
+-> 생성한 목표 기본 설정 | objActor->InitObjective
+-> 시동 목표는 종료시 이륙 목표 시작 함수 바인드 | objectiveEndDel => StartTakeOffObj
+-> 미션 데이터 대로 전술명령들 생성 | InitObjectiveList
+-> 보정된 스폰 지점 계산 | GetTransform 
+-> 목표 생성 | SpawnObjActor
+-> 목표 완료시 다음 목표 활성화 | objectiveEndDel => ActiveNextObjective
+-> 목표 완료시 수행도 갱신 함수 바인드 | sendObjSuccessDel => UpdateObjectiveSuccess
+
+호스트의 시작 팝업 종료시 시동 목표 시작 | GM->StartDefaultObjective
+-> 시동 목표 시작 | StartDefualtObj
+-> 목표 활성화 | DelayedObjectiveActive => obj->IS_OBJECTIVE_ACTIVE = true
+-> 시동 목표 종료시 이륙 목표 시작 | StartTakeOffObj
+*/
+protected:
+	virtual void BeginPlay() override;
+public:
+	// 레벨 시작 시 시동/이륙 목표 설정
+    void InitDefaultObj();
+
+    // 미션 시작 시 목표 리스트 설정
+    void InitObjectiveList(const TArray<struct FMissionObject>& missions);
+
+	// 기본 목표 시작
+	void StartDefualtObj();
+protected:
 	// 목표 액터 생성 및 설정
 	class AJ_BaseMissionObjective* SpawnObjActor(const ETacticalOrder& type, const FTransform &spawnTR = FTransform());
-
-	// 미션 시작시 기본 목표(시동/이륙) 종료 처리
-	UFUNCTION(BlueprintCallable)
-	void SkipDefaultObj(bool isSuccess);
 
 	// 시동 절차 끝날때 이륙 절차 시작
 	UFUNCTION(BlueprintCallable)
 	void StartTakeOffObj();
 
-    public:
-	// 미션 클리어
-	UFUNCTION(BlueprintCallable)
-	void MissionComplete();
-	// 레벨 시작 시 시동/이륙 목표 설정
-    void InitDefaultObj();
-    // 미션 시작 시 목표 리스트 설정
-    void InitObjectiveList(const TArray<struct FMissionObject>& missions);
+#pragma endregion
+#pragma region 목표 진행단
+/*
+GM 에서 이륙 처리 후 전술명령 시작 | ActiveNextObjective
+-> 현재 활성 목표 idx 증가 | SetCurActiveMissionIdx
+-> 결산 체크 | true => MissionComplete
+-> 해당 인덱스 목표 활성화 | ActiveObjectiveByIdx
+-> 딜레이후 목표 활성화 | DelayedObjectiveActive
 
+이륙시 미종료된 기본 목표 (시동,이륙) 종료 | SkipDefaultObj | 디버그 시 실행됨
+
+목표 수행도 업데이트 | UpdateObjectiveSuccess
+*/
+public:
+	// 다음 목표 활성화 | 목표에 바인드
+	UFUNCTION(BlueprintCallable)
+    void ActiveNextObjective();
+protected:
 	// 해당 목표 활성화
     void ActiveObjectiveByIdx(int mIdx, bool isFirst = false);
 
 	// 딜레이된 목표 활성화
     void DelayedObjectiveActive(class AJ_BaseMissionObjective *obj, float delayTime);
 
-    // 다음 목표 활성화 | 목표에 바인드
+	// 미션 시작시 기본 목표(시동/이륙) 종료 처리
 	UFUNCTION(BlueprintCallable)
-    void ActiveNextObjective();
+	void SkipDefaultObj(bool isSuccess);
 
 	// 목표 수행도 갱신
 	UFUNCTION(BlueprintCallable)
 	void UpdateObjectiveSuccess(class AJ_BaseMissionObjective* objActor, float successPercent);
 
-	// 기본 목표 시작
-	void StartDefualtObj();
+#pragma endregion
+#pragma region 미션 종료(결산) 단
+/*
+미션 종료 딜리게이트 실행 | missionEndDel
+-> 모든 목표 데이터 결합 | fullObjData
+-> AI 피드백 요청 | RequestExecute | EJsonType::AI_FEEDBACK , aiFeedbackResUseDel => ResSendResultData
+-> 결산 UI 전환 | pc->CRPC_SwitchResultUI
+-> AI 피드백 도착 | ResSendResultData
+-> 결산 UI에 전달 | pc->objUIComp->CRPC_SetResultAIFeedback
+*/
+protected:
+	// 미션 클리어
+	UFUNCTION(BlueprintCallable)
+	void MissionComplete();
+
+	// 결산 ai 피드백 데이터 보내기
+	UFUNCTION(BlueprintCallable)
+	void ResSendResultData(const FAIFeedbackRes &resData);
+#pragma endregion
+
+public:	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

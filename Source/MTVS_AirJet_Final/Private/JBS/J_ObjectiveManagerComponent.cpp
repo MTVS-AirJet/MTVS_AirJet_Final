@@ -16,6 +16,7 @@
 #include "Math/MathFwd.h"
 #include "JBS/J_JsonUtility.h"
 #include "TimerManager.h"
+#include "UObject/ObjectPtr.h"
 
 UJ_ObjectiveManagerComponent::UJ_ObjectiveManagerComponent()
 {
@@ -69,7 +70,7 @@ void UJ_ObjectiveManagerComponent::InitDefaultObj()
 		dmData.objectiveActor = objActor;
 
 		// 목표 수행도 갱신함수 바인드
-		objActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
+		objActor->sendObjSuccessDel.AddDynamic(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
 		
 		// 시동 절차 끝나고 이륙 절차 시작
 		if(dmData.objType == ETacticalOrder::ENGINE_START)
@@ -118,7 +119,7 @@ void UJ_ObjectiveManagerComponent::InitObjectiveList(const TArray<FMissionObject
 		// 목표 완료시 다음 목표 활성화 바인드
 		objectiveActor->objectiveEndDel.AddDynamic(this, &UJ_ObjectiveManagerComponent::ActiveNextObjective);
 		// 목표 수행도 갱신함수 바인드
-		objectiveActor->sendObjSuccessDel.AddUObject(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
+		objectiveActor->sendObjSuccessDel.AddDynamic(this, &UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess);
 	
 		// 목표 액터 배열에 추가
 		// 순서대로 추가하기위해 pinNo 사용
@@ -165,12 +166,17 @@ void UJ_ObjectiveManagerComponent::StartTakeOffObj()
 
 #pragma endregion
 
-#pragma region 목표 활성화단
+#pragma region 목표 진행단
 /*
 GM 에서 이륙 처리 후 전술명령 시작 | ActiveNextObjective
 -> 현재 활성 목표 idx 증가 | SetCurActiveMissionIdx
 -> 결산 체크 | true => MissionComplete
 -> 해당 인덱스 목표 활성화 | ActiveObjectiveByIdx
+-> 딜레이후 목표 활성화 | DelayedObjectiveActive
+
+이륙시 미종료된 기본 목표 (시동,이륙) 종료 | SkipDefaultObj | 디버그 시 실행됨
+
+목표 수행도 업데이트 | UpdateObjectiveSuccess
 */
 
 void UJ_ObjectiveManagerComponent::ActiveNextObjective()
@@ -231,18 +237,56 @@ void UJ_ObjectiveManagerComponent::DelayedObjectiveActive(AJ_BaseMissionObjectiv
 	}, delayTime, false);
 }
 
-#pragma endregion
+void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
+{
+	// 사용 목표 찾기
+	FObjectiveData* data = nullptr;
+	// 배열 복사 싫어서 const_cast 사용 멤버변수니깐 괜찮겠지
+	for(const auto& dataAry : {defaultObjDataAry, objectiveDataAry})
+	{
+		// 탐색
+		const auto* tempData = dataAry.FindByPredicate([objActor](const FObjectiveData& objData)
+		{
+			return objData.objectiveActor == objActor;
+		});
 
-#pragma region 목표 데이터 처리 단
+		// 탐색시 종료
+		if(tempData)
+		{
+			data = const_cast<FObjectiveData*>(tempData);
+			break;
+		}
+	}
+	
+	// 갱신
+	data->successPercent = successPercent;
+}
+
+void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
+{
+	for(const FObjectiveData& objData : defaultObjDataAry)
+	{
+		// 안 끝난 기본 목표 종료 처리
+		auto* objActor = objData.objectiveActor;
+		if(!objActor || objActor->IS_OBJ_ENDED) continue;
+
+		// 기본값 처리
+		objActor->SUCCESS_PERCENT = 0.5f;
+		// 종료
+		objActor->ObjectiveEnd(isSuccess);
+	}
+}
 
 #pragma endregion
 
 #pragma region 미션 종료(결산) 단
 /*
 미션 종료 딜리게이트 실행 | missionEndDel
-모든 목표 데이터 결합 | fullObjData
-AI 피드백 요청 | RequestExecute | EJsonType::AI_FEEDBACK , aiFeedbackResUseDel => ResSendResultData
-->
+-> 모든 목표 데이터 결합 | fullObjData
+-> AI 피드백 요청 | RequestExecute | EJsonType::AI_FEEDBACK , aiFeedbackResUseDel => ResSendResultData
+-> 결산 UI 전환 | pc->CRPC_SwitchResultUI
+-> AI 피드백 도착 | ResSendResultData
+-> 결산 UI에 전달 | pc->objUIComp->CRPC_SetResultAIFeedback
 */
 void UJ_ObjectiveManagerComponent::MissionComplete()
 {
@@ -262,12 +306,12 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	auto* gi = UJ_Utility::GetKGameInstance(GetWorld());
 	gi->aiFeedbackResUseDel.BindUObject(this, &UJ_ObjectiveManagerComponent::ResSendResultData);
 
-	// 결과 데이터 제작
+	// 수행도 결과 배열
 	TArray<float> spAry;
     Algo::Transform(fullObjData, spAry, [](FObjectiveData temp){
         return temp.successPercent;
     });
-    //캐스트 후
+	// 수행도 결과 데이터
     const FAIFeedbackReq feedbackReq(spAry);
 
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
@@ -302,60 +346,6 @@ void UJ_ObjectiveManagerComponent::ResSendResultData(const FAIFeedbackRes &resDa
 #pragma endregion
 
 #pragma region 기타
-
-#pragma endregion
-
-
-
-
-
-
-
-
-
-
-
-void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
-{
-	// 사용 목표 찾기
-	FObjectiveData* data = defaultObjDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
-	{
-		return objData.objectiveActor == objActor;
-	});
-
-	if(!data)
-	{
-		data = objectiveDataAry.FindByPredicate([objActor](const FObjectiveData& objData)
-		{
-			return objData.objectiveActor == objActor;
-		});
-	}
-	// 내가 기어코 구조체 포인터를 쓰는구나
-
-	// 갱신
-	data->successPercent = successPercent;
-
-	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("도당체 : %.2f"), data.successPercent));
-}
-
-
-
-void UJ_ObjectiveManagerComponent::SkipDefaultObj(bool isSuccess)
-{
-	for(const FObjectiveData& objData : defaultObjDataAry)
-	{
-		// 안 끝난 기본 목표 종료 처리
-		auto* objActor = objData.objectiveActor;
-		if(!objActor || objActor->IS_OBJ_ENDED) continue;
-
-		// 수행도는 0으로
-		objActor->SUCCESS_PERCENT = 0.f;
-		// 종료
-		objActor->ObjectiveEnd(isSuccess);
-	}
-}
-
-
 void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -363,8 +353,11 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	// 디버그용 현재 활성화된 목표 표시
 	if(enablePrintCurActiveMissionActor)
 	{
-		if(!CUR_ACTIVE_MISSION) return;
-		
-		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
+		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s")
+			,CUR_ACTIVE_MISSION ?
+				*CUR_ACTIVE_MISSION->GetName()
+				: TEXT("없음")));
 	}
 }
+
+#pragma endregion
