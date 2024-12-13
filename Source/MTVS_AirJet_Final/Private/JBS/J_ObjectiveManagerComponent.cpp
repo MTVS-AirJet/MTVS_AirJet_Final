@@ -263,12 +263,12 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	gi->aiFeedbackResUseDel.BindUObject(this, &UJ_ObjectiveManagerComponent::ResSendResultData);
 
 	// 결과 데이터 제작
-	TArray<float> successPercentAry;
-    Algo::Transform(fullObjData, successPercentAry, [](FObjectiveData temp){
+	TArray<float> spAry;
+    Algo::Transform(fullObjData, spAry, [](FObjectiveData temp){
         return temp.successPercent;
     });
     //캐스트 후
-    FAIFeedbackReq feedbackReq(successPercentAry);
+    const FAIFeedbackReq feedbackReq(spAry);
 
 	// 서버에 요청 시작 -> 1~4 단계를 거쳐 바인드한 함수에 데이터가 들어옴.
 	UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::AI_FEEDBACK, feedbackReq);
@@ -289,6 +289,16 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 	}, objSwitchInterval, false);
 }
 
+void UJ_ObjectiveManagerComponent::ResSendResultData(const FAIFeedbackRes &resData)
+{
+	// 결과 데이터 결과 ui에 전달
+	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
+	for(auto* pc : allPC)
+	{
+		pc->objUIComp->CRPC_SetResultAIFeedback(resData);
+	}
+}
+
 #pragma endregion
 
 #pragma region 기타
@@ -303,15 +313,7 @@ void UJ_ObjectiveManagerComponent::MissionComplete()
 
 
 
-void UJ_ObjectiveManagerComponent::ResSendResultData(const FAIFeedbackRes &resData)
-{
-	// 결과 데이터 결과 ui에 전달
-	auto allPC = UJ_Utility::GetAllMissionPC(GetWorld());
-	for(auto* pc : allPC)
-	{
-		pc->objUIComp->CRPC_SetResultAIFeedback(resData);
-	}
-}
+
 
 void UJ_ObjectiveManagerComponent::UpdateObjectiveSuccess(AJ_BaseMissionObjective* objActor, float successPercent)
 {

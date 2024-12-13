@@ -357,7 +357,7 @@ void UJ_ObjectiveUIComp::CreateUIData(const FFormationFlightUIData &data, TArray
 	FRichString tf1(TEXT("팀의 대형 유지 여부 : "), ETextStyle::OBJDETAIL);
 	// +
 	FString isFormationstr = UJ_Utility::ToStringBool(data.isCorrectPosition);
-	ETextStyle tf2Style = data.isCorrectPosition ? ETextStyle::OBJDETAILSUCCESS : ETextStyle::OBJDETAILFAIL;
+	ETextStyle tf2Style = data.isCorrectPosition ? ETextStyle::SUCCESS : ETextStyle::FAIL;
 
 	FRichString tf2(UJ_Utility::ToStringBool(data.isCorrectPosition), tf2Style);
 
