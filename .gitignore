@@ -84,3 +84,4 @@ DerivedDataCache/*
 *.xml
 *.tps
 /Samples/PixelStreaming/WebServers/Frontend/implementations
+/Builds
