@@ -223,7 +223,7 @@ void AJ_MissionGamemode::PostLogin(APlayerController *newPlayer)
         auto* gi = UJ_Utility::GetJGameInstance(GetWorld());
         if(gi->authorValue.IsEmpty())
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("디버그용 임시 로그인 처리"));
+            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("디버그용 임시 로그인 처리"));
 
             FLoginReq tempLogin(TEXT("user"), TEXT("1234"));
 

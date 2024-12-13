@@ -330,7 +330,7 @@ void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
 {
     if(!enableReqAllVoice)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("전체 미션 보이스 요청 안함(낭비 방지)"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("전체 미션 보이스 요청 안함(낭비 방지)"));
         return;
     }
     
@@ -339,7 +339,7 @@ void AJ_MissionPlayerController::CRPC_ReqMissionVoiceData_Implementation()
     gi->allVoiceResUseDel.BindUObject(this, &AJ_MissionPlayerController::ResMissionVoiceData);
 
     UJ_JsonUtility::RequestExecute(GetWorld(), EJsonType::ALL_VOICE);
-    GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 시작"));
+    // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 시작"));
 }
 
 
@@ -352,7 +352,7 @@ void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData
         return;
     }
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("미션 전체 보이스 데이터 받음"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("미션 전체 보이스 데이터 받음"));
     }
 
     // base64 데이터 wav로 변환

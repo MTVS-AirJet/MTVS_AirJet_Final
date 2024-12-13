@@ -61,7 +61,7 @@ void AJ_ObjectiveNeutralizeTarget::SpawnGroundTarget()
     bool getSpawnTR = CalcSpawnTransform(spawnTR);
     if(!getSpawnTR)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("지상 목표 위치 대체 생성"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("지상 목표 위치 대체 생성"));
     }
 
     // 스폰 | 사실상 1개만 스폰
