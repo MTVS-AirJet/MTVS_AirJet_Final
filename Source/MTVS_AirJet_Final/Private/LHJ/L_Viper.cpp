@@ -2505,12 +2505,14 @@ void AL_Viper::ServerRPC_Wheel_Implementation()
 #pragma region Voice Chat
 void AL_Viper::StartVoiceChat()
 {
-	GetController<AJ_MissionPlayerController>()->StartTalking();
+	auto pc = GetWorld()->GetFirstPlayerController();
+	pc->StartTalking();
 }
 
 void AL_Viper::StopVoiceChat()
 {
-	GetController<AJ_MissionPlayerController>()->StopTalking();
+	auto pc = GetWorld()->GetFirstPlayerController();
+	pc->StopTalking();
 }
 #pragma endregion
 
