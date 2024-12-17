@@ -324,8 +324,8 @@ void UK_ServerWidget::JoinRoom()
 void UK_ServerWidget::OpenCreaterWeb()
 {
 	// 웹 브라우저 팝업을 열고 특정 URL을 설정
-	//FString URL = TEXT("http://125.132.216.190:7759/"); // 원하는 URL 입력
-	FString URL = TEXT("http://3.35.17.2:7759/"); // 원하는 URL 입력
+	FString URL = TEXT("http://125.132.216.190:7759/"); // 원하는 URL 입력
+	//FString URL = TEXT("http://3.35.17.2:7759/"); // 원하는 URL 입력
 	if (HostMenu_web_Popup)
 	{
 		HostMenu_web_Popup->LoadURL(URL);

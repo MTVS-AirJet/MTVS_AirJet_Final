@@ -859,6 +859,15 @@ public:
 	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Default|Move")
 	float MaxRotationAngle = 15.f;
 
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Default|Move")
+	float KeyboardBankRollDiv = 9.f;
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Default|Move")
+	float KeyboardBankPitchDiv = 8.f;
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Default|Move")
+	float KeyboardRollDiv = 5.f;
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Default|Move")
+	float KeyboardPitchDiv = 10.f;
+
 	// 현재 회전 상태를 쿼터니언으로 저장
 	UPROPERTY()
 	FQuat QuatCurrentRotation = FQuat::Identity;

@@ -1190,13 +1190,13 @@ void AL_Viper::F_ViperMoveTrigger(const struct FInputActionValue& value)
 
 	if ((moveVector.Y > 0.6f || moveVector.Y < -0.6f) && (moveVector.X > 0.6f || moveVector.X < -0.6f))
 	{
-		RollAngle = moveVector.Y * MaxRotationAngle / 9.f;
-		PitchAngle = moveVector.X * MaxRotationAngle / 8.f;
+		RollAngle = moveVector.Y * MaxRotationAngle / KeyboardBankRollDiv;
+		PitchAngle = moveVector.X * MaxRotationAngle / KeyboardBankPitchDiv;
 	}
 	else
 	{
-		RollAngle = moveVector.Y * MaxRotationAngle / 5.f;
-		PitchAngle = moveVector.X * MaxRotationAngle / 10.f;
+		RollAngle = moveVector.Y * MaxRotationAngle / KeyboardRollDiv;
+		PitchAngle = moveVector.X * MaxRotationAngle / KeyboardPitchDiv;
 	}
 
 	// Roll과 Pitch를 쿼터니언 회전으로 변환
