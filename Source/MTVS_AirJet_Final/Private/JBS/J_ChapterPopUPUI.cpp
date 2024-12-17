@@ -13,8 +13,8 @@ void UJ_ChapterPopUPUI::SetPopupText(const EMissionProcess& mpIdx, const FString
     // @@ 초상화 바뀔일이 있을까?
 
     // 새 딜레이 시간 적용
-    if(newDelayTime > 0.1f)
-        deActiveDelay = newDelayTime;
+    // if(newDelayTime > 0.1f)
+    //     deActiveDelay = newDelayTime;
 
     SetActive(true);
 
@@ -43,13 +43,13 @@ void UJ_ChapterPopUPUI::SetActive(bool value)
         activeDel.Broadcast();
 
         // 시트에 정해진 시간 이후에 비활성화
-        auto& tm = GetWorld()->GetTimerManager();
-        tm.ClearTimer(deactiveTimer);
+        // auto& tm = GetWorld()->GetTimerManager();
+        // tm.ClearTimer(deactiveTimer);
 
-        tm.SetTimer(deactiveTimer, [this]() mutable
-        {
-            PlayDeactiveAnim();
-        }, deActiveDelay, false);
+        // tm.SetTimer(deactiveTimer, [this]() mutable
+        // {
+        //     PlayDeactiveAnim();
+        // }, deActiveDelay, false);
     }
     else
         deactiveDel.Broadcast();

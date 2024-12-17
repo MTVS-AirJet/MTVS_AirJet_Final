@@ -645,8 +645,11 @@ void UJ_ObjectiveUIComp::CRPC_ActivePopupUI_Implementation(const EMissionProcess
 
 void UJ_ObjectiveUIComp::DeactivatePopupUI()
 {
-	GetWorld()->GetTimerManager().ClearTimer(OBJ_UI->POPUP_UI->deactiveTimer);
-	OBJ_UI->POPUP_UI->PlayDeactiveAnim();
+	if(objUI->POPUP_UI->GetVisibility() == ESlateVisibility::Visible)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(OBJ_UI->POPUP_UI->deactiveTimer);
+		OBJ_UI->POPUP_UI->PlayDeactiveAnim();
+	}
 }
 
 void UJ_ObjectiveUIComp::SRPC_DeactivatedPopupUI_Implementation()
