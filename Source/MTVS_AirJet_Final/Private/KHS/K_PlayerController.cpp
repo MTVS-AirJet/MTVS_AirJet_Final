@@ -69,13 +69,13 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 
 	CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	//로그찍기
-	LOG_S(Warning , TEXT("KPlayerController OnPossess!!!!!"));
-	LOG_S(Warning , TEXT("PlayerController %s possessed pawn %s") , *GetName() , *InPawn->GetName());
-	LOG_S(Warning , TEXT("Current Map Name : %s") , *CurrentMapName);
-	LOG_S(Warning , TEXT("Current Player Controller Count : %d") , GetWorld()->GetNumPlayerControllers());
+	// LOG_S(Warning , TEXT("KPlayerController OnPossess!!!!!"));
+	// LOG_S(Warning , TEXT("PlayerController %s possessed pawn %s") , *GetName() , *InPawn->GetName());
+	// LOG_S(Warning , TEXT("Current Map Name : %s") , *CurrentMapName);
+	// LOG_S(Warning , TEXT("Current Player Controller Count : %d") , GetWorld()->GetNumPlayerControllers());
 	TArray<AActor*> outActor;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld() , AL_Viper::StaticClass() , outActor);
-	LOG_S(Warning , TEXT("Current Viper Count : %d") , outActor.Num());
+	// LOG_S(Warning , TEXT("Current Viper Count : %d") , outActor.Num());
 
 
 	// 서버에서 Pawn 타입을 확인하고 적절한 UI 설정 함수를 호출
@@ -85,7 +85,7 @@ void AK_PlayerController::OnPossess(APawn* InPawn)
 		//CRPC로 StandbyUI세팅하고 IMC맵핑
 		CRPC_SetIMCnCreateStandbyUI();
 		CRPC_SetMissionUI();
-		LOG_S(Warning , TEXT("KPlayerzController Call Server_NotifyPawnPossessed!!!!!"));
+		// LOG_S(Warning , TEXT("KPlayerzController Call Server_NotifyPawnPossessed!!!!!"));
 	}
 }
 
@@ -114,7 +114,7 @@ void AK_PlayerController::SRPC_StartGame_Implementation()
 	if(pc != this)
 		return;
 	
-	LOG_S(Warning , TEXT("Start Game SRPC is Called"));
+	// LOG_S(Warning , TEXT("Start Game SRPC is Called"));
 	//월드에 존재하는 PlayerController배열 받기
 	KGameState = CastChecked<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
 	TArray<AK_PlayerController*> allPC;
@@ -174,13 +174,13 @@ void AK_PlayerController::CRPC_SetMissionUI_Implementation()
 		CurrentMapName = UGameplayStatics::GetCurrentLevelName(GetWorld());
 		if (MissionTextUI && CurrentMapName == FString::Printf(TEXT("CesiumTest")))
 		{
-			LOG_S(Warning , TEXT("MissionTextUI Create Success"));
+			// LOG_S(Warning , TEXT("MissionTextUI Create Success"));
 			MissionTextUI->AddToViewport();
 			MissionTextUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-	else
-		LOG_S(Warning , TEXT("Is Not Local Controller"));
+	//else
+		// LOG_S(Warning , TEXT("Is Not Local Controller"));
 }
 //타클래스 MissionUI 세팅 함수
 void AK_PlayerController::CRPC_SetMissionTextUI_Implementation(int32 MissionIdx)
@@ -208,7 +208,7 @@ void AK_PlayerController::ToggleCommonWidget(const FInputActionValue& value)
 
 	if (nullptr == CommonWidget)
 	{
-		LOG_S(Warning , TEXT("CommonWidget is not Valid"));
+		// LOG_S(Warning , TEXT("CommonWidget is not Valid"));
 		return;
 	}
 	//플래그에 따라 UI상태 제어
@@ -238,7 +238,7 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 	UWorld* World = GetWorld();
 	if (!World)
 	{
-		UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
+		// UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
 		return; // World가 유효하지 않으면
 	}
 
@@ -246,7 +246,7 @@ void AK_PlayerController::ToggleMouseCursor(const FInputActionValue& value)
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if (!PlayerController)
 	{
-		UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
+		// UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
 		return; // PlayerController가 유효하지 않으면 
 	}
 
@@ -295,18 +295,18 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 		{
 			if (nullptr == IMC_Viper)
 			{
-				UE_LOG(LogTemp , Log , TEXT("nullptr == IMC_Viper"));
+				// UE_LOG(LogTemp , Log , TEXT("nullptr == IMC_Viper"));
 			}
 			else
 			{
 				Subsystem->ClearAllMappings();
 				Subsystem->AddMappingContext(IMC_Viper , 0);
-				UE_LOG(LogTemp , Log , TEXT("EnhancedInputMappingContext Mapping Complete"));
+				// UE_LOG(LogTemp , Log , TEXT("EnhancedInputMappingContext Mapping Complete"));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp , Error , TEXT("Subsystem == null"));
+			// UE_LOG(LogTemp , Error , TEXT("Subsystem == null"));
 		}
 
 		StandbyUI = CreateWidget<UK_StandbyWidget>(this , StandbyUIFactory);
@@ -327,8 +327,8 @@ void AK_PlayerController::CRPC_SetIMCnCreateStandbyUI_Implementation()
 			//StandbyUI->InitializeMissionData(); // 서버에서 설정한 데이터와 동기화
 		}
 	}
-	else
-	LOG_S(Warning , TEXT("Is Not Local Controller"));
+	//else
+	// LOG_S(Warning , TEXT("Is Not Local Controller"));
 }
 
 // 클라이언트를 로비 레벨로 트래블시키는 함수

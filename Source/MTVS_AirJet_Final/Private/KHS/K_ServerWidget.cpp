@@ -48,7 +48,7 @@ void UK_ServerWidget::NativeConstruct()
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (!GameInstance)
 	{
-		UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
+		// UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
 	}
 }
 
@@ -118,7 +118,7 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 		{
 			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
 			PlayAnimation(ShowServerMenuAnim);
-			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+			// UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 
 			if (WidgetInterface)
 				WidgetInterface->RefreshServerList();
@@ -137,7 +137,7 @@ void UK_ServerWidget::OpenServerMenuFromHost()
 // 		{
 // 			MenuSwitcher->SetActiveWidget(ServerMenu); // ServerMenu로 전환하여 활성화
 // 			PlayAnimation(ShowServerMenuAnim);
-// 			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+// 			// UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 //
 // 			if (WidgetInterface)
 // 				WidgetInterface->RefreshServerList();
@@ -169,7 +169,7 @@ void UK_ServerWidget::OpenHostMenuFromServer()
 			// HostMenu_btn_WebQuit->SetVisibility(ESlateVisibility::Hidden);
 
 			PlayAnimation(ShowHostMenuAnim);
-			UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
+			// UE_LOG(LogTemp , Warning , TEXT("ServerMenu is Activate"));
 		}
 	} , 1.0f , false);
 }
@@ -282,12 +282,12 @@ void UK_ServerWidget::OnResSessionInfo(const FMapInfoResponse& resData)
 		}
 		else
 		{
-			LOG_S(Warning , TEXT("Can not find Texture"));
+			// LOG_S(Warning , TEXT("Can not find Texture"));
 		}
 	}
 	else
 	{
-		LOG_S(Warning , TEXT("Failed to decode Base64 string"));
+		// LOG_S(Warning , TEXT("Failed to decode Base64 string"));
 	}
 }
 
@@ -303,12 +303,12 @@ void UK_ServerWidget::JoinRoom()
 	{
 		//WidgetBase를 통해 Interface의 Join 가상함수 호출 -> GameInstance에 있는 구현부가 호출됨
 		WidgetInterface->Join(SelectedIndex.GetValue());
-		UE_LOG(LogTemp , Warning , TEXT("Selected Index is %d.") , SelectedIndex.GetValue());
+		// UE_LOG(LogTemp , Warning , TEXT("Selected Index is %d.") , SelectedIndex.GetValue());
 	}
 
 	else
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Selected Index not set"));
+		// UE_LOG(LogTemp , Warning , TEXT("Selected Index not set"));
 	}
 }
 

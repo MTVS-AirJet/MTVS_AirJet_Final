@@ -1274,7 +1274,7 @@ void AL_Viper::BeginPlay()
 		auto KGameInstace = CastChecked<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 		if (!KGameInstace)
 		{
-			//LOG_S(Warning , TEXT("GameInstance doesn't exist"));
+			// LOG_S(Warning , TEXT("GameInstance doesn't exist"));
 		}
 		//GI에서 자신의 로그인 ID를 받아오고
 		FString MyUserID = KGameInstace->GetUserId();
@@ -1283,7 +1283,7 @@ void AL_Viper::BeginPlay()
 		//클라이언트일때
 		if (kpc && kpc->IsLocalController())
 		{
-			//LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
+			// LOG_S(Warning , TEXT("MyUserID : %s") , *MyUserID);
 			//ServerRPC함수를 호출
 			ServerRPC_SetConnectedPlayerNames(MyUserID);
 		}
@@ -1311,7 +1311,7 @@ void AL_Viper::Tick(float DeltaTime)
 
 	if (bOnceUpdatePlayerName)
 	{
-		LOG_S(Warning , TEXT("%s bOnceUpdatePlayerName is true") , *this->GetName());
+		// LOG_S(Warning , TEXT("%s bOnceUpdatePlayerName is true") , *this->GetName());
 		ServerRPCRotation(GetActorRotation().Quaternion());
 		// visible = true
 		// SRPC_VisiblePlayerName();
@@ -2152,12 +2152,12 @@ void AL_Viper::ServerRPCMissile_Implementation(AActor* newOwner)
 		}
 		else
 		{
-			//LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
+			// LOG_S(Warning , TEXT("미사일 액터가 없습니다."));
 		}
 	}
 	else
 	{
-		//LOG_S(Warning , TEXT("타겟이 없습니다!!"));
+		// LOG_S(Warning , TEXT("타겟이 없습니다!!"));
 	}
 }
 
@@ -2199,12 +2199,12 @@ void AL_Viper::ServerRPCFlare_Implementation(AActor* newOwner)
 		}
 		else
 		{
-			//LOG_S(Warning , TEXT("남은 Flare가 없습니다."));
+			// LOG_S(Warning , TEXT("남은 Flare가 없습니다."));
 		}
 	}
 	else
 	{
-		//LOG_S(Warning , TEXT("FlareFactory가 없습니다."));
+		// LOG_S(Warning , TEXT("FlareFactory가 없습니다."));
 	}
 }
 
@@ -2475,7 +2475,7 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch + CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		//LOG_S(Warning , TEXT("Open %f") , newPitch);
+		// LOG_S(Warning , TEXT("Open %f") , newPitch);
 	}
 	else
 	{
@@ -2483,7 +2483,7 @@ void AL_Viper::ServerRPC_Canopy_Implementation(bool bOpen)
 		float newPitch = CanopyPitch - CanopyRotatePitchValue;
 		newPitch = FMath::Clamp(newPitch , 0.f , 80.f);
 		CanopyPitch = newPitch;
-		//LOG_S(Warning , TEXT("Close %f") , newPitch);
+		// LOG_S(Warning , TEXT("Close %f") , newPitch);
 	}
 }
 #pragma endregion
@@ -3264,10 +3264,10 @@ void AL_Viper::SRPC_SetMyName_Implementation(const FString& PlayerName)
 
 void AL_Viper::MRPC_SetMyName_Implementation(const FString& PlayerName)
 {
-	LOG_S(Warning, TEXT("MRPC_SetMyName Start"));
+	// LOG_S(Warning, TEXT("MRPC_SetMyName Start"));
 	if (auto PlayerNameWidget = Cast<UL_PlayerNameWidget>(PlayerNameWidgetComponent->GetWidget()))
 	{
-		LOG_S(Warning, TEXT("%s Player Name : %s"), *this->GetName(), *PlayerName);		
+		// LOG_S(Warning, TEXT("%s Player Name : %s"), *this->GetName(), *PlayerName);		
 		PlayerNameWidget->txtPlayerName->SetText(FText::FromString(PlayerName));
 	}
 }

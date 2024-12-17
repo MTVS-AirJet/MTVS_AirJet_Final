@@ -20,7 +20,7 @@ void UK_WidgetBase::SetUI()
 	UWorld* World = GetWorld();
 	if ( !World )
 	{
-		UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
+		// UE_LOG(LogTemp , Error , TEXT("World is not valid in Setup."));
 		return; // World가 유효하지 않으면 종료
 	}
 
@@ -28,7 +28,7 @@ void UK_WidgetBase::SetUI()
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if ( !PlayerController )
 	{
-		UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
+		// UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Setup."));
 		return; // PlayerController가 유효하지 않으면 종료
 	}
 
@@ -52,7 +52,7 @@ void UK_WidgetBase::RemoveUI()
 	UWorld* World = GetWorld();
 	if ( !World )
 	{
-		UE_LOG(LogTemp , Error , TEXT("World is not valid in Teardown."));
+		// UE_LOG(LogTemp , Error , TEXT("World is not valid in Teardown."));
 		return; // World가 유효하지 않으면 함수를 종료
 	}
 	
@@ -60,7 +60,7 @@ void UK_WidgetBase::RemoveUI()
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	if ( !PlayerController )
 	{
-		UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Teardown."));
+		// UE_LOG(LogTemp , Error , TEXT("PlayerController is not valid in Teardown."));
 		return; // PlayerController가 유효하지 않으면 함수를 종료
 	}
 

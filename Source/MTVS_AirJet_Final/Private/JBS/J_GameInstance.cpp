@@ -107,7 +107,7 @@ void UJ_GameInstance::RequestData(FResponseDelegate resDel, const FString& jsonD
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("요청 실패 : %s"), *resDel.TryGetBoundFunctionName().ToString()));
+			//AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("요청 실패 : %s"), *resDel.TryGetBoundFunctionName().ToString()));
 		}
 	});
 	// 기본 url 사용 여부에 따라 url 설정

@@ -26,7 +26,7 @@ void UK_StandbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-    //LOG_S(Warning, TEXT("My Owner : %s"), *GetOwningPlayerPawn()->GetName());
+    // LOG_S(Warning, TEXT("My Owner : %s"), *GetOwningPlayerPawn()->GetName());
 	// GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if ( GameInstance )
@@ -81,7 +81,7 @@ void UK_StandbyWidget::SetPlayerList()
     KGameState = Cast<AK_GameState>(UGameplayStatics::GetGameState(GetWorld()));
     if ( !KGameState )
     {
-        LOG_S(Warning, TEXT("GameState doesn't exist"));
+        // LOG_S(Warning, TEXT("GameState doesn't exist"));
     }
 
     // 기존 PlayerList 초기화
@@ -92,7 +92,7 @@ void UK_StandbyWidget::SetPlayerList()
     for ( int32 Index = 0; Index < KGameState->ConnectedPlayerNames.Num(); ++Index ) {
         FString PlayerName = KGameState->ConnectedPlayerNames[Index];
 
-        LOG_S(Warning, TEXT("Set PlayerName(%s) in PlayerList"), *PlayerName);
+        // LOG_S(Warning, TEXT("Set PlayerName(%s) in PlayerList"), *PlayerName);
 
         // K_PlayerList 인스턴스 생성
         PlayerList = CreateWidget<UK_PlayerList>(this , PlayerListFactory);
@@ -178,7 +178,7 @@ void UK_StandbyWidget::OpenLobbyLevel()
     }
     else
     {
-        UE_LOG(LogTemp , Warning , TEXT("Failed to cast PlayerController to AK_PlayerController"));
+        // UE_LOG(LogTemp , Warning , TEXT("Failed to cast PlayerController to AK_PlayerController"));
     }
 }
 
@@ -188,7 +188,7 @@ void UK_StandbyWidget::InitializeMissionData()
     //GameInstance 가져오기
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	 if ( !GameInstance ) {
-		 UE_LOG(LogTemp , Error , TEXT("GameInstance를 가져오지 못했습니다."));
+		 // UE_LOG(LogTemp , Error , TEXT("GameInstance를 가져오지 못했습니다."));
 		 return;
 	 }
      const auto& MissionData = GameInstance->MissionData;
@@ -222,12 +222,12 @@ void UK_StandbyWidget::InitializeMissionData()
         }
         else
         {
-            UE_LOG(LogTemp , Warning , TEXT("Failed to create texture from mission data image"));
+            // UE_LOG(LogTemp , Warning , TEXT("Failed to create texture from mission data image"));
         }
     }
     else
     {
-        UE_LOG(LogTemp , Warning , TEXT("Failed to decode mission data image"));
+        // UE_LOG(LogTemp , Warning , TEXT("Failed to decode mission data image"));
     }
 
     //(추가) 위경도 변화예정값 담기(Cesium GeoReference)

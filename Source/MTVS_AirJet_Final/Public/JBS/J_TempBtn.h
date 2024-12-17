@@ -40,7 +40,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void UseFunction(int idx)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Green, FString::Printf(TEXT("idx : %d"), idx));
+		// GEngine->AddOnScreenDebugMessage(-1, 333.f, FColor::Green, FString::Printf(TEXT("idx : %d"), idx));
 	}
 
 public:

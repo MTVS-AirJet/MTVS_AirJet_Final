@@ -25,7 +25,7 @@ void AJ_GroundTarget::BeginPlay()
 	
 	if(debugDestroySelf)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("테스트용 자괴 타이머 시작"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("테스트용 자괴 타이머 시작"));
 		
 		FTimerHandle timerHandle;
 		GetWorld()->GetTimerManager()

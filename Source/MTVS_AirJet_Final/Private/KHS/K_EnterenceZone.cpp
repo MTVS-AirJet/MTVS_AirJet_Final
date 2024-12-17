@@ -59,7 +59,7 @@ void AK_EnterenceZone::OnMySphereBeginOverlap(UPrimitiveComponent* OverlappedCom
 		auto pc = Cast<AK_PlayerController>(GetWorld()->GetFirstPlayerController());
 		if ( nullptr == pc )
 		{
-			UE_LOG(LogTemp , Warning , TEXT("Player Controller is null"));
+			// UE_LOG(LogTemp , Warning , TEXT("Player Controller is null"));
 			return;
 		}
 		pc->SetInputMode(FInputModeUIOnly()); //인풋제어
@@ -72,11 +72,11 @@ void AK_EnterenceZone::OnMySphereBeginOverlap(UPrimitiveComponent* OverlappedCom
 		auto gi = CastChecked<UK_GameInstance>(GetWorld()->GetGameInstance());
 		if ( nullptr == gi )
 		{
-			UE_LOG(LogTemp , Warning , TEXT("ServerWidget is null"));
+			// UE_LOG(LogTemp , Warning , TEXT("ServerWidget is null"));
 			return;
 		}
 		gi->CreateServerWidget(); //ServerWidget생성
-		UE_LOG(LogTemp , Warning , TEXT("Create ServerWidget"));
+		// UE_LOG(LogTemp , Warning , TEXT("Create ServerWidget"));
 	}
 }
 

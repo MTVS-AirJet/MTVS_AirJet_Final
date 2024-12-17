@@ -41,12 +41,12 @@ void UK_StreamingUI::NativeConstruct()
 	Me = Cast<AMTVS_AirJet_FinalCharacter>(GetOwningPlayerPawn());
 	if ( Me )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Player is not Null"));
+		// UE_LOG(LogTemp , Warning , TEXT("Player is not Null"));
 		Me->StreamingUI->TextWindowScreen->SetText(FText::FromString(TEXT("Screen Share")));
 	}
 	else
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Playeris NullPtr"));
+		// UE_LOG(LogTemp , Warning , TEXT("Playeris NullPtr"));
 	}
 }
 
@@ -100,7 +100,7 @@ void UK_StreamingUI::OnButtonWindowScreen()
 		// }
 		// else
 		// {
-		// 	UE_LOG(LogTemp , Error , TEXT("ScreenActor nullptr"));
+		// 	// UE_LOG(LogTemp , Error , TEXT("ScreenActor nullptr"));
 		// }
 
 		//streamID = GetCurrentSessionID(); //세션 아이디 받아오기(위치변경)
@@ -155,12 +155,12 @@ void UK_StreamingUI::OnButtonWindowScreen()
 			}
 			else
 			{
-				UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
+				// UE_LOG(LogTemp , Error , TEXT("Could not find a valid streamer with the given ID."));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
+			// UE_LOG(LogTemp , Error , TEXT("PixelStreamingModule is not available."));
 		}
 	}
 }
@@ -204,12 +204,12 @@ void UK_StreamingUI::SetScreenActor(AK_StreamingActor* Actor)
 {
 	if ( !Actor )
 	{
-		UE_LOG(LogTemp , Error , TEXT("Invalid ScreenActor passed to SetScreenActor"));
+		// UE_LOG(LogTemp , Error , TEXT("Invalid ScreenActor passed to SetScreenActor"));
 		return;
 	}
 
 	ScreenActor = Actor;
-	UE_LOG(LogTemp , Log , TEXT("ScreenActor has been set successfully."));
+	// UE_LOG(LogTemp , Log , TEXT("ScreenActor has been set successfully."));
 }
 
 // 현재 온라인 세션의 ID를 반환하는 함수
@@ -261,7 +261,7 @@ void UK_StreamingUI::InitSlot(TArray<FString> Items)
 
 			if ( !WindowList )
 			{
-				UE_LOG(LogTemp , Error , TEXT("PartsPanel is not valid."));
+				// UE_LOG(LogTemp , Error , TEXT("PartsPanel is not valid."));
 				return;
 			}
 

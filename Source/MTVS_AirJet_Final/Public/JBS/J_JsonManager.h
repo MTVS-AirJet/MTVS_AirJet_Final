@@ -39,7 +39,7 @@ protected:
 			stopWatchTime = 0.f;
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 999.f, FColor::Yellow, FString::Printf(TEXT("스톱워치 : %.2f"), stopWatchTime));
+			// GEngine->AddOnScreenDebugMessage(-1, 999.f, FColor::Yellow, FString::Printf(TEXT("스톱워치 : %.2f"), stopWatchTime));
 		}
 		 
 		

@@ -190,8 +190,8 @@ void AJ_BaseMissionObjective::UpdateObjDisIconUI()
 
 		iconWorldUI->SetObjDisText(dis);
 	}
-	else if(!localPawn)
-		UE_LOG(LogTemp, Warning, TEXT("목표 액터 : 로컬 폰 없음"));
+	// else if(!localPawn)
+		// UE_LOG(LogTemp, Warning, TEXT("목표 액터 : 로컬 폰 없음"));
 }
 
 void AJ_BaseMissionObjective::SetSuccessPercent(float value)

@@ -80,7 +80,7 @@ void AJ_MissionGamemode::StartMission()
     // 디버그용 더미 미션 데이터 사용 여부
     if(enableUsingDummyMissionData)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("현재 디버그용 더미 미션 데이터 사용 중"));
+        // GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("현재 디버그용 더미 미션 데이터 사용 중"));
         curMissionData = dummyMissionData;
     }
     // GI 미션 데이터 사용

@@ -71,7 +71,7 @@ void AMTVS_AirJet_FinalCharacter::BeginPlay()
 		if ( IsLocallyControlled() )
 		{
 			InitStreamingUI();
-			UE_LOG(LogTemp , Warning , TEXT("==========================Streaming!!!"));
+			// UE_LOG(LogTemp , Warning , TEXT("==========================Streaming!!!"));
 		}
 	}
 }
@@ -111,7 +111,7 @@ void AMTVS_AirJet_FinalCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 	}
 	else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		// UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
 
@@ -191,14 +191,14 @@ void AMTVS_AirJet_FinalCharacter::InitStreamingUI()
 	auto pc = Cast<AK_PlayerController>(Controller);
 	if ( nullptr == pc )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Player Controller is null"));
+		// UE_LOG(LogTemp , Warning , TEXT("Player Controller is null"));
 		return;
 	}
 
 	pc->StreamingUI = CastChecked<UK_StreamingUI>(CreateWidget(GetWorld() , pc->StreamingUIFactory));
 	if ( pc->StreamingUI )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
+		// UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
 		StreamingUI = pc->StreamingUI;
 
 		StreamingUI->AddToViewport(0);
@@ -209,7 +209,7 @@ void AMTVS_AirJet_FinalCharacter::InitStreamingUI()
 	}
 	else
 	{
-		UE_LOG(LogTemp , Warning , TEXT("StreamingUI is null"));
+		// UE_LOG(LogTemp , Warning , TEXT("StreamingUI is null"));
 	}
 
 }

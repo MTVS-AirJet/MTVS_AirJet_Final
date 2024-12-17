@@ -53,11 +53,11 @@ void AK_CesiumTeleportBox::OnMyBoxBeginOverlap(UPrimitiveComponent* OverlappedCo
 	//	auto gi = CastChecked<UK_GameInstance>(GetWorld()->GetGameInstance());
 	//	if ( nullptr == gi )
 	//	{
-	//		UE_LOG(LogTemp , Warning , TEXT("ServerWidget is null"));
+	//		// UE_LOG(LogTemp , Warning , TEXT("ServerWidget is null"));
 	//		return;
 	//	}
 	//	gi->CreateLoadingWidget(); //LoadingWidget생성
-	//	UE_LOG(LogTemp , Warning , TEXT("Create ServerWidget"));
+	//	// UE_LOG(LogTemp , Warning , TEXT("Create ServerWidget"));
 
 
 
@@ -80,7 +80,7 @@ void AK_CesiumTeleportBox::MovePlayerandPolygonToDestination(double Longitude , 
 
     //if ( !WorldGeoReference )
     //{
-    //    UE_LOG(LogTemp , Warning , TEXT("Georeference 객체를 생성하지 못했습니다."));
+    //    // UE_LOG(LogTemp , Warning , TEXT("Georeference 객체를 생성하지 못했습니다."));
     //    return;
     //}
 
@@ -114,7 +114,7 @@ void AK_CesiumTeleportBox::MovePlayerandPolygonToDestination(double Longitude , 
     //}
     //else
     //{
-    //    UE_LOG(LogTemp , Warning , TEXT("CartographicPolygon을 찾거나 생성하지 못했습니다."));
+    //    // UE_LOG(LogTemp , Warning , TEXT("CartographicPolygon을 찾거나 생성하지 못했습니다."));
     //}
 
     //// 2. 플레이어의 위치를 업데이트합니다.
@@ -128,7 +128,7 @@ void AK_CesiumTeleportBox::MovePlayerandPolygonToDestination(double Longitude , 
     //    }
     //    else
     //    {
-    //        UE_LOG(LogTemp , Warning , TEXT("PlayerPawn을 찾지 못했습니다."));
+    //        // UE_LOG(LogTemp , Warning , TEXT("PlayerPawn을 찾지 못했습니다."));
     //    }
     //}
 }

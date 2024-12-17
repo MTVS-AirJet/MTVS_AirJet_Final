@@ -27,7 +27,7 @@ void UJ_MissionCompleteUI::NativeConstruct()
     // 버튼 함수 바인드
     MC_BackToLobbyBtn->OnClicked.AddDynamic( this, &UJ_MissionCompleteUI::OnClickReturnLobby);
 
-    UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(ETextStyle::DEFAULT));
+    // UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(ETextStyle::DEFAULT));
 
     // MC_SuccessGradeImage->SetVisibility(ESlateVisibility::Hidden);
 
@@ -154,7 +154,7 @@ void UJ_MissionCompleteUI::PlayResultGrade(int rank)
         MC_SuccessGradeImage->SetBrush(gradeImgAry[rank]);
     }
     else {
-        GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("등급 값이 이상해요 : %d"), rank));
+        // GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("등급 값이 이상해요 : %d"), rank));
     }
 
     PlayGradeAnim();

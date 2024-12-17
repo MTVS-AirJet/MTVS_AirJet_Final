@@ -70,7 +70,7 @@ void AJ_JsonTemp::ResGet(FHttpRequestPtr req, FHttpResponsePtr res, bool isSucce
 	// 	}
 
 	// 	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *result));
-	// 	UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *rresult);
+	// 	// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *rresult);
 	// }
 	// else {
 	// 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 실패"));
@@ -112,7 +112,7 @@ void AJ_JsonTemp::ResPost(FHttpRequestPtr req, FHttpResponsePtr res, bool isSucc
 		FString result = resStr;
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *result));
-		UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
+		// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 실패"));
@@ -163,7 +163,7 @@ void AJ_JsonTemp::ResPostTemp(FHttpRequestPtr req, FHttpResponsePtr res, bool is
 		
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("%s"), *result));
-		UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
+		// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 실패"));
@@ -230,7 +230,7 @@ void AJ_JsonTemp::ResPostTempAry(FHttpRequestPtr req, FHttpResponsePtr res, bool
 		
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("결과 : %s"), *result));
-		UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
+		// UE_LOG(LogTemp, Warning, TEXT("결과 : %s"), *result);
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("요청 실패"));

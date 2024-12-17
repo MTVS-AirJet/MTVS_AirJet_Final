@@ -180,8 +180,8 @@ FString UJ_Utility::ToStringPercent(float percent)
 
 void UJ_Utility::PrintFullLog(const FString &str, const float &time, const FColor &color)
 {
-    GEngine->AddOnScreenDebugMessage(-1, time, color, FString::Printf(TEXT("%s"), *str));
-    UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
+    // GEngine->AddOnScreenDebugMessage(-1, time, color, FString::Printf(TEXT("%s"), *str));
+    // UE_LOG(LogTemp, Warning, TEXT("%s"), *str);
 }
 
 int UJ_Utility::ConvertEngineProgressToMissionProcessIdx(const EEngineProgress& value)

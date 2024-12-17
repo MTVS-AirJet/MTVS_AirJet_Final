@@ -15,7 +15,7 @@ void UL_WaitingForStart::NativeConstruct()
 
 	gi = Cast<UK_GameInstance>(GetGameInstance());
 	gs = Cast<AK_GameState>(GetWorld()->GetGameState());	
-	LOG_S(Warning, TEXT("Current Player Count : %d"), MaxCnt);
+	// LOG_S(Warning, TEXT("Current Player Count : %d"), MaxCnt);
 	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
 	TxtReadyCnt->SetText(FText::FromString(txt));
 }
@@ -40,7 +40,7 @@ void UL_WaitingForStart::SetMem(const int32& newMem)
 	MaxCnt = gs->ConnectedPlayerNames.Num();
 	CurrentCnt = newMem;
 	//CurrentCnt = gi->ReadyMemeberCnt;
-	LOG_SCREEN("Current Mem: %d", CurrentCnt);;
+	// LOG_SCREEN("Current Mem: %d", CurrentCnt);;
 	FString txt = FString::Printf(TEXT("%d/%d") , CurrentCnt , MaxCnt);
 	TxtReadyCnt->SetText(FText::FromString(txt));
 

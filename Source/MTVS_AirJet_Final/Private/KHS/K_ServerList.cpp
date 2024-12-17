@@ -20,7 +20,7 @@ void UK_ServerList::OnClicked()
 {
 	Parent->SelecetIndex(Index);
 
-    UE_LOG(LogTemp , Warning , TEXT("Hovered on ServerList index: %d") , Index);
+    // UE_LOG(LogTemp , Warning , TEXT("Hovered on ServerList index: %d") , Index);
 
     // 세션 인덱스에 맞는 ServerData를 가져옴
     if ( Parent && Parent->GameInstance )
@@ -37,7 +37,7 @@ void UK_ServerList::OnClicked()
 
             if ( ParsedData.Num() >= 4 )
             {
-                UE_LOG(LogTemp , Warning , TEXT("Setting Producer: %s, MapName: %s") , *ParsedData[0] , *ParsedData[3]);
+                // UE_LOG(LogTemp , Warning , TEXT("Setting Producer: %s, MapName: %s") , *ParsedData[0] , *ParsedData[3]);
 
                 // 제작자와 맵 이름을 Parent의 텍스트 블록에 설정
                 Parent->ServerMenu_txt_Producer->SetText(FText::FromString(ParsedData[0]));

@@ -16,7 +16,7 @@ void UK_MIssionTextWidget::NativeConstruct()
 	GameInstance = Cast<UK_GameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (!GameInstance)
 	{
-		UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
+		// UE_LOG(LogTemp , Error , TEXT("GameInstance is null in UK_ServerWidget"));
 	}
 
 	MissionText->SetVisibility(ESlateVisibility::Hidden); //처음엔 숨기기
@@ -63,7 +63,7 @@ void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 
 			// 타이머 설정 (0.1초 간격으로 UpdateDisplayedText 함수 호출)
 			GetWorld()->GetTimerManager().SetTimer(TextDisplayTimerHandle, this, &UK_MIssionTextWidget::UpdateDisplayedText, 0.06f, true);
-			UE_LOG(LogTemp, Warning, TEXT("Starting text display animation..."));
+			// UE_LOG(LogTemp, Warning, TEXT("Starting text display animation..."));
 		}
 	}
 	else if(MissionData->MissionHelper.Equals(""))
@@ -98,7 +98,7 @@ void UK_MIssionTextWidget::SetMissionText(FAirjetTotalMissionData* MissionData)
 
 			// 타이머 설정 (0.1초 간격으로 UpdateDisplayedText 함수 호출)
 			GetWorld()->GetTimerManager().SetTimer(TextDisplayTimerHandle, this, &UK_MIssionTextWidget::UpdateDisplayedText, 0.06f, true);
-			UE_LOG(LogTemp, Warning, TEXT("Starting text display animation..."));
+			// UE_LOG(LogTemp, Warning, TEXT("Starting text display animation..."));
 		}
 	}
 	
@@ -124,7 +124,7 @@ void UK_MIssionTextWidget::UpdateDisplayedText()
 	{
 		// 모든 텍스트가 출력되었으면 타이머 중지
 		GetWorld()->GetTimerManager().ClearTimer(TextDisplayTimerHandle);
-		UE_LOG(LogTemp, Warning, TEXT("Finished text display animation."));
+		// UE_LOG(LogTemp, Warning, TEXT("Finished text display animation."));
 	}
 }
 

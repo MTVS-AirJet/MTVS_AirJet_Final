@@ -170,7 +170,7 @@ void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 	if ( this->StreamingUI )
 	{
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2. StreaingUI is not null"));
-		UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
+		// UE_LOG(LogTemp , Warning , TEXT("StreaingUI is not null"));
 
         newPawn->streamingUI = this->StreamingUI;
 
@@ -183,7 +183,7 @@ void AJ_MissionPlayerController::InitStreamingUI(AJ_BaseMissionPawn* newPawn)
 	else
 	{
 		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("2-2. streamingUI is null"));
-		UE_LOG(LogTemp , Warning , TEXT("streamingUI is null"));
+		// UE_LOG(LogTemp , Warning , TEXT("streamingUI is null"));
 	}
 }
 
@@ -347,7 +347,7 @@ void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData
 {
     if(resData.data.IsEmpty())
     {
-        GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("보이스 데이터 못 받음"));
+        // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("보이스 데이터 못 받음"));
         
         return;
     }
@@ -362,7 +362,7 @@ void AJ_MissionPlayerController::ResMissionVoiceData(const FAllVoiceRes &resData
         auto* voice = UJ_JsonUtility::ConvertBase64WavToSound(wavData.voice);
         if(!voice)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("%d 번 보이스 데이터 누락됨"), wavData.id));
+            // GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("%d 번 보이스 데이터 누락됨"), wavData.id));
             continue;
         }
 

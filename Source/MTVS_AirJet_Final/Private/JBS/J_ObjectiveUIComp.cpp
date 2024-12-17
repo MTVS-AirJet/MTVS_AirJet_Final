@@ -114,7 +114,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUIEngine_Implementation(const FEngineProg
 	// ui 데이터 확인
 	if(!(textUIData.Num() > 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
 
 		return;
 	}
@@ -143,7 +143,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUITakeOff_Implementation(const FTakeOffDa
 	// ui 데이터 확인
 	if(!(textUIData.Num() > 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
 
 		return;
 	}
@@ -172,7 +172,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUIFormation_Implementation(const FFormati
 	// ui 데이터 확인
 	if(!(textUIData.Num() > 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
 
 		return;
 	}
@@ -201,7 +201,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUINeut_Implementation(const FNeutralizeTa
 	// ui 데이터 확인
 	if(!(textUIData.Num() > 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
 
 		return;
 	}
@@ -259,7 +259,7 @@ void UJ_ObjectiveUIComp::CRPC_UpdateObjUI_Implementation(const FTacticalOrderDat
 	// ui 데이터 확인
 	if(!(textUIData.Num() > 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("obuicomp : ui 데이터 없음"));
 
 		return;
 	}

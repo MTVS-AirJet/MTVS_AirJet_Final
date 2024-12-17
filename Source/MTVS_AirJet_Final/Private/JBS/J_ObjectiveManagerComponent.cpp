@@ -365,6 +365,6 @@ void UJ_ObjectiveManagerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	{
 		if(!CUR_ACTIVE_MISSION) return;
 		
-		GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
+		// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Purple, FString::Printf(TEXT("현재 활성화된 목표 : %s"), *CUR_ACTIVE_MISSION->GetName()));
 	}
 }

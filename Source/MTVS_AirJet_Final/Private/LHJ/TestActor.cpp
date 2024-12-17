@@ -15,9 +15,9 @@ ATestActor::ATestActor()
 void ATestActor::BeginPlay()
 {
 	Super::BeginPlay();
-	LOG_S(Warning, TEXT("Log_Warning"));
-	LOG_SCREEN("Log_Screen");
-	LOG_SCREEN_T(3.f, "Log_Screen_T");
+	// LOG_S(Warning, TEXT("Log_Warning"));
+	// LOG_SCREEN("// LOG_Screen");
+	// LOG_SCREEN_T(3.f, "// LOG_Screen_T");
 }
 
 // Called every frame

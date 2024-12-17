@@ -138,7 +138,7 @@ protected:
 	UFUNCTION(BlueprintSetter)
 	void SetPlayerRole(EPlayerRole value)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(value)));
+		// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("현재 플레이어 역할 : %s"), *UEnum::GetValueAsString(value)));
 		playerRole = value;
 	}
 		protected:

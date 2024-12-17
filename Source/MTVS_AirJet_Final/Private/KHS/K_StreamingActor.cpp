@@ -113,7 +113,7 @@ void AK_StreamingActor::BeginPlay()
     auto gs = Cast<AK_GameState>(GetWorld()->GetGameState());
     if ( gs )
     {
-        LOG_S(Warning , TEXT("Current Streaming Player Num : %d") , gs->ArrStreamingUserID.Num());
+        // LOG_S(Warning , TEXT("Current Streaming Player Num : %d") , gs->ArrStreamingUserID.Num());
     }
 
     //SceneCapture2D 초기화 한번더
@@ -123,7 +123,7 @@ void AK_StreamingActor::BeginPlay()
     }
     else
     {
-        UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
+        // UE_LOG(LogTemp , Error , TEXT("Initialization failed in BeginPlay"));
     }
 }
 
@@ -162,7 +162,7 @@ void AK_StreamingActor::SetViewSharingUserID(FString ID, const bool& bAddPlayer)
 	if ( auto MyCharacter = Cast<AMTVS_AirJet_FinalCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()) )
 		MyCharacter->ServerRPC_SetStreamingPlayer(ID , bAddPlayer);
 
-	LOG_S(Warning , TEXT("Set Streaming Player ID : %s") , *ID);
+	// LOG_S(Warning , TEXT("Set Streaming Player ID : %s") , *ID);
 }
 
 // 화면 공유를 중지하는 함수
@@ -181,7 +181,7 @@ void AK_StreamingActor::StopLookSharingScreen()
     }
     else
     {
-        UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
+        // UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
     }
 }
 
@@ -201,7 +201,7 @@ void AK_StreamingActor::StopLookSharingScreen()
 //    }
 //    else
 //    {
-//        UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
+//        // UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
 //    }
 //}
 
@@ -221,7 +221,7 @@ void AK_StreamingActor::BeginLookSharingScreen()
     }
     else
     {
-        UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
+        // UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
     }
 }
 
@@ -241,7 +241,7 @@ void AK_StreamingActor::ChangeLookSharingScreen()
     }
     else
     {
-        UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
+        // UE_LOG(LogTemp , Warning , TEXT("Function not found: %s") , *FunctionName.ToString());
     }
 }
 

@@ -45,7 +45,7 @@ void UK_GameInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 
 UK_GameInstance::UK_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
-	UE_LOG(LogTemp , Warning , TEXT("GameInstance Constructor"));
+	// UE_LOG(LogTemp , Warning , TEXT("GameInstance Constructor"));
 
 	// //DataTable 찾기
 	// FString MissionDataPath = TEXT("/Script/Engine.DataTable'/Game/Blueprints/KHS/Server/AirjetTotalMission.AirjetTotalMission'");
@@ -143,7 +143,7 @@ void UK_GameInstance::OnDestroySessionComplete(FName SessionName , bool Success)
 
 	if (nullptr != GEngine)
 	{
-		GEngine->OnNetworkFailure().AddUObject(this , &UK_GameInstance::OnNetworkFailure);
+		// GEngine->OnNetworkFailure().AddUObject(this , &UK_GameInstance::OnNetworkFailure);
 	}
 }
 
@@ -152,23 +152,23 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 {
 	if (!Success)
 	{
-		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: Session search failed."));
+		// UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: Session search failed."));
 		return;
 	}
 
 	if (!SessionSearch.IsValid())
 	{
-		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: SessionSearch is not valid."));
+		// UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: SessionSearch is not valid."));
 		return;
 	}
 
 	if (!ServerWidget)
 	{
-		UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: ServerWidget is not valid."));
+		// UE_LOG(LogTemp , Error , TEXT("OnFindSessionComplete failed: ServerWidget is not valid."));
 		return;
 	}
 
-	UE_LOG(LogTemp , Warning , TEXT("Starting Find Session"));
+	// UE_LOG(LogTemp , Warning , TEXT("Starting Find Session"));
 
 	//ServerList에 내용 업데이트
 	TArray<FServerData> ServerNames;
@@ -200,7 +200,7 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 		if (SearchResult.Session.SessionSettings.Get(SERVER_DATA_SETTINGS_KEY , ServerData))
 		{
 			ServerDataList[Data.sessionIdx] = ServerData;
-			LOG_S(Warning , TEXT("ServerData : %s") , *ServerData);
+			// LOG_S(Warning , TEXT("ServerData : %s") , *ServerData);
 		}
 
 		ServerNames.Add(Data);
@@ -213,7 +213,7 @@ void UK_GameInstance::OnFindSessionComplete(bool Success)
 	}
 	else
 	{
-		UE_LOG(LogTemp , Error , TEXT("ServerWidget is not valid during SetServerList call."));
+		// UE_LOG(LogTemp , Error , TEXT("ServerWidget is not valid during SetServerList call."));
 	}
 }
 
@@ -226,7 +226,7 @@ void UK_GameInstance::OnJoinSessionComplete(FName SessionName , EOnJoinSessionCo
 	{
 		if (!SessionInterface->GetResolvedConnectString(SessionName , Address))
 		{
-			UE_LOG(LogTemp , Warning , TEXT("Could Not Get Connect String"));
+			// UE_LOG(LogTemp , Warning , TEXT("Could Not Get Connect String"));
 			return;
 		}
 	}
@@ -313,14 +313,14 @@ void UK_GameInstance::Host(FString ServerName , const FString& MapDataStruct)
 		auto ExistingSession = SessionInterface->GetNamedSession(SESSION_NAME); // 현재 세션 정보 얻기
 		if (ExistingSession) // 세션이 이미 존재한다면
 		{
-			UE_LOG(LogTemp , Warning , TEXT("Existing session found. Destroying the session..."));
+			// UE_LOG(LogTemp , Warning , TEXT("Existing session found. Destroying the session..."));
 			SessionInterface->DestroySession(SESSION_NAME); // 기존에 명명된 세션을 파괴
 			// 실행되면 'DestroySession'이 델리게이트에 정보를 제공한다. 즉, 바로 델리게이트가 호출된다.
 		}
 
 		else // 세션이 없을 경우
 		{
-			UE_LOG(LogTemp , Warning , TEXT("No existing session found. Creating a new session..."));
+			// UE_LOG(LogTemp , Warning , TEXT("No existing session found. Creating a new session..."));
 			CreateSession(); // 새로운 세션 생성
 		}
 	}
@@ -332,13 +332,13 @@ void UK_GameInstance::Join(uint32 Index)
 	// SessionInterface 또는 SessionSearch가 유효하지 않다면, return
 	if (!SessionInterface.IsValid() || !SessionSearch.IsValid())
 	{
-		UE_LOG(LogTemp , Warning , TEXT("SessionInterface or SessionSearch is not valid."));
+		// UE_LOG(LogTemp , Warning , TEXT("SessionInterface or SessionSearch is not valid."));
 		return;
 	}
 
 	if (SessionInterface->GetNamedSession(SESSION_NAME)) // 이미 세션에 접속되어 있는지 확인
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Already connected to a session. Cannot join again."));
+		// UE_LOG(LogTemp , Warning , TEXT("Already connected to a session. Cannot join again."));
 		return; // 이미 접속된 세션이 있다면 다시 접속하지 않도록 방지
 	}
 
@@ -350,7 +350,7 @@ void UK_GameInstance::Join(uint32 Index)
 	auto s = SessionSearch->SearchResults[Index].Session.SessionSettings.Settings[SERVER_DATA_SETTINGS_KEY].Data;
 	FString Value;
 	s.GetValue(Value);
-	UE_LOG(LogTemp , Warning , TEXT("join value : %s") , *Value);
+	// UE_LOG(LogTemp , Warning , TEXT("join value : %s") , *Value);
 	if (!Value.IsEmpty())
 	{
 		TArray<FString> Tokens;
@@ -380,7 +380,7 @@ void UK_GameInstance::CreateSession()
 			SessionSettings.bIsLANMatch = false; // false 시 : 다른 네트워크와 연결 가능하도록 함. (Steam, XBox 등 공식플랫폼 연결 설정)
 		}
 
-		LOG_S(Warning , TEXT("Input Data : %s") , *DesiredServerData);
+		// LOG_S(Warning , TEXT("Input Data : %s") , *DesiredServerData);
 		//Session Setting 초기화
 		SessionSettings.NumPublicConnections = 5; // 플레이어 수
 		SessionSettings.bShouldAdvertise = true; // 온라인에서 세션을 볼 수 있도록함.3
@@ -440,7 +440,7 @@ void UK_GameInstance::InitializeMission(const FMissionDataRes& newMD)
 {
 	MissionData = newMD;
 	auto str = MissionData.ToString();
-	LOG_S(Warning , TEXT("%s") , *str);
+	// LOG_S(Warning , TEXT("%s") , *str);
 }
 
 //미션에 따른 구조체 데이터 반환
@@ -465,7 +465,7 @@ void UK_GameInstance::LoadProgressDT(UScriptStruct* RowStruct)
 	}
 	else
 	{
-		LOG_S(Warning, TEXT("Failed to load CSV File : %s"), *CSVFilePath);
+		// LOG_S(Warning, TEXT("Failed to load CSV File : %s"), *CSVFilePath);
 	}
 }
 
@@ -494,7 +494,7 @@ void UK_GameInstance::TravelMainLobbyMap(bool bKeepCurrentSound)
 
 	else
 	{
-		UE_LOG(LogTemp , Error , TEXT("Failed to get PlayerController in LoadServerWidgetMap."));
+		// UE_LOG(LogTemp , Error , TEXT("Failed to get PlayerController in LoadServerWidgetMap."));
 	}
 }
 
@@ -513,11 +513,11 @@ void UK_GameInstance::PlayLoginSound()
 		}
 		CurrentPlayingSound = UGameplayStatics::SpawnSound2D(this , LoginSound , 1.0f , 1.0f , 0.0f , nullptr , true ,
 															 false);
-		UE_LOG(LogTemp , Warning , TEXT("Started playing Login sound"));
+		// UE_LOG(LogTemp , Warning , TEXT("Started playing Login sound"));
 	}
 	else
 	{
-		UE_LOG(LogTemp , Error , TEXT("LoginSound is not set"));
+		// UE_LOG(LogTemp , Error , TEXT("LoginSound is not set"));
 	}
 }
 // 로비 사운드 재생 함수
@@ -531,11 +531,11 @@ void UK_GameInstance::PlayLobbySound()
 		}
 		CurrentPlayingSound = UGameplayStatics::SpawnSound2D(this , LobbySound , 1.0f , 1.0f , 0.0f , nullptr , true ,
 		                                                     false);
-		UE_LOG(LogTemp , Warning , TEXT("Started playing lobby sound"));
+		// UE_LOG(LogTemp , Warning , TEXT("Started playing lobby sound"));
 	}
 	else
 	{
-		UE_LOG(LogTemp , Error , TEXT("LobbySound is not set"));
+		// UE_LOG(LogTemp , Error , TEXT("LobbySound is not set"));
 	}
 }
 
@@ -545,11 +545,11 @@ void UK_GameInstance::PlayStageSound()
 	if (StageSound)
 	{
 		CurrentPlayingSound = UGameplayStatics::SpawnSound2D(this , StageSound , 1.0f , 1.0f , 0.0f);
-		UE_LOG(LogTemp , Warning , TEXT("Started playing stage sound"));
+		// UE_LOG(LogTemp , Warning , TEXT("Started playing stage sound"));
 	}
 	else
 	{
-		UE_LOG(LogTemp , Error , TEXT("StageSound is not set"));
+		// UE_LOG(LogTemp , Error , TEXT("StageSound is not set"));
 	}
 }
 
@@ -559,7 +559,7 @@ void UK_GameInstance::StopCurrentSound()
 	if (CurrentPlayingSound && CurrentPlayingSound->IsPlaying())
 	{
 		CurrentPlayingSound->Stop();
-		UE_LOG(LogTemp , Warning , TEXT("Stopped current sound"));
+		// UE_LOG(LogTemp , Warning , TEXT("Stopped current sound"));
 	}
 }
 
@@ -664,7 +664,7 @@ void UK_GameInstance::RequestData(FServerResponseDel resDel , const FString& jso
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(-1 , 3.f , FColor::Green , TEXT("요청 실패"));
+				// GEngine->AddOnScreenDebugMessage(-1 , 3.f , FColor::Green , TEXT("요청 실패"));
 			}
 		});
 	// 3-5) 기본 url 사용 여부에 따라 url 설정
@@ -735,7 +735,7 @@ void UK_GameInstance::OnMyMemberReFresh()
 	{
 		if (viper->WaitingForStartUI)
 		{
-			LOG_S(Warning , TEXT("instance current mem cnt : %d") , ReadyMemeberCnt);
+			// LOG_S(Warning , TEXT("instance current mem cnt : %d") , ReadyMemeberCnt);
 			viper->WaitingForStartUI->SetMem(ReadyMemeberCnt);
 		}
 	}

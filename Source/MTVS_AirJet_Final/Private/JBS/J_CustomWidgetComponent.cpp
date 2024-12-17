@@ -89,7 +89,7 @@ void UJ_CustomWidgetComponent::FixHeight(APlayerController * pc)
 
 void UJ_CustomWidgetComponent::MRPC_SetVisible_Implementation(bool value)
 {
-    LOG_S(Warning , TEXT("MRPC_SetVisible %s") , value?*FString(TEXT("true")):*FString(TEXT("false")));
+    // LOG_S(Warning , TEXT("MRPC_SetVisible %s") , value?*FString(TEXT("true")):*FString(TEXT("false")));
     SetVisible(value);
 }
 

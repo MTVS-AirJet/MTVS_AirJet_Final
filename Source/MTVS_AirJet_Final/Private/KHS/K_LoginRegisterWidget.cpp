@@ -89,7 +89,7 @@ void UK_LoginRegisterWidget::OpenRegisterMenu()
 		PlayAnimation(ShowRegisterMenuAnim);
 	} , 1.0f , false);
 
-	UE_LOG(LogTemp , Log , TEXT("OpenRegisterMenu called"));
+	// UE_LOG(LogTemp , Log , TEXT("OpenRegisterMenu called"));
 }
 
 //로그인 요청함수
@@ -109,7 +109,7 @@ void UK_LoginRegisterWidget::OnMyLogin()
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
 	if ( false == JsonObject.IsValid() )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Failed to Create JsonObject"));
+		// UE_LOG(LogTemp , Warning , TEXT("Failed to Create JsonObject"));
 	}
 
 	JsonObject->SetStringField("loginId" , LoginUserID);
@@ -125,7 +125,7 @@ void UK_LoginRegisterWidget::OnMyLogin()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef() , Writer);
 	if ( false == FJsonSerializer::Serialize(JsonObject.ToSharedRef() , Writer) )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Failed to serialize JSON object"));
+		// UE_LOG(LogTemp , Warning , TEXT("Failed to serialize JSON object"));
 		return;
 	}
 
@@ -165,20 +165,20 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 	// 1. 요청 성공과 응답성 유효에 대해 확인
 	if ( false == bWasSuccessful || false == Response.IsValid() )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Login request failed")); // 요청 실패 로그
+		// UE_LOG(LogTemp , Warning , TEXT("Login request failed")); // 요청 실패 로그
 		ShowLoginFailure();
 		return;
 	}
 	// 2. 서버로부터 받은 응답을 문자열로 가져옴
 	FString ResponseContent = Response->GetContentAsString();
-	UE_LOG(LogTemp , Log , TEXT("Login Response: %s") , *ResponseContent);  // 받은 응답을 로그로 출력
+	// UE_LOG(LogTemp , Log , TEXT("Login Response: %s") , *ResponseContent);  // 받은 응답을 로그로 출력
 
 	// 응답받은 헤더 로그출력(토큰 확인용)
 	TArray<FString> Headers = Response->GetAllHeaders();
-	UE_LOG(LogTemp , Log , TEXT("Response Headers:"));
+	// UE_LOG(LogTemp , Log , TEXT("Response Headers:"));
 	for ( const FString& Header : Headers )
 	{
-		UE_LOG(LogTemp , Log , TEXT("%s") , *Header);
+		// UE_LOG(LogTemp , Log , TEXT("%s") , *Header);
 	}
 
 	// 유저 토큰 헤더에서 값 따로 저장
@@ -186,17 +186,17 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 	if ( Response->GetHeader(TEXT("Authorization")).IsEmpty() == false )
 	{
 		AuthToken = Response->GetHeader(TEXT("Authorization"));
-		UE_LOG(LogTemp , Log , TEXT("Authorization Token: %s") , *AuthToken);
+		// UE_LOG(LogTemp , Log , TEXT("Authorization Token: %s") , *AuthToken);
 
 		// GameInstance에 토큰 저장
 		if ( UK_GameInstance* GameInstance = Cast<UK_GameInstance>(GetWorld()->GetGameInstance()) )
 		{
 			GameInstance->SetAuthToken(AuthToken);
-			UE_LOG(LogTemp , Log , TEXT("Auth Token saved to GameInstance"));
+			// UE_LOG(LogTemp , Log , TEXT("Auth Token saved to GameInstance"));
 		}
 	}
 	else {
-		UE_LOG(LogTemp , Warning , TEXT("Authorization header not found"));
+		// UE_LOG(LogTemp , Warning , TEXT("Authorization header not found"));
 	}
 
 	// 3. JSON 응답을 처리하기 위해 JSON 객체 생성
@@ -226,7 +226,7 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 				GameInstance->TravelMainLobbyMap(true); // true 인자를 통해 현재 사운드를 유지하며 이동
 			}
 			else {
-				UE_LOG(LogTemp , Error , TEXT("Failed to get GameInstance"));
+				// UE_LOG(LogTemp , Error , TEXT("Failed to get GameInstance"));
 				ShowLoginFailure();
 			}
 		}
@@ -235,14 +235,14 @@ void UK_LoginRegisterWidget::OnLoginResponse(FHttpRequestPtr Request , FHttpResp
 			FString errorMessage;
 			if ( JsonObject->TryGetStringField(TEXT("response") , errorMessage) )
 			{
-				UE_LOG(LogTemp , Warning , TEXT("Login Failed: %s") , *errorMessage);
+				// UE_LOG(LogTemp , Warning , TEXT("Login Failed: %s") , *errorMessage);
 				LoginMenu_txt_FailedMSG->SetText(FText::FromString(errorMessage));
 			}
 			ShowLoginFailure();
 		}
 	}
 	else {
-		UE_LOG(LogTemp , Warning , TEXT("Unexpected response format"));
+		// UE_LOG(LogTemp , Warning , TEXT("Unexpected response format"));
 		ShowLoginFailure();
 	}
 }
@@ -303,7 +303,7 @@ void UK_LoginRegisterWidget::OpenLoginMenu()
 
 	} , 1.0f , false);
 
-	UE_LOG(LogTemp , Log , TEXT("OpenLoginMenu called"));
+	// UE_LOG(LogTemp , Log , TEXT("OpenLoginMenu called"));
 }
 
 //계정생성 요청함수
@@ -326,7 +326,7 @@ void UK_LoginRegisterWidget::OnMyRegister()
 
 	if ( false == JsonObject.IsValid() )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Failed to Create JsonObject"))
+		// UE_LOG(LogTemp , Warning , TEXT("Failed to Create JsonObject"))
 	}
 
 	JsonObject->SetStringField("loginId" , RegisterUserID); // UserID 텍스트를 받아서 "user_id" 키에 저장
@@ -343,7 +343,7 @@ void UK_LoginRegisterWidget::OnMyRegister()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef() , Writer); // JSON 객체를 문자열로 변환하여 JsonPayload에 저장
 	if ( false == FJsonSerializer::Serialize(JsonObject.ToSharedRef() , Writer) )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Failed to serialize JSON object"));
+		// UE_LOG(LogTemp , Warning , TEXT("Failed to serialize JSON object"));
 		return;
 	}
 
@@ -377,14 +377,14 @@ void UK_LoginRegisterWidget::OnRegisterResponse(FHttpRequestPtr Request , FHttpR
 	// 1. 요청 성공과 응답성 유효에 대해 확인
 	if ( false == bWasSuccessful || false == Response.IsValid() )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("Register request failed")); // 요청 실패 로그
+		// UE_LOG(LogTemp , Warning , TEXT("Register request failed")); // 요청 실패 로그
 		ShowRegisterFailed();
 		return;
 	}
 
 	// 2. 서버로부터 받은 응답을 문자열로 가져옴
 	FString ResponseContent = Response->GetContentAsString();
-	UE_LOG(LogTemp , Log , TEXT("HTTP Response: %s") , *ResponseContent);  // 받은 응답을 로그로 출력
+	// UE_LOG(LogTemp , Log , TEXT("HTTP Response: %s") , *ResponseContent);  // 받은 응답을 로그로 출력
 
 	// 3. JSON 응답을 처리하기 위해 JSON 객체 생성
 	TSharedPtr<FJsonObject> JsonObject;
@@ -411,18 +411,18 @@ void UK_LoginRegisterWidget::OnRegisterResponse(FHttpRequestPtr Request , FHttpR
 				if ( JsonObject->TryGetStringField(TEXT("response") , errorMessage) )
 				{
 					RegisterMenu_txt_Failed->SetText(FText::FromString(errorMessage)); //계정생성 실패시, 에러메시지 출력
-					UE_LOG(LogTemp , Warning , TEXT("Register Failed: %s") , *errorMessage);
+					// UE_LOG(LogTemp , Warning , TEXT("Register Failed: %s") , *errorMessage);
 				}
 				ShowRegisterFailed();
 			}
 		}
 		else {
-			UE_LOG(LogTemp , Warning , TEXT("Unexpected response format"));
+			// UE_LOG(LogTemp , Warning , TEXT("Unexpected response format"));
 			ShowRegisterFailed();
 		}
 	}
 	else {
-		UE_LOG(LogTemp , Warning , TEXT("Failed to parse JSON response"));
+		// UE_LOG(LogTemp , Warning , TEXT("Failed to parse JSON response"));
 		ShowRegisterFailed();
 	}
 }
@@ -454,7 +454,7 @@ void UK_LoginRegisterWidget::ShowRegisterFailed()
 		if ( RegisterMenu_txt_Failed ) {
 			RegisterMenu_txt_Failed->SetVisibility(ESlateVisibility::Visible);
 		}
-		UE_LOG(LogTemp , Warning , TEXT("ShowRegisterFailureUI executed after delay"));
+		// UE_LOG(LogTemp , Warning , TEXT("ShowRegisterFailureUI executed after delay"));
 	} , 0.1f , false);
 }
 
