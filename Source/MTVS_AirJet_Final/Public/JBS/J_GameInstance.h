@@ -113,8 +113,8 @@ public:
 protected:
 	// 기본 ip
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Default|Values")
-	//FString defaultURL = TEXT("http://125.132.216.190:7757/api/");
-	FString defaultURL = TEXT("http://43.202.221.239/api/");
+	FString defaultURL = TEXT("http://125.132.216.190:7757/api/");
+	//FString defaultURL = TEXT("http://43.202.221.239/api/");
 
 	
 
